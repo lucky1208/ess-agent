@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>大庆管业储能系统电气接线图（10kV方案）</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;font-family:"Microsoft YaHei",sans-serif;padding:20px}
+h1{color:#e0e0ff;text-align:center;font-size:22px;margin-bottom:5px}
+h2{color:#8888cc;text-align:center;font-size:14px;margin-bottom:15px}
+.container{max-width:1200px;margin:0 auto}
+svg{width:100%;height:auto;display:block}
+.legend{color:#c0c0d0;font-size:11px;margin-top:10px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>大庆管业储能系统 — 一次接线图（10kV接入方案）</h1>
+<h2>GOTION GRID 5MWh + 1.25MW PCS | 10kV侧并网 | 2×1250kVA变压器</h2>
+
+<svg viewBox="0 0 1200 950" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<style>
+.w{stroke:#c0c0d0;stroke-width:2;fill:none}
+.wa{stroke:#e8a838;stroke-width:2.5;fill:none}
+.wd{stroke:#50c878;stroke-width:2.5;fill:none;stroke-dasharray:8,3}
+.wc{stroke:#6060a0;stroke-width:1;fill:none;stroke-dasharray:4,2}
+.lb{fill:#e0e0ff;font-size:11px;font-weight:bold}
+.ls{fill:#9090a0;font-size:9px}
+.lg{fill:#c0c0d0;font-size:10px}
+</style>
+<linearGradient id="bus10" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2a50a0"/><stop offset="50%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>
+</defs>
+
+<rect width="1200" height="950" fill="#0d1117"/>
+<pattern id="d" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>
+<rect width="1200" height="950" fill="url(#d)"/>
+
+<!-- ====== 10kV Incoming ====== -->
+<text x="200" y="30" class="lb" style="fill:#4a90d9" text-anchor="middle">国网10kV</text>
+<line x1="200" y1="38" x2="200" y2="65" class="wa" style="stroke:#4a90d9"/>
+
+<!-- PCC/计量 -->
+<rect x="140" y="65" width="120" height="35" rx="4" fill="#1a2a4a" stroke="#4a90d9" stroke-width="1.5"/>
+<text x="200" y="85" text-anchor="middle" class="ls" style="fill:#80b0e0">计量/PCC</text>
+<text x="200" y="95" text-anchor="middle" style="fill:#6090c0;font-size:7">PT+CT(电力局资产)</text>
+<line x1="200" y1="100" x2="200" y2="130" class="wa" style="stroke:#4a90d9"/>
+
+<!-- 防反送电边界 -->
+<rect x="120" y="55" width="580" height="90" rx="4" fill="none" stroke="#e8a838" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="410" y="52" style="fill:#e8a838;font-size:8">防反送电控制边界：PCC实时功率 &gt; 50~100kW时触发限功率</text>
+
+<!-- ====== 10kV Bus ====== -->
+<line x1="80" y1="130" x2="700" y2="130" stroke="url(#bus10)" stroke-width="7" stroke-linecap="round"/>
+<text x="390" y="122" text-anchor="middle" class="lb" style="fill:#80b0e0">厂内10kV母线</text>
+
+<!-- ====== 变压器1支路 ====== -->
+<line x1="250" y1="130" x2="250" y2="170" class="wa"/>
+<rect x="240" y="170" width="20" height="30" fill="#2a3050" stroke="#e8a838" stroke-width="1.5" rx="2"/>
+<text x="250" y="190" text-anchor="middle" class="ls" style="fill:#e0c060">QF1</text>
+<line x1="250" y1="200" x2="250" y2="230" class="wa"/>
+<!-- T1 -->
+<circle cx="250" cy="250" r="20" fill="#2a3050" stroke="#e8a838" stroke-width="2"/>
+<circle cx="250" cy="250" r="13" fill="none" stroke="#e8a838" stroke-width="1.5"/>
+<text x="250" y="253" text-anchor="middle" class="ls" style="fill:#e8a838">Y/Δ</text>
+<text x="290" y="242" class="lg" style="fill:#e8a838">1#T: S9-1250/10</text>
+<text x="290" y="256" class="ls" style="fill:#c09030">1250kVA 10/0.4kV Zk=4.3%</text>
+<line x1="250" y1="270" x2="250" y2="300" class="wa" style="stroke:#a070d0"/>
+<!-- QF3 LV breaker -->
+<rect x="240" y="300" width="20" height="20" fill="#2a3050" stroke="#a070d0" stroke-width="1.5" rx="2"/>
+<text x="250" y="315" text-anchor="middle" class="ls" style="fill:#c090e0">QF3</text>
+<line x1="250" y1="320" x2="250" y2="350" class="wa" style="stroke:#a070d0"/>
+<!-- Load 1 -->
+<rect x="185" y="350" width="130" height="50" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/>
+<text x="250" y="370" text-anchor="middle" class="lb" style="fill:#c090e0;font-size:10">0.4kV负荷1</text>
+<text x="250" y="388" text-anchor="middle" class="ls" style="fill:#8060a0">电机/加热器 ~500kW</text>
+
+<!-- ====== 变压器2支路 ====== -->
+<line x1="400" y1="130" x2="400" y2="170" class="wa"/>
+<rect x="390" y="170" width="20" height="30" fill="#2a3050" stroke="#e8a838" stroke-width="1.5" rx="2"/>
+<text x="400" y="190" text-anchor="middle" class="ls" style="fill:#e0c060">QF2</text>
+<line x1="400" y1="200" x2="400" y2="230" class="wa"/>
+<circle cx="400" cy="250" r="20" fill="#2a3050" stroke="#e8a838" stroke-width="2"/>
+<circle cx="400" cy="250" r="13" fill="none" stroke="#e8a838" stroke-width="1.5"/>
+<text x="400" y="253" text-anchor="middle" class="ls" style="fill:#e8a838">Y/Δ</text>
+<text x="440" y="242" class="lg" style="fill:#e8a838">2#T: S9-1250/10</text>
+<text x="440" y="256" class="ls" style="fill:#c09030">1250kVA 10/0.4kV</text>
+<line x1="400" y1="270" x2="400" y2="300" class="wa" style="stroke:#a070d0"/>
+<rect x="390" y="300" width="20" height="20" fill="#2a3050" stroke="#a070d0" stroke-width="1.5" rx="2"/>
+<text x="400" y="315" text-anchor="middle" class="ls" style="fill:#c090e0">QF4</text>
+<line x1="400" y1="320" x2="400" y2="350" class="wa" style="stroke:#a070d0"/>
+<rect x="335" y="350" width="130" height="50" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/>
+<text x="400" y="370" text-anchor="middle" class="lb" style="fill:#c090e0;font-size:10">0.4kV负荷2</text>
+<text x="400" y="388" text-anchor="middle" class="ls" style="fill:#8060a0">辅助/产线 ~300kW</text>
+
+<!-- ====================================================== -->
+<!-- ====== 储能支路 (10kV侧) ====== -->
+<!-- ====================================================== -->
+<line x1="580" y1="130" x2="580" y2="165" class="wa" style="stroke:#50c878"/>
+
+<!-- 储能10kV并网柜 -->
+<rect x="510" y="165" width="140" height="55" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="2"/>
+<text x="580" y="185" text-anchor="middle" style="fill:#80e080;font-size:11;font-weight:bold">储能10kV并网柜</text>
+<text x="580" y="200" text-anchor="middle" class="ls" style="fill:#60a060">断路器+继保</text>
+<text x="580" y="213" text-anchor="middle" class="ls" style="fill:#508050;font-size:7">过流/速断/接地/防孤岛</text>
+
+<!-- 继保建议注释 -->
+<rect x="660" y="165" width="130" height="50" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>
+<text x="725" y="182" text-anchor="middle" style="fill:#a0a0ff;font-size:9;font-weight:bold">继保要求</text>
+<text x="725" y="196" text-anchor="middle" class="ls" style="fill:#8080c0">并网柜必须可见可断</text>
+<text x="725" y="208" text-anchor="middle" class="ls" style="fill:#8080c0">逆功率+EMS双闭环</text>
+<line x1="660" y1="190" x2="650" y2="190" class="wc"/>
+
+<line x1="580" y1="220" x2="580" y2="260" class="wa" style="stroke:#50c878"/>
+
+<!-- 升压变 0.69/10kV -->
+<circle cx="580" cy="280" r="22" fill="#2a3020" stroke="#e8a838" stroke-width="2"/>
+<circle cx="580" cy="280" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/>
+<text x="580" y="283" text-anchor="middle" class="ls" style="fill:#e8a838">0.69/10</text>
+<text x="620" y="272" class="lg" style="fill:#e8a838">升压变</text>
+<text x="620" y="286" class="ls" style="fill:#c09030">干式 ~1.6MVA</text>
+<text x="620" y="298" class="ls" style="fill:#c09030">独立配置(谐波隔离)</text>
+<line x1="580" y1="302" x2="580" y2="330" class="wa" style="stroke:#e8a838"/>
+
+<!-- AC柜 -->
+<rect x="520" y="330" width="120" height="35" rx="4" fill="#2a2020" stroke="#e06070" stroke-width="1.5"/>
+<text x="580" y="348" text-anchor="middle" style="fill:#ff8090;font-size:10;font-weight:bold">AC柜(0.69kV)</text>
+<text x="580" y="360" text-anchor="middle" class="ls" style="fill:#c06070">计量/隔离</text>
+<line x1="580" y1="365" x2="580" y2="395" class="wa" style="stroke:#e06070"/>
+
+<!-- PCS 1.25MW -->
+<rect x="490" y="395" width="180" height="65" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/>
+<text x="580" y="418" text-anchor="middle" style="fill:white;font-size:12;font-weight:bold">PCS</text>
+<text x="580" y="436" text-anchor="middle" class="ls" style="fill:#ffc0c0;font-size:10">1.25MW 集中式</text>
+<text x="580" y="450" text-anchor="middle" class="ls" style="fill:#c06070;font-size:9">AC690V↔DC1331.2V ≥97%</text>
+
+<!-- 直流安全注释 -->
+<rect x="690" y="400" width="120" height="45" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>
+<text x="750" y="418" text-anchor="middle" style="fill:#a0a0ff;font-size:9;font-weight:bold">直流安全</text>
+<text x="750" y="432" text-anchor="middle" class="ls" style="fill:#8080c0">绝缘监测</text>
+<text x="750" y="443" text-anchor="middle" class="ls" style="fill:#8080c0">接触器+BMS联动</text>
+<line x1="690" y1="425" x2="670" y2="425" class="wc"/>
+
+<!-- DC cable -->
+<line x1="580" y1="460" x2="580" y2="500" class="wd"/>
+<text x="620" y="485" style="fill:#50c878;font-size:8">YJV-1.5kV DC1331.2V</text>
+
+<!-- DC disconnect -->
+<rect x="570" y="500" width="20" height="18" fill="#2a2a50" stroke="#50c878" stroke-width="1.5" rx="2"/>
+<text x="580" y="513" text-anchor="middle" class="ls" style="fill:#80e080">DS</text>
+<line x1="580" y1="518" x2="580" y2="545" class="wd"/>
+
+<!-- BESS 5MWh -->
+<rect x="460" y="545" width="240" height="100" rx="8" fill="#0d2a15" stroke="#50c878" stroke-width="2"/>
+<text x="580" y="570" text-anchor="middle" style="fill:#80e080;font-size:13;font-weight:bold">GOTION GRID 5MWh</text>
+<text x="580" y="590" text-anchor="middle" class="lg" style="fill:#60c060">ESD1331-05P5015</text>
+<text x="580" y="607" text-anchor="middle" class="ls" style="fill:#408040">5015.9kWh / 1331.2V / LFP-314Ah</text>
+<text x="580" y="622" text-anchor="middle" class="ls" style="fill:#408040">液冷/IP55/20ft/≈44t</text>
+<text x="580" y="637" text-anchor="middle" class="ls" style="fill:#308030;font-size:7">BMS三级+PACK浸没+气体+水消防</text>
+
+<!-- BMS box -->
+<rect x="710" y="570" width="90" height="40" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>
+<text x="755" y="588" text-anchor="middle" class="ls" style="fill:#8080c0">BMS三级</text>
+<text x="755" y="603" text-anchor="middle" class="ls" style="fill:#6060a0;font-size:7">电芯→簇→系统</text>
+<line x1="700" y1="590" x2="710" y2="590" class="wc"/>
+
+<!-- ====== EMS Controller ====== -->
+<rect x="850" y="165" width="160" height="180" rx="8" fill="#151530" stroke="#6060a0" stroke-width="1.5"/>
+<text x="930" y="190" text-anchor="middle" style="fill:#a0a0ff;font-size:11;font-weight:bold">EMS能量管理</text>
+<line x1="865" y1="200" x2="995" y2="200" stroke="#3a3a5e" stroke-width="1"/>
+<text x="930" y="220" text-anchor="middle" class="ls" style="fill:#8080c0">● 峰谷自动调度</text>
+<text x="930" y="240" text-anchor="middle" class="ls" style="fill:#8080c0">● PCC功率实时监测</text>
+<text x="930" y="260" text-anchor="middle" class="ls" style="fill:#8080c0">● 防逆流双闭环</text>
+<text x="930" y="280" text-anchor="middle" class="ls" style="fill:#8080c0">  软件限功率+硬件兜底</text>
+<text x="930" y="300" text-anchor="middle" class="ls" style="fill:#8080c0">● SOC保护管理</text>
+<text x="930" y="320" text-anchor="middle" class="ls" style="fill:#8080c0">● 防孤岛保护联锁</text>
+<text x="930" y="340" text-anchor="middle" class="ls" style="fill:#8080c0">● 远程监控+告警</text>
+
+<!-- EMS connections -->
+<line x1="850" y1="230" x2="650" y2="185" class="wc"/>
+<line x1="850" y1="270" x2="670" y2="280" class="wc"/>
+<line x1="850" y1="300" x2="700" y2="580" class="wc"/>
+<text x="770" y="240" style="fill:#6060a0;font-size:7" transform="rotate(-20,770,240)">PCC功率采集</text>
+<text x="775" y="285" style="fill:#6060a0;font-size:7" transform="rotate(-5,775,285)">RS485/CAN</text>
+
+<!-- ====== Cable Schedule ====== -->
+<rect x="60" y="430" width="380" height="220" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>
+<text x="250" y="455" text-anchor="middle" style="fill:#a0a0ff;font-size:11;font-weight:bold">电缆与设备清单</text>
+<line x1="70" y1="465" x2="430" y2="465" stroke="#2a2a3e" stroke-width="1"/>
+
+<text x="75" y="485" class="ls" style="fill:#e8a838">10kV并网柜:</text>
+<text x="180" y="485" class="ls" style="fill:#c0c0d0">KYN28A-12 10kV真空断路器柜</text>
+<text x="75" y="505" class="ls" style="fill:#e8a838">升压变:</text>
+<text x="180" y="505" class="ls" style="fill:#c0c0d0">SC10-1600/10 0.69/10kV 干式</text>
+<text x="75" y="525" class="ls" style="fill:#e06070">PCS:</text>
+<text x="180" y="525" class="ls" style="fill:#c0c0d0">1.25MW 集中式 AC690V</text>
+<text x="75" y="545" class="ls" style="fill:#50c878">AC电缆:</text>
+<text x="180" y="545" class="ls" style="fill:#c0c0d0">YJV-0.6/1kV-3×185+1×95 PCS至升压变</text>
+<text x="75" y="565" class="ls" style="fill:#50c878">DC电缆:</text>
+<text x="180" y="565" class="ls" style="fill:#c0c0d0">YJV-1.5kV-1×400 PCS至电池舱</text>
+<text x="75" y="585" class="ls" style="fill:#50c878">10kV电缆:</text>
+<text x="180" y="585" class="ls" style="fill:#c0c0d0">YJV22-8.7/15kV-3×50 并网柜至母线</text>
+<text x="75" y="605" class="ls" style="fill:#6060a0">通讯:</text>
+<text x="180" y="605" class="ls" style="fill:#c0c0d0">光缆4芯+RS485屏蔽电缆</text>
+<text x="75" y="625" class="ls" style="fill:#6060a0">接地:</text>
+<text x="180" y="625" class="ls" style="fill:#c0c0d0">TN-S系统 铜排独立PE</text>
+<text x="75" y="645" class="ls" style="fill:#d0d040">计量:</text>
+<text x="180" y="645" class="ls" style="fill:#c0c0d0">PCC处0.5S级双向表+储能侧计量</text>
+
+<!-- ====== Protection Config ====== -->
+<rect x="60" y="670" width="380" height="140" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>
+<text x="250" y="695" text-anchor="middle" style="fill:#e06060;font-size:11;font-weight:bold">保护配置</text>
+<line x1="70" y1="705" x2="430" y2="705" stroke="#2a2a3e" stroke-width="1"/>
+<text x="75" y="725" class="ls" style="fill:#e06060">● 并网柜: 过流/速断/接地/防孤岛保护</text>
+<text x="75" y="745" class="ls" style="fill:#e06060">● 升压变独立配置: 谐波隔离,减少故障耦合</text>
+<text x="75" y="765" class="ls" style="fill:#e06060">● 逆功率保护: PCC功率&gt;阈值时限功率/停机</text>
+<text x="75" y="785" class="ls" style="fill:#e06060">● EMS双闭环: 软件限功率+硬件保护兜底</text>
+<text x="75" y="805" class="ls" style="fill:#e06060">● BMS: SOC&lt;5%强制断开/温度保护/绝缘监测</text>
+
+<!-- ====== 10kV advantage callout ====== -->
+<rect x="850" y="400" width="160" height="155" rx="6" fill="#0d1a10" stroke="#50c878" stroke-width="1"/>
+<text x="930" y="420" text-anchor="middle" style="fill:#80e080;font-size:10;font-weight:bold">10kV方案关键优势</text>
+<line x1="860" y1="428" x2="1000" y2="428" stroke="#205020" stroke-width="1"/>
+<text x="865" y="448" class="ls" style="fill:#60c060">✓ 不占用变压器容量</text>
+<text x="865" y="468" class="ls" style="fill:#60c060">✓ 充电不经变压器</text>
+<text x="865" y="488" class="ls" style="fill:#60c060">✓ 全厂削峰覆盖</text>
+<text x="865" y="508" class="ls" style="fill:#60c060">✓ 容量校核简单</text>
+<text x="865" y="528" class="ls" style="fill:#60c060">✓ 保护配置清晰</text>
+<text x="865" y="548" class="ls" style="fill:#60c060">✓ 谐波隔离(升压变)</text>
+
+<!-- ====== Voltage level markers ====== -->
+<rect x="60" y="860" width="1080" height="55" rx="4" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>
+<text x="580" y="882" text-anchor="middle" style="fill:#8888cc;font-size:10;font-weight:bold">电压等级</text>
+<text x="160" y="905" text-anchor="middle" class="ls" style="fill:#4a90d9">10kV (并网/母线)</text>
+<text x="380" y="905" text-anchor="middle" class="ls" style="fill:#e8a838">0.4kV (负荷侧)</text>
+<text x="600" y="905" text-anchor="middle" class="ls" style="fill:#e06070">0.69kV (PCS交流侧)</text>
+<text x="820" y="905" text-anchor="middle" class="ls" style="fill:#50c878">DC1331.2V (电池侧)</text>
+<text x="1020" y="905" text-anchor="middle" class="ls" style="fill:#6060a0">通讯(RS485/CAN)</text>
+
+<!-- Note -->
+<text x="600" y="840" text-anchor="middle" style="fill:#606080;font-size:8">一次接线为方案级示意；保护定值、接地方式、柜型与二次回路需由有资质设计单位出图</text>
+
+</svg>
+
+<div class="legend">
+<div class="legend-item" style="color:#e8a838">━━ AC交流回路</div>
+<div class="legend-item" style="color:#50c878">╌╌ DC直流回路</div>
+<div class="legend-item" style="color:#6060a0">┈┈ 控制通讯</div>
+<div class="legend-item" style="color:#a070d0">■ 负荷回路</div>
+<div class="legend-item" style="color:#e06070">■ 储能支路</div>
+</div>
+
+</div>
+</body>
+</html>

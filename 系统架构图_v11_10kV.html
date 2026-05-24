@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>大庆管业储能系统架构图（10kV接入方案）</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;font-family:"Microsoft YaHei",sans-serif;padding:20px}
+h1{color:#e0e0ff;text-align:center;font-size:22px;margin-bottom:5px}
+h2{color:#8888cc;text-align:center;font-size:14px;margin-bottom:15px}
+.container{max-width:1100px;margin:0 auto}
+svg{width:100%;height:auto;display:block}
+.legend{color:#c0c0d0;font-size:11px;margin-top:10px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-dot{width:14px;height:14px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>大庆管业储能系统架构图（修正版）</h1>
+<h2>10kV侧接入方案 — 储能接在电表后、变压器前</h2>
+
+<svg viewBox="0 0 1100 800" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="gGrid" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>
+<linearGradient id="gTrans" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#e8a838"/><stop offset="100%" style="stop-color:#c07820"/></linearGradient>
+<linearGradient id="gESS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#50c878"/><stop offset="100%" style="stop-color:#309858"/></linearGradient>
+<linearGradient id="gPCS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#e06070"/><stop offset="100%" style="stop-color:#b04050"/></linearGradient>
+<linearGradient id="gLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#a070d0"/><stop offset="100%" style="stop-color:#7040a0"/></linearGradient>
+<linearGradient id="gBus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#606080"/><stop offset="50%" style="stop-color:#8080a0"/><stop offset="100%" style="stop-color:#606080"/></linearGradient>
+<filter id="sh"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/></filter>
+<marker id="aB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#4a90d9"/></marker>
+<marker id="aO" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e8a838"/></marker>
+<marker id="aG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#50c878"/></marker>
+<marker id="aR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e06070"/></marker>
+</defs>
+
+<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>
+<rect width="1100" height="800" fill="url(#dot)"/>
+
+<!-- ===== 国网10kV ===== -->
+<rect x="350" y="20" width="400" height="55" rx="8" fill="url(#gGrid)" filter="url(#sh)"/>
+<text x="550" y="42" text-anchor="middle" fill="white" font-size="14" font-weight="bold">国网10kV电源</text>
+<text x="550" y="62" text-anchor="middle" fill="#c0d0ff" font-size="10">国网黑龙江大庆供电公司</text>
+
+<!-- ===== 计量/PCC ===== -->
+<line x1="550" y1="75" x2="550" y2="100" stroke="#4a90d9" stroke-width="3" marker-end="url(#aB)"/>
+<rect x="420" y="100" width="260" height="55" rx="8" fill="#1a2a4a" filter="url(#sh)" stroke="#4a90d9" stroke-width="1.5"/>
+<text x="550" y="122" text-anchor="middle" fill="#80b0e0" font-size="13" font-weight="bold">计量 / PCC</text>
+<text x="550" y="142" text-anchor="middle" fill="#6090c0" font-size="10">电表 + PT/CT（电力局资产，不需改造）</text>
+
+<!-- 防反送电边界（虚线框） -->
+<rect x="300" y="90" width="600" height="120" rx="6" fill="none" stroke="#e8a838" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="600" y="88" fill="#e8a838" font-size="10">防反送电控制边界：PCC实时功率 &gt; 50~100kW 时限功率</text>
+
+<!-- ===== 厂内10kV母线 ===== -->
+<line x1="550" y1="155" x2="550" y2="180" stroke="#4a90d9" stroke-width="3" marker-end="url(#aB)"/>
+<rect x="100" y="180" width="900" height="40" rx="4" fill="url(#gBus)" filter="url(#sh)"/>
+<text x="550" y="205" text-anchor="middle" fill="white" font-size="13" font-weight="bold">厂内10kV母线（用户侧）</text>
+
+<!-- ===== 变压器1支路 ===== -->
+<line x1="300" y1="220" x2="300" y2="260" stroke="#e8a838" stroke-width="3" marker-end="url(#aO)"/>
+<rect x="200" y="260" width="200" height="70" rx="8" fill="url(#gTrans)" filter="url(#sh)"/>
+<text x="300" y="283" text-anchor="middle" fill="white" font-size="12" font-weight="bold">1# 变压器</text>
+<text x="300" y="300" text-anchor="middle" fill="#fff0d0" font-size="10">S9-1250/10</text>
+<text x="300" y="318" text-anchor="middle" fill="#fff0d0" font-size="9">1250kVA 10/0.4kV Dyn11</text>
+<line x1="300" y1="330" x2="300" y2="370" stroke="#a070d0" stroke-width="3" marker-end="url(#aB)"/>
+<rect x="210" y="370" width="180" height="65" rx="8" fill="url(#gLoad)" filter="url(#sh)"/>
+<text x="300" y="393" text-anchor="middle" fill="white" font-size="11" font-weight="bold">0.4kV负荷1</text>
+<text x="300" y="410" text-anchor="middle" fill="#e0c0ff" font-size="10">电机/加热器 ~500kW</text>
+<text x="300" y="425" text-anchor="middle" fill="#e0c0ff" font-size="9">24h运行</text>
+
+<!-- ===== 变压器2支路 ===== -->
+<line x1="480" y1="220" x2="480" y2="260" stroke="#e8a838" stroke-width="3" marker-end="url(#aO)"/>
+<rect x="380" y="260" width="200" height="70" rx="8" fill="url(#gTrans)" filter="url(#sh)"/>
+<text x="480" y="283" text-anchor="middle" fill="white" font-size="12" font-weight="bold">2# 变压器</text>
+<text x="480" y="300" text-anchor="middle" fill="#fff0d0" font-size="10">S9-1250/10</text>
+<text x="480" y="318" text-anchor="middle" fill="#fff0d0" font-size="9">1250kVA 10/0.4kV Dyn11</text>
+<line x1="480" y1="330" x2="480" y2="370" stroke="#a070d0" stroke-width="3" marker-end="url(#aB)"/>
+<rect x="390" y="370" width="180" height="65" rx="8" fill="url(#gLoad)" filter="url(#sh)"/>
+<text x="480" y="393" text-anchor="middle" fill="white" font-size="11" font-weight="bold">0.4kV负荷2</text>
+<text x="480" y="410" text-anchor="middle" fill="#e0c0ff" font-size="10">辅助/产线 ~300kW</text>
+<text x="480" y="425" text-anchor="middle" fill="#e0c0ff" font-size="9">部分24h+部分10h</text>
+
+<!-- ===== 储能支路（10kV接入）===== -->
+<line x1="750" y1="220" x2="750" y2="265" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>
+
+<!-- 储能10kV并网柜 -->
+<rect x="650" y="265" width="200" height="55" rx="8" fill="#1a2a1a" filter="url(#sh)" stroke="#50c878" stroke-width="2"/>
+<text x="750" y="288" text-anchor="middle" fill="#80e080" font-size="12" font-weight="bold">储能10kV并网柜</text>
+<text x="750" y="308" text-anchor="middle" fill="#60a060" font-size="10">断路器+继保(过流/速断/接地/防孤岛)</text>
+
+<!-- 升压变 -->
+<line x1="750" y1="320" x2="750" y2="355" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>
+<rect x="650" y="355" width="200" height="55" rx="8" fill="#2a3020" filter="url(#sh)" stroke="#e8a838" stroke-width="1.5"/>
+<text x="750" y="378" text-anchor="middle" fill="#e8a838" font-size="12" font-weight="bold">升压变压器</text>
+<text x="750" y="398" text-anchor="middle" fill="#c09030" font-size="10">0.69/10kV 干式变压器 ~1.6MVA</text>
+
+<!-- AC柜 -->
+<line x1="750" y1="410" x2="750" y2="440" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>
+<rect x="665" y="440" width="170" height="40" rx="6" fill="#2a2020" filter="url(#sh)" stroke="#e06070" stroke-width="1"/>
+<text x="750" y="458" text-anchor="middle" fill="#ff8090" font-size="11" font-weight="bold">AC柜 (计量/隔离)</text>
+<text x="750" y="473" text-anchor="middle" fill="#c06070" font-size="9">0.69kV侧</text>
+
+<!-- PCS -->
+<line x1="750" y1="480" x2="750" y2="505" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>
+<rect x="640" y="505" width="220" height="65" rx="8" fill="url(#gPCS)" filter="url(#sh)"/>
+<text x="750" y="528" text-anchor="middle" fill="white" font-size="13" font-weight="bold">PCS 功率变换系统</text>
+<text x="750" y="548" text-anchor="middle" fill="#ffc0c0" font-size="11">1.25MW 集中式</text>
+<text x="750" y="563" text-anchor="middle" fill="#ffc0c0" font-size="10">AC 690V ↔ DC 1331.2V | 并网P/Q+离网V/F</text>
+
+<!-- DC cable -->
+<line x1="750" y1="570" x2="750" y2="600" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3" marker-end="url(#aG)"/>
+<text x="870" y="590" fill="#50c878" font-size="9">DC 1331.2V</text>
+
+<!-- 5MWh Battery -->
+<rect x="600" y="600" width="300" height="110" rx="8" fill="url(#gESS)" filter="url(#sh)"/>
+<text x="750" y="625" text-anchor="middle" fill="white" font-size="14" font-weight="bold">GOTION GRID 5MWh</text>
+<text x="750" y="645" text-anchor="middle" fill="#c0ffc0" font-size="11">ESD1331-05P5015</text>
+<text x="750" y="665" text-anchor="middle" fill="#c0ffc0" font-size="10">5015.9kWh / 1331.2V / LFP-314Ah</text>
+<text x="750" y="682" text-anchor="middle" fill="#90d090" font-size="9">液冷/IP55/20ft/≈44t</text>
+<text x="750" y="698" text-anchor="middle" fill="#90d090" font-size="9">BMS三级 + PACK浸没+气体+水消防</text>
+
+<!-- ===== EMS ===== -->
+<rect x="920" y="265" width="160" height="180" rx="8" fill="#151530" filter="url(#sh)" stroke="#6060a0" stroke-width="1.5"/>
+<text x="1000" y="290" text-anchor="middle" fill="#a0a0ff" font-size="12" font-weight="bold">EMS能量管理</text>
+<line x1="935" y1="300" x2="1065" y2="300" stroke="#3a3a5e" stroke-width="1"/>
+<text x="1000" y="320" text-anchor="middle" fill="#8080c0" font-size="10">● 峰谷时段自动调度</text>
+<text x="1000" y="340" text-anchor="middle" fill="#8080c0" font-size="10">● 防逆流双闭环控制</text>
+<text x="1000" y="360" text-anchor="middle" fill="#8080c0" font-size="10">● PCC功率实时监测</text>
+<text x="1000" y="380" text-anchor="middle" fill="#8080c0" font-size="10">● SOC保护管理</text>
+<text x="1000" y="400" text-anchor="middle" fill="#8080c0" font-size="10">● 防孤岛保护联锁</text>
+<text x="1000" y="420" text-anchor="middle" fill="#8080c0" font-size="10">● 远程监控+告警</text>
+<text x="1000" y="440" text-anchor="middle" fill="#8080c0" font-size="10">● 软件限功率+硬件兜底</text>
+
+<!-- EMS dashed connections -->
+<line x1="920" y1="350" x2="850" y2="290" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>
+<line x1="920" y1="380" x2="860" y2="530" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>
+<line x1="920" y1="410" x2="900" y2="640" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>
+<!-- EMS to PCC measurement -->
+<line x1="920" y1="300" x2="680" y2="127" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>
+<text x="820" y="195" fill="#6060a0" font-size="8" transform="rotate(-30,820,195)">PCC功率采集</text>
+
+<!-- ===== 时段 & 经济性信息框 ===== -->
+<rect x="60" y="470" width="400" height="200" rx="8" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>
+<text x="260" y="495" text-anchor="middle" fill="#a0a0ff" font-size="12" font-weight="bold">充放电策略与经济性</text>
+<line x1="70" y1="505" x2="450" y2="505" stroke="#2a2a3e" stroke-width="1"/>
+
+<text x="75" y="525" fill="#50c878" font-size="10" font-weight="bold">谷段充电: 23:30-05:30</text>
+<text x="75" y="542" fill="#50c878" font-size="9">  PCS整流 1.25MW×6h≈满(DoD95%)  电价≈0.441元</text>
+<text x="75" y="562" fill="#e06070" font-size="10" font-weight="bold">峰段放电: 7-8,9-11:30,15:30-20</text>
+<text x="75" y="579" fill="#e06070" font-size="9">  PCS逆变 ≤1.25MW  电价≈0.833元  峰谷差≈0.392元</text>
+<text x="75" y="599" fill="#e8a838" font-size="10" font-weight="bold">PCS降为1.25MW的影响:</text>
+<text x="75" y="616" fill="#e8a838" font-size="9">  5MWh/1.25MW = 4C·h 充放需~4h</text>
+<text x="75" y="633" fill="#e8a838" font-size="9">  峰段8h放电≈4750kWh/日(满足需求)</text>
+<text x="75" y="655" fill="#a0a0ff" font-size="10" font-weight="bold">年节省≈50~55万元  回收期≈8~9年</text>
+
+<!-- ===== 10kV方案优势标注 ===== -->
+<rect x="60" y="260" width="130" height="130" rx="6" fill="#0d1a10" stroke="#50c878" stroke-width="1"/>
+<text x="125" y="280" text-anchor="middle" fill="#80e080" font-size="10" font-weight="bold">10kV方案优势</text>
+<text x="70" y="298" fill="#60c060" font-size="9">✓ 不占变压器容量</text>
+<text x="70" y="315" fill="#60c060" font-size="9">✓ 充电不经过变压器</text>
+<text x="70" y="332" fill="#60c060" font-size="9">✓ 全厂削峰覆盖</text>
+<text x="70" y="349" fill="#60c060" font-size="9">✓ 容量校核简单</text>
+<text x="70" y="366" fill="#60c060" font-size="9">✓ 保护配置清晰</text>
+<text x="70" y="383" fill="#60c060" font-size="9">✓ 谐波隔离</text>
+
+<!-- ===== 核心标注 ===== -->
+<text x="750" y="245" text-anchor="middle" fill="#50c878" font-size="10" font-weight="bold">储能支路（用户侧闭环运行）</text>
+<text x="300" y="245" text-anchor="middle" fill="#e8a838" font-size="10">10kV</text>
+<text x="480" y="245" text-anchor="middle" fill="#e8a838" font-size="10">10kV</text>
+
+<!-- annotation: 0.69kV -->
+<text x="860" y="380" fill="#e8a838" font-size="9">0.69kV↔10kV</text>
+
+</svg>
+
+<div class="legend">
+<div class="legend-item"><div class="legend-dot" style="background:#4a90d9"></div>国网/计量</div>
+<div class="legend-item"><div class="legend-dot" style="background:#e8a838"></div>变压器</div>
+<div class="legend-item"><div class="legend-dot" style="background:#50c878"></div>储能支路</div>
+<div class="legend-item"><div class="legend-dot" style="background:#e06070"></div>PCS/AC柜</div>
+<div class="legend-item"><div class="legend-dot" style="background:#a070d0"></div>工厂负荷</div>
+<div class="legend-item"><div class="legend-dot" style="background:#6060a0"></div>EMS控制</div>
+</div>
+
+</div>
+</body>
+</html>

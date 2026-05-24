@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>储能系统方案智能体 ESS Agent</title>
+<style>
+:root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg1);color:var(--text1);line-height:1.6;min-height:100vh}
+a{color:var(--blue);text-decoration:none}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:#3a3e45;border-radius:3px}
+.header{background:linear-gradient(135deg,#0C447C 0%,#1A3A5C 100%);padding:20px 32px;border-bottom:1px solid var(--border)}
+.header h1{font-size:22px;font-weight:600;margin-bottom:4px}
+.header p{color:var(--text2);font-size:13px}
+.nav-tabs{display:flex;gap:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px}
+.nav-tab{padding:14px 22px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .3s;font-size:14px}
+.nav-tab:hover{color:var(--text1)}
+.nav-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.main-container{display:grid;grid-template-columns:380px 1fr;min-height:calc(100vh - 110px)}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:20px;overflow-y:auto}
+.sec-title{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text1);display:flex;align-items:center;gap:8px}
+.sec-title svg{width:18px;height:18px;color:var(--blue)}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px}
+.form-input{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:13px;transition:border-color .3s}
+.form-input:focus{outline:none;border-color:var(--blue)}
+.form-input::placeholder{color:#666}
+select.form-input{appearance:auto}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .3s;width:100%}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:#1A4A8A}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#0A5A46}
+.btn-secondary{background:var(--bg3);color:var(--text1);border:1px solid var(--border)}
+.btn-warn{background:var(--orange);color:#fff}
+.content{padding:24px;overflow-y:auto}
+.tab-content{display:none}.tab-content.active{display:block}
+.filter-bar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.filter-btn{padding:7px 15px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text2);font-size:12px;cursor:pointer;transition:all .3s}
+.filter-btn:hover{border-color:var(--blue);color:var(--text1)}
+.filter-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.device-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:28px}
+.device-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;transition:all .3s;cursor:pointer}
+.device-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+.device-card.selected{border-color:var(--green);box-shadow:0 0 0 2px rgba(15,110,86,.2)}
+.dev-img-wrap{width:100%;height:160px;overflow:hidden;border-radius:6px;margin-bottom:10px;background:linear-gradient(135deg,rgba(24,111,165,.08) 0%,rgba(15,110,86,.08) 100%);display:flex;align-items:center;justify-content:center}
+.dev-img-wrap img{max-width:100%;max-height:100%;object-fit:contain;transition:transform .3s}
+.device-card:hover .dev-img-wrap img{transform:scale(1.05)}
+.dev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.dev-name{font-size:14px;font-weight:600;color:var(--text1)}
+.dev-model{font-size:11px;color:var(--text2);margin-top:3px}
+.dev-badge{padding:3px 9px;border-radius:12px;font-size:10px;font-weight:500;white-space:nowrap}
+.badge-green{background:rgba(15,110,86,.2);color:var(--green)}
+.badge-blue{background:rgba(24,95,165,.2);color:var(--blue)}
+.badge-purple{background:rgba(83,74,183,.2);color:var(--purple)}
+.badge-orange{background:rgba(239,159,39,.2);color:var(--orange)}
+.badge-red{background:rgba(224,96,112,.15);color:var(--red)}
+.detail-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.detail-modal.show{display:flex;align-items:center;justify-content:center}
+.detail-content{background:var(--bg2);border:1px solid var(--border);border-radius:12px;width:90%;max-width:800px;max-height:85vh;overflow-y:auto;padding:24px;position:relative}
+.detail-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.detail-close:hover{color:var(--text1);background:var(--bg1)}
+.detail-img{width:100%;max-height:300px;object-fit:contain;border-radius:8px;background:var(--bg3);margin-bottom:16px}
+.detail-name{font-size:20px;font-weight:700;margin-bottom:4px}
+.detail-model{font-size:13px;color:var(--text2);margin-bottom:16px}
+.detail-specs{background:var(--bg3);border-radius:8px;padding:16px;font-size:12px;line-height:1.7;white-space:pre-wrap;color:var(--text2);max-height:400px;overflow-y:auto}
+.detail-specs b{color:var(--text1)}
+.dev-specs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.spec-item{padding:3px 7px;background:var(--bg2);border-radius:4px;font-size:10px;color:var(--text2)}
+.dev-features{display:flex;flex-wrap:wrap;gap:5px}
+.feature-tag{padding:2px 7px;background:rgba(239,159,39,.12);border-radius:4px;font-size:10px;color:var(--orange)}
+.diagram-container{background:var(--bg2);border-radius:8px;padding:20px;margin-bottom:20px}
+.diagram-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.diagram-title{font-size:15px;font-weight:600}
+.diagram-actions{display:flex;gap:8px}
+.diagram-actions button{padding:5px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:11px;cursor:pointer;transition:all .3s}
+.diagram-actions button:hover{background:var(--bg1);color:var(--text1)}
+.diagram-svg{background:var(--bg3);border-radius:8px;padding:14px;border:1px solid var(--border);overflow:auto}
+.diagram-svg svg{width:100%;height:auto;display:block}
+.case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.case-card{background:var(--bg3);border-radius:8px;overflow:hidden;border:1px solid var(--border);transition:all .3s}
+.case-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.case-img{width:100%;height:160px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.case-img img{width:100%;height:100%;object-fit:cover}
+.case-body{padding:14px}
+.case-title{font-size:14px;font-weight:600;margin-bottom:6px}
+.case-desc{font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5}
+.case-tags{display:flex;gap:5px;flex-wrap:wrap}
+.case-tag{padding:2px 7px;border-radius:4px;font-size:10px}
+.result-panel{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:20px;margin-top:18px}
+.result-panel h3{font-size:15px;color:var(--blue);margin-bottom:14px}
+.result-table{width:100%;border-collapse:collapse;font-size:11px;margin:10px 0}
+.result-table th{background:var(--bg2);padding:7px 10px;text-align:left;color:var(--blue);border:1px solid var(--border)}
+.result-table td{padding:5px 10px;border:1px solid var(--border)}
+.doc-output{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px;font-size:12px;line-height:1.8;white-space:pre-wrap;max-height:600px;overflow:auto;color:var(--text1);font-family:'Cascadia Code','Fira Code',monospace}
+.acc-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:20px}
+.acc-section h3{font-size:15px;color:var(--green);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .4s ease forwards}
+.success-msg{background:rgba(15,110,86,.12);border:1px solid var(--green);border-radius:6px;padding:10px 14px;margin-bottom:14px;display:none;font-size:13px;color:var(--green)}
+.success-msg.show{display:block}
+@media(max-width:1200px){.main-container{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}}
+</style>
+</head>
+<body>
+
+<header class="header">
+<h1>储能系统方案智能体 ESS Agent</h1>
+<p>开源、可配置的工商业储能系统方案设计工具 — 输入参数，自动匹配设备，生成完整解决方案</p>
+</header>
+
+<nav class="nav-tabs">
+<div class="nav-tab active" onclick="showPage('config')">参数配置</div>
+<div class="nav-tab" onclick="showPage('devices')">设备选型</div>
+<div class="nav-tab" onclick="showPage('diagrams')">系统图纸</div>
+<div class="nav-tab" onclick="showPage('cases')">应用案例</div>
+</nav>
+
+<div class="main-container">
+<!-- ========== SIDEBAR ========== -->
+<aside class="sidebar">
+<div class="sec-title">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+项目信息
+</div>
+<div class="form-group"><label class="form-label">项目名称</label><input type="text" class="form-input" id="projName" placeholder="如：大庆管业储能项目" value="大庆管业储能项目"></div>
+<div class="form-group"><label class="form-label">项目地址</label><input type="text" class="form-input" id="projAddr" placeholder="如：黑龙江大庆市高新区" value="黑龙江大庆市高新区建设路249号"></div>
+<div class="form-group"><label class="form-label">省份/城市</label><input type="text" class="form-input" id="region" value="黑龙江大庆"></div>
+
+<div class="sec-title" style="margin-top:20px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+变压器配置
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">单台容量 (kVA)</label><input type="number" class="form-input" id="txCap" value="1250" step="50"></div>
+<div class="form-group"><label class="form-label">变压器数量</label><input type="number" class="form-input" id="txCount" value="2" min="1" max="10"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">高压侧 (kV)</label><input type="number" class="form-input" id="txHv" value="10" step="0.1"></div>
+<div class="form-group"><label class="form-label">低压侧 (V)</label><input type="number" class="form-input" id="txLv" value="400" step="10"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">联结组别</label><select class="form-input" id="txVector"><option>Dyn11</option><option>Yyn0</option></select></div>
+<div class="form-group"><label class="form-label">短路阻抗 (%)</label><input type="number" class="form-input" id="txZk" value="4.3" step="0.1"></div>
+</div>
+<div class="form-group"><label class="form-label">是否有10kV配电室</label><select class="form-input" id="hasHvRoom"><option value="1">有（推荐10kV接入）</option><option value="0">无（将用0.4kV接入）</option></select></div>
+
+<div class="sec-title" style="margin-top:20px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+用电负荷
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">月用电-旺季 (万kWh)</label><input type="number" class="form-input" id="loadMonthHigh" value="35" step="1"></div>
+<div class="form-group"><label class="form-label">月用电-淡季 (万kWh)</label><input type="number" class="form-input" id="loadMonthLow" value="15" step="1"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">最大负荷 (kW)</label><input type="number" class="form-input" id="loadMax" value="1000" step="50"></div>
+<div class="form-group"><label class="form-label">功率因数</label><input type="number" class="form-input" id="pf" value="0.9" step="0.05" min="0.7" max="1"></div>
+</div>
+<div class="form-group"><label class="form-label">年工作天数</label><input type="number" class="form-input" id="workDays" value="300" step="10"></div>
+
+<div class="sec-title" style="margin-top:20px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+峰谷电价
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">峰段 (元/kWh)</label><input type="number" class="form-input" id="pricePeak" value="0.833" step="0.01"></div>
+<div class="form-group"><label class="form-label">谷段 (元/kWh)</label><input type="number" class="form-input" id="priceValley" value="0.441" step="0.01"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">平段 (元/kWh)</label><input type="number" class="form-input" id="priceFlat" value="0.637" step="0.01"></div>
+<div class="form-group"><label class="form-label">峰段时长 (h)</label><input type="number" class="form-input" id="hoursPeak" value="8" step="1"></div>
+</div>
+
+<button class="btn btn-primary" onclick="generateSolution()" style="margin-top:20px">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+生成解决方案
+</button>
+</aside>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="content">
+
+<!-- TAB: 参数配置/方案结果 -->
+<div id="page-config" class="tab-content active">
+<div class="success-msg" id="successMsg">解决方案已生成！请查看推荐设备和系统图纸。</div>
+<div class="device-grid" id="deviceRecommendation"></div>
+<div class="result-panel" id="selectionPanel" style="display:none"></div>
+<div class="result-panel" id="docPanel" style="display:none"></div>
+</div>
+
+<!-- TAB: 设备选型 -->
+<div id="page-devices" class="tab-content">
+<div class="sec-title">储能设备产品库</div>
+<p style="color:var(--text2);font-size:12px;margin-bottom:16px">数据来源：GOTION储能手册中文版2025Q4</p>
+
+<div class="acc-section">
+<h3>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M6 7V4"/><path d="M10 7V4"/><path d="M14 7V4"/><path d="M18 7V4"/></svg>
+ACC AC一体柜专题
+</h3>
+<div class="device-grid" style="margin-bottom:0">
+<div class="device-card" style="border-color:var(--green)">
+<div class="dev-img-wrap"><img src="images/products/X-522_X261_product.jpeg" alt="ACC-480" onerror="this.parentElement.innerHTML='<span style=color:var(--text2);font-size:12px>AC一体柜</span>'"></div>
+<div class="dev-header"><div><div class="dev-name">ACC-480-P750 AC一体机</div><div class="dev-model">ACC-480-P750-UL</div></div><span class="dev-badge badge-orange">480kWh</span></div>
+<div class="dev-specs"><span class="spec-item">750kW内置PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈10t</span></div>
+<div class="dev-features"><span class="feature-tag">PCS+升压变+开关柜一体</span><span class="feature-tag">即插即用</span><span class="feature-tag">最大4并→1.92MWh</span></div>
+</div>
+<div class="device-card" style="border-color:var(--green)">
+<div class="dev-img-wrap"><img src="images/products/GRID-5M_product.jpeg" alt="760LL" onerror="this.parentElement.innerHTML='<span style=color:var(--text2);font-size:12px>液冷储能柜</span>'"></div>
+<div class="dev-header"><div><div class="dev-name">760kWh液冷储能柜</div><div class="dev-model">光储充一体化标准柜</div></div><span class="dev-badge badge-green">760kWh</span></div>
+<div class="dev-specs"><span class="spec-item">380kW PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈38t</span></div>
+<div class="dev-features"><span class="feature-tag">光储充一体化</span><span class="feature-tag">7000次循环</span><span class="feature-tag">最大8并→6.08MWh</span></div>
+</div>
+</div>
+</div>
+
+<div class="filter-bar" id="equipFilter"></div>
+<div class="device-grid" id="deviceLibrary"></div>
+</div>
+
+<!-- TAB: 系统图纸 -->
+<div id="page-diagrams" class="tab-content">
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">系统架构图</h3><div class="diagram-actions"><button onclick="downloadSVG('archSvg','系统架构图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="archSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadSVG('wiringSvg','电气接线图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="wiringSvg"></div>
+</div>
+<div class="diagram-container" id="refSection" style="display:none">
+<div class="diagram-header"><h3 class="diagram-title">参考设计图（大庆管业5MWh项目）</h3></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden"><iframe id="refArchFrame" style="width:100%;height:480px;border:none"></iframe><div style="padding:6px 10px;font-size:11px;color:var(--text2)">系统架构图 v11</div></div>
+<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden"><iframe id="refWiringFrame" style="width:100%;height:480px;border:none"></iframe><div style="padding:6px 10px;font-size:11px;color:var(--text2)">电气接线图 v11</div></div>
+</div>
+</div>
+</div>
+
+<!-- TAB: 应用案例 -->
+<div id="page-cases" class="tab-content">
+<div class="sec-title">应用案例</div>
+<div class="case-grid" id="caseGrid"></div>
+</div>
+
+</main>
+</div>
+
+<div class="detail-modal" id="detailModal">
+<div class="detail-content">
+<button class="detail-close" onclick="closeDetail()">&times;</button>
+<img class="detail-img" id="detailImg" src="" alt="">
+<div class="detail-name" id="detailName"></div>
+<div class="detail-model" id="detailModel"></div>
+<div class="detail-specs" id="detailSpecs"></div>
+</div>
+</div>
+
+<script>
+const PRODUCTS=[
+  {id:'GRID-20M',name:'GOTION GRID 20MWh',cat:'集装箱储能',model:'ESD1331-025P20060',cap:20060,power:10031,volt:1331.2,cell:'LFP-314Ah',size:'5m×10m×4.6m',weight:'170t',cool:'风液一体',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-20M_product.jpeg',features:['PACK级消防','20MWh超大容量','风液一体温控']},
+  {id:'GRID-7M-588',name:'GOTION GRID 7MWh (588Ah)',cat:'集装箱储能',model:'ESD1331-025P7044',cap:7045,power:1761,volt:1331.2,cell:'LFP-588Ah',size:'6.1m×2.4m×2.9m',weight:'≤54t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-7M_product.jpeg',features:['588Ah大电芯','液冷温控','PACK级消防']},
+  {id:'GRID-7M-330',name:'GOTION GRID 7MWh (330Ah)',cat:'集装箱储能',model:'ESD1331-05P6261',cap:6262,power:3131,volt:1331.2,cell:'LFP-330Ah',size:'6.1m×2.4m×2.9m',weight:'≤50t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-7M_product.jpeg',features:['330Ah电芯','3.1MW高功率','液冷温控']},
+  {id:'GRID-5M-314',name:'GOTION GRID 5MWh (314Ah)',cat:'集装箱储能',model:'ESD1331-05P5015',cap:5016,power:2508,volt:1331.2,cell:'LFP-314Ah',size:'6.1m×2.4m×2.9m',weight:'≈44t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-5M_product.jpeg',features:['5MWh标准柜','液冷温控','PACK级消防']},
+  {id:'GRID-5M-330',name:'GOTION GRID 5MWh (330Ah)',cat:'集装箱储能',model:'ESD1280-05P5068',cap:5069,power:2534,volt:1280,cell:'LFP-330Ah',size:'6.1m×2.4m×2.9m',weight:'≈44t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-5M_product.jpeg',features:['330Ah电芯','1280V平台','液冷温控']},
+  {id:'X-836',name:'乾元载道 X-836',cat:'乾元载道',model:'X-836',cap:836,power:418,volt:1331.2,cell:'LFP-314Ah',size:'1.4m×2.4m×2.4m',weight:'8t',cool:'液冷',fire:'气溶胶+泄爆',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:6,img:'X-836_X950_product.jpeg',features:['PCS+升压一体','即插即用','最大6并','分期投资']},
+  {id:'X-950',name:'乾元载道 X-950',cat:'乾元载道',model:'X-950',cap:948,power:474,volt:1152,cell:'LFP-91.5Ah×3',size:'2.1m×2.3m×2.7m',weight:'9.5t',cool:'液冷',fire:'气溶胶+泄爆',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:4,img:'X-836_X950_product.jpeg',features:['PCS+升压一体','高能量密度','最大4并']},
+  {id:'X-522',name:'乾元载道 X-522',cat:'乾元载道',model:'X-522',cap:522,power:250,volt:832,cell:'LFP-314Ah',size:'2.4m×1.4m×2.4m',weight:'8t',cool:'风冷+液冷',fire:'PACK气溶胶+舱气溶胶',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:6,img:'X-522_X261_product.jpeg',features:['PCS内置','风冷+液冷','最大6并','50Hz版']},
+  {id:'X-261',name:'乾元载道 X-261',cat:'乾元载道',model:'X-261',cap:261,power:125,volt:832,cell:'LFP-314Ah',size:'1.1m×1.4m×2.4m',weight:'3.5t',cool:'全液冷',fire:'PACK气溶胶+舱气溶胶',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:6,img:'X-522_X261_product.jpeg',features:['PCS内置','全液冷','轻量3.5t','最大6并']},
+  {id:'EPD-104',name:'电池包 104.4kWh',cat:'电池包/簇',model:'EPD332-05P104',cap:104,power:52,volt:332.8,cell:'LFP-314Ah',size:'0.8m×2.2m×0.2m',weight:'660kg',cool:'液冷',fire:'-',ip:'IP67',temp:'-30~60°C',pcs:false,img:'EPD_battery_pack_img0.png',features:['IP67高防护','液冷温控','314Ah电芯']},
+  {id:'EPD-106',name:'电池包 105.6kWh',cat:'电池包/簇',model:'EPD320-05P106',cap:106,power:53,volt:320,cell:'LFP-330Ah',size:'0.8m×2.3m×0.2m',weight:'700kg',cool:'液冷',fire:'-',ip:'IP67',temp:'-30~60°C',pcs:false,img:'EPD_battery_pack_img1.png',features:['IP67高防护','液冷温控','330Ah电芯']},
+  {id:'EPD-195',name:'电池包 195.6kWh',cat:'电池包/簇',model:'EPD332-05P195',cap:196,power:98,volt:332.8,cell:'LFP-588Ah',size:'1.2m×2.2m×0.2m',weight:'12000kg',cool:'液冷',fire:'-',ip:'IP67',temp:'-30~60°C',pcs:false,img:'EPD_battery_pack_img2.png',features:['588Ah大电芯','IP67','液冷温控']},
+  {id:'Home3',name:'Home 3.0',cat:'户用/便携',model:'HSD51.2-05P16L',cap:16,power:8,volt:51.2,cell:'LFP-314Ah',size:'0.7m×0.2m×0.7m',weight:'125kg',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-20~45°C',pcs:false,img:'Home3_product.jpeg',features:['户用储能','自然冷却','IP65']},
+  {id:'Gendome',name:'Gendome Power 30kWh',cat:'户用/便携',model:'Gendome Power',cap:31,power:24,volt:307.2,cell:'LFP-100Ah',size:'0.7m×0.8m×1.1m',weight:'390kg',cool:'风冷',fire:'-',ip:'IP65',temp:'-20~58°C',pcs:false,img:'Gendome_product.jpeg',features:['便携式','风冷','IP65']},
+];
+
+const CASES=[
+  {title:'黑龙江大庆管业 5MWh',desc:'2×1250kVA变压器，月用电35万kWh，10kV侧接入，峰谷套利年省55万+',tags:['10kV','5MWh','工商业'],color:'var(--blue)',img:'transformer.png'},
+  {title:'安徽庐江大酒店 522kWh',desc:'酒店削峰填谷+需量控制+备用供电，低压0.4kV侧接入',tags:['0.4kV','522kWh','酒店'],color:'var(--green)',img:'page4_img14.png'},
+  {title:'美国Fremont光储充 1.4MWh',desc:'1.4MWh储能+1MW光伏+1.6MW直流快充，自给自足',tags:['光储充','1.4MWh','海外'],color:'var(--orange)',img:'page11_img2.png'},
+  {title:'上海邑东 2.5MWh储能站',desc:'集装箱储能充电桩一体化，2.5MWh配套充电场站',tags:['2.5MWh','充换电'],color:'var(--purple)',img:'page1_img0.png'},
+];
+
+let LAST_RESULT=null;
+let currentFilter='全部';
+
+function showPage(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-tab')[['config','devices','diagrams','cases'].indexOf(id)].classList.add('active');
+  if(id==='devices')renderDeviceLibrary(currentFilter);
+  if(id==='diagrams'&&LAST_RESULT){renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);showRefDiagrams();}
+  if(id==='cases')renderCases();
+}
+
+function v(id){return document.getElementById(id).value}
+function n(id){return parseFloat(v(id))}
+
+function getParams(){
+  return{
+    txCount:n('txCount'),txCap:n('txCap'),txHv:n('txHv'),txLv:n('txLv'),
+    txVector:v('txVector'),txZk:n('txZk'),hasHvRoom:v('hasHvRoom')==='1',
+    loadMonthHigh:n('loadMonthHigh')*10000,loadMonthLow:n('loadMonthLow')*10000,
+    loadMax:n('loadMax'),pf:n('pf'),workDays:n('workDays'),
+    pricePeak:n('pricePeak'),priceValley:n('priceValley'),priceFlat:n('priceFlat'),
+    hoursPeak:n('hoursPeak'),hoursValley:24-n('hoursPeak')*2>0?8:8,region:v('region')
+  };
+}
+
+function selectEquipment(P){
+  const totalTxKVA=P.txCount*P.txCap;const totalTxKW=totalTxKVA*P.pf;
+  const dailyHigh=P.loadMonthHigh/30;const dailyLow=P.loadMonthLow/30;
+  const peakKwhHigh=dailyHigh*P.hoursPeak/24*1.1;const peakKwhLow=dailyLow*P.hoursPeak/24*1.1;
+  const use10kV=P.hasHvRoom;const candidates=[];
+  PRODUCTS.filter(p=>p.cat==='集装箱储能').forEach(p=>{
+    const usable=p.cap*0.95;const pcsKW=Math.min(p.power*0.5,usable/8*1.2);
+    if(use10kV)candidates.push({product:p,qty:1,totalCap:p.cap,totalPower:pcsKW,usable,invest:p.cap>=20000?800:p.cap>=7000?550:p.cap>=5000?420:350,needPCS:!p.pcs,needStepUp:true,access:'10kV',pcsKW});
+  });
+  const x836=PRODUCTS.find(p=>p.id==='X-836');
+  if(x836&&use10kV)for(let q=1;q<=(x836.maxP||6);q++)candidates.push({product:x836,qty:q,totalCap:x836.cap*q,totalPower:x836.power*q,usable:x836.cap*q*0.95,invest:q*55,needPCS:false,needStepUp:false,access:'10kV',pcsKW:x836.power*q});
+  const x522=PRODUCTS.find(p=>p.id==='X-522');
+  if(x522&&use10kV)for(let q=1;q<=(x522.maxP||6);q++)candidates.push({product:x522,qty:q,totalCap:x522.cap*q,totalPower:x522.power*q,usable:x522.cap*q*0.95,invest:q*35,needPCS:false,needStepUp:false,access:'10kV',pcsKW:x522.power*q});
+  if(!use10kV){
+    if(x522)for(let q=2;q<=6;q+=2)candidates.push({product:x522,qty:q,totalCap:x522.cap*q,totalPower:x522.power*q,usable:x522.cap*q*0.95,invest:q*35,needPCS:false,needStepUp:false,access:'0.4kV',pcsKW:x522.power*q});
+    if(x836)for(let q=2;q<=4;q+=2){const pKW=Math.min(x836.power*q,totalTxKW*0.4);candidates.push({product:x836,qty:q,totalCap:x836.cap*q,totalPower:pKW,usable:x836.cap*q*0.95,invest:q*55,needPCS:false,needStepUp:false,access:'0.4kV',pcsKW:pKW});}
+  }
+  candidates.forEach(c=>{
+    const dH=Math.min(c.usable,peakKwhHigh);const dL=Math.min(c.usable,peakKwhLow);
+    const cH=dH/peakKwhHigh;const cL=Math.min(dL/peakKwhLow,1);
+    const uH=dH/c.usable;const uL=dL/c.usable;
+    const daysH=P.workDays*0.58;const daysL=P.workDays*0.42;
+    const utilAnn=(uH*daysH+uL*daysL)/P.workDays;const eff=0.92;
+    const sH=(dH*P.pricePeak-dH/eff*P.priceValley)*daysH;const sL=(dL*P.pricePeak-dL/eff*P.priceValley)*daysL;
+    const demandS=Math.min(c.pcsKW,800)*0.4*36.8/10000*12;const annS=(sH+sL)/10000+demandS;
+    const extraInv=c.needPCS?(c.pcsKW*0.028+18):0;const stepInv=c.needStepUp?18:0;
+    const hvCab=use10kV?12:0;const install=25+c.qty*3;const totalInv=c.invest+extraInv+stepInv+hvCab+install;
+    const payback=totalInv/annS;
+    c.coverageHigh=cH;c.coverageLow=cL;c.utilAnnual=utilAnn;c.annualSaving=annS;c.totalInvest=totalInv;c.payback=payback;
+    c.score=cH*0.4+utilAnn*0.3+(1/Math.max(payback,1))*0.3;c.dischargeHigh=dH;c.dischargeLow=dL;
+  });
+  candidates.sort((a,b)=>b.score-a.score);
+  return{candidates,params:{...P,totalTxKVA,dailyHigh,dailyLow,peakKwhHigh,peakKwhLow,use10kV}};
+}
+
+function generateSolution(){
+  const P=getParams();const result=selectEquipment(P);LAST_RESULT=result;
+  document.getElementById('successMsg').classList.add('show');
+  renderRecommendation(result);renderSelectionTable(result);renderDocOutput(result);
+  renderArchSvg(result);renderWiringSvg(result);showRefDiagrams();
+  showPage('config');
+}
+
+function devCardHTML(p,isSelected){
+  const capStr=p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh';
+  const badgeCls=p.cat==='集装箱储能'?'badge-green':p.cat==='乾元载道'?'badge-blue':p.cat==='户用/便携'?'badge-purple':'badge-orange';
+  return`<div class="device-card${isSelected?' selected':''}" onclick="showDetail('${p.id}')">
+    ${p.img?`<div class="dev-img-wrap"><img src="images/products/${p.img}" alt="${p.name}" onerror="this.style.display='none'"></div>`:''}
+    <div class="dev-header"><div><div class="dev-name">${p.name}</div><div class="dev-model">${p.model}</div></div><span class="dev-badge ${badgeCls}">${capStr}</span></div>
+    <div class="dev-specs">
+      <span class="spec-item">${p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW'}</span>
+      <span class="spec-item">${p.volt}V</span>
+      <span class="spec-item">${p.cell}</span>
+      <span class="spec-item">${p.cool}</span>
+      <span class="spec-item">${p.ip}</span>
+      ${p.pcs?'<span class="spec-item">PCS一体</span>':''}
+      ${p.maxP?`<span class="spec-item">最大${p.maxP}并</span>`:''}
+    </div>
+    <div class="dev-features">${(p.features||[]).slice(0,3).map(f=>`<span class="feature-tag">${f}</span>`).join('')}</div>
+  </div>`;
+}
+
+function renderRecommendation(R){
+  const top=R.candidates.slice(0,4);
+  const el=document.getElementById('deviceRecommendation');
+  el.innerHTML=`<div style="grid-column:1/-1;margin-bottom:8px"><h3 style="font-size:16px;color:var(--blue)">推荐配置排序</h3><p style="font-size:11px;color:var(--text2)">评分=覆盖率×0.4+利用率×0.3+1/回收期×0.3</p></div>`+
+    top.map((c,i)=>`<div class="device-card fade-in${i===0?' selected':''}" style="animation-delay:${i*0.08}s">
+      ${c.product.img?`<div class="dev-img-wrap"><img src="images/products/${c.product.img}" alt="${c.product.name}" onerror="this.style.display='none'"></div>`:''}
+      <div class="dev-header"><div><div class="dev-name">${i===0?'★ ':''}${c.product.name}${c.qty>1?' ×'+c.qty:''}</div><div class="dev-model">${c.product.model} | ${c.access}接入</div></div><span class="dev-badge ${i===0?'badge-green':'badge-blue'}">${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'}</span></div>
+      <div class="dev-specs">
+        <span class="spec-item">PCS ${(c.pcsKW/1000).toFixed(2)}MW</span>
+        <span class="spec-item">覆盖${(c.coverageHigh*100).toFixed(0)}%</span>
+        <span class="spec-item">利用${(c.utilAnnual*100).toFixed(0)}%</span>
+        <span class="spec-item">年收益${c.annualSaving.toFixed(1)}万</span>
+        <span class="spec-item">投资${c.totalInvest.toFixed(0)}万</span>
+      </div>
+      <div class="dev-features"><span class="feature-tag">回收${c.payback.toFixed(1)}年</span>${c.product.pcs?'<span class="feature-tag">PCS一体</span>':'<span class="feature-tag">需另配PCS</span>'}</div>
+    </div>`).join('');
+}
+
+function renderSelectionTable(R){
+  const P=R.params;const top=R.candidates.slice(0,8);
+  let html=`<h3>方案对比明细</h3><table class="result-table"><tr><th>配置</th><th>容量</th><th>PCS</th><th>接入</th><th>旺季覆盖</th><th>利用率</th><th>年收益</th><th>总投资</th><th>回收期</th></tr>`;
+  top.forEach((c,i)=>{const mark=i===0?' style="background:rgba(15,110,86,.06)"':'';
+    html+=`<tr${mark}><td><b>${i===0?'★ ':''}${c.product.name}${c.qty>1?' ×'+c.qty:''}</b></td><td>${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'}</td><td>${(c.pcsKW/1000).toFixed(2)}MW</td><td>${c.access}</td><td>${(c.coverageHigh*100).toFixed(0)}%</td><td>${(c.utilAnnual*100).toFixed(0)}%</td><td>${c.annualSaving.toFixed(1)}万</td><td>${c.totalInvest.toFixed(0)}万</td><td><b>${c.payback.toFixed(1)}年</b></td></tr>`;
+  });
+  html+=`</table>`;document.getElementById('selectionPanel').innerHTML=html;document.getElementById('selectionPanel').style.display='block';
+}
+
+function renderDocOutput(R){
+  const P=R.params;const c=R.candidates[0];const d=new Date();
+  const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+  const pcsStr=(c.pcsKW/1000).toFixed(2)+'MW';
+  let doc=`═══════════════════════════════════════════════════════════\n`;
+  doc+=`       ${P.region} 工商业储能系统完整解决方案\n`;
+  doc+=`═══════════════════════════════════════════════════════════\n\n`;
+  doc+=`一、配电现状\n────────────────────────────────────────\n`;
+  doc+=`  变压器: ${P.txCount}×${P.txCap}kVA  ${P.txHv}kV/${P.txLv}V  ${P.txVector}  Zk=${P.txZk}%\n`;
+  doc+=`  总可用有功: ${(P.txCount*P.txCap*P.pf/1000).toFixed(1)}MW\n`;
+  doc+=`  月用电(旺季): ${(P.loadMonthHigh/10000).toFixed(0)}万kWh\n`;
+  doc+=`  接入方式: ${P.use10kV?'10kV母线侧(电表后、变压器前)':'0.4kV低压侧'}\n\n`;
+  doc+=`二、电价参数\n────────────────────────────────────────\n`;
+  doc+=`  峰段: ${P.pricePeak}元/kWh (${P.hoursPeak}h)  谷段: ${P.priceValley}元/kWh\n`;
+  doc+=`  峰谷差: ${(P.pricePeak-P.priceValley).toFixed(3)}元/kWh\n\n`;
+  doc+=`三、储能设备选型\n────────────────────────────────────────\n`;
+  doc+=`  推荐配置: ${c.product.name}${c.qty>1?' ×'+c.qty+'并联':''}\n`;
+  doc+=`  总容量: ${capStr}  PCS: ${pcsStr}\n`;
+  doc+=`  电芯: ${c.product.cell}  温控: ${c.product.cool}  防护: ${c.product.ip}\n\n`;
+  doc+=`四、充放电策略\n────────────────────────────────────────\n`;
+  doc+=`  谷段充电: 23:30-05:30, 功率≤${pcsStr}\n`;
+  doc+=`  峰段放电: 7:00-8:00, 9:00-11:30, 15:30-20:00\n`;
+  doc+=`  PCC控制: P_discharge = min(P_load-50kW, P_pcs, P_soc_limit)\n`;
+  doc+=`  防逆流: EMS软件限功率 + 逆功率继电器 + 并网柜保护\n\n`;
+  doc+=`五、经济性分析\n────────────────────────────────────────\n`;
+  doc+=`  年收益: ≈${c.annualSaving.toFixed(1)}万元\n`;
+  doc+=`  总投资: ≈${c.totalInvest.toFixed(0)}万元\n`;
+  doc+=`  回收期: ≈${c.payback.toFixed(1)}年\n\n`;
+  doc+=`═══════════════════════════════════════════════════════════\n`;
+  doc+=`  日期: ${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}\n`;
+  doc+=`  数据来源: GOTION储能手册2025Q4\n`;
+  doc+=`═══════════════════════════════════════════════════════════\n`;
+  document.getElementById('docPanel').innerHTML=`<h3>完整方案文档</h3><div class="doc-output">${doc}</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn btn-primary" style="width:auto" onclick="downloadTxt()">下载 .txt</button><button class="btn btn-success" style="width:auto" onclick="downloadMD()">下载 .md</button></div>`;
+  document.getElementById('docPanel').style.display='block';
+}
+
+function renderDeviceLibrary(filter){
+  currentFilter=filter;
+  const cats=['全部',...new Set(PRODUCTS.map(p=>p.cat))];
+  const fb=document.getElementById('equipFilter');
+  fb.innerHTML=cats.map(c=>`<button class="filter-btn${c===filter?' active':''}" onclick="renderDeviceLibrary('${c}')">${c}</button>`).join('');
+  const items=filter==='全部'?PRODUCTS:PRODUCTS.filter(p=>p.cat===filter);
+  document.getElementById('deviceLibrary').innerHTML=items.map(p=>devCardHTML(p,false)).join('');
+}
+
+const DEVICE_SPECS={
+'GRID-20M':`型号: GOTION GRID 20MWh (ESD1331-025P20060)
+
+电气参数:
+  电芯容量: LFP-314Ah
+  标称能量: 20.06MWh
+  标称电压: 1331.2V
+  推荐使用电压范围: 1164.8V-1497.6V
+  最大充放电倍率: 0.5P@25°C
+  最大充电功率: 1003.1kW(0.5P)
+  最大放电功率: 1003.1kW(0.5P)
+
+环境参数:
+  工作温度范围: -30°C - +55°C
+  存储温度范围: -30°C - +60°C
+  工作湿度范围: ≤95%RH(无凝露)
+  最高工作海拔: 4000m
+
+系统参数:
+  防护等级: IP55
+  防腐等级: C5
+  消防方式: PACK级浸没抑制+全淹没气体灭火+整舱消防水喷淋
+  温控方式: 风液一体
+
+尺寸与重量:
+  尺寸(WxDxH): 6058mm x 2438mm x 2896mm (5m×10m×4.6m 双20ft)
+  重量: ≈170t`,
+
+'GRID-7M-588':`型号: GOTION GRID 7MWh (ESD1331-025P7044) - 588Ah版
+
+电气参数:
+  电芯容量: LFP-588Ah
+  标称能量: 7.04MWh
+  标称电压: 1331.2V
+  最大充放电倍率: 0.25P@25°C
+  最大充电功率: 1761kW(0.25P)
+  最大放电功率: 1761kW(0.25P)
+
+产品优势:
+  PACK级抑制+全淹没气体灭火+整舱消防水喷淋
+  隔舱设计+舱壁耐火2h，防止热失控蔓延
+  单舱容量7.04MWh，占地面积节约25%
+  能量密度提升40%
+
+系统参数:
+  防护等级: IP55 (整舱), IP67 (PACK级)
+  消防方式: PACK级浸没+全淹没气体+整舱消防水
+  尺寸: 6.1m×2.4m×2.9m (20ft)
+  重量: ≤54t`,
+
+'GRID-5M-314':`型号: GOTION GRID 5MWh (ESD1331-05P5015) - 314Ah版
+
+电气参数:
+  电芯容量: LFP-314Ah
+  标称能量: 5015.9kWh
+  标称电压: 1331.2V
+  推荐使用电压范围: 1164.8V-1497.6V
+  最大充放电倍率: 0.5P@25°C
+  最大充电功率: 2508kW(0.5P)
+  最大放电功率: 2508kW(0.5P)
+
+产品优势:
+  PACK级浸没抑制+全淹没气体灭火+整舱消防水喷淋
+  电芯级温度监测+电芯级热阻隔
+  单舱达5MWh，能量密度再提升45%
+  A,B舱单开门设计，优化空间利用
+
+系统参数:
+  防护等级: IP55 (整舱), IP67 (PACK级)
+  消防: PACK浸没+气体+水
+  尺寸: 6.1m×2.4m×2.9m (20ft)
+  重量: ≈44t`,
+
+'GRID-5M-330':`型号: GOTION GRID 5MWh (ESD1280-05P5068) - 330Ah版
+
+电气参数:
+  电芯容量: LFP-330Ah
+  标称能量: 5068.8kWh
+  标称电压: 1280V
+  最大充放电倍率: 0.5P@25°C
+  最大充电功率: 2534kW(0.5P)
+
+系统参数:
+  防护等级: IP55
+  消防: PACK浸没+气体+水
+  尺寸: 6.1m×2.4m×2.9m (20ft)
+  重量: ≈44t`,
+
+'X-836':`型号: 乾元载道 X-836
+
+直流侧参数:
+  电芯类型: LFP 3.2V/314Ah
+  电池容量: 836kWh
+  额定电压: 1331.2V
+  电池电压范围: 1164.6-1497.6V
+  额定功率: 418kW(0.5P@25°C)
+  额定电流: 314A
+
+系统参数:
+  防护等级: IP55
+  工作温度范围: -30°C - +50°C
+  工作湿度范围: ≤95%
+  消防: 气溶胶+泄爆
+
+交流侧参数 (内置PCS+升压变):
+  PCS额定功率: 418kW
+  交流输出电压: 10kV/0.69kV (经升压变)
+  最大并联数: 6台 → 5.0MWh/2.5MW
+
+产品优势:
+  二簇一柜设计，独立防火区
+  三级消防安全设计
+  支持多机无缝并联
+  支持预安装，减少现场调试时间
+  PCS+升压变一体化，即插即用
+
+尺寸: 1.4m×2.4m×2.4m
+重量: 8t`,
+
+'X-950':`型号: 乾元载道 X-950
+
+直流侧参数:
+  电芯类型: LFP 3.2V/91.5Ah×3
+  电池容量: 948kWh
+  额定电压: 1152V
+  电池电压范围: 900-1368V
+  额定功率: 474kW(0.5P@25°C)
+
+系统参数:
+  防护等级: IP55
+  工作温度: -30°C - +50°C
+  消防: 气溶胶+泄爆
+  最大并联: 4台 → 3.8MWh/1.9MW
+
+尺寸: 2.1m×2.3m×2.7m
+重量: 9.5t`,
+
+'X-522':`型号: 乾元载道 X-522
+
+直流侧参数:
+  电芯类型: LFP 3.2V/314Ah
+  标称电压: 832V
+  电池电压范围: 728V-936V
+  电池容量: 522kWh
+
+交流侧参数 (内置PCS):
+  额定功率: 250kW
+  最大并联: 6台 → 3.1MWh/1.5MW
+
+系统参数:
+  防护等级: IP55
+  工作温度: -30°C - +50°C
+  消防: PACK气溶胶+舱气溶胶
+  温控: 风冷+液冷
+
+产品优势:
+  ALL IN ONE，降低现场安装难度
+  模块化设计，提高运维效率
+  柜内汇流，整站LCOS降低2%
+  高效率液冷散热，损耗降低30%
+
+尺寸: 2.4m×1.4m×2.4m
+重量: 8t`,
+
+'X-261':`型号: 乾元载道 X-261
+
+直流侧参数:
+  电芯类型: LFP 3.2V/314Ah
+  标称电压: 832V
+  电池电压范围: 728V-936V
+  电池容量: 261kWh
+
+交流侧参数 (内置PCS):
+  额定功率: 125kW
+  最大并联: 6台 → 1.6MWh/750kW
+
+系统参数:
+  防护等级: IP55
+  工作温度: -30°C - +50°C
+  消防: PACK气溶胶+舱气溶胶
+  温控: 全液冷
+
+尺寸: 1.1m×1.4m×2.4m
+重量: 3.5t`,
+
+'EPD-104':`型号: EPD332-05P104 标准化电池包
+
+电气参数:
+  电芯容量: LFP-314Ah
+  标称能量: 104.4kWh
+  标称电压: 332.8V
+  最大充放电功率: 52kW
+
+系统参数:
+  防护等级: IP67
+  工作温度(放电): -30°C - +60°C
+  温控: 液冷
+
+尺寸: 0.8m×2.2m×0.2m
+重量: 660kg`,
+
+'EPD-106':`型号: EPD320-05P106 标准化电池包
+
+电气参数:
+  电芯容量: LFP-330Ah
+  标称能量: 105.6kWh
+  标称电压: 320V
+  最大充放电功率: 53kW
+
+系统参数:
+  防护等级: IP67
+  温控: 液冷
+
+尺寸: 0.8m×2.3m×0.2m
+重量: 700kg`,
+
+'EPD-195':`型号: EPD332-05P195 标准化电池包
+
+电气参数:
+  电芯容量: LFP-588Ah
+  标称能量: 195.6kWh
+  标称电压: 332.8V
+  最大充放电功率: 98kW
+
+系统参数:
+  防护等级: IP67
+  温控: 液冷
+
+尺寸: 1.2m×2.2m×0.2m
+重量: 12000kg`,
+
+'Home3':`型号: HSD51.2-05P16L GOTION HOME 3.0
+
+电气参数:
+  电芯容量: LFP-314Ah
+  标称能量: 16kWh
+  标称电压: 51.2V
+  推荐使用电压范围: 43.2V-57.6V
+  最大充放电功率: 8kW
+
+产品优势:
+  持久性能: 超过10,000次充电循环
+  高功率输出: 最大8kW
+  安全可靠: LFP电池+三重保护
+  高兼容性: 与主流PCS通信协议无缝集成
+  IP65高防护，支持室外安装
+
+环境参数:
+  工作温度: -20°C - +45°C
+  防护等级: IP65
+
+尺寸: 0.7m×0.2m×0.7m
+重量: 125kg`,
+
+'Gendome':`型号: Gendome Power 户用储能系统
+
+电气参数:
+  电芯容量: LFP-100Ah
+  标称能量: 30.72kWh
+  交流电压: 120V/240V
+  标称电压: 307.2Vdc
+  运行电压范围: 259.2V-345.6Vdc
+  标准充电电流: 50A
+  最大充放电功率: 24kW
+
+产品优势:
+  长寿命: 6000次长循环磷酸铁锂电池
+  模块化: 30kWh模块化设计
+  一体化: 用户友好
+  灵活化: 高效发电
+
+环境参数:
+  工作温度: -20°C - +58°C
+  防护等级: IP65
+  温控: 风冷
+
+尺寸: 0.7m×0.8m×1.1m
+重量: 390kg`,
+};
+
+function showDetail(productId){
+  const p=PRODUCTS.find(x=>x.id===productId);
+  if(!p)return;
+  const modal=document.getElementById('detailModal');
+  const img=document.getElementById('detailImg');
+  const name=document.getElementById('detailName');
+  const model=document.getElementById('detailModel');
+  const specs=document.getElementById('detailSpecs');
+  img.src=p.img?`images/products/${p.img}`:'';
+  img.style.display=p.img?'block':'none';
+  img.onerror=function(){this.style.display='none'};
+  name.textContent=p.name;
+  model.textContent=p.model;
+  const specText=DEVICE_SPECS[productId]||`型号: ${p.model}\n\n基本参数:\n  标称能量: ${p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh'}\n  额定功率: ${p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW'}\n  标称电压: ${p.volt}V\n  电芯: ${p.cell}\n  尺寸: ${p.size}\n  重量: ${p.weight}\n  温控: ${p.cool}\n  防护: ${p.ip}\n  消防: ${p.fire}\n  工作温度: ${p.temp}\n  ${p.pcs?'PCS+升压变一体化':'需另配PCS+升压变'}\n  ${p.maxP?'最大'+p.maxP+'台并联':''}`;
+  specs.textContent=specText;
+  modal.classList.add('show');
+}
+
+function closeDetail(){
+  document.getElementById('detailModal').classList.remove('show');
+}
+
+document.getElementById('detailModal').addEventListener('click',function(e){
+  if(e.target===this)closeDetail();
+});
+
+function renderCases(){
+  const el=document.getElementById('caseGrid');
+  el.innerHTML=CASES.map((c,i)=>`<div class="case-card fade-in" style="animation-delay:${i*0.1}s">
+    <div class="case-img" style="background:linear-gradient(135deg,${c.color}33,${c.color}11)">
+      ${c.img?`<img src="images/products/${c.img}" alt="${c.title}" onerror="this.parentElement.innerHTML='<span style=color:var(--text2)>⚡</span>'">`:'<span style="color:var(--text2)">⚡</span>'}
+    </div>
+    <div class="case-body"><div class="case-title">${c.title}</div><div class="case-desc">${c.desc}</div>
+    <div class="case-tags">${c.tags.map(t=>`<span class="case-tag" style="background:${c.color}22;color:${c.color}">${t}</span>`).join('')}</div>
+    </div></div>`).join('');
+}
+
+function renderArchSvg(R){
+  const P=R.params;const c=R.candidates[0];const is10kV=P.use10kV;
+  const W=1100,H=700;let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<defs><linearGradient id="g1"><stop offset="0%" stop-color="#185FA5"/><stop offset="100%" stop-color="#0C447C"/></linearGradient>`;
+  s+=`<linearGradient id="g2"><stop offset="0%" stop-color="#EF9F27"/><stop offset="100%" stop-color="#854F0B"/></linearGradient>`;
+  s+=`<linearGradient id="g3"><stop offset="0%" stop-color="#0F6E56"/><stop offset="100%" stop-color="#0A5A46"/></linearGradient>`;
+  s+=`<linearGradient id="g4"><stop offset="0%" stop-color="#E06070"/><stop offset="100%" stop-color="#B04050"/></linearGradient>`;
+  s+=`<filter id="ds"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity=".15"/></filter></defs>`;
+  s+=`<rect width="${W}" height="${H}" fill="#1A1D21"/>`;
+  s+=`<text x="550" y="28" text-anchor="middle" fill="#185FA5" font-size="13" font-weight="bold">国网${P.txHv}kV电源</text>`;
+  s+=`<rect x="420" y="40" width="260" height="38" rx="6" fill="#22262B" stroke="#185FA5" stroke-width="1.5"/>`;
+  s+=`<text x="550" y="64" text-anchor="middle" fill="#C2C0B6" font-size="11">计量/PCC (电表+PT/CT)</text>`;
+  s+=`<line x1="550" y1="78" x2="550" y2="108" stroke="#185FA5" stroke-width="2"/>`;
+  const busY=115;s+=`<rect x="80" y="${busY}" width="940" height="28" rx="3" fill="url(#g1)" filter="url(#ds)"/>`;
+  s+=`<text x="550" y="${busY+18}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">厂内${P.txHv}kV母线（用户侧）</text>`;
+  const txY=busY+48;
+  for(let i=0;i<P.txCount;i++){const x=200+i*180;
+    s+=`<line x1="${x}" y1="${busY+28}" x2="${x}" y2="${txY}" stroke="#EF9F27" stroke-width="2"/>`;
+    s+=`<rect x="${x-70}" y="${txY}" width="140" height="50" rx="6" fill="url(#g2)" filter="url(#ds)"/>`;
+    s+=`<text x="${x}" y="${txY+20}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${i+1}#变压器</text>`;
+    s+=`<text x="${x}" y="${txY+36}" text-anchor="middle" fill="#fff0d0" font-size="9">${P.txCap}kVA ${P.txHv}/${P.txLv/1000}kV</text>`;
+    s+=`<line x1="${x}" y1="${txY+50}" x2="${x}" y2="${txY+80}" stroke="#534AB7" stroke-width="2"/>`;
+    s+=`<rect x="${x-55}" y="${txY+80}" width="110" height="36" rx="5" fill="#22262B" stroke="#534AB7" stroke-width="1"/>`;
+    s+=`<text x="${x}" y="${txY+102}" text-anchor="middle" fill="#B0A0E0" font-size="10">0.4kV负荷</text>`;
+  }
+  const ex=760;s+=`<line x1="${ex}" y1="${busY+28}" x2="${ex}" y2="${txY}" stroke="#0F6E56" stroke-width="2"/>`;
+  if(is10kV){
+    s+=`<rect x="${ex-80}" y="${txY}" width="160" height="38" rx="6" fill="#22262B" stroke="#0F6E56" stroke-width="1.5" filter="url(#ds)"/>`;
+    s+=`<text x="${ex}" y="${txY+16}" text-anchor="middle" fill="#40D0A0" font-size="10" font-weight="bold">储能${P.txHv}kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${txY+30}" text-anchor="middle" fill="#60A080" font-size="8">断路器+继保</text>`;
+    s+=`<line x1="${ex}" y1="${txY+38}" x2="${ex}" y2="${txY+65}" stroke="#0F6E56" stroke-width="2"/>`;
+    if(c.needStepUp){s+=`<rect x="${ex-70}" y="${txY+65}" width="140" height="32" rx="5" fill="#2A2E33" stroke="#EF9F27" stroke-width="1"/>`;s+=`<text x="${ex}" y="${txY+85}" text-anchor="middle" fill="#EF9F27" font-size="10" font-weight="bold">升压变 0.69/${P.txHv}kV</text>`;s+=`<line x1="${ex}" y1="${txY+97}" x2="${ex}" y2="${txY+115}" stroke="#E06070" stroke-width="2"/>`;}
+    const pcsY=txY+(c.needStepUp?115:65);
+    s+=`<rect x="${ex-80}" y="${pcsY}" width="160" height="42" rx="6" fill="url(#g4)" filter="url(#ds)"/>`;
+    s+=`<text x="${ex}" y="${pcsY+17}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
+    s+=`<text x="${ex}" y="${pcsY+33}" text-anchor="middle" fill="#FFC0C0" font-size="9">并网P/Q + 离网V/F</text>`;
+    s+=`<line x1="${ex}" y1="${pcsY+42}" x2="${ex}" y2="${pcsY+65}" stroke="#0F6E56" stroke-width="2" stroke-dasharray="6,3"/>`;
+    const batY=pcsY+65;s+=`<rect x="${ex-90}" y="${batY}" width="180" height="50" rx="6" fill="url(#g3)" filter="url(#ds)"/>`;
+    s+=`<text x="${ex}" y="${batY+18}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${c.product.name}</text>`;
+    s+=`<text x="${ex}" y="${batY+35}" text-anchor="middle" fill="#C0FFC0" font-size="9">${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'} | ${c.product.cell}</text>`;
+    if(c.qty>1)s+=`<text x="${ex}" y="${batY+46}" text-anchor="middle" fill="#90D090" font-size="8">${c.qty}台并联 | ${c.product.cool}</text>`;
+  }else{
+    s+=`<rect x="${ex-80}" y="${txY}" width="160" height="32" rx="5" fill="#22262B" stroke="#0F6E56" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${txY+20}" text-anchor="middle" fill="#40D0A0" font-size="10" font-weight="bold">储能并网柜 0.4kV</text>`;
+    s+=`<line x1="${ex}" y1="${txY+32}" x2="${ex}" y2="${txY+55}" stroke="#E06070" stroke-width="2"/>`;
+    const pcsY2=txY+55;s+=`<rect x="${ex-80}" y="${pcsY2}" width="160" height="38" rx="5" fill="url(#g4)"/>`;
+    s+=`<text x="${ex}" y="${pcsY2+24}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
+    s+=`<line x1="${ex}" y1="${pcsY2+38}" x2="${ex}" y2="${pcsY2+60}" stroke="#0F6E56" stroke-width="2" stroke-dasharray="5,2"/>`;
+    const batY2=pcsY2+60;s+=`<rect x="${ex-90}" y="${batY2}" width="180" height="45" rx="5" fill="url(#g3)"/>`;
+    s+=`<text x="${ex}" y="${batY2+18}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
+    s+=`<text x="${ex}" y="${batY2+35}" text-anchor="middle" fill="#C0FFC0" font-size="9">${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'}</text>`;
+  }
+  const ix=80,iy=txY+150;s+=`<rect x="${ix}" y="${iy}" width="400" height="130" rx="6" fill="#1A1D21" stroke="#3a3e45" stroke-width="1"/>`;
+  s+=`<text x="${ix+10}" y="${iy+18}" fill="#B0A0FF" font-size="11" font-weight="bold">方案关键指标</text>`;
+  s+=`<text x="${ix+10}" y="${iy+36}" fill="#0F6E56" font-size="10">旺季覆盖率: ${(c.coverageHigh*100).toFixed(0)}% | 淡季: ${(Math.min(c.coverageLow,1)*100).toFixed(0)}%</text>`;
+  s+=`<text x="${ix+10}" y="${iy+52}" fill="#EF9F27" font-size="10">年度利用率: ${(c.utilAnnual*100).toFixed(0)}%</text>`;
+  s+=`<text x="${ix+10}" y="${iy+68}" fill="#E06070" font-size="10">峰谷差: ${(P.pricePeak-P.priceValley).toFixed(3)}元/kWh</text>`;
+  s+=`<text x="${ix+10}" y="${iy+84}" fill="#534AB7" font-size="10">年收益: ${c.annualSaving.toFixed(1)}万 | 投资: ${c.totalInvest.toFixed(0)}万</text>`;
+  s+=`<text x="${ix+10}" y="${iy+100}" fill="#185FA5" font-size="10" font-weight="bold">回收期: ${c.payback.toFixed(1)}年</text>`;
+  s+=`<text x="${ix+10}" y="${iy+118}" fill="#666" font-size="8">防逆流: EMS软件限功率 + 逆功率继电器 + 并网柜保护</text>`;
+  s+=`</svg>`;
+  document.getElementById('archSvg').innerHTML=s;
+}
+
+function renderWiringSvg(R){
+  const P=R.params;const c=R.candidates[0];const W=1100,H=620;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<rect width="${W}" height="${H}" fill="#1A1D21"/>`;
+  s+=`<text x="150" y="22" fill="#185FA5" font-size="12" font-weight="bold" text-anchor="middle">国网${P.txHv}kV</text>`;
+  s+=`<line x1="150" y1="28" x2="150" y2="55" stroke="#185FA5" stroke-width="2"/>`;
+  s+=`<rect x="100" y="55" width="100" height="26" rx="4" fill="#22262B" stroke="#185FA5" stroke-width="1"/>`;
+  s+=`<text x="150" y="73" text-anchor="middle" fill="#C2C0B6" font-size="9">计量/PCC</text>`;
+  s+=`<line x1="150" y1="81" x2="150" y2="108" stroke="#185FA5" stroke-width="2"/>`;
+  s+=`<line x1="60" y1="108" x2="700" y2="108" stroke="#185FA5" stroke-width="5"/>`;
+  s+=`<text x="380" y="103" text-anchor="middle" fill="#80A0C0" font-size="10" font-weight="bold">厂内${P.txHv}kV母线</text>`;
+  for(let i=0;i<P.txCount;i++){const x=200+i*160;
+    s+=`<line x1="${x}" y1="108" x2="${x}" y2="138" stroke="#EF9F27" stroke-width="2"/>`;
+    s+=`<circle cx="${x}" cy="158" r="17" fill="#2A2E33" stroke="#EF9F27" stroke-width="1.5"/>`;
+    s+=`<circle cx="${x}" cy="158" r="10" fill="none" stroke="#EF9F27" stroke-width="1"/>`;
+    s+=`<text x="${x}" y="161" text-anchor="middle" fill="#EF9F27" font-size="7">Y/Δ</text>`;
+    s+=`<text x="${x+28}" y="155" fill="#EF9F27" font-size="8">${i+1}#T ${P.txCap}kVA</text>`;
+    s+=`<line x1="${x}" y1="175" x2="${x}" y2="205" stroke="#534AB7" stroke-width="1.5"/>`;
+    s+=`<rect x="${x-48}" y="205" width="96" height="32" rx="4" fill="#22262B" stroke="#534AB7" stroke-width="1"/>`;
+    s+=`<text x="${x}" y="225" text-anchor="middle" fill="#B0A0E0" font-size="9">0.4kV负荷</text>`;
+  }
+  const ex=580;s+=`<line x1="${ex}" y1="108" x2="${ex}" y2="138" stroke="#0F6E56" stroke-width="2"/>`;
+  if(P.use10kV){
+    s+=`<rect x="${ex-58}" y="138" width="116" height="28" rx="4" fill="#22262B" stroke="#0F6E56" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="156" text-anchor="middle" fill="#40D0A0" font-size="9" font-weight="bold">${P.txHv}kV并网柜</text>`;
+    s+=`<line x1="${ex}" y1="166" x2="${ex}" y2="190" stroke="#0F6E56" stroke-width="1.5"/>`;
+    if(c.needStepUp){s+=`<circle cx="${ex}" cy="208" r="15" fill="#2A2E33" stroke="#EF9F27" stroke-width="1.5"/>`;s+=`<text x="${ex}" y="211" text-anchor="middle" fill="#EF9F27" font-size="7">0.69/${P.txHv}</text>`;s+=`<line x1="${ex}" y1="223" x2="${ex}" y2="248" stroke="#E06070" stroke-width="1.5"/>`;}
+    const py=c.needStepUp?248:190;
+    s+=`<rect x="${ex-58}" y="${py}" width="116" height="32" rx="5" fill="#2A2E33" stroke="#E06070" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${py+14}" text-anchor="middle" fill="#FF8090" font-size="10" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
+    s+=`<text x="${ex}" y="${py+26}" text-anchor="middle" fill="#C06070" font-size="7">P/Q+V/F</text>`;
+    s+=`<line x1="${ex}" y1="${py+32}" x2="${ex}" y2="${py+55}" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="5,2"/>`;
+    s+=`<rect x="${ex-68}" y="${py+55}" width="136" height="42" rx="5" fill="#1A2A1D" stroke="#0F6E56" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${py+73}" text-anchor="middle" fill="#40D0A0" font-size="10" font-weight="bold">${c.product.name}${c.qty>1?'×'+c.qty:''}</text>`;
+    s+=`<text x="${ex}" y="${py+89}" text-anchor="middle" fill="#408040" font-size="7">${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'} ${c.product.cool}</text>`;
+  }
+  s+=`<rect x="750" y="138" width="195" height="125" rx="5" fill="#1A1D21" stroke="#3a3e45" stroke-width="1"/>`;
+  s+=`<text x="847" y="158" text-anchor="middle" fill="#B0A0FF" font-size="10" font-weight="bold">保护与通讯</text>`;
+  s+=`<text x="760" y="175" fill="#8080C0" font-size="8">● 过流/速断/接地/防孤岛</text>`;
+  s+=`<text x="760" y="190" fill="#8080C0" font-size="8">● 逆功率保护(双闭环)</text>`;
+  s+=`<text x="760" y="205" fill="#8080C0" font-size="8">● PCC实时功率监测</text>`;
+  s+=`<text x="760" y="220" fill="#8080C0" font-size="8">● BMS三级(CAN/RS485)</text>`;
+  s+=`<text x="760" y="235" fill="#8080C0" font-size="8">● EMS(Modbus/IEC104)</text>`;
+  s+=`<text x="760" y="250" fill="#8080C0" font-size="8">● ${c.product.fire}</text>`;
+  s+=`<text x="760" y="262" fill="#555" font-size="7">示意方案，需设计院深化</text>`;
+  s+=`</svg>`;
+  document.getElementById('wiringSvg').innerHTML=s;
+}
+
+function showRefDiagrams(){
+  const sec=document.getElementById('refSection');sec.style.display='block';
+  const af=document.getElementById('refArchFrame');const wf=document.getElementById('refWiringFrame');
+  if(!af.src.endsWith('系统架构图_v11_10kV.html'))af.src='系统架构图_v11_10kV.html';
+  if(!wf.src.endsWith('电气接线图_v11_10kV.html'))wf.src='电气接线图_v11_10kV.html';
+}
+
+function downloadSVG(containerId,filename){
+  const svgEl=document.getElementById(containerId).querySelector('svg');
+  if(!svgEl)return;const svgData=new XMLSerializer().serializeToString(svgEl);
+  const blob=new Blob([svgData],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+}
+
+function downloadTxt(){
+  const el=document.querySelector('.doc-output');if(!el)return;
+  const blob=new Blob([el.textContent],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='储能系统解决方案.txt';a.click();URL.revokeObjectURL(url);
+}
+
+function downloadMD(){
+  if(!LAST_RESULT)return;const P=LAST_RESULT.params;const c=LAST_RESULT.candidates[0];const d=new Date();
+  const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+  const pcsStr=(c.pcsKW/1000).toFixed(2)+'MW';
+  let md=`# ${P.region} 工商业储能系统解决方案\n\n`;
+  md+=`> 生成日期: ${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}  \n`;
+  md+=`> 数据来源: GOTION储能手册2025Q4\n\n`;
+  md+=`## 一、配电现状\n\n| 参数 | 数值 |\n|------|------|\n`;
+  md+=`| 变压器 | ${P.txCount}×${P.txCap}kVA ${P.txHv}kV/${P.txLv}V ${P.txVector} |\n`;
+  md+=`| 接入方式 | ${P.use10kV?'10kV母线侧':'0.4kV低压侧'} |\n\n`;
+  md+=`## 二、储能选型\n\n**${c.product.name}${c.qty>1?' ×'+c.qty:''}** ${capStr} / ${pcsStr}\n\n`;
+  md+=`## 三、经济性\n\n| 项目 | 数值 |\n|------|------|\n`;
+  md+=`| 年收益 | ${c.annualSaving.toFixed(1)}万元 |\n| 总投资 | ${c.totalInvest.toFixed(0)}万元 |\n| 回收期 | ${c.payback.toFixed(1)}年 |\n`;
+  const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='储能系统解决方案.md';a.click();URL.revokeObjectURL(url);
+}
+
+renderDeviceLibrary('全部');renderCases();
+</script>
+</body>
+</html>
