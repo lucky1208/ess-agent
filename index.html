@@ -231,6 +231,10 @@ ACC AC一体柜专题
 <div class="diagram-header"><h3 class="diagram-title">电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadSVG('wiringSvg','电气接线图.svg')">下载 SVG</button></div></div>
 <div class="diagram-svg" id="wiringSvg"></div>
 </div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">电气拓扑图</h3><div class="diagram-actions"><button onclick="downloadSVG('topoSvg','电气拓扑图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="topoSvg"></div>
+</div>
 <div class="diagram-container" id="bomSection" style="display:none">
 <div class="diagram-header"><h3 class="diagram-title">物料清单(BOM)</h3></div>
 <div id="bomContent"></div>
@@ -290,6 +294,13 @@ const PRODUCTS=[
   {id:'YJN-C320',name:'易加能 C系列 固定储充320kW/844kWh',cat:'易加能-固定储充',model:'C-Series 320kW/844kWh',cap:844,power:320,volt:704,cell:'LFP',size:'4.0m×2.44m×2.9m',weight:'14000kg',cool:'自然散热/选配液冷',fire:'七氟丙烷/气溶胶',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_C_series.png',features:['1000V直流平台','320kW双枪','V2G 30kW','交直流双补电']},
   {id:'YJN-C522',name:'易加能 C系列 固定储充360kW/522kWh',cat:'易加能-固定储充',model:'C-Series 360kW/522kWh',cap:522,power:360,volt:704,cell:'LFP',size:'2.53m×2.36m×1.45m',weight:'5000kg',cool:'液冷',fire:'-',ip:'IP54',temp:'-25~45°C',pcs:false,img:'yijianeng_C522_120inverter.png',features:['液冷温控','360kW峰值','522kWh储能','5枪输出']},
   {id:'YJN-INV120',name:'易加能 120kW交流逆变装置',cat:'易加能-固定储充',model:'120kW AC Inverter',cap:0,power:120,volt:400,cell:'-',size:'-',weight:'-',cool:'-',fire:'-',ip:'-',temp:'-20~45°C',pcs:true,img:'yijianeng_C522_120inverter.png',features:['并网/离网双模式','120kW输出','PF≥0.99','THDi≤3%']},
+  {id:'DLL-YCS283',name:'电拉拉 驮龙送电车 六工位',cat:'电拉拉-移动储充换',model:'YCS283',cap:1800,power:572,volt:750,cell:'LFP',size:'12m×2.55m×3.7m',weight:'-',cool:'液冷',fire:'-',ip:'IP67',temp:'-20~55°C',pcs:true,maxP:6,img:'dianlala_p6.png',features:['绿电搬运','移动充放电','移动换电','846-1800kWh']},
+  {id:'DLL-YCS146',name:'电拉拉 驮龙送电车 八工位',cat:'电拉拉-移动储充换',model:'YCS146',cap:4800,power:1250,volt:750,cell:'LFP',size:'13.95m×2.55m×1.5m',weight:'-',cool:'液冷',fire:'-',ip:'IP67',temp:'-20~55°C',pcs:true,maxP:8,img:'dianlala_p6.png',features:['八工位','2256-4800kWh','1250kW输出','移动充换一体']},
+  {id:'DLL-HYZ452',name:'电拉拉 混元珠 452kWh电池包',cat:'电拉拉-电池/底托',model:'混元珠-452',cap:452,power:600,volt:700.8,cell:'LFP',size:'2.37m×0.824m×1.73m',weight:'-',cool:'液冷液热',fire:'-',ip:'IP68',temp:'-20~55°C',pcs:false,img:'dianlala_p7.png',features:['动储一体','可充可换','IP68','液冷液热']},
+  {id:'DLL-HYZ600',name:'电拉拉 混元珠 600kWh电池包',cat:'电拉拉-电池/底托',model:'混元珠-600',cap:600,power:600,volt:744.6,cell:'LFP',size:'2.37m×0.824m×1.82m',weight:'-',cool:'液冷+电加热',fire:'-',ip:'IP67',temp:'-20~55°C',pcs:false,img:'dianlala_p7.png',features:['大容量600kWh','5层电池','液冷+电加热','IP67']},
+  {id:'DLL-LT-GD',name:'电拉拉 莲台 电动底托',cat:'电拉拉-电池/底托',model:'YCTZ-GD120/240',cap:0,power:240,volt:750,cell:'-',size:'2.32m×0.985m×1.5m',weight:'620kg',cool:'-',fire:'-',ip:'-',temp:'-20~55°C',pcs:false,img:'dianlala_p7.png',features:['电动移动','承载282-600kWh','DC-DC 200-1000V','无需叉车']},
+  {id:'DLL-PCS750',name:'电拉拉 PCS充放一体机 750kW',cat:'电拉拉-移动储充换',model:'PCS-750kW',cap:0,power:750,volt:400,cell:'-',size:'-',weight:'-',cool:'液冷',fire:'-',ip:'IP55',temp:'-25~55°C',pcs:true,img:'dll_s11_5.png',features:['充放一体','750kW','双向PCS','离网无缝切换']},
+  {id:'DLL-DCL750',name:'电拉拉 750kW直流变换器',cat:'电拉拉-移动储充换',model:'DC-DC-750kW',cap:0,power:750,volt:1500,cell:'-',size:'-',weight:'-',cool:'液冷',fire:'-',ip:'IP55',temp:'-25~55°C',pcs:false,img:'dll_s13_4.png',features:['DC-DC变换','750kW','1500Vdc输入','高效']},
 ];
 
 const CASES=[
@@ -297,6 +308,7 @@ const CASES=[
   {title:'安徽庐江大酒店 522kWh',desc:'酒店削峰填谷+需量控制+备用供电，低压0.4kV侧接入',tags:['0.4kV','522kWh','酒店'],color:'var(--green)',img:'page4_img14.png',detailId:'lujiang'},
   {title:'美国Fremont光储充 1.4MWh',desc:'1.4MWh储能+1MW光伏+1.6MW直流快充，自给自足',tags:['光储充','1.4MWh','海外'],color:'var(--orange)',img:'page11_img2.png',detailId:'fremont'},
   {title:'上海邑东 2.5MWh储能站',desc:'集装箱储能充电桩一体化，2.5MWh配套充电场站',tags:['2.5MWh','充换电'],color:'var(--purple)',img:'page1_img0.png',detailId:'yidong'},
+  {title:'西部钻探油田钻井平台 5MWh',desc:'国轩高科×西部钻探×沃德石油，国内首创大型油改电项目，5MWh储能仓替代柴油发电',tags:['油改电','5MWh','钻井'],color:'var(--brown)',img:'dll_s15_4.jpg',detailId:'xibuzt'},
 ];
 
 let LAST_RESULT=null;
@@ -308,7 +320,7 @@ function showPage(id){
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-tab')[['config','devices','diagrams','cases'].indexOf(id)].classList.add('active');
   if(id==='devices')renderDeviceLibrary(currentFilter);
-  if(id==='diagrams'&&LAST_RESULT){renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderBOM(LAST_RESULT);showRefDiagrams();}
+  if(id==='diagrams'&&LAST_RESULT){renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);showRefDiagrams();}
   if(id==='cases')renderCases();
 }
 
@@ -365,7 +377,7 @@ function generateSolution(){
   const P=getParams();const result=selectEquipment(P);LAST_RESULT=result;
   document.getElementById('successMsg').classList.add('show');
   renderRecommendation(result);renderSelectionTable(result);renderDocOutput(result);
-  renderArchSvg(result);renderWiringSvg(result);renderBOM(result);showRefDiagrams();
+  renderArchSvg(result);renderWiringSvg(result);renderTopoSvg(result);renderBOM(result);showRefDiagrams();
   showPage('config');
 }
 
@@ -902,6 +914,110 @@ const DEVICE_SPECS={
   兼容各类负载，满足多场景供电
   结构简洁、故障率低、维护成本低
   高效节能，绿色环保`,
+'DLL-YCS283':`型号: 电拉拉 驮龙送电车 六工位 (YCS283)
+
+产品参数:
+  标称能量: 846~1800kWh
+  额定功率: 572kW
+  标称电压: 750Vdc
+  电芯体系: LFP
+  尺寸: 12m×2.55m×3.7m
+  防护等级: IP67
+  温控: 液冷
+  工作温度: -20~55°C
+
+核心特性:
+  绿电搬运，移动充放电，移动换电
+  六工位设计，846-1800kWh灵活配置
+  内置PCS，即插即用`,
+'DLL-YCS146':`型号: 电拉拉 驮龙送电车 八工位 (YCS146)
+
+产品参数:
+  标称能量: 2256~4800kWh
+  额定功率: 1250kW
+  标称电压: 750Vdc
+  电芯体系: LFP
+  尺寸: 13.95m×2.55m×1.5m
+  防护等级: IP67
+  温控: 液冷
+  工作温度: -20~55°C
+
+核心特性:
+  八工位设计，2256-4800kWh超大容量
+  1250kW大功率输出
+  移动充换一体`,
+'DLL-HYZ452':`型号: 电拉拉 混元珠 452kWh电池包
+
+产品参数:
+  标称能量: 452kWh
+  最大功率: 600kW
+  标称电压: 700.8Vdc
+  电芯体系: LFP
+  尺寸: 2.37m×0.824m×1.73m
+  防护等级: IP68
+  温控: 液冷液热
+  工作温度: -20~55°C
+
+核心特性:
+  动储一体，可充可换
+  IP68最高防护等级
+  液冷液热双温控`,
+'DLL-HYZ600':`型号: 电拉拉 混元珠 600kWh电池包
+
+产品参数:
+  标称能量: 600kWh
+  最大功率: 600kW
+  标称电压: 744.6Vdc
+  电芯体系: LFP
+  尺寸: 2.37m×0.824m×1.82m
+  防护等级: IP67
+  温控: 液冷+电加热
+  工作温度: -20~55°C
+
+核心特性:
+  大容量600kWh，5层电池架构
+  液冷+电加热双温控
+  IP67高防护`,
+'DLL-LT-GD':`型号: 电拉拉 莱台 电动底托 (YCTZ-GD120/240)
+
+产品参数:
+  额定功率: 240kW
+  标称电压: 750Vdc
+  DC-DC范围: 200-1000V
+  尺寸: 2.32m×0.985m×1.5m
+  重量: 620kg
+  工作温度: -20~55°C
+
+核心特性:
+  电动移动，无需叉车
+  承载282-600kWh电池包
+  DC-DC 200-1000V宽范围适配`,
+'DLL-PCS750':`型号: 电拉拉 PCS充放一体机 750kW
+
+产品参数:
+  额定功率: 750kW
+  交流电压: 400Vac
+  温控: 液冷
+  防护等级: IP55
+  工作温度: -25~55°C
+
+核心特性:
+  充放一体，双向PCS
+  750kW大功率
+  离网无缝切换`,
+'DLL-DCL750':`型号: 电拉拉 750kW直流变换器 (DC-DC-750kW)
+
+产品参数:
+  额定功率: 750kW
+  输入电压: 1500Vdc
+  温控: 液冷
+  防护等级: IP55
+  工作温度: -25~55°C
+
+核心特性:
+  DC-DC变换，1500Vdc输入
+  750kW高效率
+  液冷温控`,
 };
 
 function showDetail(productId){
@@ -1061,6 +1177,85 @@ AI技术实现预测分析、强化学习调度和智能能量管理。
   - SOH预测：LSTM网络基于充电曲线+EIS阻抗特征
   - 循环寿命优化：SAC自动发现"浅充浅放"策略
   - 故障预警：小波变换+CNN识别热失控`,
+
+xibuzt:`西部钻探油田钻井平台 5MWh储能仓项目
+国轩高科×西部钻探×沃德石油 — 国内首创大型油改电项目
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 项目概述
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  国轩高科携手西部钻探、沃德石油，国内首创大型油改电项目储能仓试验。
+  以5MWh储能仓替代传统柴油发电机组，为油田钻井平台提供清洁电力，
+  实现降本增效与碳减排双目标。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. 充电系统拓扑
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  10kV电网 → 10/0.4变压器 → PCS一体机3.45MW×2 → 储能电池系统×2
+  → 1500Vdc → 400Vac → 井口负荷
+
+  电网接入: 10kV架空线/电缆引入
+  变压器: 10/0.4kV 降压变
+  PCS: 3.45MW一体机 × 2台（并网/离网双模式）
+  储能电池: 5MWh系统 × 2仓
+  直流母线: 1500Vdc
+  交流输出: 400Vac 三相四线
+  负荷侧: 井口钻井设备
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. PCS离网无缝切换策略
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4台PCS配置:
+  - 1#、2# PCS → 接1号电池仓
+  - 3#、4# PCS → 接2号电池仓
+  - EMS统一控制切换时序
+
+  切换逻辑:
+  1) 并网运行: 4台PCS并网取电，电池充电备用
+  2) 离网切换: EMS检测电网失压，发出离网指令
+     1#/2# PCS切换为V/F离网模式（接1号仓）
+     3#/4# PCS切换为V/F离网模式（接2号仓）
+  3) 离网运行: 4台PCS离网带载，电池放电供电
+  4) 并网恢复: 电网恢复，EMS执行同期并网，切换回P/Q模式
+
+  切换时间: <10ms（无缝切换，钻井设备不停机）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. 运行数据
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  甩钻下钻工序:
+    电流: 120A
+    功率: 160kW
+  三开钻进工序:
+    电流: 250A
+    功率: 330kW
+  日平均用电: 约2万kWh
+  峰值功率: 约690kW（4台PCS并联输出）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. 5MWh储能仓参数
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  标称能量: 5MWh
+  标称电压: 1500Vdc
+  电芯体系: LFP磷酸铁锂
+  温控方式: 液冷
+  防护等级: IP55
+  工作温度: -20°C ~ +55°C
+  消防系统: PACK级浸没+全淹没气体+整舱消防水
+  BMS架构: 三级（电芯→簇→系统）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. 投资测算
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  日用电量: 2万kWh
+  年用电量: 410万kWh
+  柴油发电成本: 售电1.5元/kWh
+  储能取电成本: 取电0.85元/kWh
+  年节约电费: (1.5-0.85)×410万 = 266.5万元
+  柴油机组运维节约: 约80万元/年
+  年总节约: 约346.5万元
+  项目总投资: 约1140万元
+  静态回本周期: 3.3年`,
 };
 
 const ACC_DETAIL=`ACC-480-P750-UL AC一体柜 安装指导手册
@@ -1545,6 +1740,88 @@ function renderWiringSvg(R){
   s+=`<text x="600" y="840" text-anchor="middle" fill="#606080" font-size="8">一次接线为方案级示意；保护定值、接地方式、柜型与二次回路需由有资质设计单位出图</text>`;
   s+=`</svg>`;
   document.getElementById('wiringSvg').innerHTML=s;
+}
+
+function renderTopoSvg(R){
+  const W=1100,H=700;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<defs>`;
+  s+=`<linearGradient id="topoGrid" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2a50a0"/><stop offset="50%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>`;
+  s+=`<linearGradient id="topoPcs" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#e06070"/><stop offset="100%" style="stop-color:#a03040"/></linearGradient>`;
+  s+=`<linearGradient id="topoBat" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#50c878"/><stop offset="100%" style="stop-color:#208040"/></linearGradient>`;
+  s+=`<linearGradient id="topoLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#e8a838"/><stop offset="100%" style="stop-color:#a07020"/></linearGradient>`;
+  s+=`<linearGradient id="topoEms" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#6060a0"/><stop offset="100%" style="stop-color:#303060"/></linearGradient>`;
+  s+=`<filter id="topoGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  s+=`</defs>`;
+  s+=`<rect width="${W}" height="${H}" fill="#0d1117"/>`;
+  s+=`<pattern id="topoDot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
+  s+=`<rect width="${W}" height="${H}" fill="url(#topoDot)"/>`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#4a90d9" font-size="14" font-weight="bold">油田矿区充放电电气拓扑图</text>`;
+  const emsX=W/2,emsY=75;
+  s+=`<rect x="${emsX-80}" y="${emsY-20}" width="160" height="40" rx="8" fill="url(#topoEms)" stroke="#8080c0" stroke-width="2" filter="url(#topoGlow)"/>`;
+  s+=`<text x="${emsX}" y="${emsY}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">站级EMS</text>`;
+  s+=`<text x="${emsX}" y="${emsY+13}" text-anchor="middle" fill="#b0b0e0" font-size="8">以太网通讯</text>`;
+  const gridX=100,gridY=320;
+  s+=`<rect x="${gridX-70}" y="${gridY-30}" width="140" height="60" rx="8" fill="#1a2a4a" stroke="#4a90d9" stroke-width="2"/>`;
+  s+=`<text x="${gridX}" y="${gridY-8}" text-anchor="middle" fill="#80b0e0" font-size="12" font-weight="bold">10kV电网</text>`;
+  s+=`<text x="${gridX}" y="${gridY+10}" text-anchor="middle" fill="#6090c0" font-size="9">并网取电</text>`;
+  const txX=230,txY=320;
+  s+=`<line x1="${gridX+70}" y1="${gridY}" x2="${txX-35}" y2="${txY}" stroke="#4a90d9" stroke-width="2.5"/>`;
+  s+=`<text x="${(gridX+70+txX-35)/2}" y="${gridY-8}" text-anchor="middle" fill="#4a90d9" font-size="8">10kV ac</text>`;
+  s+=`<circle cx="${txX}" cy="${txY}" r="30" fill="#2a3050" stroke="#e8a838" stroke-width="2"/>`;
+  s+=`<circle cx="${txX}" cy="${txY}" r="20" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+  s+=`<text x="${txX}" y="${txY+4}" text-anchor="middle" fill="#e8a838" font-size="9">Y/Δ</text>`;
+  s+=`<text x="${txX}" y="${txY+45}" text-anchor="middle" fill="#e0c060" font-size="10" font-weight="bold">10/0.4变压器</text>`;
+  const pcs1X=420,pcs2X=620,pcsY=280;
+  s+=`<line x1="${txX+30}" y1="${txY}" x2="${pcs1X-60}" y2="${pcsY+20}" stroke="#e06070" stroke-width="2"/>`;
+  s+=`<line x1="${txX+30}" y1="${txY}" x2="${pcs2X-60}" y2="${pcsY+20}" stroke="#e06070" stroke-width="2"/>`;
+  s+=`<text x="${(txX+30+pcs1X-60)/2}" y="${(txY+pcsY+20)/2-10}" text-anchor="middle" fill="#e06070" font-size="8">400V ac</text>`;
+  for(let i=0;i<2;i++){
+    const px=i===0?pcs1X:pcs2X;
+    s+=`<rect x="${px-60}" y="${pcsY-25}" width="120" height="90" rx="8" fill="url(#topoPcs)" stroke="#ff8090" stroke-width="2" filter="url(#topoGlow)"/>`;
+    s+=`<text x="${px}" y="${pcsY}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">PCS一体机</text>`;
+    s+=`<text x="${px}" y="${pcsY+16}" text-anchor="middle" fill="#ffc0c0" font-size="10">3.45MW</text>`;
+    s+=`<text x="${px}" y="${pcsY+32}" text-anchor="middle" fill="#c06070" font-size="8">${i===0?'1#/2#':'3#/4#'} PCS</text>`;
+    s+=`<text x="${px}" y="${pcsY+48}" text-anchor="middle" fill="#c06070" font-size="8">并网P/Q | 离网V/F</text>`;
+    s+=`<line x1="${px}" y1="${emsY+20}" x2="${px}" y2="${pcsY-25}" stroke="#8080c0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  }
+  const bat1X=pcs1X,bat2X=pcs2X,batY=440;
+  s+=`<line x1="${pcs1X}" y1="${pcsY+65}" x2="${bat1X}" y2="${batY-35}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+  s+=`<text x="${pcs1X+25}" y="${(pcsY+65+batY-35)/2}" fill="#50c878" font-size="8">1500V dc</text>`;
+  s+=`<line x1="${pcs2X}" y1="${pcsY+65}" x2="${bat2X}" y2="${batY-35}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+  s+=`<text x="${pcs2X+25}" y="${(pcsY+65+batY-35)/2}" fill="#50c878" font-size="8">1500V dc</text>`;
+  for(let i=0;i<2;i++){
+    const bx=i===0?bat1X:bat2X;
+    s+=`<rect x="${bx-70}" y="${batY-35}" width="140" height="80" rx="8" fill="url(#topoBat)" stroke="#80e080" stroke-width="2" filter="url(#topoGlow)"/>`;
+    s+=`<text x="${bx}" y="${batY-10}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">储能电池系统</text>`;
+    s+=`<text x="${bx}" y="${batY+8}" text-anchor="middle" fill="#c0ffc0" font-size="10">5MWh (${i+1}号仓)</text>`;
+    s+=`<text x="${bx}" y="${batY+24}" text-anchor="middle" fill="#60a060" font-size="8">LFP / 液冷 / IP55</text>`;
+    s+=`<text x="${bx}" y="${batY+38}" text-anchor="middle" fill="#408040" font-size="8">1500Vdc / BMS三级</text>`;
+  }
+  const loadX=880,loadY=350;
+  s+=`<line x1="${pcs2X+60}" y1="${pcsY+20}" x2="${loadX-70}" y2="${loadY-30}" stroke="#e8a838" stroke-width="2.5"/>`;
+  s+=`<text x="${(pcs2X+60+loadX-70)/2}" y="${(pcsY+20+loadY-30)/2-8}" text-anchor="middle" fill="#e8a838" font-size="8">400V ac</text>`;
+  s+=`<rect x="${loadX-70}" y="${loadY-80}" width="140" height="180" rx="8" fill="url(#topoLoad)" stroke="#e0c060" stroke-width="2" filter="url(#topoGlow)"/>`;
+  s+=`<text x="${loadX}" y="${loadY-58}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">井口负荷</text>`;
+  s+=`<line x1="${loadX-55}" y1="${loadY-42}" x2="${loadX+55}" y2="${loadY-42}" stroke="#a07020" stroke-width="1"/>`;
+  s+=`<text x="${loadX}" y="${loadY-25}" text-anchor="middle" fill="#ffe080" font-size="10">绞车</text>`;
+  s+=`<text x="${loadX}" y="${loadY-8}" text-anchor="middle" fill="#ffe080" font-size="10">泥浆泵</text>`;
+  s+=`<text x="${loadX}" y="${loadY+9}" text-anchor="middle" fill="#ffe080" font-size="10">顶驱</text>`;
+  s+=`<text x="${loadX}" y="${loadY+26}" text-anchor="middle" fill="#ffe080" font-size="10">空压机</text>`;
+  s+=`<text x="${loadX}" y="${loadY+43}" text-anchor="middle" fill="#ffe080" font-size="10">固控系统</text>`;
+  s+=`<text x="${loadX}" y="${loadY+60}" text-anchor="middle" fill="#ffe080" font-size="10">照明/生活</text>`;
+  s+=`<text x="${loadX}" y="${loadY+80}" text-anchor="middle" fill="#c09030" font-size="8">~690kW峰值</text>`;
+  s+=`<line x1="${emsX+80}" y1="${emsY}" x2="${loadX}" y2="${loadY-70}" stroke="#8080c0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<rect x="60" y="570" width="980" height="55" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="${W/2}" y="590" text-anchor="middle" fill="#8888cc" font-size="11" font-weight="bold">PCS离网无缝切换策略</text>`;
+  s+=`<text x="80" y="612" fill="#8080c0" font-size="9">1#/2# PCS → 接1号电池仓(5MWh)　　3#/4# PCS → 接2号电池仓(5MWh)　　EMS统一控制切换时序　　切换时间 &lt; 10ms</text>`;
+  s+=`<rect x="60" y="640" width="980" height="45" rx="6" fill="#0d1520" stroke="#50c878" stroke-width="1"/>`;
+  s+=`<text x="${W/2}" y="660" text-anchor="middle" fill="#50c878" font-size="11" font-weight="bold">双运行模式</text>`;
+  s+=`<text x="200" y="678" text-anchor="middle" fill="#60c060" font-size="9">并网取电: 10kV电网→变压器→PCS→电池充电</text>`;
+  s+=`<text x="600" y="678" text-anchor="middle" fill="#60c060" font-size="9">离网运行: 电池放电→PCS(V/F)→井口负荷</text>`;
+  s+=`<text x="950" y="678" text-anchor="middle" fill="#c09030" font-size="9">回本3.3年</text>`;
+  s+=`</svg>`;
+  document.getElementById('topoSvg').innerHTML=s;
 }
 
 function renderBOM(R){
