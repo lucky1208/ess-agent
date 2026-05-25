@@ -231,6 +231,10 @@ ACC AC一体柜专题
 <div class="diagram-header"><h3 class="diagram-title">电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadSVG('wiringSvg','电气接线图.svg')">下载 SVG</button></div></div>
 <div class="diagram-svg" id="wiringSvg"></div>
 </div>
+<div class="diagram-container" id="bomSection" style="display:none">
+<div class="diagram-header"><h3 class="diagram-title">物料清单(BOM)</h3></div>
+<div id="bomContent"></div>
+</div>
 <div class="diagram-container" id="refSection" style="display:none">
 <div class="diagram-header"><h3 class="diagram-title">参考设计图（大庆管业5MWh项目）</h3></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -304,7 +308,7 @@ function showPage(id){
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-tab')[['config','devices','diagrams','cases'].indexOf(id)].classList.add('active');
   if(id==='devices')renderDeviceLibrary(currentFilter);
-  if(id==='diagrams'&&LAST_RESULT){renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);showRefDiagrams();}
+  if(id==='diagrams'&&LAST_RESULT){renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderBOM(LAST_RESULT);showRefDiagrams();}
   if(id==='cases')renderCases();
 }
 
@@ -361,7 +365,7 @@ function generateSolution(){
   const P=getParams();const result=selectEquipment(P);LAST_RESULT=result;
   document.getElementById('successMsg').classList.add('show');
   renderRecommendation(result);renderSelectionTable(result);renderDocOutput(result);
-  renderArchSvg(result);renderWiringSvg(result);showRefDiagrams();
+  renderArchSvg(result);renderWiringSvg(result);renderBOM(result);showRefDiagrams();
   showPage('config');
 }
 
@@ -1225,115 +1229,376 @@ function showCaseDetail(detailId,title){
 
 function renderArchSvg(R){
   const P=R.params;const c=R.candidates[0];const is10kV=P.use10kV;
-  const W=1100,H=700;let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
-  s+=`<defs><linearGradient id="g1"><stop offset="0%" stop-color="#185FA5"/><stop offset="100%" stop-color="#0C447C"/></linearGradient>`;
-  s+=`<linearGradient id="g2"><stop offset="0%" stop-color="#EF9F27"/><stop offset="100%" stop-color="#854F0B"/></linearGradient>`;
-  s+=`<linearGradient id="g3"><stop offset="0%" stop-color="#0F6E56"/><stop offset="100%" stop-color="#0A5A46"/></linearGradient>`;
-  s+=`<linearGradient id="g4"><stop offset="0%" stop-color="#E06070"/><stop offset="100%" stop-color="#B04050"/></linearGradient>`;
-  s+=`<filter id="ds"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity=".15"/></filter></defs>`;
-  s+=`<rect width="${W}" height="${H}" fill="#1A1D21"/>`;
-  s+=`<text x="550" y="28" text-anchor="middle" fill="#185FA5" font-size="13" font-weight="bold">国网${P.txHv}kV电源</text>`;
-  s+=`<rect x="420" y="40" width="260" height="38" rx="6" fill="#22262B" stroke="#185FA5" stroke-width="1.5"/>`;
-  s+=`<text x="550" y="64" text-anchor="middle" fill="#C2C0B6" font-size="11">计量/PCC (电表+PT/CT)</text>`;
-  s+=`<line x1="550" y1="78" x2="550" y2="108" stroke="#185FA5" stroke-width="2"/>`;
-  const busY=115;s+=`<rect x="80" y="${busY}" width="940" height="28" rx="3" fill="url(#g1)" filter="url(#ds)"/>`;
-  s+=`<text x="550" y="${busY+18}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">厂内${P.txHv}kV母线（用户侧）</text>`;
-  const txY=busY+48;
-  for(let i=0;i<P.txCount;i++){const x=200+i*180;
-    s+=`<line x1="${x}" y1="${busY+28}" x2="${x}" y2="${txY}" stroke="#EF9F27" stroke-width="2"/>`;
-    s+=`<rect x="${x-70}" y="${txY}" width="140" height="50" rx="6" fill="url(#g2)" filter="url(#ds)"/>`;
-    s+=`<text x="${x}" y="${txY+20}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${i+1}#变压器</text>`;
-    s+=`<text x="${x}" y="${txY+36}" text-anchor="middle" fill="#fff0d0" font-size="9">${P.txCap}kVA ${P.txHv}/${P.txLv/1000}kV</text>`;
-    s+=`<line x1="${x}" y1="${txY+50}" x2="${x}" y2="${txY+80}" stroke="#534AB7" stroke-width="2"/>`;
-    s+=`<rect x="${x-55}" y="${txY+80}" width="110" height="36" rx="5" fill="#22262B" stroke="#534AB7" stroke-width="1"/>`;
-    s+=`<text x="${x}" y="${txY+102}" text-anchor="middle" fill="#B0A0E0" font-size="10">0.4kV负荷</text>`;
+  const W=1100,H=800;let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<defs>`;
+  s+=`<linearGradient id="gGrid" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4a90d9"/><stop offset="100%" stop-color="#2a50a0"/></linearGradient>`;
+  s+=`<linearGradient id="gTrans" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#e8a838"/><stop offset="100%" stop-color="#c07820"/></linearGradient>`;
+  s+=`<linearGradient id="gESS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#50c878"/><stop offset="100%" stop-color="#309858"/></linearGradient>`;
+  s+=`<linearGradient id="gPCS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#e06070"/><stop offset="100%" stop-color="#b04050"/></linearGradient>`;
+  s+=`<linearGradient id="gLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#a070d0"/><stop offset="100%" stop-color="#7040a0"/></linearGradient>`;
+  s+=`<linearGradient id="gBus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#606080"/><stop offset="50%" stop-color="#8080a0"/><stop offset="100%" stop-color="#606080"/></linearGradient>`;
+  s+=`<filter id="sh"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/></filter>`;
+  s+=`<marker id="aB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#4a90d9"/></marker>`;
+  s+=`<marker id="aO" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e8a838"/></marker>`;
+  s+=`<marker id="aG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#50c878"/></marker>`;
+  s+=`<marker id="aR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e06070"/></marker>`;
+  s+=`</defs>`;
+  s+=`<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
+  s+=`<rect width="${W}" height="${H}" fill="url(#dot)"/>`;
+  s+=`<rect x="350" y="20" width="400" height="55" rx="8" fill="url(#gGrid)" filter="url(#sh)"/>`;
+  s+=`<text x="550" y="42" text-anchor="middle" fill="white" font-size="14" font-weight="bold">国网${P.txHv}kV电源</text>`;
+  s+=`<text x="550" y="62" text-anchor="middle" fill="#c0d0ff" font-size="10">国网${P.region||'黑龙江大庆'}供电公司</text>`;
+  s+=`<line x1="550" y1="75" x2="550" y2="100" stroke="#4a90d9" stroke-width="3" marker-end="url(#aB)"/>`;
+  s+=`<rect x="420" y="100" width="260" height="55" rx="8" fill="#1a2a4a" filter="url(#sh)" stroke="#4a90d9" stroke-width="1.5"/>`;
+  s+=`<text x="550" y="122" text-anchor="middle" fill="#80b0e0" font-size="13" font-weight="bold">计量 / PCC</text>`;
+  s+=`<text x="550" y="142" text-anchor="middle" fill="#6090c0" font-size="10">电表 + PT/CT（电力局资产，不需改造）</text>`;
+  s+=`<rect x="300" y="90" width="600" height="75" rx="6" fill="none" stroke="#e8a838" stroke-width="1.5" stroke-dasharray="6,3"/>`;
+  s+=`<text x="610" y="88" fill="#e8a838" font-size="10">防反送电控制边界：PCC实时功率 &gt; 50~100kW 时限功率</text>`;
+  s+=`<line x1="550" y1="155" x2="550" y2="180" stroke="#4a90d9" stroke-width="3" marker-end="url(#aB)"/>`;
+  const busY=180;
+  s+=`<rect x="100" y="${busY}" width="900" height="40" rx="4" fill="url(#gBus)" filter="url(#sh)"/>`;
+  s+=`<text x="550" y="${busY+25}" text-anchor="middle" fill="white" font-size="13" font-weight="bold">厂内${P.txHv}kV母线（用户侧）</text>`;
+  const txY=busY+60;
+  const txSpacing=Math.min(180,700/(P.txCount+1));
+  for(let i=0;i<P.txCount;i++){const x=200+i*txSpacing;
+    s+=`<line x1="${x}" y1="${busY+40}" x2="${x}" y2="${txY}" stroke="#e8a838" stroke-width="3" marker-end="url(#aO)"/>`;
+    s+=`<rect x="${x-100}" y="${txY}" width="200" height="70" rx="8" fill="url(#gTrans)" filter="url(#sh)"/>`;
+    s+=`<text x="${x}" y="${txY+23}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${i+1}# 变压器</text>`;
+    s+=`<text x="${x}" y="${txY+42}" text-anchor="middle" fill="#fff0d0" font-size="10">S9-${P.txCap}/10</text>`;
+    s+=`<text x="${x}" y="${txY+58}" text-anchor="middle" fill="#fff0d0" font-size="9">${P.txCap}kVA ${P.txHv}/${(P.txLv/1000).toFixed(1)}kV ${P.txVector}</text>`;
+    s+=`<line x1="${x}" y1="${txY+70}" x2="${x}" y2="${txY+105}" stroke="#a070d0" stroke-width="3" marker-end="url(#aB)"/>`;
+    s+=`<rect x="${x-90}" y="${txY+105}" width="180" height="65" rx="8" fill="url(#gLoad)" filter="url(#sh)"/>`;
+    const loadKW=Math.round(P.txCap*P.pf*0.6);
+    s+=`<text x="${x}" y="${txY+128}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${(P.txLv/1000).toFixed(1)}kV负荷${i+1}</text>`;
+    s+=`<text x="${x}" y="${txY+146}" text-anchor="middle" fill="#e0c0ff" font-size="10">电机/产线 ~${loadKW}kW</text>`;
+    s+=`<text x="${x}" y="${txY+162}" text-anchor="middle" fill="#e0c0ff" font-size="9">${P.workDays}天/月运行</text>`;
   }
-  const ex=760;s+=`<line x1="${ex}" y1="${busY+28}" x2="${ex}" y2="${txY}" stroke="#0F6E56" stroke-width="2"/>`;
+  const ex=760;
+  s+=`<line x1="${ex}" y1="${busY+40}" x2="${ex}" y2="${txY}" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>`;
+  s+=`<text x="${ex}" y="${busY+52}" text-anchor="middle" fill="#50c878" font-size="10" font-weight="bold">储能支路（用户侧闭环运行）</text>`;
   if(is10kV){
-    s+=`<rect x="${ex-80}" y="${txY}" width="160" height="38" rx="6" fill="#22262B" stroke="#0F6E56" stroke-width="1.5" filter="url(#ds)"/>`;
-    s+=`<text x="${ex}" y="${txY+16}" text-anchor="middle" fill="#40D0A0" font-size="10" font-weight="bold">储能${P.txHv}kV并网柜</text>`;
-    s+=`<text x="${ex}" y="${txY+30}" text-anchor="middle" fill="#60A080" font-size="8">断路器+继保</text>`;
-    s+=`<line x1="${ex}" y1="${txY+38}" x2="${ex}" y2="${txY+65}" stroke="#0F6E56" stroke-width="2"/>`;
-    if(c.needStepUp){s+=`<rect x="${ex-70}" y="${txY+65}" width="140" height="32" rx="5" fill="#2A2E33" stroke="#EF9F27" stroke-width="1"/>`;s+=`<text x="${ex}" y="${txY+85}" text-anchor="middle" fill="#EF9F27" font-size="10" font-weight="bold">升压变 0.69/${P.txHv}kV</text>`;s+=`<line x1="${ex}" y1="${txY+97}" x2="${ex}" y2="${txY+115}" stroke="#E06070" stroke-width="2"/>`;}
-    const pcsY=txY+(c.needStepUp?115:65);
-    s+=`<rect x="${ex-80}" y="${pcsY}" width="160" height="42" rx="6" fill="url(#g4)" filter="url(#ds)"/>`;
-    s+=`<text x="${ex}" y="${pcsY+17}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
-    s+=`<text x="${ex}" y="${pcsY+33}" text-anchor="middle" fill="#FFC0C0" font-size="9">并网P/Q + 离网V/F</text>`;
-    s+=`<line x1="${ex}" y1="${pcsY+42}" x2="${ex}" y2="${pcsY+65}" stroke="#0F6E56" stroke-width="2" stroke-dasharray="6,3"/>`;
-    const batY=pcsY+65;s+=`<rect x="${ex-90}" y="${batY}" width="180" height="50" rx="6" fill="url(#g3)" filter="url(#ds)"/>`;
-    s+=`<text x="${ex}" y="${batY+18}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${c.product.name}</text>`;
-    s+=`<text x="${ex}" y="${batY+35}" text-anchor="middle" fill="#C0FFC0" font-size="9">${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'} | ${c.product.cell}</text>`;
-    if(c.qty>1)s+=`<text x="${ex}" y="${batY+46}" text-anchor="middle" fill="#90D090" font-size="8">${c.qty}台并联 | ${c.product.cool}</text>`;
+    s+=`<rect x="${ex-100}" y="${txY}" width="200" height="55" rx="8" fill="#1a2a1a" filter="url(#sh)" stroke="#50c878" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${txY+23}" text-anchor="middle" fill="#80e080" font-size="12" font-weight="bold">储能${P.txHv}kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${txY+43}" text-anchor="middle" fill="#60a060" font-size="10">断路器+继保(过流/速断/接地/防孤岛)</text>`;
+    s+=`<line x1="${ex}" y1="${txY+55}" x2="${ex}" y2="${txY+90}" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>`;
+    if(c.needStepUp){
+      s+=`<rect x="${ex-100}" y="${txY+90}" width="200" height="55" rx="8" fill="#2a3020" filter="url(#sh)" stroke="#e8a838" stroke-width="1.5"/>`;
+      s+=`<text x="${ex}" y="${txY+113}" text-anchor="middle" fill="#e8a838" font-size="12" font-weight="bold">升压变压器</text>`;
+      const stepKVA=Math.round(c.pcsKW*1.2);
+      s+=`<text x="${ex}" y="${txY+133}" text-anchor="middle" fill="#c09030" font-size="10">0.69/${P.txHv}kV 干式变压器 ~${stepKVA}kVA</text>`;
+      s+=`<line x1="${ex}" y1="${txY+145}" x2="${ex}" y2="${txY+170}" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>`;
+    }
+    const acY=txY+(c.needStepUp?90:55)+(c.needStepUp?55:0);
+    s+=`<rect x="${ex-85}" y="${acY}" width="170" height="40" rx="6" fill="#2a2020" filter="url(#sh)" stroke="#e06070" stroke-width="1"/>`;
+    s+=`<text x="${ex}" y="${acY+18}" text-anchor="middle" fill="#ff8090" font-size="11" font-weight="bold">AC柜 (计量/隔离)</text>`;
+    s+=`<text x="${ex}" y="${acY+33}" text-anchor="middle" fill="#c06070" font-size="9">0.69kV侧</text>`;
+    s+=`<line x1="${ex}" y1="${acY+40}" x2="${ex}" y2="${acY+65}" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>`;
+    const pcsY=acY+65;
+    s+=`<rect x="${ex-110}" y="${pcsY}" width="220" height="65" rx="8" fill="url(#gPCS)" filter="url(#sh)"/>`;
+    s+=`<text x="${ex}" y="${pcsY+23}" text-anchor="middle" fill="white" font-size="13" font-weight="bold">PCS 功率变换系统</text>`;
+    s+=`<text x="${ex}" y="${pcsY+43}" text-anchor="middle" fill="#ffc0c0" font-size="11">${(c.pcsKW/1000).toFixed(2)}MW ${c.qty>1?'分布式':'集中式'}</text>`;
+    const dcV=c.product.volt;
+    s+=`<text x="${ex}" y="${pcsY+58}" text-anchor="middle" fill="#ffc0c0" font-size="10">AC 690V ↔ DC ${dcV}V | 并网P/Q+离网V/F</text>`;
+    s+=`<line x1="${ex}" y1="${pcsY+65}" x2="${ex}" y2="${pcsY+95}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3" marker-end="url(#aG)"/>`;
+    s+=`<text x="${ex+60}" y="${pcsY+85}" fill="#50c878" font-size="9">DC ${dcV}V</text>`;
+    const batY=pcsY+95;
+    s+=`<rect x="${ex-120}" y="${batY}" width="240" height="85" rx="8" fill="url(#gESS)" filter="url(#sh)"/>`;
+    s+=`<text x="${ex}" y="${batY+20}" text-anchor="middle" fill="white" font-size="14" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
+    s+=`<text x="${ex}" y="${batY+38}" text-anchor="middle" fill="#c0ffc0" font-size="11">${c.product.model}</text>`;
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    s+=`<text x="${ex}" y="${batY+55}" text-anchor="middle" fill="#c0ffc0" font-size="10">${capStr} / ${dcV}V / ${c.product.cell}</text>`;
+    s+=`<text x="${ex}" y="${batY+70}" text-anchor="middle" fill="#90d090" font-size="9">${c.product.cool}/${c.product.ip}/${c.product.size}/${c.product.weight}</text>`;
+    s+=`<text x="${ex}" y="${batY+82}" text-anchor="middle" fill="#90d090" font-size="9">BMS三级 + ${c.product.fire}</text>`;
   }else{
-    s+=`<rect x="${ex-80}" y="${txY}" width="160" height="32" rx="5" fill="#22262B" stroke="#0F6E56" stroke-width="1.5"/>`;
-    s+=`<text x="${ex}" y="${txY+20}" text-anchor="middle" fill="#40D0A0" font-size="10" font-weight="bold">储能并网柜 0.4kV</text>`;
-    s+=`<line x1="${ex}" y1="${txY+32}" x2="${ex}" y2="${txY+55}" stroke="#E06070" stroke-width="2"/>`;
-    const pcsY2=txY+55;s+=`<rect x="${ex-80}" y="${pcsY2}" width="160" height="38" rx="5" fill="url(#g4)"/>`;
-    s+=`<text x="${ex}" y="${pcsY2+24}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
-    s+=`<line x1="${ex}" y1="${pcsY2+38}" x2="${ex}" y2="${pcsY2+60}" stroke="#0F6E56" stroke-width="2" stroke-dasharray="5,2"/>`;
-    const batY2=pcsY2+60;s+=`<rect x="${ex-90}" y="${batY2}" width="180" height="45" rx="5" fill="url(#g3)"/>`;
-    s+=`<text x="${ex}" y="${batY2+18}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
-    s+=`<text x="${ex}" y="${batY2+35}" text-anchor="middle" fill="#C0FFC0" font-size="9">${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'}</text>`;
+    s+=`<rect x="${ex-100}" y="${txY}" width="200" height="45" rx="8" fill="#1a2a1a" filter="url(#sh)" stroke="#50c878" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${txY+18}" text-anchor="middle" fill="#80e080" font-size="12" font-weight="bold">储能0.4kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${txY+36}" text-anchor="middle" fill="#60a060" font-size="10">断路器+逆功率保护</text>`;
+    s+=`<line x1="${ex}" y1="${txY+45}" x2="${ex}" y2="${txY+80}" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>`;
+    const pcsY=txY+80;
+    s+=`<rect x="${ex-110}" y="${pcsY}" width="220" height="55" rx="8" fill="url(#gPCS)" filter="url(#sh)"/>`;
+    s+=`<text x="${ex}" y="${pcsY+20}" text-anchor="middle" fill="white" font-size="13" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
+    s+=`<text x="${ex}" y="${pcsY+40}" text-anchor="middle" fill="#ffc0c0" font-size="10">AC 400V ↔ DC ${c.product.volt}V | 并网P/Q</text>`;
+    s+=`<line x1="${ex}" y1="${pcsY+55}" x2="${ex}" y2="${pcsY+85}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3" marker-end="url(#aG)"/>`;
+    const batY=pcsY+85;
+    s+=`<rect x="${ex-120}" y="${batY}" width="240" height="70" rx="8" fill="url(#gESS)" filter="url(#sh)"/>`;
+    s+=`<text x="${ex}" y="${batY+18}" text-anchor="middle" fill="white" font-size="13" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    s+=`<text x="${ex}" y="${batY+35}" text-anchor="middle" fill="#c0ffc0" font-size="10">${capStr} / ${c.product.volt}V / ${c.product.cell}</text>`;
+    s+=`<text x="${ex}" y="${batY+50}" text-anchor="middle" fill="#90d090" font-size="9">${c.product.cool}/${c.product.ip} | ${c.product.fire}</text>`;
+    s+=`<text x="${ex}" y="${batY+63}" text-anchor="middle" fill="#90d090" font-size="9">BMS三级保护</text>`;
   }
-  const ix=80,iy=txY+150;s+=`<rect x="${ix}" y="${iy}" width="400" height="130" rx="6" fill="#1A1D21" stroke="#3a3e45" stroke-width="1"/>`;
-  s+=`<text x="${ix+10}" y="${iy+18}" fill="#B0A0FF" font-size="11" font-weight="bold">方案关键指标</text>`;
-  s+=`<text x="${ix+10}" y="${iy+36}" fill="#0F6E56" font-size="10">旺季覆盖率: ${(c.coverageHigh*100).toFixed(0)}% | 淡季: ${(Math.min(c.coverageLow,1)*100).toFixed(0)}%</text>`;
-  s+=`<text x="${ix+10}" y="${iy+52}" fill="#EF9F27" font-size="10">年度利用率: ${(c.utilAnnual*100).toFixed(0)}%</text>`;
-  s+=`<text x="${ix+10}" y="${iy+68}" fill="#E06070" font-size="10">峰谷差: ${(P.pricePeak-P.priceValley).toFixed(3)}元/kWh</text>`;
-  s+=`<text x="${ix+10}" y="${iy+84}" fill="#534AB7" font-size="10">年收益: ${c.annualSaving.toFixed(1)}万 | 投资: ${c.totalInvest.toFixed(0)}万</text>`;
-  s+=`<text x="${ix+10}" y="${iy+100}" fill="#185FA5" font-size="10" font-weight="bold">回收期: ${c.payback.toFixed(1)}年</text>`;
-  s+=`<text x="${ix+10}" y="${iy+118}" fill="#666" font-size="8">防逆流: EMS软件限功率 + 逆功率继电器 + 并网柜保护</text>`;
+  s+=`<rect x="920" y="${txY}" width="160" height="180" rx="8" fill="#151530" filter="url(#sh)" stroke="#6060a0" stroke-width="1.5"/>`;
+  s+=`<text x="1000" y="${txY+25}" text-anchor="middle" fill="#a0a0ff" font-size="12" font-weight="bold">EMS能量管理</text>`;
+  s+=`<line x1="935" y1="${txY+35}" x2="1065" y2="${txY+35}" stroke="#3a3a5e" stroke-width="1"/>`;
+  const emsItems=['● 峰谷时段自动调度','● 防逆流双闭环控制','● PCC功率实时监测','● SOC保护管理','● 防孤岛保护联锁','● 远程监控+告警','● 软件限功率+硬件兜底'];
+  emsItems.forEach((t,i)=>{s+=`<text x="1000" y="${txY+55+i*20}" text-anchor="middle" fill="#8080c0" font-size="10">${t}</text>`;});
+  s+=`<line x1="920" y1="${txY+95}" x2="860" y2="${txY+23}" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>`;
+  s+=`<line x1="920" y1="${txY+120}" x2="870" y2="${txY+100}" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>`;
+  s+=`<line x1="920" y1="${txY+145}" x2="880" y2="${txY+140}" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>`;
+  s+=`<line x1="920" y1="${txY+80}" x2="680" y2="127" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<text x="820" y="195" fill="#6060a0" font-size="8" transform="rotate(-30,820,195)">PCC功率采集</text>`;
+  s+=`<rect x="60" y="${txY+90}" width="400" height="200" rx="8" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="260" y="${txY+115}" text-anchor="middle" fill="#a0a0ff" font-size="12" font-weight="bold">充放电策略与经济性</text>`;
+  s+=`<line x1="70" y1="${txY+125}" x2="450" y2="${txY+125}" stroke="#2a2a3e" stroke-width="1"/>`;
+  s+=`<text x="75" y="${txY+145}" fill="#50c878" font-size="10" font-weight="bold">谷段充电: 23:30-05:30</text>`;
+  s+=`<text x="75" y="${txY+162}" fill="#50c878" font-size="9">  PCS整流 ${(c.pcsKW/1000).toFixed(2)}MW×6h≈满(DoD95%)  电价≈${P.priceValley.toFixed(3)}元</text>`;
+  s+=`<text x="75" y="${txY+182}" fill="#e06070" font-size="10" font-weight="bold">峰段放电: 7-8,9-11:30,15:30-20</text>`;
+  s+=`<text x="75" y="${txY+199}" fill="#e06070" font-size="9">  PCS逆变 ≤${(c.pcsKW/1000).toFixed(2)}MW  电价≈${P.pricePeak.toFixed(3)}元  峰谷差≈${(P.pricePeak-P.priceValley).toFixed(3)}元</text>`;
+  s+=`<text x="75" y="${txY+219}" fill="#e8a838" font-size="10" font-weight="bold">容量/功率比:</text>`;
+  const chH=(c.totalCap*0.95/c.pcsKW).toFixed(1);
+  s+=`<text x="75" y="${txY+236}" fill="#e8a838" font-size="9">  ${(c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh')}/${(c.pcsKW/1000).toFixed(2)}MW = ${chH}C·h 充放需~${chH}h</text>`;
+  s+=`<text x="75" y="${txY+260}" fill="#a0a0ff" font-size="10" font-weight="bold">年节省≈${c.annualSaving.toFixed(0)}万元  回收期≈${c.payback.toFixed(1)}年  投资≈${c.totalInvest.toFixed(0)}万元</text>`;
+  if(is10kV){
+    s+=`<rect x="60" y="${txY-20}" width="130" height="100" rx="6" fill="#0d1a10" stroke="#50c878" stroke-width="1"/>`;
+    s+=`<text x="125" y="${txY}" text-anchor="middle" fill="#80e080" font-size="10" font-weight="bold">${P.txHv}kV方案优势</text>`;
+    s+=`<text x="70" y="${txY+18}" fill="#60c060" font-size="9">✓ 不占变压器容量</text>`;
+    s+=`<text x="70" y="${txY+33}" fill="#60c060" font-size="9">✓ 充电不经过变压器</text>`;
+    s+=`<text x="70" y="${txY+48}" fill="#60c060" font-size="9">✓ 全厂削峰覆盖</text>`;
+    s+=`<text x="70" y="${txY+63}" fill="#60c060" font-size="9">✓ 谐波隔离</text>`;
+    s+=`<text x="70" y="${txY+78}" fill="#60c060" font-size="9">✓ 保护配置清晰</text>`;
+  }
   s+=`</svg>`;
   document.getElementById('archSvg').innerHTML=s;
 }
 
 function renderWiringSvg(R){
-  const P=R.params;const c=R.candidates[0];const W=1100,H=620;
+  const P=R.params;const c=R.candidates[0];const W=1200,H=950;
   let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
-  s+=`<rect width="${W}" height="${H}" fill="#1A1D21"/>`;
-  s+=`<text x="150" y="22" fill="#185FA5" font-size="12" font-weight="bold" text-anchor="middle">国网${P.txHv}kV</text>`;
-  s+=`<line x1="150" y1="28" x2="150" y2="55" stroke="#185FA5" stroke-width="2"/>`;
-  s+=`<rect x="100" y="55" width="100" height="26" rx="4" fill="#22262B" stroke="#185FA5" stroke-width="1"/>`;
-  s+=`<text x="150" y="73" text-anchor="middle" fill="#C2C0B6" font-size="9">计量/PCC</text>`;
-  s+=`<line x1="150" y1="81" x2="150" y2="108" stroke="#185FA5" stroke-width="2"/>`;
-  s+=`<line x1="60" y1="108" x2="700" y2="108" stroke="#185FA5" stroke-width="5"/>`;
-  s+=`<text x="380" y="103" text-anchor="middle" fill="#80A0C0" font-size="10" font-weight="bold">厂内${P.txHv}kV母线</text>`;
-  for(let i=0;i<P.txCount;i++){const x=200+i*160;
-    s+=`<line x1="${x}" y1="108" x2="${x}" y2="138" stroke="#EF9F27" stroke-width="2"/>`;
-    s+=`<circle cx="${x}" cy="158" r="17" fill="#2A2E33" stroke="#EF9F27" stroke-width="1.5"/>`;
-    s+=`<circle cx="${x}" cy="158" r="10" fill="none" stroke="#EF9F27" stroke-width="1"/>`;
-    s+=`<text x="${x}" y="161" text-anchor="middle" fill="#EF9F27" font-size="7">Y/Δ</text>`;
-    s+=`<text x="${x+28}" y="155" fill="#EF9F27" font-size="8">${i+1}#T ${P.txCap}kVA</text>`;
-    s+=`<line x1="${x}" y1="175" x2="${x}" y2="205" stroke="#534AB7" stroke-width="1.5"/>`;
-    s+=`<rect x="${x-48}" y="205" width="96" height="32" rx="4" fill="#22262B" stroke="#534AB7" stroke-width="1"/>`;
-    s+=`<text x="${x}" y="225" text-anchor="middle" fill="#B0A0E0" font-size="9">0.4kV负荷</text>`;
+  s+=`<defs>`;
+  s+=`<linearGradient id="bus10w" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2a50a0"/><stop offset="50%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>`;
+  s+=`</defs>`;
+  s+=`<rect width="${W}" height="${H}" fill="#0d1117"/>`;
+  s+=`<pattern id="dw" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
+  s+=`<rect width="${W}" height="${H}" fill="url(#dw)"/>`;
+  const hv=P.txHv;const lvKv=(P.txLv/1000).toFixed(1);
+  s+=`<text x="200" y="30" fill="#4a90d9" font-size="11" font-weight="bold" text-anchor="middle">国网${hv}kV</text>`;
+  s+=`<line x1="200" y1="38" x2="200" y2="65" stroke="#4a90d9" stroke-width="2.5"/>`;
+  s+=`<rect x="140" y="65" width="120" height="35" rx="4" fill="#1a2a4a" stroke="#4a90d9" stroke-width="1.5"/>`;
+  s+=`<text x="200" y="85" text-anchor="middle" fill="#80b0e0" font-size="9">计量/PCC</text>`;
+  s+=`<text x="200" y="95" text-anchor="middle" fill="#6090c0" font-size="7">PT+CT(电力局资产)</text>`;
+  s+=`<line x1="200" y1="100" x2="200" y2="130" stroke="#4a90d9" stroke-width="2"/>`;
+  const boundaryW=Math.min(580,200+P.txCount*150+80);
+  s+=`<rect x="120" y="55" width="${boundaryW}" height="90" rx="4" fill="none" stroke="#e8a838" stroke-width="1" stroke-dasharray="5,3"/>`;
+  s+=`<text x="${120+boundaryW/2}" y="52" fill="#e8a838" font-size="8">防反送电控制边界：PCC实时功率 &gt; 50~100kW时触发限功率</text>`;
+  const busY=130;
+  s+=`<line x1="80" y1="${busY}" x2="700" y2="${busY}" stroke="url(#bus10w)" stroke-width="7" stroke-linecap="round"/>`;
+  s+=`<text x="390" y="${busY-8}" text-anchor="middle" fill="#80b0e0" font-size="11" font-weight="bold">厂内${hv}kV母线</text>`;
+  const txSpacing=Math.min(150,400/Math.max(P.txCount,1));
+  for(let i=0;i<P.txCount;i++){const x=250+i*txSpacing;
+    s+=`<line x1="${x}" y1="${busY}" x2="${x}" y2="${busY+40}" stroke="#e8a838" stroke-width="2"/>`;
+    s+=`<rect x="${x-10}" y="${busY+40}" width="20" height="30" fill="#2a3050" stroke="#e8a838" stroke-width="1.5" rx="2"/>`;
+    s+=`<text x="${x}" y="${busY+60}" text-anchor="middle" fill="#e0c060" font-size="8">QF${i*2+1}</text>`;
+    s+=`<line x1="${x}" y1="${busY+70}" x2="${x}" y2="${busY+100}" stroke="#e8a838" stroke-width="2"/>`;
+    s+=`<circle cx="${x}" cy="${busY+120}" r="20" fill="#2a3050" stroke="#e8a838" stroke-width="2"/>`;
+    s+=`<circle cx="${x}" cy="${busY+120}" r="13" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+    s+=`<text x="${x}" y="${busY+123}" text-anchor="middle" fill="#e8a838" font-size="8">${P.txVector||'Y/Δ'}</text>`;
+    s+=`<text x="${x+30}" y="${busY+112}" fill="#e8a838" font-size="9">${i+1}#T: S9-${P.txCap}/${hv}</text>`;
+    s+=`<text x="${x+30}" y="${busY+126}" fill="#c09030" font-size="8">${P.txCap}kVA ${hv}/${lvKv}kV Zk=${P.txZk||4.3}%</text>`;
+    s+=`<line x1="${x}" y1="${busY+140}" x2="${x}" y2="${busY+170}" stroke="#a070d0" stroke-width="2"/>`;
+    s+=`<rect x="${x-10}" y="${busY+170}" width="20" height="20" fill="#2a3050" stroke="#a070d0" stroke-width="1.5" rx="2"/>`;
+    s+=`<text x="${x}" y="${busY+185}" text-anchor="middle" fill="#c090e0" font-size="8">QF${i*2+2}</text>`;
+    s+=`<line x1="${x}" y1="${busY+190}" x2="${x}" y2="${busY+220}" stroke="#a070d0" stroke-width="2"/>`;
+    const loadKW=Math.round(P.txCap*P.pf*0.6);
+    s+=`<rect x="${x-65}" y="${busY+220}" width="130" height="50" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/>`;
+    s+=`<text x="${x}" y="${busY+240}" text-anchor="middle" fill="#c090e0" font-size="10" font-weight="bold">${lvKv}kV负荷${i+1}</text>`;
+    s+=`<text x="${x}" y="${busY+258}" text-anchor="middle" fill="#8060a0" font-size="8">电机/产线 ~${loadKW}kW</text>`;
   }
-  const ex=580;s+=`<line x1="${ex}" y1="108" x2="${ex}" y2="138" stroke="#0F6E56" stroke-width="2"/>`;
+  const ex=580;
+  s+=`<line x1="${ex}" y1="${busY}" x2="${ex}" y2="${busY+35}" stroke="#50c878" stroke-width="2.5"/>`;
   if(P.use10kV){
-    s+=`<rect x="${ex-58}" y="138" width="116" height="28" rx="4" fill="#22262B" stroke="#0F6E56" stroke-width="1.5"/>`;
-    s+=`<text x="${ex}" y="156" text-anchor="middle" fill="#40D0A0" font-size="9" font-weight="bold">${P.txHv}kV并网柜</text>`;
-    s+=`<line x1="${ex}" y1="166" x2="${ex}" y2="190" stroke="#0F6E56" stroke-width="1.5"/>`;
-    if(c.needStepUp){s+=`<circle cx="${ex}" cy="208" r="15" fill="#2A2E33" stroke="#EF9F27" stroke-width="1.5"/>`;s+=`<text x="${ex}" y="211" text-anchor="middle" fill="#EF9F27" font-size="7">0.69/${P.txHv}</text>`;s+=`<line x1="${ex}" y1="223" x2="${ex}" y2="248" stroke="#E06070" stroke-width="1.5"/>`;}
-    const py=c.needStepUp?248:190;
-    s+=`<rect x="${ex-58}" y="${py}" width="116" height="32" rx="5" fill="#2A2E33" stroke="#E06070" stroke-width="1.5"/>`;
-    s+=`<text x="${ex}" y="${py+14}" text-anchor="middle" fill="#FF8090" font-size="10" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
-    s+=`<text x="${ex}" y="${py+26}" text-anchor="middle" fill="#C06070" font-size="7">P/Q+V/F</text>`;
-    s+=`<line x1="${ex}" y1="${py+32}" x2="${ex}" y2="${py+55}" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="5,2"/>`;
-    s+=`<rect x="${ex-68}" y="${py+55}" width="136" height="42" rx="5" fill="#1A2A1D" stroke="#0F6E56" stroke-width="1.5"/>`;
-    s+=`<text x="${ex}" y="${py+73}" text-anchor="middle" fill="#40D0A0" font-size="10" font-weight="bold">${c.product.name}${c.qty>1?'×'+c.qty:''}</text>`;
-    s+=`<text x="${ex}" y="${py+89}" text-anchor="middle" fill="#408040" font-size="7">${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'} ${c.product.cool}</text>`;
+    s+=`<rect x="${ex-70}" y="${busY+35}" width="140" height="55" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${busY+55}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能${hv}kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${busY+70}" text-anchor="middle" fill="#60a060" font-size="8">断路器+继保</text>`;
+    s+=`<text x="${ex}" y="${busY+83}" text-anchor="middle" fill="#508050" font-size="7">过流/速断/接地/防孤岛</text>`;
+    s+=`<rect x="${ex+80}" y="${busY+35}" width="130" height="50" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+    s+=`<text x="${ex+145}" y="${busY+52}" text-anchor="middle" fill="#a0a0ff" font-size="9" font-weight="bold">继保要求</text>`;
+    s+=`<text x="${ex+145}" y="${busY+66}" text-anchor="middle" fill="#8080c0" font-size="8">并网柜必须可见可断</text>`;
+    s+=`<text x="${ex+145}" y="${busY+78}" text-anchor="middle" fill="#8080c0" font-size="8">逆功率+EMS双闭环</text>`;
+    s+=`<line x1="${ex+80}" y1="${busY+60}" x2="${ex+70}" y2="${busY+60}" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+    s+=`<line x1="${ex}" y1="${busY+90}" x2="${ex}" y2="${busY+130}" stroke="#50c878" stroke-width="2.5"/>`;
+    let nextY=busY+130;
+    if(c.needStepUp){
+      s+=`<circle cx="${ex}" cy="${nextY+20}" r="22" fill="#2a3020" stroke="#e8a838" stroke-width="2"/>`;
+      s+=`<circle cx="${ex}" cy="${nextY+20}" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+      s+=`<text x="${ex}" y="${nextY+23}" text-anchor="middle" fill="#e8a838" font-size="8">0.69/${hv}</text>`;
+      const stepKVA=Math.round(c.pcsKW*1.2);
+      s+=`<text x="${ex+30}" y="${nextY+12}" fill="#e8a838" font-size="9">升压变</text>`;
+      s+=`<text x="${ex+30}" y="${nextY+26}" fill="#c09030" font-size="8">干式 ~${stepKVA}kVA</text>`;
+      s+=`<text x="${ex+30}" y="${nextY+38}" fill="#c09030" font-size="7">独立配置(谐波隔离)</text>`;
+      s+=`<line x1="${ex}" y1="${nextY+42}" x2="${ex}" y2="${nextY+70}" stroke="#e8a838" stroke-width="2"/>`;
+      nextY=nextY+70;
+    }
+    s+=`<rect x="${ex-60}" y="${nextY}" width="120" height="35" rx="4" fill="#2a2020" stroke="#e06070" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${nextY+18}" text-anchor="middle" fill="#ff8090" font-size="10" font-weight="bold">AC柜(0.69kV)</text>`;
+    s+=`<text x="${ex}" y="${nextY+30}" text-anchor="middle" fill="#c06070" font-size="8">计量/隔离</text>`;
+    s+=`<line x1="${ex}" y1="${nextY+35}" x2="${ex}" y2="${nextY+65}" stroke="#e06070" stroke-width="2"/>`;
+    nextY=nextY+65;
+    s+=`<rect x="${ex-90}" y="${nextY}" width="180" height="65" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+23}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PCS</text>`;
+    s+=`<text x="${ex}" y="${nextY+41}" text-anchor="middle" fill="#ffc0c0" font-size="10">${(c.pcsKW/1000).toFixed(2)}MW ${c.qty>1?'分布式':'集中式'}</text>`;
+    s+=`<text x="${ex}" y="${nextY+55}" text-anchor="middle" fill="#c06070" font-size="9">AC690V↔DC${c.product.volt}V ≥97%</text>`;
+    s+=`<rect x="${ex+100}" y="${nextY+5}" width="120" height="45" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+    s+=`<text x="${ex+160}" y="${nextY+23}" text-anchor="middle" fill="#a0a0ff" font-size="9" font-weight="bold">直流安全</text>`;
+    s+=`<text x="${ex+160}" y="${nextY+37}" text-anchor="middle" fill="#8080c0" font-size="8">绝缘监测</text>`;
+    s+=`<text x="${ex+160}" y="${nextY+48}" text-anchor="middle" fill="#8080c0" font-size="7">接触器+BMS联动</text>`;
+    s+=`<line x1="${ex+100}" y1="${nextY+30}" x2="${ex+90}" y2="${nextY+30}" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+    nextY=nextY+65;
+    s+=`<line x1="${ex}" y1="${nextY}" x2="${ex}" y2="${nextY+40}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+    s+=`<text x="${ex+40}" y="${nextY+25}" fill="#50c878" font-size="8">YJV-1.5kV DC${c.product.volt}V</text>`;
+    nextY=nextY+40;
+    s+=`<rect x="${ex-10}" y="${nextY}" width="20" height="18" fill="#2a2a50" stroke="#50c878" stroke-width="1.5" rx="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+13}" text-anchor="middle" fill="#80e080" font-size="8">DS</text>`;
+    s+=`<line x1="${ex}" y1="${nextY+18}" x2="${ex}" y2="${nextY+45}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+    nextY=nextY+45;
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    s+=`<rect x="${ex-120}" y="${nextY}" width="240" height="100" rx="8" fill="#0d2a15" stroke="#50c878" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+25}" text-anchor="middle" fill="#80e080" font-size="13" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
+    s+=`<text x="${ex}" y="${nextY+45}" text-anchor="middle" fill="#60c060" font-size="10">${c.product.model}</text>`;
+    s+=`<text x="${ex}" y="${nextY+62}" text-anchor="middle" fill="#408040" font-size="8">${capStr} / ${c.product.volt}V / ${c.product.cell}</text>`;
+    s+=`<text x="${ex}" y="${nextY+77}" text-anchor="middle" fill="#408040" font-size="8">${c.product.cool}/${c.product.ip}/${c.product.size}/${c.product.weight}</text>`;
+    s+=`<text x="${ex}" y="${nextY+92}" text-anchor="middle" fill="#308030" font-size="7">BMS三级+${c.product.fire}</text>`;
+    s+=`<rect x="${ex+130}" y="${nextY+25}" width="90" height="40" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+    s+=`<text x="${ex+175}" y="${nextY+43}" text-anchor="middle" fill="#8080c0" font-size="8">BMS三级</text>`;
+    s+=`<text x="${ex+175}" y="${nextY+58}" text-anchor="middle" fill="#6060a0" font-size="7">电芯→簇→系统</text>`;
+    s+=`<line x1="${ex+120}" y1="${nextY+45}" x2="${ex+130}" y2="${nextY+45}" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  }else{
+    s+=`<rect x="${ex-70}" y="${busY+35}" width="140" height="45" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${busY+53}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能${lvKv}kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${busY+71}" text-anchor="middle" fill="#60a060" font-size="9">断路器+逆功率保护</text>`;
+    s+=`<line x1="${ex}" y1="${busY+80}" x2="${ex}" y2="${busY+115}" stroke="#e06070" stroke-width="2"/>`;
+    let nextY=busY+115;
+    s+=`<rect x="${ex-90}" y="${nextY}" width="180" height="55" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+20}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
+    s+=`<text x="${ex}" y="${nextY+40}" text-anchor="middle" fill="#ffc0c0" font-size="10">AC400V↔DC${c.product.volt}V | 并网P/Q</text>`;
+    s+=`<line x1="${ex}" y1="${nextY+55}" x2="${ex}" y2="${nextY+85}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+    nextY=nextY+85;
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    s+=`<rect x="${ex-120}" y="${nextY}" width="240" height="70" rx="8" fill="#0d2a15" stroke="#50c878" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+18}" text-anchor="middle" fill="#80e080" font-size="13" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
+    s+=`<text x="${ex}" y="${nextY+35}" text-anchor="middle" fill="#60c060" font-size="10">${capStr} / ${c.product.volt}V / ${c.product.cell}</text>`;
+    s+=`<text x="${ex}" y="${nextY+50}" text-anchor="middle" fill="#408040" font-size="9">${c.product.cool}/${c.product.ip} | ${c.product.fire}</text>`;
+    s+=`<text x="${ex}" y="${nextY+63}" text-anchor="middle" fill="#408040" font-size="9">BMS三级保护</text>`;
   }
-  s+=`<rect x="750" y="138" width="195" height="125" rx="5" fill="#1A1D21" stroke="#3a3e45" stroke-width="1"/>`;
-  s+=`<text x="847" y="158" text-anchor="middle" fill="#B0A0FF" font-size="10" font-weight="bold">保护与通讯</text>`;
-  s+=`<text x="760" y="175" fill="#8080C0" font-size="8">● 过流/速断/接地/防孤岛</text>`;
-  s+=`<text x="760" y="190" fill="#8080C0" font-size="8">● 逆功率保护(双闭环)</text>`;
-  s+=`<text x="760" y="205" fill="#8080C0" font-size="8">● PCC实时功率监测</text>`;
-  s+=`<text x="760" y="220" fill="#8080C0" font-size="8">● BMS三级(CAN/RS485)</text>`;
-  s+=`<text x="760" y="235" fill="#8080C0" font-size="8">● EMS(Modbus/IEC104)</text>`;
-  s+=`<text x="760" y="250" fill="#8080C0" font-size="8">● ${c.product.fire}</text>`;
-  s+=`<text x="760" y="262" fill="#555" font-size="7">示意方案，需设计院深化</text>`;
+  s+=`<rect x="850" y="165" width="160" height="180" rx="8" fill="#151530" stroke="#6060a0" stroke-width="1.5"/>`;
+  s+=`<text x="930" y="190" text-anchor="middle" fill="#a0a0ff" font-size="11" font-weight="bold">EMS能量管理</text>`;
+  s+=`<line x1="865" y1="200" x2="995" y2="200" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="930" y="220" text-anchor="middle" fill="#8080c0" font-size="9">● 峰谷自动调度</text>`;
+  s+=`<text x="930" y="240" text-anchor="middle" fill="#8080c0" font-size="9">● PCC功率实时监测</text>`;
+  s+=`<text x="930" y="260" text-anchor="middle" fill="#8080c0" font-size="9">● 防逆流双闭环</text>`;
+  s+=`<text x="930" y="280" text-anchor="middle" fill="#8080c0" font-size="8">  软件限功率+硬件兜底</text>`;
+  s+=`<text x="930" y="300" text-anchor="middle" fill="#8080c0" font-size="9">● SOC保护管理</text>`;
+  s+=`<text x="930" y="320" text-anchor="middle" fill="#8080c0" font-size="9">● 防孤岛保护联锁</text>`;
+  s+=`<text x="930" y="340" text-anchor="middle" fill="#8080c0" font-size="9">● 远程监控+告警</text>`;
+  s+=`<line x1="850" y1="230" x2="650" y2="185" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<line x1="850" y1="270" x2="670" y2="280" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<line x1="850" y1="300" x2="700" y2="580" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<text x="770" y="240" fill="#6060a0" font-size="7" transform="rotate(-20,770,240)">PCC功率采集</text>`;
+  s+=`<text x="775" y="285" fill="#6060a0" font-size="7" transform="rotate(-5,775,285)">RS485/CAN</text>`;
+  s+=`<rect x="60" y="430" width="380" height="220" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="250" y="455" text-anchor="middle" fill="#a0a0ff" font-size="11" font-weight="bold">电缆与设备清单</text>`;
+  s+=`<line x1="70" y1="465" x2="430" y2="465" stroke="#2a2a3e" stroke-width="1"/>`;
+  const cabY=475;
+  s+=`<text x="75" y="${cabY+10}" fill="#e8a838" font-size="9">${hv}kV并网柜:</text>`;
+  s+=`<text x="180" y="${cabY+10}" fill="#c0c0d0" font-size="9">KYN28A-12 ${hv}kV真空断路器柜</text>`;
+  if(c.needStepUp){s+=`<text x="75" y="${cabY+30}" fill="#e8a838" font-size="9">升压变:</text>`;s+=`<text x="180" y="${cabY+30}" fill="#c0c0d0" font-size="9">SC10-${Math.round(c.pcsKW*1.2)}/10 0.69/${hv}kV 干式</text>`;}
+  const pcsRowY=cabY+(c.needStepUp?30:10);
+  s+=`<text x="75" y="${pcsRowY+20}" fill="#e06070" font-size="9">PCS:</text>`;
+  s+=`<text x="180" y="${pcsRowY+20}" fill="#c0c0d0" font-size="9">${(c.pcsKW/1000).toFixed(2)}MW 集中式 AC${P.use10kV?'690':'400'}V</text>`;
+  s+=`<text x="75" y="${pcsRowY+40}" fill="#50c878" font-size="9">AC电缆:</text>`;
+  s+=`<text x="180" y="${pcsRowY+40}" fill="#c0c0d0" font-size="9">YJV-0.6/1kV-3×185+1×95 PCS至${c.needStepUp?'升压变':'并网柜'}</text>`;
+  s+=`<text x="75" y="${pcsRowY+60}" fill="#50c878" font-size="9">DC电缆:</text>`;
+  s+=`<text x="180" y="${pcsRowY+60}" fill="#c0c0d0" font-size="9">YJV-1.5kV-1×400 PCS至电池舱</text>`;
+  if(P.use10kV){s+=`<text x="75" y="${pcsRowY+80}" fill="#50c878" font-size="9">${hv}kV电缆:</text>`;s+=`<text x="180" y="${pcsRowY+80}" fill="#c0c0d0" font-size="9">YJV22-8.7/15kV-3×50 并网柜至母线</text>`;}
+  const comRowY=pcsRowY+(P.use10kV?80:60);
+  s+=`<text x="75" y="${comRowY+20}" fill="#6060a0" font-size="9">通讯:</text>`;
+  s+=`<text x="180" y="${comRowY+20}" fill="#c0c0d0" font-size="9">光缆4芯+RS485屏蔽电缆</text>`;
+  s+=`<text x="75" y="${comRowY+40}" fill="#6060a0" font-size="9">接地:</text>`;
+  s+=`<text x="180" y="${comRowY+40}" fill="#c0c0d0" font-size="9">TN-S系统 铜排独立PE</text>`;
+  s+=`<text x="75" y="${comRowY+60}" fill="#d0d040" font-size="9">计量:</text>`;
+  s+=`<text x="180" y="${comRowY+60}" fill="#c0c0d0" font-size="9">PCC处0.5S级双向表+储能侧计量</text>`;
+  s+=`<rect x="60" y="670" width="380" height="140" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="250" y="695" text-anchor="middle" fill="#e06060" font-size="11" font-weight="bold">保护配置</text>`;
+  s+=`<line x1="70" y1="705" x2="430" y2="705" stroke="#2a2a3e" stroke-width="1"/>`;
+  s+=`<text x="75" y="725" fill="#e06060" font-size="9">● 并网柜: 过流/速断/接地/防孤岛保护</text>`;
+  s+=`<text x="75" y="745" fill="#e06060" font-size="9">● 升压变独立配置: 谐波隔离,减少故障耦合</text>`;
+  s+=`<text x="75" y="765" fill="#e06060" font-size="9">● 逆功率保护: PCC功率&gt;阈值时限功率/停机</text>`;
+  s+=`<text x="75" y="785" fill="#e06060" font-size="9">● EMS双闭环: 软件限功率+硬件保护兜底</text>`;
+  s+=`<text x="75" y="805" fill="#e06060" font-size="9">● BMS: SOC&lt;5%强制断开/温度保护/绝缘监测</text>`;
+  if(P.use10kV){
+    s+=`<rect x="850" y="400" width="160" height="155" rx="6" fill="#0d1a10" stroke="#50c878" stroke-width="1"/>`;
+    s+=`<text x="930" y="420" text-anchor="middle" fill="#80e080" font-size="10" font-weight="bold">${hv}kV方案关键优势</text>`;
+    s+=`<line x1="860" y1="428" x2="1000" y2="428" stroke="#205020" stroke-width="1"/>`;
+    s+=`<text x="865" y="448" fill="#60c060" font-size="9">✓ 不占用变压器容量</text>`;
+    s+=`<text x="865" y="468" fill="#60c060" font-size="9">✓ 充电不经变压器</text>`;
+    s+=`<text x="865" y="488" fill="#60c060" font-size="9">✓ 全厂削峰覆盖</text>`;
+    s+=`<text x="865" y="508" fill="#60c060" font-size="9">✓ 容量校核简单</text>`;
+    s+=`<text x="865" y="528" fill="#60c060" font-size="9">✓ 保护配置清晰</text>`;
+    s+=`<text x="865" y="548" fill="#60c060" font-size="9">✓ 谐波隔离(升压变)</text>`;
+  }
+  s+=`<rect x="60" y="860" width="1080" height="55" rx="4" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="580" y="882" text-anchor="middle" fill="#8888cc" font-size="10" font-weight="bold">电压等级</text>`;
+  s+=`<text x="160" y="905" text-anchor="middle" fill="#4a90d9" font-size="9">${hv}kV (并网/母线)</text>`;
+  s+=`<text x="380" y="905" text-anchor="middle" fill="#e8a838" font-size="9">${lvKv}kV (负荷侧)</text>`;
+  s+=`<text x="600" y="905" text-anchor="middle" fill="#e06070" font-size="9">${P.use10kV?'0.69kV (PCS交流侧)':'0.4kV (PCS交流侧)'}</text>`;
+  s+=`<text x="820" y="905" text-anchor="middle" fill="#50c878" font-size="9">DC${c.product.volt}V (电池侧)</text>`;
+  s+=`<text x="1020" y="905" text-anchor="middle" fill="#6060a0" font-size="9">通讯(RS485/CAN)</text>`;
+  s+=`<text x="600" y="840" text-anchor="middle" fill="#606080" font-size="8">一次接线为方案级示意；保护定值、接地方式、柜型与二次回路需由有资质设计单位出图</text>`;
   s+=`</svg>`;
   document.getElementById('wiringSvg').innerHTML=s;
+}
+
+function renderBOM(R){
+  if(!R||!R.candidates||!R.candidates.length)return;
+  const P=R.params;const c=R.candidates[0];
+  const bom=[];
+  let idx=1;
+  bom.push({no:idx,name:'并网柜',spec:P.use10kV?`KYN28A-12 ${P.txHv}kV真空断路器柜`:`MNS ${((P.txLv/1000).toFixed(1))}kV抽出式开关柜`,qty:1,unit:'面',note:P.use10kV?'含过流/速断/接地/防孤岛保护':'含逆功率保护'});
+  idx++;
+  if(c.needStepUp){
+    const stepKVA=Math.round(c.pcsKW*1.2);
+    bom.push({no:idx,name:'升压变压器',spec:`SC10-${stepKVA}/10 0.69/${P.txHv}kV 干式`,qty:1,unit:'台',note:'独立配置,谐波隔离'});
+    idx++;
+  }
+  bom.push({no:idx,name:'PCS功率变换系统',spec:`${(c.pcsKW/1000).toFixed(2)}MW ${c.qty>1?'分布式':'集中式'} AC${P.use10kV?'690':'400'}V`,qty:c.needPCS?c.qty:1,unit:'台',note:'并网P/Q+离网V/F'});
+  idx++;
+  bom.push({no:idx,name:'电池舱',spec:`${c.product.name} ${c.product.model}`,qty:c.qty,unit:'套',note:`${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'} ${c.product.cool} ${c.product.fire}`});
+  idx++;
+  bom.push({no:idx,name:'AC电缆',spec:'YJV-0.6/1kV-3×185+1×95',qty:1,unit:'批',note:'PCS至'+(c.needStepUp?'升压变':'并网柜')});
+  idx++;
+  bom.push({no:idx,name:'DC电缆',spec:'YJV-1.5kV-1×400',qty:1,unit:'批',note:'PCS至电池舱'});
+  idx++;
+  if(P.use10kV){
+    bom.push({no:idx,name:'高压电缆',spec:'YJV22-8.7/15kV-3×50',qty:1,unit:'批',note:'并网柜至母线'});
+    idx++;
+  }
+  bom.push({no:idx,name:'通讯电缆',spec:'光缆4芯+RS485屏蔽电缆',qty:1,unit:'批',note:'CAN/RS485/Ethernet'});
+  idx++;
+  bom.push({no:idx,name:'EMS控制柜',spec:'能量管理系统',qty:1,unit:'套',note:'峰谷调度+防逆流+远程监控'});
+  idx++;
+  bom.push({no:idx,name:'消防系统',spec:c.product.fire,qty:c.qty,unit:'套',note:'含探测+灭火+联动'});
+  let html=`<table style="width:100%;border-collapse:collapse;font-size:13px">`;
+  html+=`<thead><tr style="background:var(--bg3);color:var(--text1);font-weight:600">`;
+  html+=`<th style="padding:10px 12px;text-align:center;border-bottom:1px solid var(--border)">序号</th>`;
+  html+=`<th style="padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)">设备名称</th>`;
+  html+=`<th style="padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)">型号/规格</th>`;
+  html+=`<th style="padding:10px 12px;text-align:center;border-bottom:1px solid var(--border)">数量</th>`;
+  html+=`<th style="padding:10px 12px;text-align:center;border-bottom:1px solid var(--border)">单位</th>`;
+  html+=`<th style="padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)">备注</th>`;
+  html+=`</tr></thead><tbody>`;
+  bom.forEach((item,i)=>{
+    const bg=i%2===0?'var(--bg2)':'var(--bg1)';
+    html+=`<tr style="background:${bg}">`;
+    html+=`<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--text2)">${item.no}</td>`;
+    html+=`<td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text1);font-weight:500">${item.name}</td>`;
+    html+=`<td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2)">${item.spec}</td>`;
+    html+=`<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--text1)">${item.qty}</td>`;
+    html+=`<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--text2)">${item.unit}</td>`;
+    html+=`<td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);font-size:12px">${item.note}</td>`;
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table>`;
+  const sec=document.getElementById('bomSection');
+  if(sec){sec.style.display='block';document.getElementById('bomContent').innerHTML=html;}
 }
 
 function showRefDiagrams(){
