@@ -10,7 +10,7 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg1);color:var(--text1);line-height:1.6;min-height:100vh}
 a{color:var(--blue);text-decoration:none}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:#3a3e45;border-radius:3px}
-.header{background:linear-gradient(135deg,#0C447C 0%,#1A3A5C 100%);padding:20px 32px;border-bottom:1px solid var(--border)}
+.header{background:linear-gradient(135deg,#0C447C 0%,#1A3A5C 100%);padding:20px 32px;border-bottom:1px solid var(--border);position:relative}
 .header h1{font-size:22px;font-weight:600;margin-bottom:4px}
 .header p{color:var(--text2);font-size:13px}
 .footer{background:var(--bg2);border-top:1px solid var(--border);padding:14px 32px;text-align:center;font-size:11px;color:var(--text2);line-height:1.6}
@@ -102,104 +102,112 @@ select.form-input{appearance:auto}
 .success-msg{background:rgba(15,110,86,.12);border:1px solid var(--green);border-radius:6px;padding:10px 14px;margin-bottom:14px;display:none;font-size:13px;color:var(--green)}
 .success-msg.show{display:block}
 @media(max-width:1200px){.main-container{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}}
+.lang-btn{padding:4px 10px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:4px;color:#fff;font-size:12px;cursor:pointer;transition:all .3s}
+.lang-btn:hover{background:rgba(255,255,255,.25)}
+.lang-btn.active{background:rgba(255,255,255,.35);font-weight:bold}
 </style>
 </head>
 <body>
 
 <header class="header">
-<h1>Open ESS Agent — 开源储能系统解决方案AI智能体</h1>
-<p>设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905</p>
+<h1 data-i18n="header_title">Open ESS Agent — 开源储能系统解决方案AI智能体</h1>
+<p data-i18n="header_spec">设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905</p>
+<div style="position:absolute;top:20px;right:32px;display:flex;gap:6px">
+  <button class="lang-btn active" onclick="switchLang('zh')">中</button>
+  <button class="lang-btn" onclick="switchLang('en')">EN</button>
+  <button class="lang-btn" onclick="switchLang('ar')">عربي</button>
+</div>
 </header>
 
 <nav class="nav-tabs">
-<div class="nav-tab active" onclick="showPage('devices')">设备库</div>
-<div class="nav-tab" onclick="showPage('config')">用户输入</div>
-<div class="nav-tab" onclick="showPage('diagrams')">生成图纸</div>
-<div class="nav-tab" onclick="showPage('cases')">应用案例</div>
+<div class="nav-tab active" onclick="showPage('devices')" data-i18n="nav_devices">设备库</div>
+<div class="nav-tab" onclick="showPage('config')" data-i18n="nav_input">用户输入</div>
+<div class="nav-tab" onclick="showPage('diagrams')" data-i18n="nav_diagrams">生成图纸</div>
+<div class="nav-tab" onclick="showPage('cases')" data-i18n="nav_cases">应用案例</div>
 </nav>
 
 <div class="main-container">
 <!-- ========== SIDEBAR ========== -->
 <aside class="sidebar">
 <div style="background:linear-gradient(135deg,#185FA5,#0F6E56);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
-<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px">AI智能体自动配置</div>
-<div style="font-size:11px;color:#c0e0d0;line-height:1.5">输入需求信息，智能体自动生成完整解决方案：设备选型、系统架构图、电气接线图、电气拓扑图、BOM清单、充放电策略、经济性分析</div>
+<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px" data-i18n="sidebar_ai_title">AI智能体自动配置</div>
+<div style="font-size:11px;color:#c0e0d0;line-height:1.5" data-i18n="sidebar_ai_desc">输入需求信息，智能体自动生成完整解决方案：设备选型、系统架构图、电气接线图、电气拓扑图、BOM清单、充放电策略、经济性分析</div>
 </div>
 <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
 <div class="sec-title" style="margin-bottom:8px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-方式一：自然语言描述
+<span data-i18n="method1_title">方式一：自然语言描述</span>
 </div>
-<div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.4">请用自然语言描述你的需求，AI自动识别参数并生成方案</div>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.4" data-i18n="method1_desc">请用自然语言描述你的需求，AI自动识别参数并生成方案</div>
 <textarea id="naturalInput" class="form-input" rows="3" placeholder="例：大庆油田2台1250kVA变压器10kV接入，月用电35万度，峰谷价差0.39元，请配置储能方案" style="resize:vertical;font-size:12px;line-height:1.4"></textarea>
 <button class="btn btn-primary" onclick="parseNaturalInput()" style="margin-top:8px;width:100%;font-size:12px;padding:8px">
 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-AI识别并配置
+<span data-i18n="ai_detect_btn">AI识别并配置</span>
 </button>
 </div>
 <div style="margin-bottom:16px">
 <div class="sec-title" style="margin-bottom:4px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-方式二：详细信息输入
+<span data-i18n="method2_title">方式二：详细信息输入</span>
 </div>
-<div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.4">逐项填写场地参数，手动配置储能方案</div>
+<div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.4" data-i18n="method2_desc">逐项填写场地参数，手动配置储能方案</div>
 
 <div class="sec-title" style="font-size:13px;margin-bottom:10px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-场地基本信息
+<span data-i18n="site_info">场地基本信息</span>
 </div>
-<div class="form-group"><label class="form-label">项目名称</label><input type="text" class="form-input" id="projName" placeholder="如：大庆管业储能项目" value="大庆管业储能项目"></div>
-<div class="form-group"><label class="form-label">项目地址</label><input type="text" class="form-input" id="projAddr" placeholder="如：黑龙江大庆市高新区" value="黑龙江大庆市高新区建设路249号"></div>
-<div class="form-group"><label class="form-label">省份/城市</label><input type="text" class="form-input" id="region" value="黑龙江大庆"></div>
+<div class="form-group"><label class="form-label" data-i18n="proj_name">项目名称</label><input type="text" class="form-input" id="projName" placeholder="如：大庆管业储能项目" value="大庆管业储能项目"></div>
+<div class="form-group"><label class="form-label" data-i18n="proj_addr">项目地址</label><input type="text" class="form-input" id="projAddr" placeholder="如：黑龙江大庆市高新区" value="黑龙江大庆市高新区建设路249号"></div>
+<div class="form-group"><label class="form-label" data-i18n="region">省份/城市</label><input type="text" class="form-input" id="region" value="黑龙江大庆"></div>
 
 <div class="sec-title" style="margin-top:20px;font-size:13px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-变压器配置
+<span data-i18n="tx_config">变压器配置</span>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">单台容量 (kVA)</label><input type="number" class="form-input" id="txCap" value="1250" step="50"></div>
-<div class="form-group"><label class="form-label">变压器数量</label><input type="number" class="form-input" id="txCount" value="2" min="1" max="10"></div>
+<div class="form-group"><label class="form-label" data-i18n="tx_cap">单台容量 (kVA)</label><input type="number" class="form-input" id="txCap" value="1250" step="50"></div>
+<div class="form-group"><label class="form-label" data-i18n="tx_count">变压器数量</label><input type="number" class="form-input" id="txCount" value="2" min="1" max="10"></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">高压侧 (kV)</label><input type="number" class="form-input" id="txHv" value="10" step="0.1"></div>
-<div class="form-group"><label class="form-label">低压侧 (V)</label><input type="number" class="form-input" id="txLv" value="400" step="10"></div>
+<div class="form-group"><label class="form-label" data-i18n="tx_hv">高压侧 (kV)</label><input type="number" class="form-input" id="txHv" value="10" step="0.1"></div>
+<div class="form-group"><label class="form-label" data-i18n="tx_lv">低压侧 (V)</label><input type="number" class="form-input" id="txLv" value="400" step="10"></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">联结组别</label><select class="form-input" id="txVector"><option>Dyn11</option><option>Yyn0</option></select></div>
-<div class="form-group"><label class="form-label">短路阻抗 (%)</label><input type="number" class="form-input" id="txZk" value="4.3" step="0.1"></div>
+<div class="form-group"><label class="form-label" data-i18n="tx_vector">联结组别</label><select class="form-input" id="txVector"><option>Dyn11</option><option>Yyn0</option></select></div>
+<div class="form-group"><label class="form-label" data-i18n="tx_zk">短路阻抗 (%)</label><input type="number" class="form-input" id="txZk" value="4.3" step="0.1"></div>
 </div>
-<div class="form-group"><label class="form-label">是否有10kV配电室</label><select class="form-input" id="hasHvRoom"><option value="1">有（推荐10kV接入）</option><option value="0">无（将用0.4kV接入）</option></select></div>
+<div class="form-group"><label class="form-label" data-i18n="has_hv_room">是否有10kV配电室</label><select class="form-input" id="hasHvRoom"><option value="1" data-i18n="hv_room_yes">有（推荐10kV接入）</option><option value="0" data-i18n="hv_room_no">无（将用0.4kV接入）</option></select></div>
 
 <div class="sec-title" style="margin-top:20px;font-size:13px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-用电负荷
+<span data-i18n="load_title">用电负荷</span>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">月用电-旺季 (万kWh)</label><input type="number" class="form-input" id="loadMonthHigh" value="35" step="1"></div>
-<div class="form-group"><label class="form-label">月用电-淡季 (万kWh)</label><input type="number" class="form-input" id="loadMonthLow" value="15" step="1"></div>
+<div class="form-group"><label class="form-label" data-i18n="load_month_high">月用电-旺季 (万kWh)</label><input type="number" class="form-input" id="loadMonthHigh" value="35" step="1"></div>
+<div class="form-group"><label class="form-label" data-i18n="load_month_low">月用电-淡季 (万kWh)</label><input type="number" class="form-input" id="loadMonthLow" value="15" step="1"></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">最大负荷 (kW)</label><input type="number" class="form-input" id="loadMax" value="1000" step="50"></div>
-<div class="form-group"><label class="form-label">功率因数</label><input type="number" class="form-input" id="pf" value="0.9" step="0.05" min="0.7" max="1"></div>
+<div class="form-group"><label class="form-label" data-i18n="load_max">最大负荷 (kW)</label><input type="number" class="form-input" id="loadMax" value="1000" step="50"></div>
+<div class="form-group"><label class="form-label" data-i18n="pf">功率因数</label><input type="number" class="form-input" id="pf" value="0.9" step="0.05" min="0.7" max="1"></div>
 </div>
-<div class="form-group"><label class="form-label">年工作天数</label><input type="number" class="form-input" id="workDays" value="300" step="10"></div>
+<div class="form-group"><label class="form-label" data-i18n="work_days">年工作天数</label><input type="number" class="form-input" id="workDays" value="300" step="10"></div>
 
 <div class="sec-title" style="margin-top:20px;font-size:13px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-峰谷电价
+<span data-i18n="price_title">峰谷电价</span>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">峰段 (元/kWh)</label><input type="number" class="form-input" id="pricePeak" value="0.833" step="0.01"></div>
-<div class="form-group"><label class="form-label">谷段 (元/kWh)</label><input type="number" class="form-input" id="priceValley" value="0.441" step="0.01"></div>
+<div class="form-group"><label class="form-label" data-i18n="price_peak">峰段 (元/kWh)</label><input type="number" class="form-input" id="pricePeak" value="0.833" step="0.01"></div>
+<div class="form-group"><label class="form-label" data-i18n="price_valley">谷段 (元/kWh)</label><input type="number" class="form-input" id="priceValley" value="0.441" step="0.01"></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">平段 (元/kWh)</label><input type="number" class="form-input" id="priceFlat" value="0.637" step="0.01"></div>
-<div class="form-group"><label class="form-label">峰段时长 (h)</label><input type="number" class="form-input" id="hoursPeak" value="8" step="1"></div>
+<div class="form-group"><label class="form-label" data-i18n="price_flat">平段 (元/kWh)</label><input type="number" class="form-input" id="priceFlat" value="0.637" step="0.01"></div>
+<div class="form-group"><label class="form-label" data-i18n="hours_peak">峰段时长 (h)</label><input type="number" class="form-input" id="hoursPeak" value="8" step="1"></div>
 </div>
 
 <button class="btn btn-primary" onclick="generateSolution()" style="margin-top:20px">
 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-生成解决方案
+<span data-i18n="generate_btn">生成解决方案</span>
 </button>
 </aside>
 
@@ -216,7 +224,7 @@ AI识别并配置
 
 <!-- TAB: 设备选型 -->
 <div id="page-devices" class="tab-content">
-<div class="sec-title">储能设备产品库</div>
+<div class="sec-title" data-i18n="device_library_title">储能设备产品库</div>
 <p style="color:var(--text2);font-size:12px;margin-bottom:16px">数据来源：GOTION储能手册中文版2025Q4</p>
 
 <div class="acc-section">
@@ -248,23 +256,23 @@ ACC AC一体柜专题
 <div id="page-diagrams" class="tab-content">
 <div id="diagramTabs" style="display:none;margin-bottom:16px"></div>
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">系统架构图</h3><div class="diagram-actions"><button onclick="downloadSVG('archSvg','系统架构图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="diagram_arch">系统架构图</h3><div class="diagram-actions"><button onclick="downloadSVG('archSvg','系统架构图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="archSvg"></div>
 </div>
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadSVG('wiringSvg','电气接线图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="diagram_wiring">电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadSVG('wiringSvg','电气接线图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="wiringSvg"></div>
 </div>
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">电气拓扑图</h3><div class="diagram-actions"><button onclick="downloadSVG('topoSvg','电气拓扑图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="diagram_topo">电气拓扑图</h3><div class="diagram-actions"><button onclick="downloadSVG('topoSvg','电气拓扑图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="topoSvg"></div>
 </div>
 <div class="diagram-container" id="bomSection" style="display:none">
-<div class="diagram-header"><h3 class="diagram-title">物料清单(BOM)</h3></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="diagram_bom">物料清单(BOM)</h3></div>
 <div id="bomContent"></div>
 </div>
 <div class="diagram-container" id="refSection">
-<div class="diagram-header"><h3 class="diagram-title">参考设计图（大庆管业5MWh项目）</h3></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="diagram_ref">参考设计图（大庆管业5MWh项目）</h3></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden"><iframe id="refArchFrame" style="width:100%;height:480px;border:none" src="系统架构图_v11_10kV.html"></iframe><div style="padding:6px 10px;font-size:11px;color:var(--text2)">系统架构图 v11</div></div>
 <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden"><iframe id="refWiringFrame" style="width:100%;height:480px;border:none" src="电气接线图_v11_10kV.html"></iframe><div style="padding:6px 10px;font-size:11px;color:var(--text2)">电气接线图 v11</div></div>
@@ -274,14 +282,14 @@ ACC AC一体柜专题
 
 <!-- TAB: 应用案例 -->
 <div id="page-cases" class="tab-content">
-<div class="sec-title">应用案例</div>
+<div class="sec-title" data-i18n="cases_title">应用案例</div>
 <div class="case-grid" id="caseGrid"></div>
 </div>
 
 </main>
 </div>
 
-<footer class="footer">
+<footer class="footer" data-i18n="footer_text">
 Open ESS Agent — 开源储能系统解决方案AI智能体 ｜ 设计遵循规范：系统级《<span>GB/T 36558-2023</span>》电气接线设计层《<span>GB 50055</span>》并网层《<span>GB/T 34120</span>》《<span>GB/T 34131</span>》储能电站层《<span>GB/T 42288</span>》｜ 设计人：<span>卢继雄</span> ｜ 联系电话：<span>15026953905</span>
 </footer>
 
@@ -296,6 +304,94 @@ Open ESS Agent — 开源储能系统解决方案AI智能体 ｜ 设计遵循规
 </div>
 
 <script>
+const I18N={
+zh:{
+header_title:'Open ESS Agent — 开源储能系统解决方案AI智能体',
+header_spec:'设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905',
+footer_text:'Open ESS Agent — 开源储能系统解决方案AI智能体 ｜ 设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905',
+nav_devices:'设备库',nav_input:'用户输入',nav_diagrams:'生成图纸',nav_cases:'应用案例',
+sidebar_ai_title:'AI智能体自动配置',
+sidebar_ai_desc:'输入需求信息，智能体自动生成完整解决方案：设备选型、系统架构图、电气接线图、电气拓扑图、BOM清单、充放电策略、经济性分析',
+method1_title:'方式一：自然语言描述',
+method1_desc:'请用自然语言描述你的需求，AI自动识别参数并生成方案',
+ai_detect_btn:'AI识别并配置',
+method2_title:'方式二：详细信息输入',
+method2_desc:'逐项填写场地参数，手动配置储能方案',
+site_info:'场地基本信息',proj_name:'项目名称',proj_addr:'项目地址',region:'省份/城市',
+tx_config:'变压器配置',tx_cap:'单台容量 (kVA)',tx_count:'变压器数量',tx_hv:'高压侧 (kV)',tx_lv:'低压侧 (V)',tx_vector:'联结组别',tx_zk:'短路阻抗 (%)',
+has_hv_room:'是否有10kV配电室',hv_room_yes:'有（推荐10kV接入）',hv_room_no:'无（将用0.4kV接入）',
+load_title:'用电负荷',load_month_high:'月用电-旺季 (万kWh)',load_month_low:'月用电-淡季 (万kWh)',load_max:'最大负荷 (kW)',pf:'功率因数',work_days:'年工作天数',
+price_title:'峰谷电价',price_peak:'峰段 (元/kWh)',price_valley:'谷段 (元/kWh)',price_flat:'平段 (元/kWh)',hours_peak:'峰段时长 (h)',
+generate_btn:'生成解决方案',
+device_library_title:'储能设备产品库',
+diagram_arch:'系统架构图',diagram_wiring:'电气一次接线图',diagram_topo:'电气拓扑图',diagram_bom:'物料清单(BOM)',diagram_ref:'参考设计图（大庆管业5MWh项目）',
+download_svg:'下载 SVG',cases_title:'应用案例'
+},
+en:{
+header_title:'Open ESS Agent — Open-source ESS Solution AI Agent',
+header_spec:'Design Standards: System-level GB/T 36558-2023 | Wiring GB 50055 | Grid-connection GB/T 34120, GB/T 34131 | Station GB/T 42288 | Designer: Lu Jixiong | Tel: 15026953905',
+footer_text:'Open ESS Agent — Open-source ESS Solution AI Agent | Design Standards: System-level GB/T 36558-2023 | Wiring GB 50055 | Grid-connection GB/T 34120, GB/T 34131 | Station GB/T 42288 | Designer: Lu Jixiong | Tel: 15026953905',
+nav_devices:'Device Library',nav_input:'User Input',nav_diagrams:'Generate Diagrams',nav_cases:'Use Cases',
+sidebar_ai_title:'AI Agent Auto Configuration',
+sidebar_ai_desc:'Input your requirements, the AI agent auto-generates a complete solution: equipment selection, system architecture, wiring diagram, topology diagram, BOM, charge/discharge strategy, economic analysis',
+method1_title:'Method 1: Natural Language',
+method1_desc:'Describe your requirements in natural language, AI auto-identifies parameters and generates solution',
+ai_detect_btn:'AI Detect & Configure',
+method2_title:'Method 2: Detailed Input',
+method2_desc:'Fill in site parameters item by item, manually configure ESS solution',
+site_info:'Site Basic Info',proj_name:'Project Name',proj_addr:'Project Address',region:'Province/City',
+tx_config:'Transformer Config',tx_cap:'Capacity per Unit (kVA)',tx_count:'Transformer Qty',tx_hv:'HV Side (kV)',tx_lv:'LV Side (V)',tx_vector:'Vector Group',tx_zk:'Short-circuit Impedance (%)',
+has_hv_room:'Has 10kV Distribution Room?',hv_room_yes:'Yes (10kV access recommended)',hv_room_no:'No (0.4kV access will be used)',
+load_title:'Electrical Load',load_month_high:'Monthly Usage-Peak (10k kWh)',load_month_low:'Monthly Usage-Off-peak (10k kWh)',load_max:'Max Load (kW)',pf:'Power Factor',work_days:'Working Days/Year',
+price_title:'Time-of-Use Pricing',price_peak:'Peak (CNY/kWh)',price_valley:'Valley (CNY/kWh)',price_flat:'Flat (CNY/kWh)',hours_peak:'Peak Duration (h)',
+generate_btn:'Generate Solution',
+device_library_title:'ESS Device Product Library',
+diagram_arch:'System Architecture',diagram_wiring:'Electrical Single-line Diagram',diagram_topo:'Electrical Topology',diagram_bom:'Bill of Materials (BOM)',diagram_ref:'Reference Design (Daqing 5MWh Project)',
+download_svg:'Download SVG',cases_title:'Use Cases'
+},
+ar:{
+header_title:'Open ESS Agent — وكيل الذكاء الاصطناعي لحلول أنظمة تخزين الطاقة مفتوحة المصدر',
+header_spec:'معايير التصميم: مستوى النظام GB/T 36558-2023 | التوصيل GB 50055 | ربط الشبكة GB/T 34120, GB/T 34131 | المحطة GB/T 42288 | المصمم: لو جيشيونغ | هاتف: 15026953905',
+footer_text:'Open ESS Agent — وكيل الذكاء الاصطناعي لحلول أنظمة تخزين الطاقة مفتوحة المصدر | معايير التصميم: مستوى النظام GB/T 36558-2023 | التوصيل GB 50055 | ربط الشبكة GB/T 34120, GB/T 34131 | المحطة GB/T 42288 | المصمم: لو جيشيونغ | هاتف: 15026953905',
+nav_devices:'مكتبة المعدات',nav_input:'إدخال المستخدم',nav_diagrams:'إنشاء الرسوم',nav_cases:'حالات الاستخدام',
+sidebar_ai_title:'التكوين التلقائي بواسطة وكيل الذكاء الاصطناعي',
+sidebar_ai_desc:'أدخل متطلباتك، يقوم وكيل الذكاء الاصطناعي بتوليد حل كامل تلقائياً: اختيار المعدات، مخطط النظام، مخطط التوصيل، مخطط الطوبولوجيا، قائمة المواد، استراتيجية الشحن/التفريغ، التحليل الاقتصادي',
+method1_title:'الطريقة الأولى: وصف اللغة الطبيعية',
+method1_desc:'صف متطلباتك باللغة الطبيعية، يتعرف الذكاء الاصطناعي تلقائياً على المعلمات ويولد الحل',
+ai_detect_btn:'تعرف الذكاء الاصطناعي والتكوين',
+method2_title:'الطريقة الثانية: الإدخال التفصيلي',
+method2_desc:'املأ معلمات الموقع شيئاً فشيئاً، كون حل التخزين يدوياً',
+site_info:'معلومات الموقع الأساسية',proj_name:'اسم المشروع',proj_addr:'عنوان المشروع',region:'المحافظة/المدينة',
+tx_config:'تكوين المحول',tx_cap:'السعة لكل وحدة (kVA)',tx_count:'عدد المحولات',tx_hv:'جانب الجهد العالي (kV)',tx_lv:'جانب الجهد المنخفض (V)',tx_vector:'مجموعة التوصيل',tx_zk:'معاوقة القصر (%)',
+has_hv_room:'هل توجد غرفة توزيع 10kV؟',hv_room_yes:'نعم (يُوصى بالوصول 10kV)',hv_room_no:'لا (سيتم استخدام الوصول 0.4kV)',
+load_title:'الحمل الكهربائي',load_month_high:'الاستهلاك الشهري-ذروة (10k kWh)',load_month_low:'الاستهلاك الشهري-خامل (10k kWh)',load_max:'الحمل الأقصى (kW)',pf:'معامل القدرة',work_days:'أيام العمل/السنة',
+price_title:'تسعير الوقت من الاستخدام',price_peak:'ذروة (يوان/kWh)',price_valley:'وادي (يوان/kWh)',price_flat:'مسطح (يوان/kWh)',hours_peak:'مدة الذروة (h)',
+generate_btn:'توليد الحل',
+device_library_title:'مكتبة منتجات معدات التخزين',
+diagram_arch:'هيكل النظام',diagram_wiring:'مخطط التوصيل الكهربائي أحادي الخط',diagram_topo:'طوبولوجيا كهربائية',diagram_bom:'قائمة المواد (BOM)',diagram_ref:'تصميم مرجعي (مشروع داتشينغ 5MWh)',
+download_svg:'تحميل SVG',cases_title:'حالات الاستخدام'
+}
+};
+
+function switchLang(lang){
+  const dict=I18N[lang];if(!dict)return;
+  document.documentElement.lang=lang==='ar'?'ar':'zh-CN';
+  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(dict[key]!==undefined)el.textContent=dict[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key=el.getAttribute('data-i18n-placeholder');
+    if(dict[key]!==undefined)el.placeholder=dict[key];
+  });
+  document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.remove('active'));
+  const btns=document.querySelectorAll('.lang-btn');
+  const idx={zh:0,en:1,ar:2}[lang];
+  if(btns[idx])btns[idx].classList.add('active');
+  localStorage.setItem('lang',lang);
+}
+
 const PRODUCTS=[
   {id:'GRID-20M',name:'GOTION GRID 20MWh',cat:'集装箱储能',model:'ESD1331-025P20060',cap:20060,power:10031,volt:1331.2,cell:'LFP-314Ah',size:'5m×10m×4.6m',weight:'170t',cool:'风液一体',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-20M_product.jpeg',features:['PACK级消防','20MWh超大容量','风液一体温控']},
   {id:'GRID-7M-588',name:'GOTION GRID 7MWh (588Ah)',cat:'集装箱储能',model:'ESD1331-025P7044',cap:7045,power:1761,volt:1331.2,cell:'LFP-588Ah',size:'6.1m×2.4m×2.9m',weight:'≤54t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-7M_product.jpeg',features:['588Ah大电芯','液冷温控','PACK级消防']},
@@ -2130,6 +2226,7 @@ function downloadMD(){
   a.href=url;a.download='储能系统解决方案.md';a.click();URL.revokeObjectURL(url);
 }
 
+switchLang(localStorage.getItem('lang')||'zh');
 showPage('devices');
 </script>
 </body>
