@@ -202,13 +202,13 @@ select.form-input{appearance:auto}
 ACC AC一体柜专题
 </h3>
 <div class="device-grid" style="margin-bottom:0">
-<div class="device-card" style="border-color:var(--green)">
+<div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('ACC_DETAIL','ACC-480-P750 AC一体柜')">
 <div class="dev-img-wrap"><img src="images/products/X-522_X261_product.jpeg" alt="ACC-480" onerror="this.parentElement.innerHTML='<span style=color:var(--text2);font-size:12px>AC一体柜</span>'"></div>
 <div class="dev-header"><div><div class="dev-name">ACC-480-P750 AC一体机</div><div class="dev-model">ACC-480-P750-UL</div></div><span class="dev-badge badge-orange">480kWh</span></div>
 <div class="dev-specs"><span class="spec-item">750kW内置PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈10t</span></div>
 <div class="dev-features"><span class="feature-tag">PCS+升压变+开关柜一体</span><span class="feature-tag">即插即用</span><span class="feature-tag">最大4并→1.92MWh</span></div>
 </div>
-<div class="device-card" style="border-color:var(--green)">
+<div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('LL760_DETAIL','760kWh液冷储能柜')">
 <div class="dev-img-wrap"><img src="images/products/GRID-5M_product.jpeg" alt="760LL" onerror="this.parentElement.innerHTML='<span style=color:var(--text2);font-size:12px>液冷储能柜</span>'"></div>
 <div class="dev-header"><div><div class="dev-name">760kWh液冷储能柜</div><div class="dev-model">光储充一体化标准柜</div></div><span class="dev-badge badge-green">760kWh</span></div>
 <div class="dev-specs"><span class="spec-item">380kW PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈38t</span></div>
@@ -282,10 +282,10 @@ const PRODUCTS=[
 ];
 
 const CASES=[
-  {title:'黑龙江大庆管业 5MWh',desc:'2×1250kVA变压器，月用电35万kWh，10kV侧接入，峰谷套利年省55万+',tags:['10kV','5MWh','工商业'],color:'var(--blue)',img:'transformer.png'},
-  {title:'安徽庐江大酒店 522kWh',desc:'酒店削峰填谷+需量控制+备用供电，低压0.4kV侧接入',tags:['0.4kV','522kWh','酒店'],color:'var(--green)',img:'page4_img14.png'},
-  {title:'美国Fremont光储充 1.4MWh',desc:'1.4MWh储能+1MW光伏+1.6MW直流快充，自给自足',tags:['光储充','1.4MWh','海外'],color:'var(--orange)',img:'page11_img2.png'},
-  {title:'上海邑东 2.5MWh储能站',desc:'集装箱储能充电桩一体化，2.5MWh配套充电场站',tags:['2.5MWh','充换电'],color:'var(--purple)',img:'page1_img0.png'},
+  {title:'黑龙江大庆管业 5MWh',desc:'2×1250kVA变压器，月用电35万kWh，10kV侧接入，峰谷套利年省55万+',tags:['10kV','5MWh','工商业'],color:'var(--blue)',img:'transformer.png',detailId:'daqing'},
+  {title:'安徽庐江大酒店 522kWh',desc:'酒店削峰填谷+需量控制+备用供电，低压0.4kV侧接入',tags:['0.4kV','522kWh','酒店'],color:'var(--green)',img:'page4_img14.png',detailId:'lujiang'},
+  {title:'美国Fremont光储充 1.4MWh',desc:'1.4MWh储能+1MW光伏+1.6MW直流快充，自给自足',tags:['光储充','1.4MWh','海外'],color:'var(--orange)',img:'page11_img2.png',detailId:'fremont'},
+  {title:'上海邑东 2.5MWh储能站',desc:'集装箱储能充电桩一体化，2.5MWh配套充电场站',tags:['2.5MWh','充换电'],color:'var(--purple)',img:'page1_img0.png',detailId:'yidong'},
 ];
 
 let LAST_RESULT=null;
@@ -751,19 +751,298 @@ function closeDetail(){
   document.getElementById('detailModal').classList.remove('show');
 }
 
+function showDocDetail(detailKey,title){
+  const detailMap={ACC_DETAIL,LL760_DETAIL};
+  const text=detailMap[detailKey];
+  if(!text)return;
+  const modal=document.getElementById('detailModal');
+  const img=document.getElementById('detailImg');
+  const name=document.getElementById('detailName');
+  const model=document.getElementById('detailModel');
+  const specs=document.getElementById('detailSpecs');
+  img.style.display='none';
+  name.textContent=title;
+  model.textContent=detailKey==='ACC_DETAIL'?'安装指导手册':'技术规格书';
+  specs.textContent=text;
+  modal.classList.add('show');
+}
+
 document.getElementById('detailModal').addEventListener('click',function(e){
   if(e.target===this)closeDetail();
 });
 
+const CASE_DETAILS={
+yidong:`上海邑东 2.5MWh储能充电站
+来源：充电桩+储能运行方案（邑东场地20201125）  设计人：卢继雄
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 背景及拓扑图
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  应用场景：上海邑东充电站场地
+  系统拓扑：储能集装箱 + PCS + 充电桩 + EMU能量管理
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. 集装箱储能参数
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  电芯及数量: 105Ah电芯，7560只
+  标称能量: 2.53MWh
+  标称容量: 3780Ah
+  直流侧标称电压: 672V
+  直流电压范围: 567～766.5Vdc
+  标称充放电电流: 945A (0.25C充放电)
+  循环次数: ＞6000次 (0.25C@80%DOD)
+  自放电率/月: ＜3%
+  使用寿命: ＞10年 (0.5C@80%DOD)
+  运行温度: -20℃～60℃
+  运行湿度: 5%～90%
+  外形尺寸: 6058×2500×2896mm
+  总重量: 约28T
+  绝缘电阻: ＞0.1KΩ/V
+
+  储能系统组成:
+  - 20尺标准储能系统舱（舱体+配电+消防+监控+温控）
+  - 自动消防系统（七氟丙烷+自动报警+联动）
+  - 视频监控系统（4G网卡+PC/手机客户端）
+  - 电池储能系统（3级BMS控制架构）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. PCS需求
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  充电条件: 优先保证场地固定充电桩用电功率，动态调整PCS充电功率
+  - 平电价时：变压器富余全部给储能充电
+  - 谷电价时：3小时1300kVA功率快速充电
+  放电条件: 非充电时间段，PCS待机或放电，变压器保持0kVA
+  配置: 630kW储能变流器 + 630kVA隔离变压器 + EMU + 功率采集装置 + Goos板卡 + 防逆流装置
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. 控制策略
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  平价时间段: EMU调整电网侧允许功率为1000kVA，Pc=Ppcs+Pb+Pa
+  谷价时间段: EMU调整电网侧允许功率为1300kVA，以最大功率给PCS充电
+  其余时间段: EMU调整电网侧允许功率为0，Pc=0
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. 通信与计费
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  通信: Modbus RTU协议 → 工控机+4G → 云平台
+  电量统计: 充/放电电量实时统计，分时费用设定
+  平台: https://billing.gotion.vip`,
+
+fremont:`AI赋能的集成光伏-储能-充电项目 — 国轩高科美国硅谷项目
+负责人：卢继雄  单位：上海轩邑新能源发展有限公司
+项目经费：1600万元  申报方向：工程系列人工智能（应用技术）专业
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+摘要
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+将光伏发电、储能系统与电动汽车充电设施深度融合，构建PV–ESS–EV一体化系统。
+国轩高科创新产品体系：光伏板(PVs)、Mobile Charger智能移动充电机器人、
+高集成度液冷工商业储能系统EDGE676、PCS AC Blocks储能变流器系统。
+AI技术实现预测分析、强化学习调度和智能能量管理。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. 产品体系与系统架构概述
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+美国实际部署项目：Autel MaxiEdge Controller Integration with Gotion Liquid BESS 760
+微电网系统：光伏发电 + 储能(BESS) + PCS双向变换 + 高功率充电 + EMS调度
+
+2.1 光伏板及并网系统 (PVs)
+  - 纯能量输入源，自带DC-AC逆变器→480V交流母线
+  - 智能电表(Meter)通过RS485上报实时功率/电压/电流
+  - EMS策略：光伏优先供给本地负载，余电给BESS充电
+
+2.2 MaxiEdge Controller (边缘微网控制器)
+  - 场站"边缘大脑"(Site EMS)，收集遥测数据+下发调度指令
+  - 通信：内置Router(外网)、Switch(局域网IP)、RS485(电表)
+  - 多重供电冗余：480V市电(AC-DC)、220V备电(PCS UPS)、24V DRR
+  - AI策略：光伏预测、削峰填谷、防逆流、电网容量动态保护
+
+2.3 Mobile Charger 智能移动充电机器人
+  - 内置184kWh锂离子电池(1P192S, 614.4V)
+  - 最大直流输出60kW，支持交直流双向充电
+  - 远程操控+灵活部署，适用于临时场站/应急补能
+
+2.4 Gotion BESS 760 (国轩液冷储能系统)
+  - 标称能量760kWh，标称电压DC 1267.2V (1069.2V~1425.6V)
+  - 2簇架构，每簇9个电池包(44S1P)，BMS实时监控
+  - 高压箱：1267.2V汇流+接触器控制+电气安全防护
+  - TMS：12kW智能液冷机组，温差5±2℃
+  - FSS：温烟感+STAT-X气溶胶+PACK级灭火+DN25水消防
+
+2.5 PCS AC Blocks (储能变流器系统)
+  - 双向能量通道：480V交流↔1000V直流
+  - 模块化设计：2×125kW并联=250kW总功率(3P3W 480V)
+  - 离网支撑：125kW变压器+220V UPS备电回路
+  - 支持黑启动(Black Start)和孤岛运行
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. 核心AI技术
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  规划设计层(天-月级): NSGA-II/MOROA → 充电站布局+储能容量+系统拓扑
+  短期调度层(分钟-小时级): LSTM-Attention → 光伏/负荷预测(含置信区间)
+  实时控制层(秒-分钟级): SAC → 最优充放电功率指令 (推理<10ms)
+
+  AI-BMS健康管理:
+  - SOH预测：LSTM网络基于充电曲线+EIS阻抗特征
+  - 循环寿命优化：SAC自动发现"浅充浅放"策略
+  - 故障预警：小波变换+CNN识别热失控`,
+};
+
+const ACC_DETAIL=`ACC-480-P750-UL AC一体柜 安装指导手册
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 适用产品
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  型号: ACC-480-P750-UL
+  适用人员: 具备电气知识的操作/维护人员
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. 安装注意事项
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. 放置在水平地面上，确保平稳无晃动无倾斜
+  2. 考虑安装地面/楼板的承载荷重能力
+  3. 勿遮盖通风孔，保持散热通畅
+  4. 保持通风良好，远离水/可燃气体/腐蚀剂/发热源
+  5. 避免阳光直射，进出风口无灰尘
+  6. 避免粉尘/挥发性气体/腐蚀性气体/盐分过高环境
+  7. 周围勿放易燃易爆物品
+  8. 墙壁/天花板/地板使用防火材料
+  9. 配备手提式干粉灭火器
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. 部件清单
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  AC一体柜体(L×W×H): 1650×1200×2350mm ×1
+  PCS模块: BCS125K-B-HM-US ×6
+  直流线缆总成: 6组(Ⅰ~Ⅵ)
+  交流线缆总成: 6组(Ⅰ~Ⅵ)
+  通讯线缆: 6组(Ⅰ~Ⅵ)
+  配电柜总成: 1(铜排+断路器+端子+线缆+开关电源+变压器+UPS+EMU)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. 内部配置
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PCS模块(125kW): 6个
+  交流断路器: 6个
+  配电开关: 辅电输入总开关1个+其他断路器11个
+  UPS(2kVA): 1个
+  EMU: 1个
+  急停及指示灯: 1急停+2指示灯
+  变压器(2kVA): 1个
+  交流输出铜排: U、V、W
+  直流输入铜排: 6正6负
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. 安装步骤
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  步骤1: 清点部件
+  步骤2: 安装配电系统(交流断路器+铜排组装)
+  步骤3: 安装预置线缆(直流+交流+通讯总成)
+  步骤4: 安装PCS模块(推入PCS槽→固定→接线)
+  步骤5: 配电部分布线(按配电原理图现场布线)`;
+
+const LL760_DETAIL=`高集成度工商业液冷储能产品 技术规格书 (760kWh)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 产品应用范围
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+由标准液冷电池包+高压箱+液冷机组+消防系统组成。
+应用：工商业、城市园区、楼宇、社区、低压台区等。
+户外柜形式，两簇一柜设计，独立防火区。
+支持与集中式/组串式PCS配套使用。
+"小而美，重安全，易安装、易扩展"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. 产品性能特点
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  - 柜体满足IP54、C3防护等级，支持户外工况
+  - 液冷机组制冷/制热模式+温度控制
+  - 电池管理系统：CAN/RS485接口，多层次保护策略
+  - 消防：温烟感+气溶胶+PACK级灭火+水消防(预防为主、防消结合)
+  - 运行状态实时监控+故障诊断+自我保护
+  - 智能液冷温差5±2℃，延长使用寿命
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. 电芯参数 (IFP81175200-300Ah)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  标称容量: 300Ah (25±2℃，100%DOD)
+  标称电压: 3.2V
+  标称能量: 960Wh
+  循环寿命: 8000次 (25±2℃，0.5P/0.5P 90%DOD 70%EOL)
+  日历寿命: 15年 (25±2℃，50%SOC 70%EOL)
+  工作电压: 2.5~3.65V (T>0℃)
+  工作温度: 15℃~45℃ (充电≤0.5P)
+  存储温度: -30~60℃ (最佳15℃~35℃)
+  尺寸: 81.2×175.4×202.6mm (含极柱)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. 电池包参数 (EPD140-05P42)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  模组方案: 140.8V300Ah (1P44S)
+  标称能量: 42.24kWh
+  标称电压: 140.8V (范围118.8V~158.4V)
+  最大充放电功率: 21.1kW (0.5P)
+  防护等级: IP67
+  尺寸: 1088×787×235mm
+  重量: ≈313.8±5kg
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. 系统参数
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  标称能量: 760kWh (0.5P 100%DOD 25±2℃)
+  运行电压范围: 1069.2~1425.6Vdc (2.7-3.6V)
+  标称电压: 1267.2Vdc
+  最大充放电倍率: 0.5P (@25℃)
+  最大充放电功率: 380kW
+  循环寿命: 7000次 (0.5P/0.5P 95%DOD 70%EOL)
+  日历寿命: 15年 (50%SOC 70%EOL)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. 环境参数
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  工作环境温度: -20~50℃
+  工作湿度: 0~95%
+  防护等级: IP55
+  冷却方式: 智能液冷
+  消防系统: 气溶胶+水消防+PACK级灭火
+  海拔: ≤2000m
+  通讯: CAN、RS485、Ethernet
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. 结构参数
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  尺寸(W×D×H): 1400×2400×2500mm
+  重量: ≈8t
+  内部: 高压箱×2 + 电池包×18 + 液冷机组×1 + 温烟感×2 + 气溶胶×2
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. 并机应用
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  支持≥2户外柜并联，系统总容量最大6.01MWh
+  集中式/组串式PCS均可配套
+  柜体布置：有门侧间距≥4m，基础上表面高于周边道路≥300mm
+  使用环境：-35/45℃，海拔<2000m，非强风沙/盐雾区域`;
+
 function renderCases(){
   const el=document.getElementById('caseGrid');
-  el.innerHTML=CASES.map((c,i)=>`<div class="case-card fade-in" style="animation-delay:${i*0.1}s">
+  el.innerHTML=CASES.map((c,i)=>`<div class="case-card fade-in" style="animation-delay:${i*0.1}s;cursor:pointer" onclick="${c.detailId?'showCaseDetail(\\''+c.detailId+'\\',\\''+c.title+'\\')':''}">
     <div class="case-img" style="background:linear-gradient(135deg,${c.color}33,${c.color}11)">
       ${c.img?`<img src="images/products/${c.img}" alt="${c.title}" onerror="this.parentElement.innerHTML='<span style=color:var(--text2)>⚡</span>'">`:'<span style="color:var(--text2)">⚡</span>'}
     </div>
-    <div class="case-body"><div class="case-title">${c.title}</div><div class="case-desc">${c.desc}</div>
+    <div class="case-body"><div class="case-title">${c.title}${c.detailId?' ↗':''}</div><div class="case-desc">${c.desc}</div>
     <div class="case-tags">${c.tags.map(t=>`<span class="case-tag" style="background:${c.color}22;color:${c.color}">${t}</span>`).join('')}</div>
     </div></div>`).join('');
+}
+
+function showCaseDetail(detailId,title){
+  const text=CASE_DETAILS[detailId];
+  if(!text)return;
+  const modal=document.getElementById('detailModal');
+  document.getElementById('detailImg').style.display='none';
+  document.getElementById('detailName').textContent=title;
+  document.getElementById('detailModel').textContent='';
+  document.getElementById('detailSpecs').textContent=text;
+  modal.classList.add('show');
 }
 
 function renderArchSvg(R){
