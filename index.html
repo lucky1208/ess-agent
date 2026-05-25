@@ -112,9 +112,9 @@ select.form-input{appearance:auto}
 </header>
 
 <nav class="nav-tabs">
-<div class="nav-tab active" onclick="showPage('config')">参数配置</div>
-<div class="nav-tab" onclick="showPage('devices')">设备选型</div>
-<div class="nav-tab" onclick="showPage('diagrams')">系统图纸</div>
+<div class="nav-tab active" onclick="showPage('devices')">设备库</div>
+<div class="nav-tab" onclick="showPage('config')">用户输入</div>
+<div class="nav-tab" onclick="showPage('diagrams')">生成图纸</div>
 <div class="nav-tab" onclick="showPage('cases')">应用案例</div>
 </nav>
 
@@ -329,7 +329,6 @@ const PRODUCTS=[
 
 const CASES=[
   {title:'黑龙江大庆管业 5MWh',desc:'2×1250kVA变压器，月用电35万kWh，10kV侧接入，峰谷套利年省55万+',tags:['10kV','5MWh','工商业'],color:'var(--blue)',img:'transformer.png',detailId:'daqing'},
-  {title:'安徽庐江大酒店 522kWh',desc:'酒店削峰填谷+需量控制+备用供电，低压0.4kV侧接入',tags:['0.4kV','522kWh','酒店'],color:'var(--green)',img:'page4_img14.png',detailId:'lujiang'},
   {title:'美国Fremont光储充 1.4MWh',desc:'1.4MWh储能+1MW光伏+1.6MW直流快充，自给自足',tags:['光储充','1.4MWh','海外'],color:'var(--orange)',img:'page11_img2.png',detailId:'fremont'},
   {title:'上海邑东 2.5MWh储能站',desc:'集装箱储能充电桩一体化，2.5MWh配套充电场站',tags:['2.5MWh','充换电'],color:'var(--purple)',img:'page1_img0.png',detailId:'yidong'},
   {title:'西部钻探油田钻井平台 5MWh',desc:'国轩高科×西部钻探×沃德石油，国内首创大型油改电项目，5MWh储能仓替代柴油发电',tags:['油改电','5MWh','钻井'],color:'var(--brown)',img:'dll_s15_4.jpg',detailId:'xibuzt'},
@@ -342,7 +341,7 @@ function showPage(id){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  document.querySelectorAll('.nav-tab')[['config','devices','diagrams','cases'].indexOf(id)].classList.add('active');
+  document.querySelectorAll('.nav-tab')[['devices','config','diagrams','cases'].indexOf(id)].classList.add('active');
   if(id==='devices')renderDeviceLibrary(currentFilter);
   if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);showRefDiagrams();}
   if(id==='cases')renderCases();
@@ -1113,61 +1112,89 @@ document.getElementById('detailModal').addEventListener('click',function(e){
 });
 
 const CASE_DETAILS={
-yidong:`上海邑东 2.5MWh储能充电站
-来源：充电桩+储能运行方案（邑东场地20201125）  设计人：卢继雄
+yidong:`<div style="font-size:13px;line-height:1.7">
+<h3 style="color:#185FA5;margin:0 0 8px">上海邑东 2.5MWh储能充电站</h3>
+<p style="color:#C2C0B6">来源：充电桩+储能运行方案（邑东场地20201125） | 设计人：卢继雄</p>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. 背景及拓扑图
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  应用场景：上海邑东充电站场地
-  系统拓扑：储能集装箱 + PCS + 充电桩 + EMU能量管理
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">1. 背景及拓扑图</h4>
+<h4 style="color:#534AB7;margin:8px 0 4px">1.1 应用场景现场图</h4>
+<img src="images/products/yidong/yidong_p2_img0_5ca72dd1.jpg" style="max-width:48%;border-radius:6px;margin:4px 2px" onerror="this.style.display='none'">
+<img src="images/products/yidong/yidong_p2_img1_f0dba265.jpg" style="max-width:48%;border-radius:6px;margin:4px 2px" onerror="this.style.display='none'">
+<h4 style="color:#534AB7;margin:8px 0 4px">1.2 系统拓扑图</h4>
+<img src="images/products/yidong/yidong_p2_img2_e22915a6.jpg" style="max-width:48%;border-radius:6px;margin:4px 2px" onerror="this.style.display='none'">
+<img src="images/products/yidong/yidong_p2_img3_6f92470a.jpg" style="max-width:48%;border-radius:6px;margin:4px 2px" onerror="this.style.display='none'">
+<p>系统拓扑：储能集装箱 + PCS + 充电桩 + EMU能量管理</p>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-2. 集装箱储能参数
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  电芯及数量: 105Ah电芯，7560只
-  标称能量: 2.53MWh
-  标称容量: 3780Ah
-  直流侧标称电压: 672V
-  直流电压范围: 567～766.5Vdc
-  标称充放电电流: 945A (0.25C充放电)
-  循环次数: ＞6000次 (0.25C@80%DOD)
-  自放电率/月: ＜3%
-  使用寿命: ＞10年 (0.5C@80%DOD)
-  运行温度: -20℃～60℃
-  运行湿度: 5%～90%
-  外形尺寸: 6058×2500×2896mm
-  总重量: 约28T
-  绝缘电阻: ＞0.1KΩ/V
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">2. 集装箱储能</h4>
+<h4 style="color:#534AB7;margin:8px 0 4px">2.1 储能系统组成</h4>
+<p>20尺标准储能系统舱是由舱体（含配电）、自动消防系统、视频监控系统、温控系统等组成，电池储能系统（含机架，电池组，直流汇流柜）组成。</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li><b>舱体：</b>包含箱体及内部辅助系统。整体内部机架承重设计，散热设计，照明功能，保温隔热功能，具备逃生门，可防尘、防水、防虫鼠符合IP20防护等级，具备门禁功能等</li>
+<li><b>自动消防系统：</b>采用七氟丙烷为主要材料的自动灭火系统，安装自动报警装置，检测到火灾时及时断开电气连接，启动灭火装置并上传告警，具备联动功能</li>
+<li><b>视频监控系统（选配）：</b>包含网络摄像机、数据硬盘、网络交换器等，通过4G网卡接入互联网，可通过PC/手机客户端控制和监控</li>
+<li><b>电池储能系统：</b>电池包采用3.2V 105Ah磷酸铁锂电芯，每簇7个模组（210S20P为一簇），共12簇，采用3级BMS控制架构</li>
+</ul>
 
-  储能系统组成:
-  - 20尺标准储能系统舱（舱体+配电+消防+监控+温控）
-  - 自动消防系统（七氟丙烷+自动报警+联动）
-  - 视频监控系统（4G网卡+PC/手机客户端）
-  - 电池储能系统（3级BMS控制架构）
+<h4 style="color:#534AB7;margin:8px 0 4px">2.2 参数</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">序号</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">项目</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">参数</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">备注</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电芯及数量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">105Ah电芯，7560只</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称能量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2.53MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称容量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3780Ah</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">直流侧标称电压</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">672V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">直流电压范围</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">567~766.5Vdc</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">6</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称充放电电流</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">945A</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.25C充放电</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">7</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">循环次数</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">&gt;6000次</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.25C@80%DOD</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">8</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">自放电率/月</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">&lt;3%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">9</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">使用寿命</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">&gt;10年</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.5C@80%DOD</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">运行温度</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">-20\u2103~60\u2103</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">11</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">运行湿度</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5%~90%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">12</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">外形尺寸</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">6058\u00D72500\u00D72896mm</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">13</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">总重量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">约28T</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">14</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">绝缘电阻</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">&gt;0.1k\u03A9/V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+</table>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-3. PCS需求
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  充电条件: 优先保证场地固定充电桩用电功率，动态调整PCS充电功率
-  - 平电价时：变压器富余全部给储能充电
-  - 谷电价时：3小时1300kVA功率快速充电
-  放电条件: 非充电时间段，PCS待机或放电，变压器保持0kVA
-  配置: 630kW储能变流器 + 630kVA隔离变压器 + EMU + 功率采集装置 + Goos板卡 + 防逆流装置
+<h4 style="color:#534AB7;margin:8px 0 4px">2.3 布局</h4>
+<img src="images/products/yidong/yidong_p4_img0_1fdfefa3.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>舱体布置要求：</b></p>
+<ol style="padding-left:18px;margin:4px 0">
+<li>舱体设备总重约28吨，安装基础应采用钢筋混凝土结构，单个舱基础安装面平整度误差不大于20mm</li>
+<li>两个电池舱可在无门侧背靠背排布（间距大于50mm即可）；有门侧舱体间距不小于4米，保证维护空间</li>
+<li>电池舱布置时，舱体间道路、通道应做硬化处理，保证维护车辆正常作业</li>
+<li>电池舱基础上表面应高于周边道路，高出部分不小于300mm</li>
+<li>使用环境：气温-30/45\u2103，海拔&lt;2000米，非强风沙、沙尘区域，非强盐雾区域</li>
+</ol>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-4. 控制策略
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  平价时间段: EMU调整电网侧允许功率为1000kVA，Pc=Ppcs+Pb+Pa
-  谷价时间段: EMU调整电网侧允许功率为1300kVA，以最大功率给PCS充电
-  其余时间段: EMU调整电网侧允许功率为0，Pc=0
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">3. PCS需求</h4>
+<img src="images/products/yidong/yidong_p5_img0_d0d229f9.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>充电条件：</b>优先保证场地固定充电桩的用电功率，动态调整PCS充电功率：</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li><b>平电价时：</b>将变压器富余全部用起来给储能集装箱充电</li>
+<li><b>谷电价时：</b>有3个小时变压器可提供1300kVA功率给储能集装箱充电，需要PCS尽可能在此时间段快速充满电</li>
+</ul>
+<p><b>放电条件：</b>非充电时间段，PCS系统处于待机或放电状态，变压器保持功率为0kVA状态。</p>
+<p><b>配置：</b>630kW储能变流器、630kVA隔离变压器、能量管理单元EMU、功率采集装置、Goos板卡及防逆流装置。</p>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-5. 通信与计费
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  通信: Modbus RTU协议 → 工控机+4G → 云平台
-  电量统计: 充/放电电量实时统计，分时费用设定
-  平台: https://billing.gotion.vip`,
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">4. 实现方案</h4>
+<img src="images/products/yidong/yidong_p6_img0_fd5faf82.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p>为完成PCS的动态调整功率的功能，需要加装以下装置：</p>
+<ol style="padding-left:18px;margin:4px 0">
+<li>能量管理控制器EMU</li>
+<li>三套功率采集装置A/B/C，能够采集采样点的有功功率值和视在功率值</li>
+</ol>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">5. 控制策略</h4>
+<ol style="padding-left:18px;margin:4px 0">
+<li><b>平价时间段：</b>EMU将电网侧允许功率调整为最大允许值1000kVA，当Pb+Pa功率增加或减少时，依据 Pc=Ppcs+Pb+Pa，动态调节Ppcs</li>
+<li><b>谷价时间段：</b>EMU将电网侧允许功率调整为最大功率值1300kVA，即Pc=1300，以最大的功率给PCS充电</li>
+<li><b>其余时间段：</b>EMU将电网侧允许功率调整为0，即Pc=0。如Pb+Pa为0时，Ppcs则为0；当Pb+Pa为-500kW时，Ppcs放电功率为500kW</li>
+</ol>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">6. 通信与计费</h4>
+<img src="images/products/yidong/yidong_p7_img0_44aa975e.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>通信：</b>采用Modbus RTU协议将PCS的实时数据解析通过工控机+4G网推送到云平台。</p>
+<p><b>电量统计：</b>集装箱充电电量、放电电量实时统计在云平台端，用于计费。平台可以登录查询实时电量、分时费用设定。</p>
+</div>`,
 
 fremont:`<div style="font-size:13px;line-height:1.7">
 <h3 style="color:#185FA5;margin:0 0 8px">AI赋能的集成光伏-储能-充电项目</h3>
@@ -2005,7 +2032,7 @@ function downloadMD(){
   a.href=url;a.download='储能系统解决方案.md';a.click();URL.revokeObjectURL(url);
 }
 
-renderDeviceLibrary('全部');renderCases();
+showPage('devices');
 </script>
 </body>
 </html>
