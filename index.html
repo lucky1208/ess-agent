@@ -125,26 +125,34 @@ select.form-input{appearance:auto}
 <div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px">AI智能体自动配置</div>
 <div style="font-size:11px;color:#c0e0d0;line-height:1.5">输入需求信息，智能体自动生成完整解决方案：设备选型、系统架构图、电气接线图、电气拓扑图、BOM清单、充放电策略、经济性分析</div>
 </div>
-<div style="margin-bottom:16px">
+<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
 <div class="sec-title" style="margin-bottom:8px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-自然语言输入
+方式一：自然语言描述
 </div>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.4">请用自然语言描述你的需求，AI自动识别参数并生成方案</div>
 <textarea id="naturalInput" class="form-input" rows="3" placeholder="例：大庆油田2台1250kVA变压器10kV接入，月用电35万度，峰谷价差0.39元，请配置储能方案" style="resize:vertical;font-size:12px;line-height:1.4"></textarea>
 <button class="btn btn-primary" onclick="parseNaturalInput()" style="margin-top:8px;width:100%;font-size:12px;padding:8px">
 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
 AI识别并配置
 </button>
 </div>
-<div class="sec-title">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-项目信息
+<div style="margin-bottom:16px">
+<div class="sec-title" style="margin-bottom:4px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+方式二：详细信息输入
+</div>
+<div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.4">逐项填写场地参数，手动配置储能方案</div>
+
+<div class="sec-title" style="font-size:13px;margin-bottom:10px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+场地基本信息
 </div>
 <div class="form-group"><label class="form-label">项目名称</label><input type="text" class="form-input" id="projName" placeholder="如：大庆管业储能项目" value="大庆管业储能项目"></div>
 <div class="form-group"><label class="form-label">项目地址</label><input type="text" class="form-input" id="projAddr" placeholder="如：黑龙江大庆市高新区" value="黑龙江大庆市高新区建设路249号"></div>
 <div class="form-group"><label class="form-label">省份/城市</label><input type="text" class="form-input" id="region" value="黑龙江大庆"></div>
 
-<div class="sec-title" style="margin-top:20px">
+<div class="sec-title" style="margin-top:20px;font-size:13px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
 变压器配置
 </div>
@@ -162,7 +170,7 @@ AI识别并配置
 </div>
 <div class="form-group"><label class="form-label">是否有10kV配电室</label><select class="form-input" id="hasHvRoom"><option value="1">有（推荐10kV接入）</option><option value="0">无（将用0.4kV接入）</option></select></div>
 
-<div class="sec-title" style="margin-top:20px">
+<div class="sec-title" style="margin-top:20px;font-size:13px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
 用电负荷
 </div>
@@ -176,7 +184,7 @@ AI识别并配置
 </div>
 <div class="form-group"><label class="form-label">年工作天数</label><input type="number" class="form-input" id="workDays" value="300" step="10"></div>
 
-<div class="sec-title" style="margin-top:20px">
+<div class="sec-title" style="margin-top:20px;font-size:13px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 峰谷电价
 </div>
