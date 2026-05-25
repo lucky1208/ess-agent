@@ -263,11 +263,11 @@ ACC AC一体柜专题
 <div class="diagram-header"><h3 class="diagram-title">物料清单(BOM)</h3></div>
 <div id="bomContent"></div>
 </div>
-<div class="diagram-container" id="refSection" style="display:none">
+<div class="diagram-container" id="refSection">
 <div class="diagram-header"><h3 class="diagram-title">参考设计图（大庆管业5MWh项目）</h3></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden"><iframe id="refArchFrame" style="width:100%;height:480px;border:none"></iframe><div style="padding:6px 10px;font-size:11px;color:var(--text2)">系统架构图 v11</div></div>
-<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden"><iframe id="refWiringFrame" style="width:100%;height:480px;border:none"></iframe><div style="padding:6px 10px;font-size:11px;color:var(--text2)">电气接线图 v11</div></div>
+<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden"><iframe id="refArchFrame" style="width:100%;height:480px;border:none" src="系统架构图_v11_10kV.html"></iframe><div style="padding:6px 10px;font-size:11px;color:var(--text2)">系统架构图 v11</div></div>
+<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden"><iframe id="refWiringFrame" style="width:100%;height:480px;border:none" src="电气接线图_v11_10kV.html"></iframe><div style="padding:6px 10px;font-size:11px;color:var(--text2)">电气接线图 v11</div></div>
 </div>
 </div>
 </div>
@@ -343,7 +343,7 @@ function showPage(id){
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-tab')[['devices','config','diagrams','cases'].indexOf(id)].classList.add('active');
   if(id==='devices')renderDeviceLibrary(currentFilter);
-  if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);showRefDiagrams();}
+  if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);}
   if(id==='cases')renderCases();
 }
 
@@ -1347,6 +1347,104 @@ xibuzt:`<div style="font-size:13px;line-height:1.7">
 <li>年营收1872万元 = 720万度\u00D72.6元/度，回本周期约0.62年</li>
 <li>原柴油发电约5元/度，改造后单度电降低成本2元</li>
 </ul>
+</div>`,
+
+daqing:`<div style="font-size:13px;line-height:1.7">
+<h3 style="color:#185FA5;margin:0 0 8px">大庆管业 5MWh 客户侧储能配置方案</h3>
+<p style="color:#C2C0B6">来源：大庆管业5MWh储能配置方案_优化版 | 设计人：卢继雄</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">1. 方案概述</h4>
+<p>建议采用 <b>1套 GOTION GRID 5MWh</b>，接入厂内<b>10kV用户侧母线</b>，先做峰谷套利与需量削峰。不是低压侧外挂电池柜，而是10kV母线侧一体化储能支路。这样能同时覆盖两台1250kVA变压器下游负荷，避免0.4kV侧数千安培大电流接入，也便于统一做防孤岛、逆功率、需量控制和消防联动。</p>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">项目</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">规格</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">说明</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电池容量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">覆盖多数高峰电量</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">推荐PCS</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1.25MW</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">可扩展到2.5MW</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">推荐并网点</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10kV</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电表后、变压器前</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">控制边界</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0反送</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCC保持正向取电</td></tr>
+</table>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">2. 电气一次系统</h4>
+<img src="images/products/daqing/daqing_s3_e6e91c84.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>10kV侧接入</b>：储能支路经升压变压器接入10kV用户母线，PCC点设于电表后。</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>国网10kV架空线/电缆引入</li>
+<li>用户10kV母线 \u2192 计量点 \u2192 并网柜 \u2192 升压变1600kVA \u2192 PCS 1.25MW \u2192 电池舱5MWh</li>
+<li>两台1250kVA变压器各自供0.4kV低压侧负荷</li>
+<li>储能支路与变压器并联于10kV母线</li>
+</ul>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">3. 0.4kV低压备选方案</h4>
+<p>若厂内无10kV配电室，则0.4kV侧接入（<b>必须降功率</b>，2\u00D7500kW PCS，不可硬上2.5MW）：</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>0.4kV母排接入，最大电流约3600A（需大容量母排）</li>
+<li>PCS降至2\u00D7500kW = 1MW，电池可配3.3MWh（X-836\u00D74）</li>
+<li>仅覆盖单台变压器负荷，无法同时覆盖两台</li>
+<li>防逆流仅靠PCC侧软件控制，硬件保护较弱</li>
+</ul>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">4. 容量优化分析</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">配置</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">容量</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">投资(万)</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">回本(年)</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">利用率</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">备注</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">X-836\u00D74</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3.3MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">260</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">94%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">推荐最优性价比</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">X-950\u00D74</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3.8MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">280</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5.2</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">88%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr style="font-weight:bold"><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">GRID 5MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">350</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">6.3</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">82%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">初设推荐</td></tr>
+</table>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">5. 充放电策略</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">时段</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">动作</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">逻辑</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">峰段(8h)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">放电</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">P_discharge=min(P_load-50kW, 1250kW, P_soc_limit)</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">平段(8h)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">待机</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCC=负荷，储能不动作</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">谷段(8h)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">充电</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCS满功率充电，5h充满</td></tr>
+</table>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">6. 防逆流三重保障</h4>
+<p><b>并网放电(P/Q模式)：</b>储能与市电同时供电，PCC=负荷-储能放电，市电方向始终正向流入，不会逆流。这是正常运行模式。</p>
+<p><b>PCC实时闭环控制（每1秒执行）：</b></p>
+<ol style="padding-left:18px;margin:4px 0">
+<li>读取P_pcc(PCC实时功率)、P_load(总负荷)、SOC</li>
+<li><b>P_discharge = min(P_load - 50kW, 1250kW, P_soc_limit)</b> \u2190 核心公式</li>
+<li>若P_pcc &lt; 50kW \u2192 降功率(1s内)；若P_pcc &lt; 0 \u2192 紧急停机(200ms内)</li>
+</ol>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">保障层级</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">机制</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">动作</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">第1道</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">EMS软件防逆流(主动)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">实时采集PCC功率，动态调整PCS放电功率，目标PCC\u226550kW正向，负荷突降1s内跟踪</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">第2道</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">逆功率继电器(硬保护)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCC有功&lt;0时动作：先强制PCS降功率到0(\u2264200ms)；持续逆流&gt;2s则跳并网柜</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">第3道</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">并网柜保护(最后防线)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">方向保护检测功率异常跳闸；防孤岛保护国网断电&lt;2s跳开；过流保护短路/过载时跳闸</td></tr>
+</table>
+<p><b>实际运行效果(峰段)：</b>负荷800kW = 储能放750kW + 市电供50kW \u2192 覆盖93.75%，PCC=50kW正向，零逆流</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">7. 经济性分析</h4>
+<p>按2026年5月黑龙江10kV两部制电价，峰谷差约<b>0.3009元/kWh</b>；考虑90%效率后，每放1kWh约节省<b>0.2485元</b>。</p>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">电价口径</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">元/kWh</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">高峰</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.7719</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">平段</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.6215</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">低谷</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.4711</td></tr>
+<tr style="font-weight:bold"><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">峰谷差</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.3009</td></tr>
+</table>
+<p><b>每日放电量敏感性</b>（按300个生产日估算）：</p>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">容量</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">年节约(万元)</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">22.4</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3.5MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">26.1</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">29.8</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4.5MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">33.6</td></tr>
+<tr style="font-weight:bold"><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">37.3</td></tr>
+</table>
+<p><b>两部制电费复核重点：</b>容量电价约23元/kVA\u00B7月；最大需量约36.8元/kW\u00B7月。若改按需量计费，临界值约1560kW。下一步必须拿到12个月电费单确认。</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">8. 落地路径</h4>
+<p>先锁定10kV并网和1.25MW经济型配置，再用账单数据复核收益。</p>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">步骤</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">内容</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1. 资料核准</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">12个月电费单、15min负荷曲线、现有一次图、合同容量/需量计费方式</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2. 电气深化</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10kV柜位、升压变容量、继保定值、接地、通讯点表和防反送边界</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3. 经济复算</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">按实际峰谷电价、运行天数、需量削峰、运维和可用率做现金流模型</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4. 实施验收</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">土建基础、消防报审、并网联调、EMS策略试运行和应急预案</td></tr>
+</table>
+<p><b>初设推荐BOM：</b>5MWh电池舱\u00D71；PCS 1.25MW\u00D71；升压变1600kVA\u00D71；10kV并网柜/计量保护/EMS/消防/通讯。</p>
+<p><b>保守结论：</b>5MWh容量合适；投资收益是否达标，关键看最大需量削峰、生产天数和是否能稳定4MWh/天以上放电。</p>
 </div>`,
 };
 
