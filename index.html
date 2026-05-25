@@ -223,6 +223,7 @@ ACC AC一体柜专题
 
 <!-- TAB: 系统图纸 -->
 <div id="page-diagrams" class="tab-content">
+<div id="diagramTabs" style="display:none;margin-bottom:16px"></div>
 <div class="diagram-container">
 <div class="diagram-header"><h3 class="diagram-title">系统架构图</h3><div class="diagram-actions"><button onclick="downloadSVG('archSvg','系统架构图.svg')">下载 SVG</button></div></div>
 <div class="diagram-svg" id="archSvg"></div>
@@ -311,7 +312,7 @@ const CASES=[
   {title:'西部钻探油田钻井平台 5MWh',desc:'国轩高科×西部钻探×沃德石油，国内首创大型油改电项目，5MWh储能仓替代柴油发电',tags:['油改电','5MWh','钻井'],color:'var(--brown)',img:'dll_s15_4.jpg',detailId:'xibuzt'},
 ];
 
-let LAST_RESULT=null;
+let LAST_RESULT=null;let currentDiagramIdx=0;
 let currentFilter='全部';
 
 function showPage(id){
@@ -320,7 +321,7 @@ function showPage(id){
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-tab')[['config','devices','diagrams','cases'].indexOf(id)].classList.add('active');
   if(id==='devices')renderDeviceLibrary(currentFilter);
-  if(id==='diagrams'&&LAST_RESULT){renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);showRefDiagrams();}
+  if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);showRefDiagrams();}
   if(id==='cases')renderCases();
 }
 
@@ -377,7 +378,7 @@ function generateSolution(){
   const P=getParams();const result=selectEquipment(P);LAST_RESULT=result;
   document.getElementById('successMsg').classList.add('show');
   renderRecommendation(result);renderSelectionTable(result);renderDocOutput(result);
-  renderArchSvg(result);renderWiringSvg(result);renderTopoSvg(result);renderBOM(result);showRefDiagrams();
+  renderDiagramTabs(result);renderArchSvg(result);renderWiringSvg(result);renderTopoSvg(result);renderBOM(result);showRefDiagrams();
   showPage('config');
 }
 
@@ -428,7 +429,7 @@ function renderSelectionTable(R){
 }
 
 function renderDocOutput(R){
-  const P=R.params;const c=R.candidates[0];const d=new Date();
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];const d=new Date();
   const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
   const pcsStr=(c.pcsKW/1000).toFixed(2)+'MW';
   let doc=`═══════════════════════════════════════════════════════════\n`;
@@ -1422,9 +1423,23 @@ function showCaseDetail(detailId,title){
   modal.classList.add('show');
 }
 
+function renderDiagramTabs(R){
+  if(!R||!R.candidates||R.candidates.length<=1){document.getElementById('diagramTabs').style.display='none';return;}
+  const N=Math.min(R.candidates.length,4);
+  let html='';
+  for(let i=0;i<N;i++){
+    const c=R.candidates[i];
+    const active=i===(currentDiagramIdx||0)?'background:var(--blue);color:white;':'background:var(--bg3);color:var(--text2);';
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    html+=`<button onclick="currentDiagramIdx=${i};renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);" style="${active}border:1px solid var(--border);border-radius:6px;padding:8px 16px;margin-right:8px;cursor:pointer;font-size:12px;">方案${i+1}: ${c.product.name} ${capStr} (${c.payback.toFixed(1)}年)</button>`;
+  }
+  document.getElementById('diagramTabs').innerHTML=html;
+  document.getElementById('diagramTabs').style.display='block';
+}
+
 function renderArchSvg(R){
-  const P=R.params;const c=R.candidates[0];const is10kV=P.use10kV;
-  const W=1100,H=800;let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];const is10kV=P.use10kV;
+  const W=1100,H=900;let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   s+=`<defs>`;
   s+=`<linearGradient id="gGrid" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4a90d9"/><stop offset="100%" stop-color="#2a50a0"/></linearGradient>`;
   s+=`<linearGradient id="gTrans" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#e8a838"/><stop offset="100%" stop-color="#c07820"/></linearGradient>`;
@@ -1468,7 +1483,7 @@ function renderArchSvg(R){
     s+=`<text x="${x}" y="${txY+146}" text-anchor="middle" fill="#e0c0ff" font-size="10">电机/产线 ~${loadKW}kW</text>`;
     s+=`<text x="${x}" y="${txY+162}" text-anchor="middle" fill="#e0c0ff" font-size="9">${P.workDays}天/月运行</text>`;
   }
-  const ex=760;
+  const ex=660;
   s+=`<line x1="${ex}" y1="${busY+40}" x2="${ex}" y2="${txY}" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>`;
   s+=`<text x="${ex}" y="${busY+52}" text-anchor="middle" fill="#50c878" font-size="10" font-weight="bold">储能支路（用户侧闭环运行）</text>`;
   if(is10kV){
@@ -1522,16 +1537,17 @@ function renderArchSvg(R){
     s+=`<text x="${ex}" y="${batY+50}" text-anchor="middle" fill="#90d090" font-size="9">${c.product.cool}/${c.product.ip} | ${c.product.fire}</text>`;
     s+=`<text x="${ex}" y="${batY+63}" text-anchor="middle" fill="#90d090" font-size="9">BMS三级保护</text>`;
   }
-  s+=`<rect x="920" y="${txY}" width="160" height="180" rx="8" fill="#151530" filter="url(#sh)" stroke="#6060a0" stroke-width="1.5"/>`;
-  s+=`<text x="1000" y="${txY+25}" text-anchor="middle" fill="#a0a0ff" font-size="12" font-weight="bold">EMS能量管理</text>`;
-  s+=`<line x1="935" y1="${txY+35}" x2="1065" y2="${txY+35}" stroke="#3a3a5e" stroke-width="1"/>`;
+  const emsY=busY+40;
+  s+=`<rect x="920" y="${emsY}" width="160" height="180" rx="8" fill="#151530" filter="url(#sh)" stroke="#6060a0" stroke-width="1.5"/>`;
+  s+=`<text x="1000" y="${emsY+25}" text-anchor="middle" fill="#a0a0ff" font-size="12" font-weight="bold">EMS能量管理</text>`;
+  s+=`<line x1="935" y1="${emsY+35}" x2="1065" y2="${emsY+35}" stroke="#3a3a5e" stroke-width="1"/>`;
   const emsItems=['● 峰谷时段自动调度','● 防逆流双闭环控制','● PCC功率实时监测','● SOC保护管理','● 防孤岛保护联锁','● 远程监控+告警','● 软件限功率+硬件兜底'];
-  emsItems.forEach((t,i)=>{s+=`<text x="1000" y="${txY+55+i*20}" text-anchor="middle" fill="#8080c0" font-size="10">${t}</text>`;});
-  s+=`<line x1="920" y1="${txY+95}" x2="860" y2="${txY+23}" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>`;
-  s+=`<line x1="920" y1="${txY+120}" x2="870" y2="${txY+100}" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>`;
-  s+=`<line x1="920" y1="${txY+145}" x2="880" y2="${txY+140}" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>`;
-  s+=`<line x1="920" y1="${txY+80}" x2="680" y2="127" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
-  s+=`<text x="820" y="195" fill="#6060a0" font-size="8" transform="rotate(-30,820,195)">PCC功率采集</text>`;
+  emsItems.forEach((t,i)=>{s+=`<text x="1000" y="${emsY+55+i*20}" text-anchor="middle" fill="#8080c0" font-size="10">${t}</text>`;});
+  s+=`<line x1="920" y1="${emsY+95}" x2="${ex+100}" y2="${txY+23}" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>`;
+  s+=`<line x1="920" y1="${emsY+120}" x2="${ex+100}" y2="${txY+100}" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>`;
+  s+=`<line x1="920" y1="${emsY+145}" x2="${ex+100}" y2="${txY+140}" stroke="#6060a0" stroke-width="1.2" stroke-dasharray="5,3"/>`;
+  s+=`<line x1="920" y1="${emsY+80}" x2="680" y2="127" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<text x="820" y="${emsY+60}" fill="#6060a0" font-size="8" transform="rotate(-30,820,${emsY+60})">PCC功率采集</text>`;
   s+=`<rect x="60" y="${txY+90}" width="400" height="200" rx="8" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
   s+=`<text x="260" y="${txY+115}" text-anchor="middle" fill="#a0a0ff" font-size="12" font-weight="bold">充放电策略与经济性</text>`;
   s+=`<line x1="70" y1="${txY+125}" x2="450" y2="${txY+125}" stroke="#2a2a3e" stroke-width="1"/>`;
@@ -1557,7 +1573,7 @@ function renderArchSvg(R){
 }
 
 function renderWiringSvg(R){
-  const P=R.params;const c=R.candidates[0];const W=1200,H=950;
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];const W=1200,H=950;
   let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   s+=`<defs>`;
   s+=`<linearGradient id="bus10w" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2a50a0"/><stop offset="50%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>`;
@@ -1826,7 +1842,7 @@ function renderTopoSvg(R){
 
 function renderBOM(R){
   if(!R||!R.candidates||!R.candidates.length)return;
-  const P=R.params;const c=R.candidates[0];
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];
   const bom=[];
   let idx=1;
   bom.push({no:idx,name:'并网柜',spec:P.use10kV?`KYN28A-12 ${P.txHv}kV真空断路器柜`:`MNS ${((P.txLv/1000).toFixed(1))}kV抽出式开关柜`,qty:1,unit:'面',note:P.use10kV?'含过流/速断/接地/防孤岛保护':'含逆功率保护'});
@@ -1901,7 +1917,7 @@ function downloadTxt(){
 }
 
 function downloadMD(){
-  if(!LAST_RESULT)return;const P=LAST_RESULT.params;const c=LAST_RESULT.candidates[0];const d=new Date();
+  if(!LAST_RESULT)return;const P=LAST_RESULT.params;const c=LAST_RESULT.candidates[currentDiagramIdx||0];const d=new Date();
   const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
   const pcsStr=(c.pcsKW/1000).toFixed(2)+'MW';
   let md=`# ${P.region} 工商业储能系统解决方案\n\n`;
