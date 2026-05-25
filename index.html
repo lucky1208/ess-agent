@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Open ESS Agent — 开源储能系统解决方案AI生成平台</title>
+<title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
 <style>
 :root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -107,7 +107,7 @@ select.form-input{appearance:auto}
 <body>
 
 <header class="header">
-<h1>Open ESS Agent — 开源储能系统解决方案AI生成平台</h1>
+<h1>Open ESS Agent — 开源储能系统解决方案AI智能体</h1>
 <p>数据规范参考：GB/T 36276, GB/T 42287 ｜ 设计人：卢继雄</p>
 </header>
 
@@ -250,7 +250,7 @@ ACC AC一体柜专题
 </div>
 
 <footer class="footer">
-Open ESS Agent — 开源储能系统解决方案AI生成平台 ｜ 数据规范参考：<span>GB/T 36276</span>, <span>GB/T 42287</span> ｜ 设计人：<span>卢继雄</span>
+Open ESS Agent — 开源储能系统解决方案AI智能体 ｜ 数据规范参考：<span>GB/T 36276</span>, <span>GB/T 42287</span> ｜ 设计人：<span>卢继雄</span>
 </footer>
 
 <div class="detail-modal" id="detailModal">
@@ -279,6 +279,13 @@ const PRODUCTS=[
   {id:'EPD-195',name:'电池包 195.6kWh',cat:'电池包/簇',model:'EPD332-05P195',cap:196,power:98,volt:332.8,cell:'LFP-588Ah',size:'1.2m×2.2m×0.2m',weight:'12000kg',cool:'液冷',fire:'-',ip:'IP67',temp:'-30~60°C',pcs:false,img:'EPD_battery_pack_img2.png',features:['588Ah大电芯','IP67','液冷温控']},
   {id:'Home3',name:'Home 3.0',cat:'户用/便携',model:'HSD51.2-05P16L',cap:16,power:8,volt:51.2,cell:'LFP-314Ah',size:'0.7m×0.2m×0.7m',weight:'125kg',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-20~45°C',pcs:false,img:'Home3_product.jpeg',features:['户用储能','自然冷却','IP65']},
   {id:'Gendome',name:'Gendome Power 30kWh',cat:'户用/便携',model:'Gendome Power',cap:31,power:24,volt:307.2,cell:'LFP-100Ah',size:'0.7m×0.8m×1.1m',weight:'390kg',cool:'风冷',fire:'-',ip:'IP65',temp:'-20~58°C',pcs:false,img:'Gendome_product.jpeg',features:['便携式','风冷','IP65']},
+  {id:'YJN-A209',name:'易加能 A系列 自动驾驶充电桩',cat:'易加能-移动充',model:'A-Series',cap:209,power:100,volt:665.6,cell:'LFP',size:'0.99m×2.27m×1.38m',weight:'2300kg',cool:'自然散热/液冷',fire:'-',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_A_series.png',features:['无人驾驶','100kW快充','209kWh储能','自动寻车避障']},
+  {id:'YJN-G209',name:'易加能 G系列 智能移动充电桩G3',cat:'易加能-移动充',model:'G-Series G3',cap:209,power:60,volt:665.6,cell:'LFP',size:'2.27m×0.99m×1.38m',weight:'2300kg',cool:'自然散热/液冷',fire:'-',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_G_D_series.png',features:['移动充电','60kW输出','V2L放电','扫码即充']},
+  {id:'YJN-D184',name:'易加能 D系列 轻量移动充电桩',cat:'易加能-移动充',model:'D-Series',cap:184,power:60,volt:614.4,cell:'LFP',size:'2.1m×1.06m×1.45m',weight:'2100kg',cool:'自然散热/液冷',fire:'-',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_G_D_series.png',features:['轻量化','60kW快充','适配商用车','免基建']},
+  {id:'YJN-C120',name:'易加能 C系列 固定储充120kW/209kWh',cat:'易加能-固定储充',model:'C-Series 120kW',cap:209,power:120,volt:704,cell:'LFP',size:'1.59m×0.995m×1.43m',weight:'-',cool:'自然散热/选配液冷',fire:'-',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_C_series.png',features:['固定储充','120kW快充','V2G 30kW','交直流双补电']},
+  {id:'YJN-C320',name:'易加能 C系列 固定储充320kW/844kWh',cat:'易加能-固定储充',model:'C-Series 320kW/844kWh',cap:844,power:320,volt:704,cell:'LFP',size:'4.0m×2.44m×2.9m',weight:'14000kg',cool:'自然散热/选配液冷',fire:'七氟丙烷/气溶胶',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_C_series.png',features:['1000V直流平台','320kW双枪','V2G 30kW','交直流双补电']},
+  {id:'YJN-C522',name:'易加能 C系列 固定储充360kW/522kWh',cat:'易加能-固定储充',model:'C-Series 360kW/522kWh',cap:522,power:360,volt:704,cell:'LFP',size:'2.53m×2.36m×1.45m',weight:'5000kg',cool:'液冷',fire:'-',ip:'IP54',temp:'-25~45°C',pcs:false,img:'yijianeng_C522_120inverter.png',features:['液冷温控','360kW峰值','522kWh储能','5枪输出']},
+  {id:'YJN-INV120',name:'易加能 120kW交流逆变装置',cat:'易加能-固定储充',model:'120kW AC Inverter',cap:0,power:120,volt:400,cell:'-',size:'-',weight:'-',cool:'-',fire:'-',ip:'-',temp:'-20~45°C',pcs:true,img:'yijianeng_C522_120inverter.png',features:['并网/离网双模式','120kW输出','PF≥0.99','THDi≤3%']},
 ];
 
 const CASES=[
@@ -727,6 +734,170 @@ const DEVICE_SPECS={
 
 尺寸: 0.7m×0.8m×1.1m
 重量: 390kg`,
+'YJN-A209':`型号: 易加能 A系列 自动驾驶充电桩
+来源: 易加能产品手册
+
+产品参数:
+  设备尺寸: 990L×2270W×1380H mm
+  整机重量: 2300kg
+  最大越障高度: 70mm
+  额定电量: 209kWh
+  环境温度: -20~+45°C
+  电池额定电压: 665.6V
+  防护等级: IP54
+
+核心特性:
+  可选配无人驾驶模块，满足封闭场所内无人驾驶功能
+  降低运维成本，增加产品利用率
+  SIC技术，损耗更低，大功率快速充电
+  精准充放电控制，提升能量效率
+  多级热管理方案，延长储能寿命
+  运行数据实时传输，故障提前预警
+  系统OTA远程更新`,
+'YJN-G209':`型号: 易加能 G系列 智能移动充电桩G3
+来源: 易加能产品手册
+
+产品参数:
+  设备尺寸: 2270L×990W×1380H mm
+  整机重量: 2300kg
+  最大越障高度: 70mm
+  额定电量: 209kWh
+  环境温度: -20~+45°C
+  电池额定电压: 665.6V
+  防护等级: IP54
+  额定输出功率: 60kW
+  直流输出: 200-750Vdc
+  最大充电电流: 150A
+  最大速度: 4km/h
+  电芯体系: LFP
+
+核心特性:
+  从车找电→电找车，颠覆充电时空观
+  部署灵活，操作便捷
+  削峰填谷，小型储能站
+  多重保护措施，运行稳定主动防护`,
+'YJN-D184':`型号: 易加能 D系列 轻量移动充电桩
+来源: 易加能产品手册
+
+产品参数:
+  设备尺寸: 2100L×1060W×1445H mm
+  整机重量: 2100kg
+  最大越障高度: 70mm
+  额定电量: 184kWh
+  环境温度: -20~+45°C
+  电池额定电压: 614.4V
+  防护等级: IP54
+  额定输出功率: 60kW
+
+核心特性:
+  轻量紧凑，90kW快充，157kWh储能
+  适配商用车/物流车货箱
+  免基建安装，灵活部署
+  多重保护措施，运行稳定主动防护
+  标配工业标准插座
+  支持交/直流补电、直流充电`,
+'YJN-C120':`型号: 易加能 C系列 固定储充120kW/209kWh
+来源: 易加能产品手册
+
+产品参数:
+  设备尺寸: 1590L×995W×1430H mm
+  额定电量: 209kWh
+  标称电压: 704Vdc
+  环境温度: -20~45°C
+  额定功率: 100kW
+  额定输出功率: 120kW
+  V2G功率: 30kW
+  防护等级: IP54
+  交流补电输入功率: 30kW
+  直流补电输入功率: 100kW
+  充电输出电压: 200~1000Vdc
+  充电输出电流: 0~250A
+  冷却方式: 自然散热，选配液冷
+  通讯方式: CAN、RS485、Ethernet、4G
+
+核心特性:
+  即投即用，无需场地改造
+  电网扩容，降低投入，支持V2G
+  参与电网调峰、应急供电
+  兼容主流充电服务平台
+  交直流放电/充电，适配800V未来平台`,
+'YJN-C320':`型号: 易加能 C系列 固定储充320kW/844kWh
+来源: 易加能产品手册
+
+产品参数:
+  额定电量: 844kWh
+  标称电压: 704Vdc
+  环境温度: -20~45°C
+  直流放电功率: 320kW（双枪）
+  V2G功率: 30kW
+  放电电压范围: 200~1000Vdc
+  直流充电功率: 2×180kW
+  充电电压范围: 616~792Vdc
+  交流额定电压: 400Vac
+  交流额定电流: 144A
+  交流制式: 三相四线+地线
+  防护等级: IP54
+  消防系统: 七氟丙烷/气溶胶
+  尺寸: 4000L×2438W×2896H mm
+  重量: 14000kg
+  冷却方式: 自然散热，选配液冷
+  通讯方式: CAN、RS485、Ethernet、4G
+
+核心特性:
+  1000V直流平台，适配800V未来平台
+  320kW双枪快充
+  交直流放电/充电
+  覆盖乘用车、重卡、工程机械
+  运输部署简便`,
+'YJN-C522':`型号: 易加能 C系列 固定储充360kW/522kWh
+来源: 易加能产品手册
+
+产品参数:
+  直流输出功率: 360kW CCS2
+  直流输入电压范围: 650~1000Vdc
+  直流输入功率: 120kW
+  输出电压: 直流200~1000Vdc / 交流400Vac
+  直流最大输入电流: 220A
+  交流输入: Max 110kW 160A 3ph (50Hz)
+  交流输出: 63A cee-3ph
+  充电枪输出: MAX 380A CCS2×5m×2
+  标准电量: 522kWh
+  冷却方式: 液冷
+  工作温度范围: -25~45°C
+  海拔: <2000m
+  外壳防护等级: IP54
+
+核心特性:
+  多能互补融合，交直流+光伏多能源接入
+  522kWh储能、峰值360kW
+  电网动态增容，降低变压器负载
+  集成削峰填谷、虚拟电厂、后备电源
+  充电10分钟续航百公里
+  多级测温、多层熔断、多重消防`,
+'YJN-INV120':`型号: 易加能 120kW交流逆变装置
+来源: 易加能产品手册
+
+产品参数:
+  直流输入电压范围: 650~1000Vdc
+  直流输入功率: 120kW
+  输入路数: 1路
+  交流输出电压: 380Vac
+  交流输出电流: 190A
+  交流输出电压频率: 50/60Hz
+  功率因素: ≥0.99 @50%~100%输出功率
+  总电流波形畸变率: ≤3% @50%~100%满载输出功率
+  环境温度: -20~45°C
+  操作界面: 10.1寸
+  显示方式: 7寸触摸屏
+  设计标准: IEC62619、IEC61851
+
+核心特性:
+  依托交流电高效转换特性，能量利用率高
+  支持并网/离网双模式
+  内置过压、过流保护
+  兼容各类负载，满足多场景供电
+  结构简洁、故障率低、维护成本低
+  高效节能，绿色环保`,
 };
 
 function showDetail(productId){
@@ -1025,13 +1196,20 @@ const LL760_DETAIL=`高集成度工商业液冷储能产品 技术规格书 (760
 
 function renderCases(){
   const el=document.getElementById('caseGrid');
-  el.innerHTML=CASES.map((c,i)=>`<div class="case-card fade-in" style="animation-delay:${i*0.1}s;cursor:pointer" onclick="${c.detailId?'showCaseDetail(\\''+c.detailId+'\\',\\''+c.title+'\\')':''}">
+  el.innerHTML=CASES.map((c,i)=>`<div class="case-card fade-in" style="animation-delay:${i*0.1}s;cursor:pointer" data-detail="${c.detailId||''}" data-title="${c.title}">
     <div class="case-img" style="background:linear-gradient(135deg,${c.color}33,${c.color}11)">
       ${c.img?`<img src="images/products/${c.img}" alt="${c.title}" onerror="this.parentElement.innerHTML='<span style=color:var(--text2)>⚡</span>'">`:'<span style="color:var(--text2)">⚡</span>'}
     </div>
     <div class="case-body"><div class="case-title">${c.title}${c.detailId?' ↗':''}</div><div class="case-desc">${c.desc}</div>
     <div class="case-tags">${c.tags.map(t=>`<span class="case-tag" style="background:${c.color}22;color:${c.color}">${t}</span>`).join('')}</div>
     </div></div>`).join('');
+  el.querySelectorAll('.case-card').forEach(card=>{
+    card.addEventListener('click',function(){
+      const d=this.getAttribute('data-detail');
+      const t=this.getAttribute('data-title');
+      if(d)showCaseDetail(d,t);
+    });
+  });
 }
 
 function showCaseDetail(detailId,title){
