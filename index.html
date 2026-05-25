@@ -108,7 +108,7 @@ select.form-input{appearance:auto}
 
 <header class="header">
 <h1>Open ESS Agent — 开源储能系统解决方案AI智能体</h1>
-<p>设计遵循规范：系统级：GB/T 36558-2023 电气接线设计层：GB 50055 并网层：GB/T 34120、GB/T 34131 储能电站层：GB/T 42288 ｜ 设计人：卢继雄</p>
+<p>设计遵循规范：系统级：GB/T 36558-2023 电气接线设计层：GB 50055 并网层：GB/T 34120、GB/T 34131 储能电站层：GB/T 42288 ｜ 设计人：卢继雄 ｜ 联系电话：15026953905</p>
 </header>
 
 <nav class="nav-tabs">
@@ -121,6 +121,21 @@ select.form-input{appearance:auto}
 <div class="main-container">
 <!-- ========== SIDEBAR ========== -->
 <aside class="sidebar">
+<div style="background:linear-gradient(135deg,#185FA5,#0F6E56);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
+<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px">AI智能体自动配置</div>
+<div style="font-size:11px;color:#c0e0d0;line-height:1.5">输入需求信息，智能体自动生成完整解决方案：设备选型、系统架构图、电气接线图、电气拓扑图、BOM清单、充放电策略、经济性分析</div>
+</div>
+<div style="margin-bottom:16px">
+<div class="sec-title" style="margin-bottom:8px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+自然语言输入
+</div>
+<textarea id="naturalInput" class="form-input" rows="3" placeholder="例：大庆油田2台1250kVA变压器10kV接入，月用电35万度，峰谷价差0.39元，请配置储能方案" style="resize:vertical;font-size:12px;line-height:1.4"></textarea>
+<button class="btn btn-primary" onclick="parseNaturalInput()" style="margin-top:8px;width:100%;font-size:12px;padding:8px">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+AI识别并配置
+</button>
+</div>
 <div class="sec-title">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
 项目信息
@@ -259,7 +274,7 @@ ACC AC一体柜专题
 </div>
 
 <footer class="footer">
-Open ESS Agent — 开源储能系统解决方案AI智能体 ｜ 设计遵循规范：系统级：<span>GB/T 36558-2023</span> 电气接线设计层：<span>GB 50055</span> 并网层：<span>GB/T 34120</span>、<span>GB/T 34131</span> 储能电站层：<span>GB/T 42288</span> ｜ 设计人：<span>卢继雄</span>
+Open ESS Agent — 开源储能系统解决方案AI智能体 ｜ 设计遵循规范：系统级：<span>GB/T 36558-2023</span> 电气接线设计层：<span>GB 50055</span> 并网层：<span>GB/T 34120</span>、<span>GB/T 34131</span> 储能电站层：<span>GB/T 42288</span> ｜ 设计人：<span>卢继雄</span> ｜ 联系电话：<span>15026953905</span>
 </footer>
 
 <div class="detail-modal" id="detailModal">
@@ -380,6 +395,32 @@ function generateSolution(){
   renderRecommendation(result);renderSelectionTable(result);renderDocOutput(result);
   renderDiagramTabs(result);renderArchSvg(result);renderWiringSvg(result);renderTopoSvg(result);renderBOM(result);showRefDiagrams();
   showPage('config');
+}
+
+function parseNaturalInput(){
+  const raw=document.getElementById('naturalInput').value.trim();
+  if(!raw){alert('请输入需求描述');return;}
+  const puncMap={'\uFF0C':',','\u3002':'.','\u3001':'/','\uFF1B':';','\uFF1A':':','\uFF01':'!','\uFF1F':'?','\u201C':'"','\u201D':'"','\u2018':"'",'\u2019':"'",'\uFF08':'(','\uFF09':')','\u3010':'[','\u3011':']'};
+  const s=raw.replace(/[\uFF0C\u3002\u3001\uFF1B\uFF1A\uFF01\uFF1F\u201C\u201D\u2018\u2019\uFF08\uFF09\u3010\u3011]/g,m=>puncMap[m]||m);
+  function sv(id,val){const el=document.getElementById(id);if(el&&val!=null)el.value=val;}
+  let found=0;
+  const capM=s.match(/(\d+)\s*kVA/i);if(capM){sv('txCap',capM[1]);found++;}
+  const cntM=s.match(/(\d+)\s*台/);if(cntM){sv('txCount',cntM[1]);found++;}
+  const hvM=s.match(/(\d+\.?\d*)\s*kV/i);if(hvM){const kv=parseFloat(hvM[1]);if(kv>=6){sv('txHv',kv);if(kv>=10)sv('hasHvRoom','1');else sv('hasHvRoom','0');found++;}}
+  const mhM=s.match(/月[用电用]*\s*(\d+\.?\d*)\s*万/);if(mhM){sv('loadMonthHigh',mhM[1]);found++;}
+  const mhM2=s.match(/(\d+\.?\d*)\s*万\s*[度kK][Ww]?[Hh]?/);if(!mhM&&mhM2){sv('loadMonthHigh',mhM2[1]);found++;}
+  const mlM=s.match(/淡季\s*(\d+\.?\d*)\s*万/);if(mlM){sv('loadMonthLow',mlM[1]);found++;}
+  const pkM=s.match(/峰[价电段]?\s*(\d+\.?\d*)/);if(pkM){sv('pricePeak',pkM[1]);found++;}
+  const vlM=s.match(/谷[价电段]?\s*(\d+\.?\d*)/);if(vlM){sv('priceValley',vlM[1]);found++;}
+  const flM=s.match(/平[价电段]?\s*(\d+\.?\d*)/);if(flM){sv('priceFlat',flM[1]);found++;}
+  const diffM=s.match(/价差\s*(\d+\.?\d*)/);if(diffM){const d=parseFloat(diffM[1]);if(!pkM&&!vlM){sv('pricePeak',(0.44+d).toFixed(3));sv('priceValley','0.441');}found++;}
+  const loadM=s.match(/最大负荷\s*(\d+)\s*kW/i);if(loadM){sv('loadMax',loadM[1]);found++;}
+  const addrM=s.match(/(?:地址|位于|在)\s*([^\s,，]+(?:省|市|区|县|路|号))/);if(addrM){sv('region',addrM[1]);found++;}
+  const nameM=s.match(/(?:项目|工程)[名称]?\s*([^\s,，]+(?:项目|工程))/);if(nameM){sv('projName',nameM[1]);found++;}
+  if(s.includes('大庆')||s.includes('油田')){if(!document.getElementById('region').value.includes('大庆'))sv('region','黑龙江大庆');if(!document.getElementById('projAddr').value)sv('projAddr','黑龙江大庆市高新区建设路249号');found++;}
+  if(found===0){alert('未能识别到有效参数，请尝试输入如：1250kVA变压器2台，10kV接入，月用电35万度');return;}
+  const tip=document.createElement('div');tip.style.cssText='position:fixed;top:20px;right:20px;background:#0F6E56;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:999;animation:fadeIn .3s';tip.textContent='AI识别完成，已填充'+found+'个参数，正在生成方案...';document.body.appendChild(tip);setTimeout(()=>tip.remove(),3000);
+  setTimeout(()=>generateSolution(),500);
 }
 
 function devCardHTML(p,isSelected){
