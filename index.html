@@ -1169,143 +1169,158 @@ yidong:`上海邑东 2.5MWh储能充电站
   电量统计: 充/放电电量实时统计，分时费用设定
   平台: https://billing.gotion.vip`,
 
-fremont:`AI赋能的集成光伏-储能-充电项目 — 国轩高科美国硅谷项目
-负责人：卢继雄  单位：上海轩邑新能源发展有限公司
-项目经费：1600万元  申报方向：工程系列人工智能（应用技术）专业
+fremont:`<div style="font-size:13px;line-height:1.7">
+<h3 style="color:#185FA5;margin:0 0 8px">AI赋能的集成光伏-储能-充电项目</h3>
+<p style="color:#C2C0B6">国轩高科美国硅谷项目 | 负责人：卢继雄 | 项目经费：1600万元</p>
+<p style="color:#C2C0B6">申报方向：工程系列人工智能（应用技术）专业</p>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-摘要
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-将光伏发电、储能系统与电动汽车充电设施深度融合，构建PV–ESS–EV一体化系统。
-国轩高科创新产品体系：光伏板(PVs)、Mobile Charger智能移动充电机器人、
-高集成度液冷工商业储能系统EDGE676、PCS AC Blocks储能变流器系统。
-AI技术实现预测分析、强化学习调度和智能能量管理。
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">系统架构图</h4>
+<img src="images/products/fremont/fremont_img0_119c434b.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-2. 产品体系与系统架构概述
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-美国实际部署项目：Autel MaxiEdge Controller Integration with Gotion Liquid BESS 760
-微电网系统：光伏发电 + 储能(BESS) + PCS双向变换 + 高功率充电 + EMS调度
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">2. 产品体系与系统架构概述</h4>
+<p>作为光储充一体化应用场景，国轩高科在美国实际部署"Autel MaxiEdge Controller Integration with Gotion Liquid BESS 760 for Hybrid Application"项目，构建<b>"光伏发电 + 储能（BESS）+ PCS双向变换 + 高功率充电 + EMS调度"</b>的微电网系统，为AI驱动的智能能源系统提供硬件基础。</p>
 
-2.1 光伏板及并网系统 (PVs)
-  - 纯能量输入源，自带DC-AC逆变器→480V交流母线
-  - 智能电表(Meter)通过RS485上报实时功率/电压/电流
-  - EMS策略：光伏优先供给本地负载，余电给BESS充电
+<h4 style="color:#534AB7;margin:12px 0 6px">2.1 光伏板及并网系统 (PVs)</h4>
+<p>作为纯能量输入源的光伏系统PVs自带独立的DC-AC逆变器，将直流电直接转换为交流电并入480V交流母线。逆变器下方挂载了智能电表（Meter），通过RS485总线将实时发电功率、电压、电流等电气特征量上报给MaxiEdge控制器。在EMS的策略下，光伏发电会优先供给本地交流负载（Mobile Charger/HPC），余电再通过PCS给BESS充电，实现"光伏自发自用"最大化。</p>
 
-2.2 MaxiEdge Controller (边缘微网控制器)
-  - 场站"边缘大脑"(Site EMS)，收集遥测数据+下发调度指令
-  - 通信：内置Router(外网)、Switch(局域网IP)、RS485(电表)
-  - 多重供电冗余：480V市电(AC-DC)、220V备电(PCS UPS)、24V DRR
-  - AI策略：光伏预测、削峰填谷、防逆流、电网容量动态保护
+<h4 style="color:#534AB7;margin:12px 0 6px">2.2 MaxiEdge Controller (边缘微网控制器)</h4>
+<p>MaxiEdge Controller是整个场站的"边缘大脑"（Site EMS），负责收集所有节点的遥测数据，并下发实时调度指令。通信通过内置Router（路由器）对接外网Internet（与云端通信），内置Switch（交换机）聚合PCS、HPC的局域网IP通信，内置RS485模块采集电表和底层传感器数据。控制器同时接入了480V市电（经AC-DC降压）、220V备电（来自PCS UPS）以及24V DRR（直流导轨电源），<b>多重供电冗余</b>，确保了在电网波动、PCS故障等各种工况下，EMS控制逻辑绝对不会掉线。</p>
+<p>控制器EMS系统通过AI技术，可处理毫秒级到秒级的策略计算，包括：光伏曲线预测、削峰填谷（Peak Shaving）、防逆流控制、大功率超充接入时的电网容量动态保护，以及消防级别的硬件级联动断电。</p>
 
-2.3 Mobile Charger 智能移动充电机器人
-  - 内置184kWh锂离子电池(1P192S, 614.4V)
-  - 最大直流输出60kW，支持交直流双向充电
-  - 远程操控+灵活部署，适用于临时场站/应急补能
+<h4 style="color:#534AB7;margin:12px 0 6px">2.3 Mobile Charger 智能移动充电机器人</h4>
+<p>该产品将储能单元与直流快充功能集成于移动式平台中，内置<b>184kWh锂离子电池系统</b>（1P192S架构，额定电压614.4V），最大直流输出功率可达60kW。设备支持交直流双向充电，并具备远程操控和灵活部署能力，适用于临时场站、应急补能和高峰补电场景。在AI技术支持下，该系统可根据实时负载需求和电池状态动态调整充放电策略，实现智能调度与预测性维护。</p>
 
-2.4 Gotion BESS 760 (国轩液冷储能系统)
-  - 标称能量760kWh，标称电压DC 1267.2V (1069.2V~1425.6V)
-  - 2簇架构，每簇9个电池包(44S1P)，BMS实时监控
-  - 高压箱：1267.2V汇流+接触器控制+电气安全防护
-  - TMS：12kW智能液冷机组，温差5±2℃
-  - FSS：温烟感+STAT-X气溶胶+PACK级灭火+DN25水消防
+<h4 style="color:#534AB7;margin:12px 0 6px">2.4 Gotion BESS 760 (国轩液冷储能系统)</h4>
+<p>储能系统物理与电气参数：<b>标称能量760kWh</b>，系统标称电压DC 1267.2V（运行电压范围1069.2V~1425.6V）。该系统采用高压直流架构，能有效降低线损并提升PCS的转换效率。</p>
+<p><b>内部架构：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li><b>2簇架构 & BMS：</b>物理上分为两个电池簇，每簇包含9个电池包（单包44S1P结构），配备完善的BMS监控功能，实时检测单体电压、温度及系统状态</li>
+<li><b>高压箱 (High Voltage Box)：</b>负责1267.2V强电的汇流、接触器控制及电气安全防护</li>
+<li><b>TMS (热管理系统)：</b>采用12kW功率的智能液冷机组，通过50%乙二醇水溶液作为介质进行制冷或制热，内部温差控制在5\u00B12\u2103范围内</li>
+<li><b>FSS (消防系统) & Env (环控传感器)：</b>采用多级安全防护体系，包含温烟感探测、STAT-X气溶胶灭火装置、PACK级灭火以及DN25管道水消防</li>
+<li><b>控制接口：</b>支持CAN、RS485及Ethernet多种通讯方式</li>
+</ul>
 
-2.5 PCS AC Blocks (储能变流器系统)
-  - 双向能量通道：480V交流↔1000V直流
-  - 模块化设计：2×125kW并联=250kW总功率(3P3W 480V)
-  - 离网支撑：125kW变压器+220V UPS备电回路
-  - 支持黑启动(Black Start)和孤岛运行
+<h4 style="color:#534AB7;margin:12px 0 6px">2.5 PCS AC Blocks (储能变流器系统)</h4>
+<p><b>核心功能：</b>连接480V交流母线与1000V直流电池簇的双向能量通道，负责AC-DC（充电）和DC-AC（放电）的逆变与整流。</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li><b>模块化设计：</b>由两组125kW模块并联，组成250kW的总功率（3P3W 480V接入）。多模块并联设计提高了系统的冗余度</li>
+<li><b>辅电与离网支撑：</b>PCS内部包含一个125kW的变压器，并引出一条220V UPS备用供电回路。在市电断电的极端工况下，PCS可利用电池的直流电逆变出220V交流电，优先保障EMS大脑和BMS/液冷系统的存活，具备<b>黑启动（Black Start）和孤岛运行</b>的硬件基础</li>
+</ul>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-3. 核心AI技术
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  规划设计层(天-月级): NSGA-II/MOROA → 充电站布局+储能容量+系统拓扑
-  短期调度层(分钟-小时级): LSTM-Attention → 光伏/负荷预测(含置信区间)
-  实时控制层(秒-分钟级): SAC → 最优充放电功率指令 (推理<10ms)
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">3. 核心AI技术</h4>
+<p><b>规划设计层(天-月级)：</b>NSGA-II/MOROA \u2192 充电站布局+储能容量+系统拓扑</p>
+<p><b>短期调度层(分钟-小时级)：</b>LSTM-Attention \u2192 光伏/负荷预测(含置信区间)</p>
+<p><b>实时控制层(秒-分钟级)：</b>SAC \u2192 最优充放电功率指令 (推理&lt;10ms)</p>
+<p><b>AI-BMS健康管理：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>SOH预测：LSTM网络基于充电曲线+EIS阻抗特征</li>
+<li>循环寿命优化：SAC自动发现"浅充浅放"策略</li>
+<li>故障预警：小波变换+CNN识别热失控</li>
+</ul>
+</div>`,
 
-  AI-BMS健康管理:
-  - SOH预测：LSTM网络基于充电曲线+EIS阻抗特征
-  - 循环寿命优化：SAC自动发现"浅充浅放"策略
-  - 故障预警：小波变换+CNN识别热失控`,
+xibuzt:`<div style="font-size:13px;line-height:1.7">
+<h3 style="color:#185FA5;margin:0 0 8px">西部钻探油田钻井平台 5MWh储能仓项目</h3>
+<p style="color:#C2C0B6">国轩高科\u00D7西部钻探\u00D7沃德石油 — 国内首创大型油改电项目</p>
 
-xibuzt:`西部钻探油田钻井平台 5MWh储能仓项目
-国轩高科×西部钻探×沃德石油 — 国内首创大型油改电项目
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">1. 项目概述</h4>
+<img src="images/products/dll_slides/dll_s15_img2_28f72703.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<img src="images/products/dll_slides/dll_s15_img3_588c1006.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p>国轩高科携手西部钻探、沃德石油，正式启动国内首创大型油改电项目储能仓试验。项目聚焦绿色勘探，将传统燃油钻井设备改造为电力驱动并配套储能系统，依托国轩高科储能技术优势，大幅降低钻井作业碳排放，为能源行业低碳转型提供可复制示范样本。</p>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. 项目概述
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  国轩高科携手西部钻探、沃德石油，国内首创大型油改电项目储能仓试验。
-  以5MWh储能仓替代传统柴油发电机组，为油田钻井平台提供清洁电力，
-  实现降本增效与碳减排双目标。
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">2. 充电系统拓扑图</h4>
+<img src="images/products/dll_slides/dll_s16_img3_68aa57b0.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<img src="images/products/dll_slides/dll_s16_img5_ececd021.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>10kV电网</b> \u2192 <b>10/0.4变压器</b> \u2192 <b>PCS一体机3.45MW\u00D72</b> \u2192 <b>储能电池系统\u00D72</b> \u2192 1500Vdc \u2192 400Vac \u2192 井口负荷</p>
+<p>站级EMS通过以太网通讯统一调度，PCS并网/离网双模式运行</p>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-2. 充电系统拓扑
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  10kV电网 → 10/0.4变压器 → PCS一体机3.45MW×2 → 储能电池系统×2
-  → 1500Vdc → 400Vac → 井口负荷
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">3. PCS离网无缝切换策略</h4>
+<img src="images/products/dll_slides/dll_s17_img2_fca4d411.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>运行策略：</b>离网模式控制4台PCS功率，按照PCS预设的下垂特性，动态切载时功率波动在PCS允许范围之内，保证现场电池舱换电情况下，负荷实现无扰切换。</p>
+<ol style="padding-left:18px;margin:4px 0">
+<li>1#、2#PCS接入1号电池仓，3#、4#PCS接入2号电池仓</li>
+<li>EMS控制1#、2#PCS离网开机建立母线电压供负荷用电，控制3#、4#PCS离网待机</li>
+<li>EMS通过和BMS通讯获取各堆电池SOC状态，当1号电池仓任意堆低于10%，EMS控制3#、4#开机用2号电池舱为负载供电，等待1min后控制1#、2#PCS停机，提示更换电池仓</li>
+<li>等待10min系统残余电荷泄放完毕，对1号电池仓进行拆除更换</li>
+<li>1号电池仓更换完毕，EMS控制1#、2#PCS离网待机，准备随时带载切换</li>
+<li>EMS持续检测2号电池仓SOC，按步骤3条件进行带载切换</li>
+</ol>
 
-  电网接入: 10kV架空线/电缆引入
-  变压器: 10/0.4kV 降压变
-  PCS: 3.45MW一体机 × 2台（并网/离网双模式）
-  储能电池: 5MWh系统 × 2仓
-  直流母线: 1500Vdc
-  交流输出: 400Vac 三相四线
-  负荷侧: 井口钻井设备
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">4. 储能系统配置清单</h4>
+<img src="images/products/dll_slides/dll_s18_img2_470c60a8.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">项目</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">规格</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">产品编号</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">CN2476</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电芯型号</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">314Ah</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">储能舱容量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5015kWh（2堆）</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">系统组合方式</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">12P416S（长包）</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCS配置</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4\u00D71725kW+3150kVA隔离变压器</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">EMS配置</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">厂家自制</td></tr>
+</table>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-3. PCS离网无缝切换策略
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  4台PCS配置:
-  - 1#、2# PCS → 接1号电池仓
-  - 3#、4# PCS → 接2号电池仓
-  - EMS统一控制切换时序
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">5. 运行数据 — BMS1数据簇电流及堆数据分析</h4>
+<img src="images/products/dll_slides/dll_s19_img2_dcde9e44.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>1#舱BMS1数据：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>8月20日 1堆放电（15:00-17:30），"甩钻下钻"工序，电流120A，功率160kW，主要设备：绞车及空压机</li>
+<li>8月21日 1堆放电（16:30-19:30），"三开钻进"工序，电流250A，平均功率330kW，主要设备：空压机、泥浆泵、绞车、顶驱系统</li>
+</ul>
+<p><b>结论：</b>各簇充放电过程中具有较好电流一致性，能够有效降低电池簇间总压差异；系统可承受放电过程中的功率冲击。</p>
 
-  切换逻辑:
-  1) 并网运行: 4台PCS并网取电，电池充电备用
-  2) 离网切换: EMS检测电网失压，发出离网指令
-     1#/2# PCS切换为V/F离网模式（接1号仓）
-     3#/4# PCS切换为V/F离网模式（接2号仓）
-  3) 离网运行: 4台PCS离网带载，电池放电供电
-  4) 并网恢复: 电网恢复，EMS执行同期并网，切换回P/Q模式
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">6. 运行数据 — BMS2数据簇电流及堆数据分析</h4>
+<img src="images/products/dll_slides/dll_s20_img2_6daca7e1.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>2#舱BMS2数据：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>8月18日15:14-16:43 2堆放电，电流100A，功率130kW（生活负载+工业用电）</li>
+<li>8月20日 2堆放电（15:00-17:30），"甩钻下钻"工序，电流120A，功率160kW</li>
+<li>8月21日 2堆放电（16:30-19:30），"三开钻进"工序，电流250A，平均功率330kW</li>
+</ul>
 
-  切换时间: <10ms（无缝切换，钻井设备不停机）
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">7. 5MWh储能仓产品参数</h4>
+<img src="images/products/dll_slides/dll_s21_img2_6151eeb6.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<img src="images/products/dll_slides/dll_s21_img3_abc4d1a7.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">序号</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">项目</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">规格</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">产品型号</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">ESD1331-05P5015</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">产品配置</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2堆\u00D76簇\u00D74包\u00D71P104S</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电芯容量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">314Ah</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称能量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5015.9kWh</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称电压</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1331.2Vdc</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">6</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">工作电压范围</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1164.8-1497.6Vdc</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">7</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">充放电倍率</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">\u22640.5P</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">8</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">辅助用电</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">AC380V 50Hz 三相四线制</td></tr>
+</table>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-4. 运行数据
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  甩钻下钻工序:
-    电流: 120A
-    功率: 160kW
-  三开钻进工序:
-    电流: 250A
-    功率: 330kW
-  日平均用电: 约2万kWh
-  峰值功率: 约690kW（4台PCS并联输出）
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">8. PCS一体机产品参数</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">参数</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">1375kW</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">1725kW</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">DC电压范围</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">800-1500V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1000-1500V</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">额定AC电压</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">550V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">690V</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">额定AC功率</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1375kVA@45\u2103</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1725kVA@45\u2103</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">额定功率因数</td><td colspan="2" style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.99（大于20%负载）</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">AC电压范围(离网)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">465-605V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">586-759V</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">AC电压谐波(离网)</td><td colspan="2" style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">小于3%</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">MV额定功率</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2900kVA（2台并机）</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3650kVA（2台并机）</td></tr>
+</table>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-5. 5MWh储能仓参数
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  标称能量: 5MWh
-  标称电压: 1500Vdc
-  电芯体系: LFP磷酸铁锂
-  温控方式: 液冷
-  防护等级: IP55
-  工作温度: -20°C ~ +55°C
-  消防系统: PACK级浸没+全淹没气体+整舱消防水
-  BMS架构: 三级（电芯→簇→系统）
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-6. 投资测算
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  日用电量: 2万kWh
-  年用电量: 410万kWh
-  柴油发电成本: 售电1.5元/kWh
-  储能取电成本: 取电0.85元/kWh
-  年节约电费: (1.5-0.85)×410万 = 266.5万元
-  柴油机组运维节约: 约80万元/年
-  年总节约: 约346.5万元
-  项目总投资: 约1140万元
-  静态回本周期: 3.3年`,
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">9. 投资测算分析</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">序号</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">产品名称</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">规格</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">数量</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">单价(万元)</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">小计(万元)</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">送电直板车</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">9.5米</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3套</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">35</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">105</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">储能系统</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5MW</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3套</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">300</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">900</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCS一体机</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3450kW</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2套</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">72</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">144</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">EMS</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">/</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1套</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10</td></tr>
+<tr style="font-weight:bold"><td colspan="5" style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">费用共计</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1159</td></tr>
+</table>
+<p><b>投资回报测算：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>油田钻井平台日用电3.6万度，年工作200天，年总用电约720万度</li>
+<li>1套送电系统成本1159万元，售电3元/度，取电0.4元/度，盈利差价2.6元/度</li>
+<li>年营收1872万元 = 720万度\u00D72.6元/度，回本周期约0.62年</li>
+<li>原柴油发电约5元/度，改造后单度电降低成本2元</li>
+</ul>
+</div>`,
 };
 
 const ACC_DETAIL=`ACC-480-P750-UL AC一体柜 安装指导手册
@@ -1462,13 +1477,14 @@ function renderCases(){
 }
 
 function showCaseDetail(detailId,title){
-  const text=CASE_DETAILS[detailId];
-  if(!text)return;
+  const content=CASE_DETAILS[detailId];
+  if(!content)return;
   const modal=document.getElementById('detailModal');
   document.getElementById('detailImg').style.display='none';
   document.getElementById('detailName').textContent=title;
   document.getElementById('detailModel').textContent='';
-  document.getElementById('detailSpecs').textContent=text;
+  const specs=document.getElementById('detailSpecs');
+  if(content.startsWith('<')){specs.innerHTML=content;}else{specs.textContent=content;}
   modal.classList.add('show');
 }
 
