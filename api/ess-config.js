@@ -16,7 +16,9 @@ export default async function handler(req, res) {
     deepseek: {
       url: 'https://api.deepseek.com/v1/chat/completions',
       key: process.env.DEEPSEEK_API_KEY,
-      model: 'deepseek-v4-pro'
+      model: 'deepseek-v4-pro',
+      reasoning_effort: 'high',
+      thinking: { type: 'enabled' }
     },
     glm: {
       url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
@@ -36,19 +38,23 @@ export default async function handler(req, res) {
   }
 
   try {
+    const body = {
+      model: cfg.model,
+      messages,
+      temperature: 0.3,
+      max_tokens: 8192,
+      stream: !!stream
+    };
+    if (cfg.reasoning_effort) body.reasoning_effort = cfg.reasoning_effort;
+    if (cfg.thinking) body.thinking = cfg.thinking;
+
     const resp = await fetch(cfg.url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${cfg.key}`
       },
-      body: JSON.stringify({
-        model: cfg.model,
-        messages,
-        temperature: 0.3,
-        max_tokens: 4096,
-        stream: !!stream
-      })
+      body: JSON.stringify(body)
     });
 
     if (!resp.ok) {
@@ -69,12 +75,23 @@ export default async function handler(req, res) {
           res.write(decoder.decode(value, { stream: true }));
         }
       } catch (e) {
-        // client disconnected
       }
       return res.end();
     }
 
     const data = await resp.json();
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      const msg = data.choices[0].message;
+      if (msg.reasoning_content && !msg.content) {
+        msg.content = msg.reasoning_content;
+      }
+      if (msg.content && msg.reasoning_content) {
+        const jsonMatch = msg.content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          msg.content = jsonMatch[0];
+        }
+      }
+    }
     return res.status(200).json(data);
   } catch (e) {
     return res.status(500).json({ error: `Proxy error: ${e.message}` });

@@ -663,11 +663,20 @@ async function generateSolution() {
     ];
     const data = await callLLM(messages);
     addLog(`API响应成功, tokens: ${data.usage?.total_tokens || '?'}`, 'ok');
-    const content = data.choices?.[0]?.message?.content || '';
+    const msg = data.choices?.[0]?.message;
+    const reasoningContent = msg?.reasoning_content || '';
+    const content = msg?.content || '';
+    if (reasoningContent) {
+      addLog('思考过程: ' + reasoningContent.substring(0, 200) + (reasoningContent.length > 200 ? '...' : ''), 'step');
+    }
     addLog('解析LLM输出JSON...', 'step');
     let result;
     try {
-      const jsonStr = content.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+      let jsonStr = content.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+      if (!jsonStr.startsWith('{')) {
+        const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+        if (jsonMatch) jsonStr = jsonMatch[0];
+      }
       result = JSON.parse(jsonStr);
       addLog('JSON解析成功 ✓', 'ok');
     } catch (e) {
