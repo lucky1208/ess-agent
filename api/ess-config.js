@@ -21,12 +21,12 @@ export default async function handler(req, res) {
     glm: {
       url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
       key: process.env.GLM_API_KEY,
-      model: 'glm-4-flash'
+      model: 'glm-5.1'
     },
     bailian: {
       url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
       key: process.env.BAILIAN_API_KEY,
-      model: 'qwen-plus'
+      model: 'qwen-max'
     }
   };
 
