@@ -943,45 +943,34 @@ function getArrowForLink(l){
 function autoLayoutNodes(nodes, svgW, svgH) {
   if (!nodes || !nodes.length) return nodes;
   const LAYER_ORDER = ['source','meter','busbar','breaker','switch','transformer','pcs','battery','controller','load'];
-  const LAYER_Y = [80, 155, 230, 230, 230, 320, 320, 320, 320, 440];
-  const TOP_MARGIN = 60;
-  const hasCoord = nodes.every(n => typeof n.x === 'number' && typeof n.y === 'number');
-  if (hasCoord) {
-    const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
-    const xMin = Math.min(...xs), xMax = Math.max(...xs), yMin = Math.min(...ys), yMax = Math.max(...ys);
-    if (xMax - xMin < 20 || yMax - yMin < 20) {
-      return assignLayerLayout(nodes, svgW, LAYER_ORDER, LAYER_Y, TOP_MARGIN);
-    }
-    const xOverlap = nodes.some((a,i) => nodes.some((b,j) => i !== j && Math.abs(a.x - b.x) < 120 && Math.abs(a.y - b.y) < 60));
-    if (!xOverlap) return nodes;
-    const byLayer = {};
-    nodes.forEach(n => { const ly = getLayerIndex(n.type, LAYER_ORDER); byLayer[ly] = byLayer[ly] || []; byLayer[ly].push(n); });
-    Object.values(byLayer).forEach(layer => {
-      layer.sort((a,b) => a.x - b.x);
-      const count = layer.length;
+  const LAYER_Y = [80, 155, 230, 260, 260, 330, 330, 330, 330, 450];
+  const byLayer = {};
+  nodes.forEach(n => { const ly = getLayerIndex(n.type, LAYER_ORDER); byLayer[ly] = byLayer[ly] || []; byLayer[ly].push(n); });
+  Object.entries(byLayer).forEach(([ly, layer]) => {
+    const yBase = LAYER_Y[parseInt(ly)] || 400;
+    layer.forEach(n => { n.y = yBase; });
+    layer.sort((a, b) => (a.x || 0) - (b.x || 0));
+    const count = layer.length;
+    const hasX = layer.every(n => typeof n.x === 'number' && n.x > 0);
+    if (hasX) {
+      const xs = layer.map(n => n.x);
+      const xOverlap = layer.some((a, i) => layer.some((b, j) => i !== j && Math.abs(a.x - b.x) < 140));
+      if (xOverlap) {
+        const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
+        const startX = svgW / 2 - (count - 1) * spacing / 2;
+        layer.forEach((n, i) => { n.x = Math.round(startX + i * spacing); });
+      }
+    } else {
       const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
       const startX = svgW / 2 - (count - 1) * spacing / 2;
-      layer.forEach((n, i) => { n.x = startX + i * spacing; });
-    });
-    return nodes;
-  }
-  return assignLayerLayout(nodes, svgW, LAYER_ORDER, LAYER_Y, TOP_MARGIN);
+      layer.forEach((n, i) => { n.x = Math.round(startX + i * spacing); });
+    }
+  });
+  return nodes;
 }
 function getLayerIndex(type, layerOrder) {
   const idx = layerOrder.indexOf(type);
   return idx >= 0 ? idx : layerOrder.length - 1;
-}
-function assignLayerLayout(nodes, svgW, LAYER_ORDER, LAYER_Y, TOP_MARGIN) {
-  const byLayer = {};
-  nodes.forEach(n => { const ly = getLayerIndex(n.type, LAYER_ORDER); byLayer[ly] = byLayer[ly] || []; byLayer[ly].push(n); });
-  Object.entries(byLayer).forEach(([ly, layer]) => {
-    const count = layer.length;
-    const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
-    const startX = svgW / 2 - (count - 1) * spacing / 2;
-    const yBase = LAYER_Y[parseInt(ly)] || 400;
-    layer.forEach((n, i) => { n.x = Math.round(startX + i * spacing); n.y = yBase; });
-  });
-  return nodes;
 }
 
 function renderDiagramFromJSON(containerId, diagramData, title) {
