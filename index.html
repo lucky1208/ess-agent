@@ -19,8 +19,7 @@ a{color:var(--blue);text-decoration:none}
 .nav-tab{padding:14px 22px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .3s;font-size:14px}
 .nav-tab:hover{color:var(--text1)}
 .nav-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
-.main-container{display:grid;grid-template-columns:380px 1fr;min-height:calc(100vh - 110px)}
-.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:20px;overflow-y:auto}
+.main-container{min-height:calc(100vh - 110px)}
 .sec-title{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text1);display:flex;align-items:center;gap:8px}
 .sec-title svg{width:18px;height:18px;color:var(--blue)}
 .form-group{margin-bottom:16px}
@@ -101,7 +100,7 @@ select.form-input{appearance:auto}
 .fade-in{animation:fadeIn .4s ease forwards}
 .success-msg{background:rgba(15,110,86,.12);border:1px solid var(--green);border-radius:6px;padding:10px 14px;margin-bottom:14px;display:none;font-size:13px;color:var(--green)}
 .success-msg.show{display:block}
-@media(max-width:1200px){.main-container{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}}
+@media(max-width:1200px){.config-layout{flex-direction:column}.config-form,.config-log{width:100%!important}}
 .lang-btn{padding:4px 10px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:4px;color:#fff;font-size:12px;cursor:pointer;transition:all .3s}
 .lang-btn:hover{background:rgba(255,255,255,.25)}
 .lang-btn.active{background:rgba(255,255,255,.35);font-weight:bold}
@@ -122,15 +121,20 @@ select.form-input{appearance:auto}
 </header>
 
 <nav class="nav-tabs">
-<div class="nav-tab active" onclick="showPage('devices')" data-i18n="nav_devices">设备库</div>
-<div class="nav-tab" onclick="showPage('config')" data-i18n="nav_input">用户输入</div>
+<div class="nav-tab" onclick="showPage('devices')" data-i18n="nav_devices">设备库</div>
+<div class="nav-tab active" onclick="showPage('config')" data-i18n="nav_input">用户输入</div>
 <div class="nav-tab" onclick="showPage('diagrams')" data-i18n="nav_diagrams">生成图纸</div>
 <div class="nav-tab" onclick="showPage('cases')" data-i18n="nav_cases">应用案例</div>
 </nav>
 
 <div class="main-container">
-<!-- ========== SIDEBAR ========== -->
-<aside class="sidebar">
+
+<!-- TAB: 用户输入/方案结果 -->
+<div id="page-config" class="tab-content active">
+<div class="success-msg" id="successMsg">解决方案已生成！请查看推荐设备和系统图纸。</div>
+<div class="config-layout" style="display:flex;gap:20px;align-items:flex-start">
+<div class="config-form" style="flex:0 0 440px;background:var(--bg2);border-radius:8px;padding:20px;border:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 160px)">
+
 <div style="background:linear-gradient(135deg,#185FA5,#0F6E56);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
 <div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px" data-i18n="sidebar_ai_title">AI智能体自动配置</div>
 <div style="font-size:11px;color:#c0e0d0;line-height:1.5" data-i18n="sidebar_ai_desc">输入需求信息，智能体自动生成完整解决方案：设备选型、系统架构图、电气接线图、电气拓扑图、BOM清单、充放电策略、经济性分析</div>
@@ -212,29 +216,32 @@ select.form-input{appearance:auto}
 <div class="form-row" style="margin-top:12px">
   <div class="form-group"><label class="form-label" data-i18n="llm_provider">AI模型</label>
     <select class="form-input" id="llmProvider">
-      <option value="deepseek" data-i18n="llm_deepseek">DeepSeek</option>
+      <option value="local" data-i18n="llm_local">本地正则策略</option>
+      <option value="deepseek" data-i18n="llm_deepseek">DeepSeek V4</option>
       <option value="glm" data-i18n="llm_glm">GLM-5.1 (智谱)</option>
       <option value="bailian" data-i18n="llm_bailian">Qwen-Max (阿里百炼)</option>
     </select>
   </div>
 </div>
 
-<button class="btn btn-primary" onclick="generateSolution()" style="margin-top:20px">
+<button class="btn btn-primary" onclick="generateSolution()" style="margin-top:20px;width:100%">
 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
 <span data-i18n="generate_btn">生成解决方案</span>
 </button>
-</aside>
+</div>
+</div>
 
-<!-- ========== MAIN CONTENT ========== -->
-<main class="content">
-
-<!-- TAB: 参数配置/方案结果 -->
-<div id="page-config" class="tab-content active">
-<div class="success-msg" id="successMsg">解决方案已生成！请查看推荐设备和系统图纸。</div>
+<div class="config-log" style="flex:1;min-width:0">
+<div id="analysisLog" style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border);font-family:monospace;display:none;max-height:200px;overflow-y:auto;margin-bottom:16px"></div>
 <div class="device-grid" id="deviceRecommendation"></div>
 <div class="result-panel" id="selectionPanel" style="display:none"></div>
 <div class="result-panel" id="docPanel" style="display:none"></div>
 </div>
+</div>
+</div>
+
+<!-- ========== MAIN CONTENT (non-config tabs) ========== -->
+<main class="content" style="padding:0 32px">
 
 <!-- TAB: 设备选型 -->
 <div id="page-devices" class="tab-content">
@@ -340,7 +347,7 @@ generate_btn:'生成解决方案',
 device_library_title:'储能设备产品库',
 diagram_arch:'系统架构图',diagram_wiring:'电气一次接线图',diagram_topo:'电气拓扑图',diagram_bom:'物料清单(BOM)',diagram_ref:'参考设计图（大庆管业5MWh项目）',
 download_svg:'下载 SVG',cases_title:'应用案例',
-llm_provider:'AI模型',llm_deepseek:'DeepSeek',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen-Max (阿里百炼)'
+llm_provider:'AI模型',llm_local:'本地正则策略',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen-Max (阿里百炼)'
 },
 en:{
 header_title:'Open ESS Agent — Open-source ESS Solution AI Agent',
@@ -363,7 +370,7 @@ generate_btn:'Generate Solution',
 device_library_title:'ESS Device Product Library',
 diagram_arch:'System Architecture',diagram_wiring:'Electrical Single-line Diagram',diagram_topo:'Electrical Topology',diagram_bom:'Bill of Materials (BOM)',diagram_ref:'Reference Design (Daqing 5MWh Project)',
 download_svg:'Download SVG',cases_title:'Use Cases',
-llm_provider:'AI Model',llm_deepseek:'DeepSeek',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen-Max (Alibaba)'
+llm_provider:'AI Model',llm_local:'Local Regex',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen-Max (Alibaba)'
 },
 ar:{
 header_title:'Open ESS Agent — وكيل الذكاء الاصطناعي لحلول أنظمة تخزين الطاقة مفتوحة المصدر',
@@ -386,7 +393,7 @@ generate_btn:'توليد الحل',
 device_library_title:'مكتبة منتجات معدات التخزين',
 diagram_arch:'هيكل النظام',diagram_wiring:'مخطط التوصيل الكهربائي أحادي الخط',diagram_topo:'طوبولوجيا كهربائية',diagram_bom:'قائمة المواد (BOM)',diagram_ref:'تصميم مرجعي (مشروع داتشينغ 5MWh)',
 download_svg:'تحميل SVG',cases_title:'حالات الاستخدام',
-llm_provider:'نموذج AI',llm_deepseek:'DeepSeek',llm_glm:'GLM-5.1',llm_bailian:'Qwen-Max'
+llm_provider:'نموذج AI',llm_local:'محلي',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1',llm_bailian:'Qwen-Max'
 }
 };
 
@@ -465,6 +472,8 @@ function showPage(id){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-tab')[['devices','config','diagrams','cases'].indexOf(id)].classList.add('active');
+  const mainEl = document.querySelector('main.content');
+  if(mainEl) mainEl.style.display = id==='config' ? 'none' : 'block';
   if(id==='devices')renderDeviceLibrary(currentFilter);
   if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);}
   if(id==='cases')renderCases();
@@ -610,23 +619,59 @@ function buildUserPrompt() {
 async function generateSolution() {
   const btn = document.querySelector('[onclick="generateSolution()"]');
   const origText = btn.innerHTML;
-  btn.innerHTML = '<span class="spinner"></span> AI分析中...';
+  btn.innerHTML = '<span class="spinner"></span> 分析中...';
   btn.disabled = true;
+  const logEl = document.getElementById('analysisLog');
+  if (logEl) { logEl.innerHTML = ''; logEl.style.display = 'block'; }
+  const addLog = (msg, type) => {
+    if (!logEl) return;
+    const d = document.createElement('div');
+    d.style.cssText = `font-size:12px;padding:3px 0;color:${type==='step'?'#80b0e0':type==='ok'?'#50c878':type==='warn'?'#e8a838':'#C2C0B6'};`;
+    d.textContent = msg;
+    logEl.appendChild(d);
+    logEl.scrollTop = logEl.scrollHeight;
+  };
   try {
+    const provider = document.getElementById('llmProvider').value;
+    const P = getParams();
+    if (provider === 'local') {
+      addLog('[本地正则策略] 启动规则引擎...', 'step');
+      addLog(`参数: ${P.txCount}×${P.txCap}kVA, ${P.use10kV?'10kV':'0.4kV'}接入, 最大负荷${P.loadMax}kW`, 'step');
+      const result = selectEquipment(P);
+      addLog('规则引擎匹配完成 ✓', 'ok');
+      result._llmSource = false;
+      LAST_RESULT = result;
+      document.getElementById('successMsg').classList.add('show');
+      renderRecommendation(result);
+      renderSelectionTable(result);
+      renderDocOutput(result);
+      renderDiagramTabs(result);
+      renderArchSvg(result);
+      renderWiringSvg(result);
+      renderTopoSvg(result);
+      renderBOM(result);
+      showPage('config');
+      return;
+    }
+    addLog(`[${provider.toUpperCase()}] 构建储能领域Prompt...`, 'step');
     const userPrompt = buildUserPrompt();
+    addLog(`场地信息: ${P.txCount}×${P.txCap}kVA, ${P.use10kV?'10kV':'0.4kV'}接入, 最大负荷${P.loadMax}kW`, 'step');
+    addLog(`调用${provider.toUpperCase()} API...`, 'step');
     const messages = [
       { role: 'system', content: ESS_SYSTEM_PROMPT },
       { role: 'user', content: userPrompt }
     ];
     const data = await callLLM(messages);
+    addLog(`API响应成功, tokens: ${data.usage?.total_tokens || '?'}`, 'ok');
     const content = data.choices?.[0]?.message?.content || '';
+    addLog('解析LLM输出JSON...', 'step');
     let result;
     try {
       const jsonStr = content.replace(/```json\n?/g, '').replace(/```/g, '').trim();
       result = JSON.parse(jsonStr);
+      addLog('JSON解析成功 ✓', 'ok');
     } catch (e) {
-      console.warn('LLM output not JSON, falling back to rule engine', content);
-      const P = getParams();
+      addLog('LLM输出非标准JSON, fallback到规则引擎', 'warn');
       result = selectEquipment(P);
       result._llmRaw = content;
     }
@@ -637,6 +682,8 @@ async function generateSolution() {
     showPage('config');
   } catch (e) {
     console.error('LLM error:', e);
+    addLog('LLM调用失败: ' + e.message, 'warn');
+    addLog('Fallback到本地规则引擎...', 'warn');
     const P = getParams();
     const result = selectEquipment(P);
     LAST_RESULT = result;
@@ -650,7 +697,6 @@ async function generateSolution() {
     renderTopoSvg(result);
     renderBOM(result);
     showPage('config');
-    alert('LLM调用失败，已使用本地规则引擎生成方案。\n错误: ' + e.message);
   } finally {
     btn.innerHTML = origText;
     btn.disabled = false;
@@ -663,17 +709,30 @@ async function parseNaturalInput(){
   const provider=document.getElementById('llmProvider').value;
   const tip=document.createElement('div');
   tip.style.cssText='position:fixed;top:20px;right:20px;background:#185FA5;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:999';
-  tip.textContent='AI正在识别参数...';
+  tip.textContent=provider==='local'?'本地正则识别参数...':'AI正在识别参数...';
   document.body.appendChild(tip);
   try{
-    const messages=[
-      {role:'system',content:'你是储能系统参数提取助手。从用户自然语言描述中提取参数，返回JSON：{"txCap":1250,"txCount":2,"txHv":10,"loadMonthHigh":35,"pricePeak":0.833,"priceValley":0.441,"priceFlat":0.637,"region":"黑龙江大庆","hasHvRoom":1}。无法识别的字段不返回。'},
-      {role:'user',content:raw}
-    ];
-    const data=await callLLM(messages);
-    const content=data.choices?.[0]?.message?.content||'';
-    const jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
-    const params=JSON.parse(jsonStr);
+    let params;
+    if(provider==='local'){
+      const s=raw;
+      params={};
+      const capM=s.match(/(\d+)\s*kVA/i);if(capM)params.txCap=parseInt(capM[1]);
+      const cntM=s.match(/(\d+)\s*台/);if(cntM)params.txCount=parseInt(cntM[1]);
+      const hvM=s.match(/(\d+\.?\d*)\s*kV/i);if(hvM){const kv=parseFloat(hvM[1]);if(kv>=6){params.txHv=kv;params.hasHvRoom=kv>=10?1:0;}}
+      const mhM=s.match(/月[电用]*\s*(\d+\.?\d*)\s*万/);if(mhM)params.loadMonthHigh=parseFloat(mhM[1]);
+      if(s.includes('大庆')||s.includes('油田'))params.region='黑龙江大庆';
+      const pcM=s.match(/峰[价段]*\s*(\d+\.?\d*)/);if(pcM)params.pricePeak=parseFloat(pcM[1]);
+      const vcM=s.match(/谷[价段]*\s*(\d+\.?\d*)/);if(vcM)params.priceValley=parseFloat(vcM[1]);
+    }else{
+      const messages=[
+        {role:'system',content:'你是储能系统参数提取助手。从用户自然语言描述中提取参数，返回JSON：{"txCap":1250,"txCount":2,"txHv":10,"loadMonthHigh":35,"pricePeak":0.833,"priceValley":0.441,"priceFlat":0.637,"region":"黑龙江大庆","hasHvRoom":1}。无法识别的字段不返回。'},
+        {role:'user',content:raw}
+      ];
+      const data=await callLLM(messages);
+      const content=data.choices?.[0]?.message?.content||'';
+      const jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+      params=JSON.parse(jsonStr);
+    }
     let found=0;
     function sv(id,val){const el=document.getElementById(id);if(el&&val!=null){el.value=val;found++;}}
     if(params.txCap)sv('txCap',params.txCap);
@@ -685,11 +744,11 @@ async function parseNaturalInput(){
     if(params.priceFlat)sv('priceFlat',params.priceFlat);
     if(params.region)sv('region',params.region);
     if(params.hasHvRoom!=null)sv('hasHvRoom',params.hasHvRoom?'1':'0');
-    tip.textContent='AI识别完成，填充了'+found+'个参数，正在生成方案...';
+    tip.textContent=(provider==='local'?'正则':'AI')+'识别完成，填充了'+found+'个参数，正在生成方案...';
     tip.style.background='#0F6E56';
     setTimeout(()=>generateSolution(),500);
   }catch(e){
-    console.warn('LLM parse failed, using regex fallback',e);
+    console.warn('Parse failed, using regex fallback',e);
     const s=raw;
     function sv(id,val){const el=document.getElementById(id);if(el&&val!=null)el.value=val;}
     let found=0;
@@ -698,7 +757,7 @@ async function parseNaturalInput(){
     const hvM=s.match(/(\d+\.?\d*)\s*kV/i);if(hvM){const kv=parseFloat(hvM[1]);if(kv>=6){sv('txHv',kv);sv('hasHvRoom',kv>=10?'1':'0');found++;}}
     const mhM=s.match(/月[电用]*\s*(\d+\.?\d*)\s*万/);if(mhM){sv('loadMonthHigh',mhM[1]);found++;}
     if(s.includes('大庆')||s.includes('油田')){sv('region','黑龙江大庆');found++;}
-    tip.textContent='AI识别失败，正则提取'+found+'个参数';
+    tip.textContent='识别失败，正则提取'+found+'个参数';
     tip.style.background='#D4A017';
     setTimeout(()=>generateSolution(),500);
   }
@@ -2613,7 +2672,7 @@ function downloadMD(){
 }
 
 switchLang(localStorage.getItem('lang')||'zh');
-showPage('devices');
+showPage('config');
 </script>
 </body>
 </html>
