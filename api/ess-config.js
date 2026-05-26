@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     deepseek: {
       url: 'https://api.deepseek.com/v1/chat/completions',
       key: process.env.DEEPSEEK_API_KEY,
-      model: 'deepseek-chat-v4-0324'
+      model: 'deepseek-v4-pro'
     },
     glm: {
       url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
