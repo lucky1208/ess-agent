@@ -556,14 +556,29 @@ const ESS_SYSTEM_PROMPT = `你是一个工商业储能系统解决方案AI智能
   "economics": {"annualSaving":37.3,"totalInvest":260,"payback":5.0,"dailyKWh":500},
   "protection": ["EMS软件防逆流","逆功率继电器","并网柜方向保护"],
   "bom": [{"item":"电池舱X-836","qty":4,"unit":"台","price":65,"total":260},{"item":"PCS 1.25MW","qty":1,"unit":"台","price":30,"total":30},{"item":"升压变1600kVA","qty":1,"unit":"台","price":18,"total":18},{"item":"10kV并网柜","qty":1,"unit":"台","price":8,"total":8}],
-  "archDiagram": {"bus":"10kV","nodes":[{"id":"grid","label":"国网10kV","x":0,"y":200,"type":"source"},{"id":"pcc","label":"PCC计量","x":120,"y":200,"type":"meter"},{"id":"busbar","label":"10kV母线","x":240,"y":200,"type":"busbar"},{"id":"tx1","label":"1250kVA","x":400,"y":120,"type":"transformer"},{"id":"tx2","label":"1250kVA","x":400,"y":280,"type":"transformer"},{"id":"stepup","label":"1600kVA","x":400,"y":400,"type":"transformer"},{"id":"pcs","label":"PCS 1.25MW","x":560,"y":400,"type":"pcs"},{"id":"bess","label":"X-836×4 3.3MWh","x":700,"y":400,"type":"battery"},{"id":"ems","label":"EMS","x":700,"y":200,"type":"controller"}],"links":[{"from":"grid","to":"pcc"},{"from":"pcc","to":"busbar"},{"from":"busbar","to":"tx1"},{"from":"busbar","to":"tx2"},{"from":"busbar","to":"stepup"},{"from":"stepup","to":"pcs"},{"from":"pcs","to":"bess"},{"from":"ems","to":"pcs","dashed":true}],"loads":[{"parent":"tx1","label":"0.4kV负荷1"},{"parent":"tx2","label":"0.4kV负荷2"}]},
+  "archDiagram": {"bus":"10kV","nodes":[{"id":"grid","label":"国网10kV","sub":"黑龙江大庆供电公司","x":550,"y":80,"type":"source"},{"id":"pcc","label":"PCC计量","sub":"电表+PT/CT","x":550,"y":155,"type":"meter"},{"id":"busbar","label":"10kV母线","sub":"用户侧","x":550,"y":230,"type":"busbar"},{"id":"tx1","label":"1#变压器","sub":"S9-1250/10 10/0.4kV","x":300,"y":320,"type":"transformer"},{"id":"tx2","label":"2#变压器","sub":"S9-1250/10 10/0.4kV","x":480,"y":320,"type":"transformer"},{"id":"stepup","label":"升压变","sub":"1600kVA 0.4/10kV","x":660,"y":320,"type":"transformer"},{"id":"pcs","label":"PCS","sub":"1.25MW AC/DC","x":660,"y":320,"type":"pcs"},{"id":"bess","label":"储能电池","sub":"X-836×4 3.3MWh","x":840,"y":320,"type":"battery"},{"id":"ems","label":"EMS","sub":"能量管理","x":950,"y":320,"type":"controller"}],"links":[{"from":"grid","to":"pcc"},{"from":"pcc","to":"busbar"},{"from":"busbar","to":"tx1"},{"from":"busbar","to":"tx2"},{"from":"busbar","to":"stepup"},{"from":"stepup","to":"pcs"},{"from":"pcs","to":"bess"},{"from":"ems","to":"pcs","dashed":true}],"loads":[{"parent":"tx1","label":"0.4kV负荷1","sub":"电机/加热器 ~500kW"},{"parent":"tx2","label":"0.4kV负荷2","sub":"辅助/产线 ~300kW"}]},
   "wiringDiagram": {"voltage":"10kV","components":[{"id":"QF1","label":"QF并网断路器","type":"breaker"},{"id":"T1","label":"升压变1600kVA 10/0.4kV Dyn11","type":"transformer"},{"id":"PCS1","label":"PCS 1.25MW","type":"pcs"},{"id":"DS1","label":"直流隔离开关","type":"switch"},{"id":"BAT1","label":"电池簇X-836×4","type":"battery"}],"connections":[{"from":"QF1","to":"T1","cable":"YJV22-10-3×70"},{"from":"T1","to":"PCS1","cable":"低压母排"},{"from":"PCS1","to":"DS1","cable":"DC1500V"},{"from":"DS1","to":"BAT1","cable":"DC1500V"}],"protection":["并网柜：过流+方向+防孤岛","升压变：差动+瓦斯+温度","PCS：过流+过压+欠压+频偏","电池：BMS三级保护+温烟感+气溶胶"]},
-  "topoDiagram": {"nodes":[{"id":"grid","label":"电网10kV","type":"source"},{"id":"tx","label":"变压器","type":"transformer"},{"id":"pcs","label":"PCS","type":"pcs"},{"id":"bat","label":"储能电池","type":"battery"},{"id":"load","label":"负荷","type":"load"},{"id":"ems","label":"EMS","type":"controller"}],"links":[{"from":"grid","to":"tx","label":"PCC"},{"from":"tx","to":"load","label":"供电"},{"from":"tx","to":"pcs","label":"PCS接口"},{"from":"pcs","to":"bat","label":"DC"},{"from":"ems","to":"pcs","label":"控制","dashed":true}]}
+  "topoDiagram": {"nodes":[{"id":"grid","label":"电网10kV","sub":"电源","type":"source"},{"id":"tx","label":"变压器","sub":"1250kVA","type":"transformer"},{"id":"pcs","label":"PCS","sub":"1.25MW","type":"pcs"},{"id":"bat","label":"储能电池","sub":"3.3MWh","type":"battery"},{"id":"load","label":"负荷","sub":"~800kW","type":"load"},{"id":"ems","label":"EMS","sub":"控制","type":"controller"}],"links":[{"from":"grid","to":"tx","label":"PCC"},{"from":"tx","to":"load","label":"供电"},{"from":"tx","to":"pcs","label":"PCS接口"},{"from":"pcs","to":"bat","label":"DC"},{"from":"ems","to":"pcs","label":"控制","dashed":true}]}
 }
 
 archDiagram, wiringDiagram, topoDiagram 中的节点和连接定义了图纸元素。前端会按国标电气制图规则渲染SVG。
-节点type: source/meter/busbar/transformer/pcs/battery/controller/breaker/switch/load
-坐标x/y是建议位置(0-800范围)，前端渲染时可微调。links中dashed=true表示控制/信号线。`;
+
+## 图纸节点布局规则（必须遵守）
+1. 节点type: source/meter/busbar/transformer/pcs/battery/controller/breaker/switch/load
+2. 每个节点必须有id/label/type，推荐加sub(副标题，显示型号或参数)
+3. 坐标x/y是建议位置，前端有智能布局算法会自动排列，但你应按层级给出合理x/y：
+   - source层 y=80：电源/电网节点
+   - meter层 y=155：计量/PCC节点
+   - busbar层 y=230：母线节点
+   - transformer/pcs/battery层 y=320：变压器/PCS/电池节点
+   - controller层 y=320：EMS/控制器节点（通常在右侧）
+   - load层 y=440：负荷节点
+4. 同层多节点x均匀分布（x范围100-1000，间距≥150）
+5. links中dashed=true表示控制/信号线（如EMS→PCS）
+6. archDiagram必须包含：source→meter→busbar→transformer(×N) + transformer→load + busbar→stepup→pcs→battery + ems→pcs(dashed)
+7. wiringDiagram必须包含完整一次回路：breaker→transformer→pcs→switch→battery + protection数组
+8. topoDiagram必须包含：source→transformer→load + source→pcs→battery + ems→pcs(dashed)
+9. 每个节点的sub副标题必须包含实际参数（如"1250kVA 10/0.4kV"、"1.25MW"、"3.3MWh 314Ah"）`;
 
 async function callLLM(messages, useStream) {
   const provider = document.getElementById('llmProvider').value;
@@ -866,8 +881,53 @@ function getArrowForLink(l){
   return 'aB';
 }
 
+function autoLayoutNodes(nodes, svgW, svgH) {
+  if (!nodes || !nodes.length) return nodes;
+  const LAYER_ORDER = ['source','meter','busbar','breaker','switch','transformer','pcs','battery','controller','load'];
+  const LAYER_Y = [80, 155, 230, 230, 230, 320, 320, 320, 320, 440];
+  const TOP_MARGIN = 60;
+  const hasCoord = nodes.every(n => typeof n.x === 'number' && typeof n.y === 'number');
+  if (hasCoord) {
+    const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+    const xMin = Math.min(...xs), xMax = Math.max(...xs), yMin = Math.min(...ys), yMax = Math.max(...ys);
+    if (xMax - xMin < 20 || yMax - yMin < 20) {
+      return assignLayerLayout(nodes, svgW, LAYER_ORDER, LAYER_Y, TOP_MARGIN);
+    }
+    const xOverlap = nodes.some((a,i) => nodes.some((b,j) => i !== j && Math.abs(a.x - b.x) < 120 && Math.abs(a.y - b.y) < 60));
+    if (!xOverlap) return nodes;
+    const byLayer = {};
+    nodes.forEach(n => { const ly = getLayerIndex(n.type, LAYER_ORDER); byLayer[ly] = byLayer[ly] || []; byLayer[ly].push(n); });
+    Object.values(byLayer).forEach(layer => {
+      layer.sort((a,b) => a.x - b.x);
+      const count = layer.length;
+      const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
+      const startX = svgW / 2 - (count - 1) * spacing / 2;
+      layer.forEach((n, i) => { n.x = startX + i * spacing; });
+    });
+    return nodes;
+  }
+  return assignLayerLayout(nodes, svgW, LAYER_ORDER, LAYER_Y, TOP_MARGIN);
+}
+function getLayerIndex(type, layerOrder) {
+  const idx = layerOrder.indexOf(type);
+  return idx >= 0 ? idx : layerOrder.length - 1;
+}
+function assignLayerLayout(nodes, svgW, LAYER_ORDER, LAYER_Y, TOP_MARGIN) {
+  const byLayer = {};
+  nodes.forEach(n => { const ly = getLayerIndex(n.type, LAYER_ORDER); byLayer[ly] = byLayer[ly] || []; byLayer[ly].push(n); });
+  Object.entries(byLayer).forEach(([ly, layer]) => {
+    const count = layer.length;
+    const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
+    const startX = svgW / 2 - (count - 1) * spacing / 2;
+    const yBase = LAYER_Y[parseInt(ly)] || 400;
+    layer.forEach((n, i) => { n.x = Math.round(startX + i * spacing); n.y = yBase; });
+  });
+  return nodes;
+}
+
 function renderDiagramFromJSON(containerId, diagramData, title) {
   const svgW = 1100, svgH = 700;
+  if (diagramData.nodes) autoLayoutNodes(diagramData.nodes, svgW, svgH);
   let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">`;
   svg += DIAGRAM_DEFS;
   svg += `<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern><rect width="${svgW}" height="${svgH}" fill="url(#dot)"/>`;
