@@ -23,7 +23,10 @@ export default async function handler(req, res) {
     glm: {
       url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
       key: process.env.GLM_API_KEY,
-      model: 'glm-5.1'
+      model: 'glm-5.1',
+      thinking: { type: 'enabled' },
+      max_tokens: 65536,
+      temperature: 1.0
     },
     bailian: {
       url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
@@ -41,8 +44,8 @@ export default async function handler(req, res) {
     const body = {
       model: cfg.model,
       messages,
-      temperature: 0.3,
-      max_tokens: 8192,
+      temperature: cfg.temperature !== undefined ? cfg.temperature : 0.3,
+      max_tokens: cfg.max_tokens || 8192,
       stream: !!stream
     };
     if (cfg.reasoning_effort) body.reasoning_effort = cfg.reasoning_effort;
