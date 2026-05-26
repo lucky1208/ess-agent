@@ -572,22 +572,64 @@ const ESS_SYSTEM_PROMPT = `你是一个工商业储能系统解决方案AI智能
 
 archDiagram, wiringDiagram, topoDiagram 中的节点和连接定义了图纸元素。前端会按国标电气制图规则渲染SVG。
 
-## 图纸节点布局规则（必须遵守）
-1. 节点type: source/meter/busbar/transformer/pcs/battery/controller/breaker/switch/load
-2. 每个节点必须有id/label/type，推荐加sub(副标题，显示型号或参数)
-3. 坐标x/y是建议位置，前端有智能布局算法会自动排列，但你应按层级给出合理x/y：
-   - source层 y=80：电源/电网节点
-   - meter层 y=155：计量/PCC节点
-   - busbar层 y=230：母线节点
-   - transformer/pcs/battery层 y=320：变压器/PCS/电池节点
-   - controller层 y=320：EMS/控制器节点（通常在右侧）
-   - load层 y=440：负荷节点
-4. 同层多节点x均匀分布（x范围100-1000，间距≥150）
-5. links中dashed=true表示控制/信号线（如EMS→PCS）
-6. archDiagram必须包含：source→meter→busbar→transformer(×N) + transformer→load + busbar→stepup→pcs→battery + ems→pcs(dashed)
-7. wiringDiagram必须包含完整一次回路：breaker→transformer→pcs→switch→battery + protection数组
-8. topoDiagram必须包含：source→transformer→load + source→pcs→battery + ems→pcs(dashed)
-9. 每个节点的sub副标题必须包含实际参数（如"1250kVA 10/0.4kV"、"1.25MW"、"3.3MWh 314Ah"）`;
+## 图纸制图规范（必须严格遵守，参照大庆管业5MWh项目SVG设计）
+
+### 层级布局（系统框图，viewBox 0 0 1100 700）
+| 层级 | Y坐标 | 设备类型 | 方框宽×高 | 说明 |
+|------|--------|---------|-----------|------|
+| ROW1 | y=55 | source | 220×44 | 国网10kV电源 |
+| ROW2 | y=120 | meter | 220×44 | PCC计量点 |
+| ROW3 | y=185 | busbar | 340×44 | 厂内10kV母线 |
+| ROW4 | y=270 | transformer/switch | 180×44 | 变压器/储能并网柜 |
+| ROW5 | y=340 | transformer/pcs | 180×44 | 升压变/PCS变流器 |
+| ROW6 | y=410 | battery | 280×56 | BESS电池系统 |
+| 左侧 | y=270~450 | controller | 130×120虚线框 | EMS控制器 |
+| 右下 | y=340 | load | 180×44 | 0.4kV负荷 |
+
+同层多节点X均匀分布，中心x=550，间距≥200
+
+### 颜色方案（暗色主题，每个设备4色：填充深/边框亮/主文字浅/副文字中）
+| 设备类型 | 填充(深) | 边框(亮) | 主文字(浅) | 副文字(中) | 连线色 |
+|----------|---------|---------|-----------|-----------|--------|
+| source(电网) | #0C447C | #85B7EB | #B5D4F4 | #85B7EB | #185FA5 |
+| meter(PCC) | #444441 | #B4B2A9 | #D3D1C7 | #B4B2A9 | #185FA5 |
+| busbar(母线) | #085041 | #5DCAA5 | #9FE1CB | #5DCAA5 | #0F6E56 |
+| transformer(变压器) | #633806 | #EF9F27 | #FAC775 | #EF9F27 | #185FA5 |
+| pcs(PCS) | #3C3489 | #AFA9EC | #CECBF6 | #AFA9EC | #534AB7 |
+| battery(电池) | #085041 | #5DCAA5 | #9FE1CB | #5DCAA5 | #0F6E56 |
+| controller(EMS) | 虚线框stroke:#854F0B | - | #FAF9F5 | #854F0B | #854F0B虚线 |
+| load(负荷) | #444441 | #B4B2A9 | #D3D1C7 | #B4B2A9 | #0F6E56 |
+| switch(并网柜) | #712B13 | #F0997B | #F5C4B3 | #F0997B | #185FA5 |
+| breaker(断路器) | #B5D4F4 | #185FA5 | - | - | #185FA5 |
+
+### 方框样式
+- 圆角rx=8，边框stroke-width=0.5
+- 主文字14px font-weight:500，副文字12px font-weight:400
+- 文字text-anchor:middle dominant-baseline:central
+- 主文字位于方框中心偏上，副文字位于方框中心偏下
+
+### 连线/箭头
+- 箭头：开放V形，markerWidth=6，markerHeight=6
+- 系统框图连线色：#9C9A92，stroke-width=1.5，实线+箭头
+- 10kV回路：#185FA5，stroke-width=2
+- 0.4kV/储能回路：#0F6E56，stroke-width=2
+- PCS/直流回路：#534AB7，stroke-width=2
+- 控制线/信号线：dashed=true，stroke-dasharray=4 3，色#854F0B
+
+### 特殊元素
+- 母线(busbar)：宽340高8矩形，圆角rx=2，fill=#185FA5 opacity=0.85
+- 控制器(EMS)：虚线框stroke-dasharray=4 3，stroke=#854F0B stroke-width=0.8
+- 断路器(QF)：小矩形30×14，圆角rx=3
+- 保护边界：虚线框stroke-dasharray=4 2，stroke=#534AB7
+
+### 节点必须包含的字段
+1. 每个节点必须有id/label/type/sub(sub为副标题含实际参数)
+2. sub必须包含实际参数如："S9-1250/10 10/0.4kV"、"1.25MW AC/DC"、"5MWh 314Ah液冷"
+
+### 3张图纸必须包含的拓扑
+1. archDiagram：source→meter→busbar→transformer(×N) + transformer→load + busbar→switch(并网柜)→transformer(升压变)→pcs→battery + controller(ems)→pcs(dashed)
+2. wiringDiagram：breaker→transformer→pcs→switch→battery + protection数组(含并网柜/升压变/PCS/电池4级保护)
+3. topoDiagram：source→transformer→load + source→pcs→battery + controller(ems)→pcs(dashed) + source→meter(dashed)`;
 
 async function callLLM(messages, useStream) {
   const provider = document.getElementById('llmProvider').value;
@@ -910,33 +952,35 @@ function renderLLMResult(R) {
 }
 
 const DIAGRAM_DEFS=`<defs>
-<linearGradient id="gGrid" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>
-<linearGradient id="gTrans" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#e8a838"/><stop offset="100%" style="stop-color:#c07820"/></linearGradient>
-<linearGradient id="gESS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#50c878"/><stop offset="100%" style="stop-color:#309858"/></linearGradient>
-<linearGradient id="gPCS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#e06070"/><stop offset="100%" style="stop-color:#b04050"/></linearGradient>
-<linearGradient id="gLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#a070d0"/><stop offset="100%" style="stop-color:#7040a0"/></linearGradient>
-<linearGradient id="gBus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#606080"/><stop offset="50%" style="stop-color:#8080a0"/><stop offset="100%" style="stop-color:#606080"/></linearGradient>
-<linearGradient id="gCtrl" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#d4a017"/><stop offset="100%" style="stop-color:#a07810"/></linearGradient>
-<filter id="sh"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/></filter>
-<marker id="aB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#4a90d9"/></marker>
-<marker id="aO" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e8a838"/></marker>
-<marker id="aG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#50c878"/></marker>
-<marker id="aR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e06070"/></marker>
-<marker id="aP" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#a070d0"/></marker>
-<marker id="aY" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#d4a017"/></marker>
+<linearGradient id="gGrid" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#185FA5"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient>
+<linearGradient id="gTrans" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#633806"/><stop offset="100%" style="stop-color:#4A2804"/></linearGradient>
+<linearGradient id="gESS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#085041"/><stop offset="100%" style="stop-color:#063828"/></linearGradient>
+<linearGradient id="gPCS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#3C3489"/><stop offset="100%" style="stop-color:#2A2466"/></linearGradient>
+<linearGradient id="gLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#444441"/><stop offset="100%" style="stop-color:#333330"/></linearGradient>
+<linearGradient id="gBus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#085041"/><stop offset="50%" style="stop-color:#0F6E56"/><stop offset="100%" style="stop-color:#085041"/></linearGradient>
+<linearGradient id="gCtrl" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#854F0B"/><stop offset="100%" style="stop-color:#6A3D08"/></linearGradient>
+<linearGradient id="gSwitch" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#712B13"/><stop offset="100%" style="stop-color:#5A2210"/></linearGradient>
+<filter id="sh"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.2"/></filter>
+<marker id="aB" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aO" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#EF9F27" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aG" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aR" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aP" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aY" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aX" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#9C9A92" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
 </defs>`;
 
 const DIAGRAM_ICONS = {
-  source: (x,y,label,sub) => `<rect x="${x-90}" y="${y-25}" width="180" height="50" rx="8" fill="url(#gGrid)" filter="url(#sh)"/><text x="${x}" y="${y-5}" text-anchor="middle" fill="white" font-size="13" font-weight="bold">${label}</text>${sub?`<text x="${x}" y="${y+12}" text-anchor="middle" fill="#c0d0ff" font-size="9">${sub}</text>`:''}`,
-  meter: (x,y,label,sub) => `<rect x="${x-65}" y="${y-25}" width="130" height="50" rx="8" fill="#1a2a4a" filter="url(#sh)" stroke="#4a90d9" stroke-width="1.5"/><text x="${x}" y="${y-5}" text-anchor="middle" fill="#80b0e0" font-size="12" font-weight="bold">${label}</text>${sub?`<text x="${x}" y="${y+10}" text-anchor="middle" fill="#6090c0" font-size="9">${sub}</text>`:''}`,
-  busbar: (x,y,label) => `<rect x="${x-250}" y="${y-16}" width="500" height="32" rx="4" fill="url(#gBus)" filter="url(#sh)"/><text x="${x}" y="${y+5}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${label}</text>`,
-  transformer: (x,y,label,sub) => `<rect x="${x-60}" y="${y-30}" width="120" height="60" rx="8" fill="url(#gTrans)" filter="url(#sh)"/><text x="${x}" y="${y-7}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${label}</text>${sub?`<text x="${x}" y="${y+10}" text-anchor="middle" fill="#fff0d0" font-size="9">${sub}</text>`:''}`,
-  pcs: (x,y,label,sub) => `<rect x="${x-60}" y="${y-25}" width="120" height="50" rx="8" fill="url(#gPCS)" filter="url(#sh)"/><text x="${x}" y="${y-5}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${label}</text>${sub?`<text x="${x}" y="${y+10}" text-anchor="middle" fill="#ffc0c0" font-size="9">${sub}</text>`:''}`,
-  battery: (x,y,label,sub) => `<rect x="${x-75}" y="${y-25}" width="150" height="50" rx="8" fill="url(#gESS)" filter="url(#sh)"/><text x="${x}" y="${y-5}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${label}</text>${sub?`<text x="${x}" y="${y+10}" text-anchor="middle" fill="#c0ffc0" font-size="9">${sub}</text>`:''}`,
-  controller: (x,y,label,sub) => `<rect x="${x-45}" y="${y-22}" width="90" height="44" rx="10" fill="url(#gCtrl)" filter="url(#sh)"/><text x="${x}" y="${y-3}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${label}</text>${sub?`<text x="${x}" y="${y+12}" text-anchor="middle" fill="#fff0d0" font-size="9">${sub}</text>`:''}`,
-  breaker: (x,y,label) => `<rect x="${x-40}" y="${y-18}" width="80" height="36" rx="4" fill="#1a2744" filter="url(#sh)" stroke="#EF4444" stroke-width="1.5"/><text x="${x}" y="${y+4}" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">${label}</text>`,
-  switch: (x,y,label) => `<line x1="${x-15}" y1="${y}" x2="${x}" y2="${y-12}" stroke="#C2C0B6" stroke-width="2.5"/><line x1="${x}" y1="${y-12}" x2="${x+15}" y2="${y}" stroke="#C2C0B6" stroke-width="2.5"/><text x="${x}" y="${y+16}" text-anchor="middle" fill="#C2C0B6" font-size="9">${label}</text>`,
-  load: (x,y,label,sub) => `<rect x="${x-55}" y="${y-22}" width="110" height="44" rx="8" fill="url(#gLoad)" filter="url(#sh)"/><text x="${x}" y="${y-3}" text-anchor="middle" fill="white" font-size="10" font-weight="bold">${label}</text>${sub?`<text x="${x}" y="${y+12}" text-anchor="middle" fill="#e0c0ff" font-size="9">${sub}</text>`:''}`
+  source: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="url(#gGrid)" stroke="#85B7EB" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#85B7EB" font-size="12">${sub}</text>`:''}`,
+  meter: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="#444441" stroke="#B4B2A9" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#D3D1C7" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}`,
+  busbar: (x,y,label) => `<rect x="${x-170}" y="${y-4}" width="340" height="8" rx="2" fill="#185FA5" opacity="0.85" filter="url(#sh)"/><text x="${x}" y="${y+20}" text-anchor="middle" fill="#9FE1CB" font-size="12" font-weight="500">${label}</text>`,
+  transformer: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gTrans)" stroke="#EF9F27" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#FAC775" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#EF9F27" font-size="12">${sub}</text>`:''}`,
+  pcs: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gPCS)" stroke="#AFA9EC" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#CECBF6" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#AFA9EC" font-size="12">${sub}</text>`:''}`,
+  battery: (x,y,label,sub) => `<rect x="${x-140}" y="${y-28}" width="280" height="56" rx="8" fill="url(#gESS)" stroke="#5DCAA5" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-4}" text-anchor="middle" dominant-baseline="central" fill="#9FE1CB" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#5DCAA5" font-size="12">${sub}</text>`:''}`,
+  controller: (x,y,label,sub) => `<rect x="${x-65}" y="${y-60}" width="130" height="120" rx="8" fill="none" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="4 3"/><text x="${x}" y="${y-40}" text-anchor="middle" fill="#FAF9F5" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y-20}" text-anchor="middle" fill="#854F0B" font-size="12">${sub}</text>`:''}`,
+  breaker: (x,y,label) => `<rect x="${x-15}" y="${y-7}" width="30" height="14" rx="3" fill="#B5D4F4" stroke="#185FA5" stroke-width="1.2"/><line x1="${x-10}" y1="${y}" x2="${x+10}" y2="${y}" stroke="#185FA5" stroke-width="1.2"/><text x="${x}" y="${y+18}" text-anchor="middle" fill="#185FA5" font-size="12">${label}</text>`,
+  switch: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gSwitch)" stroke="#F0997B" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#F5C4B3" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="12">${sub}</text>`:''}`,
+  load: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gLoad)" stroke="#B4B2A9" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#D3D1C7" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}`
 };
 
 function getArrowForLink(l){
@@ -946,7 +990,8 @@ function getArrowForLink(l){
   if(toType==='pcs') return 'aR';
   if(toType==='battery') return 'aG';
   if(toType==='load') return 'aP';
-  return 'aB';
+  if(toType==='switch') return 'aB';
+  return 'aX';
 }
 
 function autoLayoutNodes(nodes, svgW, svgH) {
@@ -1002,11 +1047,20 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
       const to = diagramData.nodes?.find(n => n.id === l.to);
       if (from && to) {
         l._toType = to.type;
-        const dash = l.dashed ? ' stroke-dasharray="6,3"' : '';
-        const color = l.dashed ? '#d4a017' : '#4a90d9';
+        const dash = l.dashed ? ' stroke-dasharray="4,3"' : '';
+        let color;
+        if (l.dashed) { color = '#854F0B'; }
+        else {
+          const toT = to.type;
+          if (toT==='transformer'||toT==='switch') color='#185FA5';
+          else if (toT==='pcs') color='#534AB7';
+          else if (toT==='battery') color='#0F6E56';
+          else if (toT==='load') color='#0F6E56';
+          else color='#9C9A92';
+        }
         const arrow = getArrowForLink(l);
-        const sw = l.dashed ? '1.5' : '3';
-        svg += `<line x1="${from.x}" y1="${from.y + 60 + (from.type==='busbar'?16:25)}" x2="${to.x}" y2="${to.y + 60 - (to.type==='busbar'?16:25)}" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
+        const sw = l.dashed ? '1' : '1.5';
+        svg += `<line x1="${from.x}" y1="${from.y + 60 + (from.type==='busbar'?4:22)}" x2="${to.x}" y2="${to.y + 60 - (to.type==='busbar'?4:(to.type==='controller'?60:22))}" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
         if (l.label) {
           svg += `<text x="${(from.x + to.x) / 2 + 6}" y="${(from.y + to.y) / 2 + 58}" text-anchor="start" fill="#C2C0B6" font-size="9" transform="rotate(${Math.atan2(to.y-from.y,to.x-from.x)*180/Math.PI},${(from.x+to.x)/2},${(from.y+to.y)/2+58})">${l.label}</text>`;
         }
@@ -1038,10 +1092,10 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
     });
   }
   if (diagramData.protection) {
-    svg += `<rect x="700" y="70" width="380" height="${20 + diagramData.protection.length * 20}" rx="6" fill="none" stroke="#d4a017" stroke-width="1" stroke-dasharray="4,2"/>`;
-    svg += `<text x="890" y="86" text-anchor="middle" fill="#d4a017" font-size="10" font-weight="bold">保护配置</text>`;
+    svg += `<rect x="700" y="70" width="380" height="${20 + diagramData.protection.length * 20}" rx="6" fill="none" stroke="#534AB7" stroke-width="1" stroke-dasharray="4,2"/>`;
+    svg += `<text x="890" y="86" text-anchor="middle" fill="#534AB7" font-size="10" font-weight="bold">保护配置</text>`;
     diagramData.protection.forEach((p, i) => {
-      svg += `<text x="715" y="${105 + i * 20}" fill="#d4a017" font-size="9">\u25CF ${p}</text>`;
+      svg += `<text x="715" y="${105 + i * 20}" fill="#AFA9EC" font-size="9">\u25CF ${p}</text>`;
     });
   }
   svg += '</svg>';
