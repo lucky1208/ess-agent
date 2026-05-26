@@ -697,7 +697,9 @@ async function generateSolution() {
     }
     addLog(`[${provider.toUpperCase()}] 构建储能领域Prompt...`, 'step');
     const userPrompt = buildUserPrompt();
-    addLog(`场地信息: ${P.txCount}×${P.txCap}kVA, ${P.use10kV?'10kV':'0.4kV'}接入, 最大负荷${P.loadMax}kW`, 'step');
+    addLog('─── 发送给LLM的完整输入 ───', 'step');
+    userPrompt.split('\n').forEach(line => { if(line.trim()) addLog(line, ''); });
+    addLog('─── 输入结束 ───', 'step');
     addLog(`调用${provider.toUpperCase()} API...`, 'step');
     const messages = [
       { role: 'system', content: ESS_SYSTEM_PROMPT },
