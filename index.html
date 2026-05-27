@@ -1283,13 +1283,13 @@ const DIAGRAM_DEFS=`<defs>
 <linearGradient id="gCtrl" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#854F0B"/><stop offset="100%" style="stop-color:#6A3D08"/></linearGradient>
 <linearGradient id="gSwitch" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#712B13"/><stop offset="100%" style="stop-color:#5A2210"/></linearGradient>
 <filter id="sh"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.2"/></filter>
-<marker id="aB" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-<marker id="aO" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#EF9F27" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-<marker id="aG" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-<marker id="aR" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-<marker id="aP" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-<marker id="aY" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-<marker id="aX" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#9C9A92" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aB" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#185FA5" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aO" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#EF9F27" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aG" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#0F6E56" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aR" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#534AB7" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aP" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#0F6E56" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aY" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#854F0B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aX" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#9C9A92" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
 </defs>`;
 
 const DIAGRAM_ICONS = {
@@ -1439,7 +1439,228 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
 }
 
 function renderArchDiagramFromJSON(d) { renderDiagramFromJSON('archSvg', d, '系统架构图 (AI生成)'); }
-function renderWiringDiagramFromJSON(d) { renderDiagramFromJSON('wiringSvg', d, '电气一次接线图 (AI生成)'); }
+function renderWiringDiagramFromJSON(d) {
+  const W=1200, H=950;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<defs>`;
+  s+=`<style>.wa{stroke:#e8a838;stroke-width:2.5;fill:none}.wd{stroke:#50c878;stroke-width:2.5;fill:none;stroke-dasharray:8,3}.wc{stroke:#6060a0;stroke-width:1;fill:none;stroke-dasharray:4,2}.lb{fill:#e0e0ff;font-size:11px;font-weight:bold}.ls{fill:#9090a0;font-size:9px}.lg{fill:#c0c0d0;font-size:10px}</style>`;
+  s+=`<linearGradient id="bus10w" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2a50a0"/><stop offset="50%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>`;
+  s+=`<marker id="awB" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#4a90d9"/></marker>`;
+  s+=`<marker id="awO" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e8a838"/></marker>`;
+  s+=`<marker id="awG" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#50c878"/></marker>`;
+  s+=`<marker id="awR" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e06070"/></marker>`;
+  s+=`</defs>`;
+  s+=`<rect width="${W}" height="${H}" fill="#0d1117"/>`;
+  s+=`<pattern id="dw" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
+  s+=`<rect width="${W}" height="${H}" fill="url(#dw)"/>`;
+
+  const comps = d.components || [];
+  const conns = d.connections || [];
+  const prots = d.protection || [];
+  const volt = d.voltage || '10kV';
+  const is10kV = volt.includes('10');
+
+  const cx = 580;
+
+  // === 10kV Incoming ===
+  s+=`<text x="${cx}" y="30" class="lb" style="fill:#4a90d9" text-anchor="middle">国网${volt}电源</text>`;
+  s+=`<line x1="${cx}" y1="38" x2="${cx}" y2="65" class="wa" style="stroke:#4a90d9" marker-end="url(#awB)"/>`;
+
+  // === PCC/计量 ===
+  s+=`<rect x="${cx-60}" y="65" width="120" height="35" rx="4" fill="#1a2a4a" stroke="#4a90d9" stroke-width="1.5"/>`;
+  s+=`<text x="${cx}" y="85" text-anchor="middle" class="ls" style="fill:#80b0e0">计量/PCC</text>`;
+  s+=`<text x="${cx}" y="95" text-anchor="middle" style="fill:#6090c0;font-size:7">PT+CT(电力局资产)</text>`;
+  s+=`<line x1="${cx}" y1="100" x2="${cx}" y2="130" class="wa" style="stroke:#4a90d9" marker-end="url(#awB)"/>`;
+
+  // === 防反送电边界 ===
+  s+=`<rect x="${cx-180}" y="55" width="580" height="90" rx="4" fill="none" stroke="#e8a838" stroke-width="1" stroke-dasharray="5,3"/>`;
+  s+=`<text x="${cx+110}" y="52" style="fill:#e8a838;font-size:8">防反送电控制边界：PCC实时功率 > 50~100kW时触发限功率</text>`;
+
+  // === 10kV Bus ===
+  s+=`<line x1="${cx-200}" y1="130" x2="${cx+200}" y2="130" stroke="url(#bus10w)" stroke-width="7" stroke-linecap="round"/>`;
+  s+=`<text x="${cx}" y="122" text-anchor="middle" class="lb" style="fill:#80b0e0">厂内${volt}母线</text>`;
+
+  // Count transformer loads vs BESS components
+  const transformers = comps.filter(c=>c.type==='transformer');
+  const breakers = comps.filter(c=>c.type==='breaker');
+  const pcsList = comps.filter(c=>c.type==='pcs');
+  const switches = comps.filter(c=>c.type==='switch');
+  const batteries = comps.filter(c=>c.type==='battery');
+
+  // Layout columns
+  const txCount = Math.max(transformers.length, 2);
+  const essX = cx + 180;
+  const txStartX = cx - 180;
+  const txStep = txCount > 1 ? 150 : 0;
+
+  let curY = 130;
+
+  // === Transformer + Load branches ===
+  transformers.forEach((tx, i) => {
+    const txX = txStartX + i * txStep;
+    curY = 130;
+    // QF from bus
+    s+=`<line x1="${txX}" y1="${curY}" x2="${txX}" y2="${curY+35}" class="wa" marker-end="url(#awO)"/>`;
+    const qfLabel = breakers[i] ? breakers[i].label : `QF${i+1}`;
+    s+=`<rect x="${txX-10}" y="${curY+35}" width="20" height="30" fill="#2a3050" stroke="#e8a838" stroke-width="1.5" rx="2"/>`;
+    s+=`<text x="${txX}" y="${curY+55}" text-anchor="middle" class="ls" style="fill:#e0c060">${qfLabel}</text>`;
+    curY += 65;
+    s+=`<line x1="${txX}" y1="${curY}" x2="${txX}" y2="${curY+25}" class="wa" marker-end="url(#awO)"/>`;
+    // Transformer symbol (double circle)
+    s+=`<circle cx="${txX}" cy="${curY+45}" r="20" fill="#2a3050" stroke="#e8a838" stroke-width="2"/>`;
+    s+=`<circle cx="${txX}" cy="${curY+45}" r="13" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+    s+=`<text x="${txX}" y="${curY+48}" text-anchor="middle" class="ls" style="fill:#e8a838">Y/Δ</text>`;
+    const txParts = (tx.label||'').split(' ');
+    s+=`<text x="${txX+30}" y="${curY+38}" class="lg" style="fill:#e8a838">${txParts[0]||tx.label}</text>`;
+    if(tx.sub) s+=`<text x="${txX+30}" y="${curY+52}" class="ls" style="fill:#c09030">${tx.sub}</text>`;
+    curY += 65;
+    // LV breaker
+    const lvQf = `QF${i+3}`;
+    s+=`<line x1="${txX}" y1="${curY}" x2="${txX}" y2="${curY+20}" class="wa" style="stroke:#a070d0"/>`;
+    s+=`<rect x="${txX-10}" y="${curY+20}" width="20" height="20" fill="#2a3050" stroke="#a070d0" stroke-width="1.5" rx="2"/>`;
+    s+=`<text x="${txX}" y="${curY+35}" text-anchor="middle" class="ls" style="fill:#c090e0">${lvQf}</text>`;
+    curY += 40;
+    // Load
+    s+=`<line x1="${txX}" y1="${curY}" x2="${txX}" y2="${curY+15}" class="wa" style="stroke:#a070d0"/>`;
+    s+=`<rect x="${txX-65}" y="${curY+15}" width="130" height="50" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/>`;
+    s+=`<text x="${txX}" y="${curY+35}" text-anchor="middle" class="lb" style="fill:#c090e0;font-size:10">0.4kV负荷${i+1}</text>`;
+    s+=`<text x="${txX}" y="${curY+53}" text-anchor="middle" class="ls" style="fill:#8060a0">~${Math.round(500/(txCount||1))}kW</text>`;
+  });
+
+  // === BESS Branch ===
+  let bY = 130;
+  const bX = essX;
+
+  // From bus to BESS
+  s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+30}" class="wa" style="stroke:#50c878" marker-end="url(#awG)"/>`;
+  bY += 30;
+
+  // 并网柜
+  s+=`<rect x="${bX-70}" y="${bY}" width="140" height="55" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="2"/>`;
+  s+=`<text x="${bX}" y="${bY+20}" text-anchor="middle" style="fill:#80e080;font-size:11;font-weight:bold">储能${volt}并网柜</text>`;
+  s+=`<text x="${bX}" y="${bY+35}" text-anchor="middle" class="ls" style="fill:#60a060">断路器+继保</text>`;
+  s+=`<text x="${bX}" y="${bY+48}" text-anchor="middle" class="ls" style="fill:#508050;font-size:7">过流/速断/接地/防孤岛</text>`;
+  bY += 55;
+  s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+25}" class="wa" style="stroke:#50c878" marker-end="url(#awG)"/>`;
+  bY += 25;
+
+  // 升压变 (if 10kV)
+  if(is10kV) {
+    s+=`<circle cx="${bX}" cy="${bY+20}" r="22" fill="#2a3020" stroke="#e8a838" stroke-width="2"/>`;
+    s+=`<circle cx="${bX}" cy="${bY+20}" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+    s+=`<text x="${bX}" y="${bY+23}" text-anchor="middle" class="ls" style="fill:#e8a838">0.69/10</text>`;
+    s+=`<text x="${bX+30}" y="${bY+15}" class="lg" style="fill:#e8a838">升压变</text>`;
+    s+=`<text x="${bX+30}" y="${bY+28}" class="ls" style="fill:#c09030">干式 ~1.6MVA</text>`;
+    bY += 42;
+    s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+20}" class="wa" style="stroke:#e8a838" marker-end="url(#awO)"/>`;
+    bY += 20;
+
+    // AC柜
+    s+=`<rect x="${bX-60}" y="${bY}" width="120" height="35" rx="4" fill="#2a2020" stroke="#e06070" stroke-width="1.5"/>`;
+    s+=`<text x="${bX}" y="${bY+18}" text-anchor="middle" style="fill:#ff8090;font-size:10;font-weight:bold">AC柜(0.69kV)</text>`;
+    s+=`<text x="${bX}" y="${bY+30}" text-anchor="middle" class="ls" style="fill:#c06070">计量/隔离</text>`;
+    bY += 35;
+    s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+20}" class="wa" style="stroke:#e06070" marker-end="url(#awR)"/>`;
+    bY += 20;
+  }
+
+  // PCS
+  const pcs = pcsList[0];
+  const pcsLabel = pcs ? pcs.label : 'PCS 1.25MW';
+  s+=`<rect x="${bX-90}" y="${bY}" width="180" height="65" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/>`;
+  s+=`<text x="${bX}" y="${bY+23}" text-anchor="middle" style="fill:white;font-size:12;font-weight:bold">PCS</text>`;
+  s+=`<text x="${bX}" y="${bY+41}" text-anchor="middle" class="ls" style="fill:#ffc0c0;font-size:10">${pcsLabel}</text>`;
+  s+=`<text x="${bX}" y="${bY+55}" text-anchor="middle" class="ls" style="fill:#c06070;font-size:9">AC↔DC ≥97%</text>`;
+  bY += 65;
+
+  // 直流安全注释
+  s+=`<rect x="${bX+100}" y="${bY-55}" width="120" height="45" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+  s+=`<text x="${bX+160}" y="${bY-37}" text-anchor="middle" style="fill:#a0a0ff;font-size:9;font-weight:bold">直流安全</text>`;
+  s+=`<text x="${bX+160}" y="${bY-23}" text-anchor="middle" class="ls" style="fill:#8080c0">绝缘监测</text>`;
+  s+=`<text x="${bX+160}" y="${bY-12}" text-anchor="middle" class="ls" style="fill:#8080c0">接触器+BMS联动</text>`;
+  s+=`<line x1="${bX+100}" y1="${bY-30}" x2="${bX+90}" y2="${bY-30}" class="wc"/>`;
+
+  // DC cable
+  s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+30}" class="wd" marker-end="url(#awG)"/>`;
+  s+=`<text x="${bX+35}" y="${bY+18}" style="fill:#50c878;font-size:8">YJV-1.5kV DC</text>`;
+  bY += 30;
+
+  // DC disconnect
+  const sw = switches[0];
+  const swLabel = sw ? sw.label : 'DS';
+  s+=`<rect x="${bX-10}" y="${bY}" width="20" height="18" fill="#2a2a50" stroke="#50c878" stroke-width="1.5" rx="2"/>`;
+  s+=`<text x="${bX}" y="${bY+13}" text-anchor="middle" class="ls" style="fill:#80e080">${swLabel}</text>`;
+  bY += 18;
+  s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+20}" class="wd" marker-end="url(#awG)"/>`;
+  bY += 20;
+
+  // BESS Battery
+  const bat = batteries[0];
+  const batLabel = bat ? bat.label : '电池储能系统';
+  s+=`<rect x="${bX-120}" y="${bY}" width="240" height="100" rx="8" fill="#0d2a15" stroke="#50c878" stroke-width="2"/>`;
+  s+=`<text x="${bX}" y="${bY+25}" text-anchor="middle" style="fill:#80e080;font-size:13;font-weight:bold">${batLabel}</text>`;
+  if(bat && bat.sub) s+=`<text x="${bX}" y="${bY+45}" text-anchor="middle" class="lg" style="fill:#60c060">${bat.sub}</text>`;
+  s+=`<text x="${bX}" y="${bY+62}" text-anchor="middle" class="ls" style="fill:#408040">BMS三级+温烟感+气溶胶</text>`;
+  s+=`<text x="${bX}" y="${bY+78}" text-anchor="middle" class="ls" style="fill:#308030;font-size:7">LFP | 液冷/风冷 | IP55</text>`;
+
+  // BMS box
+  s+=`<rect x="${bX+130}" y="${bY+25}" width="90" height="40" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+  s+=`<text x="${bX+175}" y="${bY+43}" text-anchor="middle" class="ls" style="fill:#8080c0">BMS三级</text>`;
+  s+=`<text x="${bX+175}" y="${bY+58}" text-anchor="middle" class="ls" style="fill:#6060a0;font-size:7">电芯→簇→系统</text>`;
+  s+=`<line x1="${bX+120}" y1="${bY+45}" x2="${bX+130}" y2="${bY+45}" class="wc"/>`;
+
+  // === EMS Controller ===
+  s+=`<rect x="850" y="165" width="160" height="180" rx="8" fill="#151530" stroke="#6060a0" stroke-width="1.5"/>`;
+  s+=`<text x="930" y="190" text-anchor="middle" style="fill:#a0a0ff;font-size:11;font-weight:bold">EMS能量管理</text>`;
+  s+=`<line x1="865" y1="200" x2="995" y2="200" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="930" y="220" text-anchor="middle" class="ls" style="fill:#8080c0">● 峰谷自动调度</text>`;
+  s+=`<text x="930" y="240" text-anchor="middle" class="ls" style="fill:#8080c0">● PCC功率实时监测</text>`;
+  s+=`<text x="930" y="260" text-anchor="middle" class="ls" style="fill:#8080c0">● 防逆流双闭环</text>`;
+  s+=`<text x="930" y="280" text-anchor="middle" class="ls" style="fill:#8080c0">  软件限功率+硬件兜底</text>`;
+  s+=`<text x="930" y="300" text-anchor="middle" class="ls" style="fill:#8080c0">● SOC保护管理</text>`;
+  s+=`<text x="930" y="320" text-anchor="middle" class="ls" style="fill:#8080c0">● 防孤岛保护联锁</text>`;
+  s+=`<text x="930" y="340" text-anchor="middle" class="ls" style="fill:#8080c0">● 远程监控+告警</text>`;
+  // EMS connections
+  s+=`<line x1="850" y1="230" x2="${bX+70}" y2="185" class="wc"/>`;
+  s+=`<line x1="850" y1="270" x2="${bX+90}" y2="280" class="wc"/>`;
+
+  // === Cable Schedule ===
+  s+=`<rect x="60" y="430" width="380" height="${conns.length*20+80}" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="250" y="455" text-anchor="middle" style="fill:#a0a0ff;font-size:11;font-weight:bold">电缆与设备清单</text>`;
+  s+=`<line x1="70" y1="465" x2="430" y2="465" stroke="#2a2a3e" stroke-width="1"/>`;
+  conns.forEach((c,i)=>{
+    const y=485+i*20;
+    const cableInfo = c.cable ? ` → ${c.cable}` : '';
+    s+=`<text x="75" y="${y}" class="ls" style="fill:#e8a838">${c.from||''}</text>`;
+    s+=`<text x="160" y="${y}" class="ls" style="fill:#c0c0d0">→ ${c.to||''}${cableInfo}</text>`;
+  });
+
+  // === Protection Config ===
+  if(prots.length>0) {
+    const protY = 430 + conns.length*20 + 80 + 15;
+    s+=`<rect x="60" y="${protY}" width="380" height="${prots.length*20+50}" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+    s+=`<text x="250" y="${protY+25}" text-anchor="middle" style="fill:#e06060;font-size:11;font-weight:bold">保护配置</text>`;
+    s+=`<line x1="70" y1="${protY+35}" x2="430" y2="${protY+35}" stroke="#2a2a3e" stroke-width="1"/>`;
+    prots.forEach((p,i)=>{
+      s+=`<text x="75" y="${protY+55+i*20}" class="ls" style="fill:#e06060">● ${p}</text>`;
+    });
+  }
+
+  // === Voltage level markers ===
+  s+=`<rect x="60" y="860" width="1080" height="55" rx="4" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="580" y="882" text-anchor="middle" style="fill:#8888cc;font-size:10;font-weight:bold">电压等级</text>`;
+  s+=`<text x="160" y="905" text-anchor="middle" class="ls" style="fill:#4a90d9">${volt} (并网/母线)</text>`;
+  s+=`<text x="380" y="905" text-anchor="middle" class="ls" style="fill:#e8a838">0.4kV (负荷侧)</text>`;
+  s+=`<text x="600" y="905" text-anchor="middle" class="ls" style="fill:#e06070">0.69kV (PCS交流侧)</text>`;
+  s+=`<text x="820" y="905" text-anchor="middle" class="ls" style="fill:#50c878">DC (电池侧)</text>`;
+  s+=`<text x="1020" y="905" text-anchor="middle" class="ls" style="fill:#6060a0">通讯(RS485/CAN)</text>`;
+
+  // === Title ===
+  s+=`<text x="${W/2}" y="${H-10}" text-anchor="middle" style="fill:#606080;font-size:8">一次接线为方案级示意 | 设计人:卢继雄 | ${volt}方案 | GB/T 36558-2023</text>`;
+
+  s+=`</svg>`;
+  document.getElementById('wiringSvg').innerHTML = s;
+}
 function renderTopoDiagramFromJSON(d) { renderDiagramFromJSON('wiring2Svg', d, '电气接线图 (AI生成)'); }
 
 function renderDeviceLibrary(filter){
@@ -2567,10 +2788,10 @@ function renderArchSvg(R){
   s+=`<linearGradient id="gLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#a070d0"/><stop offset="100%" stop-color="#7040a0"/></linearGradient>`;
   s+=`<linearGradient id="gBus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#606080"/><stop offset="50%" stop-color="#8080a0"/><stop offset="100%" stop-color="#606080"/></linearGradient>`;
   s+=`<filter id="sh"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/></filter>`;
-  s+=`<marker id="aB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#4a90d9"/></marker>`;
-  s+=`<marker id="aO" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e8a838"/></marker>`;
-  s+=`<marker id="aG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#50c878"/></marker>`;
-  s+=`<marker id="aR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e06070"/></marker>`;
+  s+=`<marker id="aB" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#4a90d9"/></marker>`;
+  s+=`<marker id="aO" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e8a838"/></marker>`;
+  s+=`<marker id="aG" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#50c878"/></marker>`;
+  s+=`<marker id="aR" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e06070"/></marker>`;
   s+=`</defs>`;
   s+=`<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
   let Y=0;
