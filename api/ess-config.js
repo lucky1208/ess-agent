@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     bailian: {
       url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
       key: process.env.BAILIAN_API_KEY,
-      model: 'qwen-max'
+      model: 'qwen3.7-max'
     }
   };
 
