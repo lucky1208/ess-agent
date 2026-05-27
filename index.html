@@ -138,10 +138,8 @@ select.form-input{appearance:auto}
 <div style="font-size:11px;color:#c0e0d0;line-height:1.5" data-i18n="sidebar_ai_desc">输入需求信息，智能体自动生成完整解决方案：设备选型、系统架构图、电气接线图、电气接线图(系统)、BOM清单、充放电策略、经济性分析</div>
 </div>
 
-<div id="analysisLog" style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border);font-family:monospace;display:none;max-height:400px;overflow-y:auto;margin-bottom:16px"></div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">
-<div>
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:16px">
+<div style="border-left:3px solid var(--green);padding-left:14px">
 <div class="sec-title" style="margin-bottom:8px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
 <span data-i18n="method1_title">方式一：自然语言描述</span>
@@ -152,6 +150,9 @@ select.form-input{appearance:auto}
 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
 <span data-i18n="ai_detect_btn">AI识别并配置</span>
 </button>
+<div style="margin-top:16px">
+<div class="form-group" style="margin-bottom:0"><label class="form-label" data-i18n="special_note">特别说明</label><textarea id="specialNote" class="form-input" rows="2" data-i18n-placeholder="special_note_ph" placeholder="如：要求防逆流三重保障、必须10kV接入、预算不超过300万..." style="resize:vertical;font-size:12px;line-height:1.4"></textarea></div>
+</div>
 </div>
 <div>
 <div class="sec-title" style="margin-bottom:8px">
@@ -164,12 +165,7 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="region">省份/城市</label><input type="text" class="form-input" id="region" value="黑龙江大庆"></div>
 </div>
 <div class="form-group"><label class="form-label" data-i18n="proj_addr">项目地址</label><input type="text" class="form-input" id="projAddr" placeholder="如：黑龙江大庆市高新区" value="黑龙江大庆市高新区建设路249号"></div>
-</div>
-</div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:16px">
-<div>
-<div class="sec-title" style="font-size:13px;margin-bottom:10px">
+<div class="sec-title" style="font-size:13px;margin-bottom:10px;margin-top:12px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
 <span data-i18n="tx_config">变压器配置</span>
 </div>
@@ -186,9 +182,7 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="tx_zk">短路阻抗 (%)</label><input type="number" class="form-input" id="txZk" value="4.3" step="0.1"></div>
 </div>
 <div class="form-group"><label class="form-label" data-i18n="has_hv_room">是否有10kV配电室</label><select class="form-input" id="hasHvRoom"><option value="1" data-i18n="hv_room_yes">有（推荐10kV接入）</option><option value="0" data-i18n="hv_room_no">无（将用0.4kV接入）</option></select></div>
-</div>
-<div>
-<div class="sec-title" style="font-size:13px;margin-bottom:10px">
+<div class="sec-title" style="font-size:13px;margin-bottom:10px;margin-top:12px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
 <span data-i18n="load_title">用电负荷</span>
 </div>
@@ -201,9 +195,7 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="pf">功率因数</label><input type="number" class="form-input" id="pf" value="0.9" step="0.05" min="0.7" max="1"></div>
 </div>
 <div class="form-group"><label class="form-label" data-i18n="work_days">年工作天数</label><input type="number" class="form-input" id="workDays" value="300" step="10"></div>
-</div>
-<div>
-<div class="sec-title" style="font-size:13px;margin-bottom:10px">
+<div class="sec-title" style="font-size:13px;margin-bottom:10px;margin-top:12px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 <span data-i18n="price_title">峰谷电价</span>
 </div>
@@ -215,12 +207,7 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="price_flat">平段 (元/kWh)</label><input type="number" class="form-input" id="priceFlat" value="0.637" step="0.01"></div>
 <div class="form-group"><label class="form-label" data-i18n="hours_peak">峰段时长 (h)</label><input type="number" class="form-input" id="hoursPeak" value="8" step="1"></div>
 </div>
-</div>
-</div>
-
-<div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:16px">
-<div class="form-group" style="margin-bottom:0"><label class="form-label" data-i18n="special_note">特别说明</label><textarea id="specialNote" class="form-input" rows="2" data-i18n-placeholder="special_note_ph" placeholder="如：要求防逆流三重保障、必须10kV接入、预算不超过300万..." style="resize:vertical;font-size:12px;line-height:1.4"></textarea></div>
-<div class="form-group" style="margin-bottom:0"><label class="form-label" data-i18n="llm_provider">AI模型</label>
+<div class="form-group" style="margin-top:12px"><label class="form-label" data-i18n="llm_provider">AI模型</label>
     <select class="form-input" id="llmProvider">
       <option value="local" data-i18n="llm_local">本地小模型</option>
       <option value="deepseek" data-i18n="llm_deepseek">DeepSeek V4</option>
@@ -229,11 +216,22 @@ select.form-input{appearance:auto}
     </select>
   </div>
 </div>
+</div>
 
 <button class="btn btn-primary" onclick="generateSolution()" style="width:100%;padding:12px;font-size:14px">
 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
 <span data-i18n="generate_btn">生成解决方案</span>
 </button>
+
+<div id="rankingSection" style="display:none;margin-top:12px;background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">
+  <div class="sec-title" style="font-size:13px;margin-bottom:8px">
+    <span data-i18n="ranking_title">推荐配置排序</span>
+  </div>
+  <div style="font-size:11px;color:var(--text2);margin-bottom:12px" data-i18n="ranking_formula">评分 = 覆盖率×0.4 + 利用率×0.3 + 1/回收期×0.3</div>
+  <div id="rankingContent"></div>
+</div>
+
+<div id="analysisLog" style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border);font-family:monospace;display:none;max-height:400px;overflow-y:auto;margin-top:12px"></div>
 
 <div class="device-grid" id="deviceRecommendation"></div>
 <div class="result-panel" id="selectionPanel" style="display:none"></div>
@@ -347,7 +345,8 @@ generate_btn:'生成解决方案',
 device_library_title:'储能设备产品库',
 diagram_arch:'系统架构图',diagram_wiring:'电气一次接线图',diagram_topo:'电气接线图',diagram_bom:'物料清单(BOM)',diagram_ref:'参考设计图（大庆管业5MWh项目）',
 download_svg:'下载 SVG',export_csv:'导出 CSV',export_excel:'导出 Excel',cases_title:'应用案例',
-llm_provider:'AI模型',llm_local:'本地小模型',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen3.7-Max (阿里百炼)'
+llm_provider:'AI模型',llm_local:'本地小模型',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen3.7-Max (阿里百炼)',
+ranking_title:'推荐配置排序',ranking_formula:'评分 = 覆盖率×0.4 + 利用率×0.3 + 1/回收期×0.3'
 },
 en:{
 header_title:'Open ESS Agent — Open-source ESS Solution AI Agent',
@@ -370,7 +369,8 @@ generate_btn:'Generate Solution',
 device_library_title:'ESS Device Product Library',
 diagram_arch:'System Architecture',diagram_wiring:'Electrical Single-line Diagram',diagram_topo:'Electrical Wiring Diagram',diagram_bom:'Bill of Materials (BOM)',diagram_ref:'Reference Design (Daqing 5MWh Project)',
 download_svg:'Download SVG',export_csv:'Export CSV',export_excel:'Export Excel',cases_title:'Use Cases',
-llm_provider:'AI Model',llm_local:'Local Mini Model',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen3.7-Max (Alibaba)'
+llm_provider:'AI Model',llm_local:'Local Mini Model',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen3.7-Max (Alibaba)',
+ranking_title:'Recommended Configuration Ranking',ranking_formula:'Score = Coverage×0.4 + Utilization×0.3 + 1/Payback×0.3'
 },
 ar:{
 header_title:'Open ESS Agent — وكيل الذكاء الاصطناعي لحلول أنظمة تخزين الطاقة مفتوحة المصدر',
@@ -393,7 +393,8 @@ generate_btn:'توليد الحل',
 device_library_title:'مكتبة منتجات معدات التخزين',
 diagram_arch:'هيكل النظام',diagram_wiring:'مخطط التوصيل الكهربائي أحادي الخط',diagram_topo:'مخطط التوصيل الكهربائي',diagram_bom:'قائمة المواد (BOM)',diagram_ref:'تصميم مرجعي (مشروع داتشينغ 5MWh)',
 download_svg:'تحميل SVG',export_csv:'تصدير CSV',export_excel:'تصدير Excel',cases_title:'حالات الاستخدام',
-llm_provider:'نموذج AI',llm_local:'نموذج محلي صغير',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1',llm_bailian:'Qwen3.7-Max'
+llm_provider:'نموذج AI',llm_local:'نموذج محلي صغير',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1',llm_bailian:'Qwen3.7-Max',
+ranking_title:'ترتيب التكوين الموصى به',ranking_formula:'النتيجة = التغطية×0.4 + الاستخدام×0.3 + 1/فترة الاسترداد×0.3'
 }
 };
 
@@ -1006,6 +1007,7 @@ async function generateSolution() {
       renderWiringSvg(result);
       renderTopoSvg(result);
       renderBOM(result);
+      showRanking(result);
       showPage('config');
       return;
     }
@@ -1052,6 +1054,7 @@ async function generateSolution() {
     LAST_RESULT = result;
     document.getElementById('successMsg').classList.add('show');
     renderLLMResult(result);
+    showRanking(result);
     showPage('config');
   } catch (e) {
     console.error('LLM error:', e);
@@ -1069,6 +1072,7 @@ async function generateSolution() {
     renderWiringSvg(result);
     renderTopoSvg(result);
     renderBOM(result);
+    showRanking(result);
     showPage('config');
   } finally {
     btn.innerHTML = origText;
@@ -1222,6 +1226,42 @@ function renderDocOutput(R){
   doc+=`═══════════════════════════════════════════════════════════\n`;
   document.getElementById('docPanel').innerHTML=`<h3>完整方案文档</h3><div class="doc-output">${doc}</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn btn-primary" style="width:auto" onclick="downloadTxt()">下载 .txt</button><button class="btn btn-success" style="width:auto" onclick="downloadMD()">下载 .md</button></div>`;
   document.getElementById('docPanel').style.display='block';
+}
+
+function showRanking(R){
+  if(!R||!R.candidates||!R.candidates.length)return;
+  const sec=document.getElementById('rankingSection');
+  if(!sec)return;
+  sec.style.display='block';
+  let html='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+  html+='<thead><tr style="background:var(--bg3);color:var(--text1);font-weight:600">';
+  html+='<th style="padding:8px;text-align:center">排名</th>';
+  html+='<th style="padding:8px;text-align:left">设备方案</th>';
+  html+='<th style="padding:8px;text-align:center">容量</th>';
+  html+='<th style="padding:8px;text-align:center">功率</th>';
+  html+='<th style="padding:8px;text-align:center">覆盖率</th>';
+  html+='<th style="padding:8px;text-align:center">回收期</th>';
+  html+='<th style="padding:8px;text-align:center">评分</th>';
+  html+='</tr></thead><tbody>';
+  R.candidates.forEach((c,i)=>{
+    const bg=i%2===0?'var(--bg2)':'var(--bg1)';
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    const pcsStr=(c.pcsKW/1000).toFixed(2)+'MW';
+    const covH=((c.coverageHigh||0)*100).toFixed(0)+'%';
+    const pb=(c.payback||0).toFixed(1)+'年';
+    const score=(c.score||0).toFixed(3);
+    html+=`<tr style="background:${bg}">`;
+    html+=`<td style="padding:6px 8px;text-align:center;color:var(--text2)">${i+1}</td>`;
+    html+=`<td style="padding:6px 8px;color:var(--text1);font-weight:500">${c.product.name}×${c.qty}</td>`;
+    html+=`<td style="padding:6px 8px;text-align:center;color:var(--text2)">${capStr}</td>`;
+    html+=`<td style="padding:6px 8px;text-align:center;color:var(--text2)">${pcsStr}</td>`;
+    html+=`<td style="padding:6px 8px;text-align:center;color:var(--text2)">${covH}</td>`;
+    html+=`<td style="padding:6px 8px;text-align:center;color:var(--text2)">${pb}</td>`;
+    html+=`<td style="padding:6px 8px;text-align:center;color:#50c878;font-weight:600">${score}</td>`;
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById('rankingContent').innerHTML=html;
 }
 
 function renderLLMResult(R) {
