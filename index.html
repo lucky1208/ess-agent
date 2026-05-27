@@ -1531,9 +1531,19 @@ function renderWiringDiagramFromJSON(d) {
   let bY = 130;
   const bX = essX;
 
-  // From bus to BESS
-  s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+30}" class="wa" style="stroke:#50c878" marker-end="url(#awG)"/>`;
-  bY += 30;
+  if(is10kV) {
+    // 10kV方案: 储能从10kV母线引出
+    s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+30}" class="wa" style="stroke:#50c878" marker-end="url(#awG)"/>`;
+    bY += 30;
+  } else {
+    // 0.4kV方案: 储能从0.4kV低压母线引出(变压器二次侧之后)
+    const lvBusY = 400;
+    s+=`<line x1="${txStartX}" y1="${lvBusY-70}" x2="${txStartX}" y2="${lvBusY}" class="wa" style="stroke:#a070d0"/>`;
+    s+=`<line x1="${txStartX-100}" y1="${lvBusY}" x2="${bX+50}" y2="${lvBusY}" stroke="#a070d0" stroke-width="5" stroke-linecap="round"/>`;
+    s+=`<text x="${(txStartX+bX)/2}" y="${lvBusY-8}" text-anchor="middle" class="ls" style="fill:#c090e0">0.4kV低压母线</text>`;
+    s+=`<line x1="${bX}" y1="${lvBusY}" x2="${bX}" y2="${lvBusY+20}" class="wa" style="stroke:#50c878" marker-end="url(#awG)"/>`;
+    bY = lvBusY + 20;
+  }
 
   // 并网柜
   s+=`<rect x="${bX-70}" y="${bY}" width="140" height="55" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="2"/>`;
@@ -2831,8 +2841,10 @@ function renderArchSvg(R){
     loadBottomY=Math.max(loadBottomY,txY+85+55);
   }
   const ex=660;
-  s+=`<line x1="${ex}" y1="${busY+36}" x2="${ex}" y2="${txY}" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>`;
-  s+=`<text x="${ex}" y="${busY+48}" text-anchor="middle" fill="#50c878" font-size="9" font-weight="bold">储能支路</text>`;
+  if(is10kV){
+    s+=`<line x1="${ex}" y1="${busY+36}" x2="${ex}" y2="${txY}" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>`;
+    s+=`<text x="${ex}" y="${busY+48}" text-anchor="middle" fill="#50c878" font-size="9" font-weight="bold">储能支路</text>`;
+  }
   let essBottomY=txY;
   if(is10kV){
     s+=`<rect x="${ex-95}" y="${txY}" width="190" height="48" rx="8" fill="#1a2a1a" filter="url(#sh)" stroke="#50c878" stroke-width="2"/>`;
@@ -2866,10 +2878,18 @@ function renderArchSvg(R){
     s+=`<text x="${ex}" y="${curY+62}" text-anchor="middle" fill="#90d090" font-size="8">${c.product.cool}/${c.product.ip} BMS+${c.product.fire}</text>`;
     essBottomY=curY+75;
   }else{
-    s+=`<rect x="${ex-95}" y="${txY}" width="190" height="40" rx="8" fill="#1a2a1a" filter="url(#sh)" stroke="#50c878" stroke-width="1.5"/>`;
-    s+=`<text x="${ex}" y="${txY+16}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能0.4kV并网柜</text>`;
-    s+=`<text x="${ex}" y="${txY+34}" text-anchor="middle" fill="#60a060" font-size="9">断路器+逆功率保护</text>`;
-    let curY=txY+40+15;s+=`<line x1="${ex}" y1="${txY+40}" x2="${ex}" y2="${curY}" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>`;
+    const lvBusY=txY+85+55+15;
+    s+=`<line x1="${180}" y1="${txY+85+55}" x2="${180}" y2="${lvBusY}" stroke="#a070d0" stroke-width="2"/>`;
+    s+=`<line x1="60" y1="${lvBusY}" x2="${ex+50}" y2="${lvBusY}" stroke="#a070d0" stroke-width="5" stroke-linecap="round"/>`;
+    s+=`<text x="${(180+ex)/2}" y="${lvBusY-8}" text-anchor="middle" fill="#c090e0" font-size="9">0.4kV低压母线</text>`;
+    for(let i=0;i<P.txCount;i++){const x=180+i*txSpacing;
+      s+=`<line x1="${x}" y1="${txY+85+55}" x2="${x}" y2="${lvBusY}" stroke="#a070d0" stroke-width="2"/>`;
+    }
+    s+=`<line x1="${ex}" y1="${lvBusY}" x2="${ex}" y2="${lvBusY+20}" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>`;
+    s+=`<rect x="${ex-95}" y="${lvBusY+20}" width="190" height="40" rx="8" fill="#1a2a1a" filter="url(#sh)" stroke="#50c878" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${lvBusY+36}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能0.4kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${lvBusY+54}" text-anchor="middle" fill="#60a060" font-size="9">断路器+逆功率保护</text>`;
+    let curY=lvBusY+20+40+15;s+=`<line x1="${ex}" y1="${lvBusY+60}" x2="${ex}" y2="${curY}" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>`;
     s+=`<rect x="${ex-100}" y="${curY}" width="200" height="48" rx="8" fill="url(#gPCS)" filter="url(#sh)"/>`;
     s+=`<text x="${ex}" y="${curY+18}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
     s+=`<text x="${ex}" y="${curY+38}" text-anchor="middle" fill="#ffc0c0" font-size="9">AC400V↔DC${c.product.volt}V P/Q</text>`;
@@ -2961,7 +2981,17 @@ function renderWiringSvg(R){
     s+=`<text x="${x}" y="${busY+258}" text-anchor="middle" fill="#8060a0" font-size="8">电机/产线 ~${loadKW}kW</text>`;
   }
   const ex=580;
-  s+=`<line x1="${ex}" y1="${busY}" x2="${ex}" y2="${busY+35}" stroke="#50c878" stroke-width="2.5"/>`;
+  if(P.use10kV){
+    s+=`<line x1="${ex}" y1="${busY}" x2="${ex}" y2="${busY+35}" stroke="#50c878" stroke-width="2.5"/>`;
+  }else{
+    const lvBusTopY=busY+220+50+15;
+    s+=`<line x1="80" y1="${lvBusTopY}" x2="${ex+50}" y2="${lvBusTopY}" stroke="#a070d0" stroke-width="5" stroke-linecap="round"/>`;
+    s+=`<text x="${(250+ex)/2}" y="${lvBusTopY-8}" text-anchor="middle" fill="#c090e0" font-size="9">0.4kV低压母线</text>`;
+    for(let i=0;i<P.txCount;i++){const x=250+i*txSpacing;
+      s+=`<line x1="${x}" y1="${busY+270}" x2="${x}" y2="${lvBusTopY}" stroke="#a070d0" stroke-width="2"/>`;
+    }
+    s+=`<line x1="${ex}" y1="${lvBusTopY}" x2="${ex}" y2="${lvBusTopY+20}" stroke="#50c878" stroke-width="2.5"/>`;
+  }
   if(P.use10kV){
     s+=`<rect x="${ex-70}" y="${busY+35}" width="140" height="55" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="2"/>`;
     s+=`<text x="${ex}" y="${busY+55}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能${hv}kV并网柜</text>`;
@@ -3019,11 +3049,13 @@ function renderWiringSvg(R){
     s+=`<text x="${ex+175}" y="${nextY+58}" text-anchor="middle" fill="#6060a0" font-size="7">电芯→簇→系统</text>`;
     s+=`<line x1="${ex+120}" y1="${nextY+45}" x2="${ex+130}" y2="${nextY+45}" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
   }else{
-    s+=`<rect x="${ex-70}" y="${busY+35}" width="140" height="45" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="1.5"/>`;
-    s+=`<text x="${ex}" y="${busY+53}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能${lvKv}kV并网柜</text>`;
-    s+=`<text x="${ex}" y="${busY+71}" text-anchor="middle" fill="#60a060" font-size="9">断路器+逆功率保护</text>`;
-    s+=`<line x1="${ex}" y1="${busY+80}" x2="${ex}" y2="${busY+115}" stroke="#e06070" stroke-width="2"/>`;
-    let nextY=busY+115;
+    const lvBusTopY=busY+220+50+15;
+    const cabY=lvBusTopY+20;
+    s+=`<rect x="${ex-70}" y="${cabY}" width="140" height="45" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${cabY+18}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能${lvKv}kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${cabY+36}" text-anchor="middle" fill="#60a060" font-size="9">断路器+逆功率保护</text>`;
+    s+=`<line x1="${ex}" y1="${cabY+45}" x2="${ex}" y2="${cabY+75}" stroke="#e06070" stroke-width="2"/>`;
+    let nextY=cabY+75;
     s+=`<rect x="${ex-90}" y="${nextY}" width="180" height="55" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/>`;
     s+=`<text x="${ex}" y="${nextY+20}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
     s+=`<text x="${ex}" y="${nextY+40}" text-anchor="middle" fill="#ffc0c0" font-size="10">AC400V↔DC${c.product.volt}V | 并网P/Q</text>`;
