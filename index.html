@@ -529,6 +529,202 @@ function selectEquipment(P){
   return{candidates,params:{...P,totalTxKVA,dailyHigh,dailyLow,peakKwhHigh,peakKwhLow,use10kV}};
 }
 
+const ESS_DIAGRAM_SKILL_V3 = `
+# ═════════════════════════════════════════════════════════════════════════════
+# 储能系统电气图绘制专业Skill v3.0（核心规则摘要）
+# 来源：energy-storage-diagram-skill-v3.md
+# ═════════════════════════════════════════════════════════════════════════════
+
+## SKILL-1：适用标准体系
+- 所有电气图符号必须以GB/T 4728.1~13为准（等效IEC 60617）
+- 图框标题栏：GB/T 6988.1~5，CAD/SVG图层：GB/T 18135
+- 储能电站总平面/一次系统：GB 51048
+- 系统参数标注依据：GB/T 36558，电池参数：GB/T 36276，BMS架构：GB/T 34131
+- 并网点(PCC)参数：GB/T 36547，配电回路：GB 50052，低压侧：GB 50054
+- 继电保护：GB/T 50062，接地：GB 50065
+- 控制策略标注：DL/T 2246，EMS/SCADA：DL/T 2528
+
+## SKILL-2：八类图核心规则摘要
+
+### 2.1 系统框图（System Block Diagram）
+定位：概念性架构，面向决策层
+必须包含：
+- 能量主回路（粗实线+双向箭头表示充放电）
+- 信息/控制回路（虚线，区分于能量回路）
+- 各子系统边界框（矩形，层级嵌套表达包含关系）
+- 关键参数（电压等级、容量/功率、PCC位置）
+- 保护层级分区
+布局：纵向4层 — Layer4:电网→Layer3:配电母线(负荷/储能支路)→Layer2:PCS/变流器→Layer1:BESS电池舱
+符号：电源=平行线+电压标注，变压器=双圆圈(△/Y0)，母线≥3倍粗，PCS=矩形框+功率，BESS=矩形框+容量+单簇串数，EMS=虚线矩形包围被控设备，双向箭头=充电⇄放电
+禁止：❌框图出现具体开关符号 ❌能量流和信息流同种线型 ❌不标注电压等级 ❌缺失EMS控制域虚线框
+
+### 2.2 电气一次接线图（Single-Line Diagram, SLD）
+定位：工程设计核心文件，施工图和审图用。必须符合GB/T 4728。
+电气间隔层级：
+【10kV进线间隔】隔离开关QS→避雷器F→PT(计量)→CT(保护/测量)→断路器QF→10kV母线
+【10kV母线】出线间隔1:QF2→CT→电缆→变压器T1 | 出线间隔2:QF3→CT→电缆→T2
+【变压器出线】T1(△/Y0)→0.4kV侧总断路器QF→低压母线
+【低压/直流储能区】PCS支路:QF-AC→CT→PCS→QF-DC→FU-DC→KM-DC→高压箱→电池簇
+【电池簇内部】高压箱(BCP):主正接触器KM+、主负KM-、预充回路KM-pre+R-pre、熔断器FU+/FU-、BMS从控(BCMU)
+
+GB/T 4728强制符号：
+断路器QF:矩形□内斜线"/"  |  隔离开关QS:矩形□内刀片无斜线  |  熔断器FU:矩形□内S形线
+接触器KM:半圆触点  |  变压器TM:双圆圈⊙ 一次侧△ 二次侧Y0  |  CT:圆圈穿过主回路
+PT:双圆圈  |  避雷器F:△+接地  |  接地PE:三条渐短平行线  |  PCS:矩形标注AC/DC
+
+每条线路必须标注：中压电缆=型号+芯数×截面积(如ZR-YJV22-8.7/15kV 3×95mm²)，低压交流电缆=型号+芯数×截面积，直流电缆=型号+芯数×截面积，断路器=额定电流+短路分断能力，变压器=容量+变比+接线组别+阻抗%，PCS=额定功率+AC/DC电压范围，CT=变比+准确级，PT=变比+准确级
+
+### 2.3 控制二次接线图
+二次回路线型：保护=实粗线红色，控制=实细线蓝色，信号=虚线绿色，测量=点线黄色，通信=长虚线，电源=双实线
+储能专项必须表达：PCS紧急停机ESD(独立硬接线)、消防联动停机(硬接线非通信)、BMS故障分级停机(1级降功率→2级停机→3级急停)、防孤岛保护逻辑
+
+### 2.4 通信拓扑图
+4层架构：云端(MQTT/HTTP/4G)→站控层(EMS/HMI,Modbus TCP/IEC61850)→间隔层(PCS/BMS/电表/保护,RS485/CAN)→设备层(BMU菊花链/CAN)
+RS485强制：标A/B极性、末端120Ω终端电阻、手拉手连接(禁星型)
+CAN强制：两端各120Ω终端电阻、标CAN_H/CAN_L/GND、支线长度≤0.3m@1Mbps
+
+### 2.5~2.8 端子排图/接地/光储充/保护配置（略，按需引用）
+
+## SKILL-3：储能核心设备参数速查
+
+### 电池簇典型拓扑
+| 参数 | 风冷 | 液冷 |
+| 单体电芯 | LFP 3.2V 280Ah | LFP 3.2V 314Ah |
+| 电池模组 | 1P52S (166.4V) | 1P48S (153.6V) |
+| RACK(簇) | 8模组串,1P416S | 8模组串,1P384S |
+| 电池舱 | 2×8簇并,5.016MWh | 2×10簇并,约6MWh |
+
+### PCS拓扑
+| 类型 | 场景 | 画法 |
+| 单级DC/AC | ≤1MW | 一个PCS块 |
+| 双级DC/DC+DC/AC | 宽电压范围 | DC/DC块+DC/AC块串联 |
+| 高压级联 | 10kV直挂 | 每相一串H桥模块,无需变压器 |
+
+### BMS三层架构
+BAMU(站控级)→对上EMS,对下BCMU×N：SOC/SOH汇总,充放电策略,故障分级
+BCMU(簇级)→对上BAMU(CAN/RS485),对下BMU×M：簇电压/电流,绝缘监测,接触器控制
+BMU(模组级)→对上BCMU(菊花链/CAN)：电芯电压(每颗),电芯温度(多点),均衡管理
+
+### 高压箱(BCP)内部结构
+电池簇正极→FU1(正极熔断器)→KM1(主正接触器)→Hall电流传感器→+直流母线→PCS
+电池簇负极→KM2(主负接触器)→Shunt/Hall→FU2(负极熔断器,可选)→-直流母线→PCS
+预充回路(并接KM1两端):+→KM-pre→R-pre→+
+绝缘监测:平衡电桥在+→地和-→地之间检测
+
+## SKILL-4：SVG工程制图规范
+
+### 全局CSS变量(颜色体系)
+电力线: --line-hv-ac:#EF4444(高压≥1kV红), --line-lv-ac:#F59E0B(低压<1kV), --line-dc:#00D4FF(直流主回路), --line-aux:#64748B(辅助电源)
+通信线: --comm-ethernet:#1E90FF, --comm-rs485:#22C55E, --comm-can:#A78BFA, --comm-fiber:#F97316
+保护回路: --prot-hardwire:#EF4444(硬接线红), --prot-trip:#DC2626, --prot-signal:#10B981
+分区背景: --zone-hv:rgba(239,68,68,0.06), --zone-lv:rgba(245,158,11,0.05), --zone-dc:rgba(0,212,255,0.06), --zone-ctrl:rgba(167,139,250,0.06)
+线条粗细: --line-busbar:6px, --line-main:2.5px, --line-branch:2px, --line-control:1.5px, --line-signal:1px
+字号: --fs-title:16px, --fs-section:14px, --fs-device:13px, --fs-param:11px, --fs-note:10px, --fs-code:11px
+
+### 交叉点处理（极其重要）
+导线交叉且连接：必须画实心圆点●(直径≥3px)
+导线交叉不连接：必须画跨弧（半圆弧跳过）
+绝对禁止：两条线直接画十字┼（读者无法判断是否连接）
+
+### viewBox规范
+| 图类型 | viewBox | 方向 |
+| 系统框图 | 900×600 | 纵向 |
+| 一次接线图(小型) | 900×750 | 纵向 |
+| 一次接线图(大储) | 1200×900 | 纵向 |
+| 二次接线图 | 1000×700 | 横向 |
+| 通信拓扑图 | 900×650 | 星型居中 |
+| 光储充一体化 | 1000×800 | 纵向 |
+
+### 图框标题栏（每张图必须包含）
+<g id="title-block">底部: 图名(14px加粗) | 项目名称 | 图号+版本+日期 | 设计单位</g>
+
+### 图例框
+<g id="legend">右下角: 主电力线/RS485通信/消防硬接线 等图例条目</g>
+
+## SKILL-5：布局坐标工程计算
+
+### 坐标推导总公式
+viewBox=(0,0,W,H), 列数=N_cols, 行数=N_rows
+列中心X[i] = gap_x + (i-1)×(ew + gap_x) + ew/2
+行中心Y[j] = top_margin + (j-1)×(eh + gap_y) + eh/2
+gap_x = (W - N_cols×ew - 2×margin_x) / (N_cols + 1)
+gap_y = (H - N_rows×eh - top_margin - bottom_margin - legend_height) / N_rows
+验证: N_cols×ew + (N_cols-1)×gap_x + 2×margin ≤ W
+
+### 箭头连接精确坐标
+垂直连接(A→B): P1=(A.cx, A.cy+A.h/2), P2=(B.cx, B.cy-B.h/2-arrow_offset), arrow_offset=markerHeight+2px
+水平连接(A→B): P1=(A.cx+A.w/2, A.cy), P2=(B.cx-B.w/2-arrow_offset, B.cy)
+
+### 文字框尺寸推导
+矩形框最小宽度 = 汉字数×font_size×1.0 + 英文数×font_size×0.65 + 32
+标准单行框: w≥max(text_width+32,140), h=40或48
+标准双行框: w≥max(text_width+32,160), h=56或64
+
+### EMS/BMS虚线控制域精确包围
+围框.x=MIN(所有被围元素.x)-20, 围框.y=MIN(所有被围元素.y)-16
+围框.w=MAX(元素.x+元素.w)-围框.x+20, 围框.h=MAX(元素.y+元素.h)-围框.y+16
+
+### Z轴绘制顺序（必须严格遵守）
+Layer1:背景色 → Layer2:分区色块 → Layer3:母线 → Layer4:主回路连接线+箭头 → Layer5:设备符号框 → Layer6:设备文字 → Layer7:控制通信虚线 → Layer8:标注引线+旁注 → Layer9:图例+标题栏
+
+## SKILL-6：标准化SVG符号库（GB/T 4728）
+
+### 断路器QF(07-13-05)
+<g id="sym-QF">: 主回路进出线 → 方框28×14 → 斜线"/" → 编号QF{N}
+
+### 隔离开关QS(07-13-06)
+<g id="sym-QS">: 进出线 → 刀片(无斜线) → 编号QS{N}
+
+### 变压器TM(06-09-01)
+<g id="sym-TR">: 一次绕组(圆圈+△) → 二次绕组(圆圈+Y0) → 接线组别Dyn11
+
+### CT(06-14-01)
+<g id="sym-CT">: 主回路穿过(粗线) → 圆圈 → 二次引出(虚线) → 变比500/5A
+
+### PT(06-13-01)
+<g id="sym-PT">: 进出线 → 双圆圈 → 变比10/0.1kV
+
+### 熔断器FU(07-21-01)
+<g id="sym-FU">: 进出线 → 方框16×24 → S形熔丝曲线 → 编号FU{N}
+
+### 避雷器F(07-22-03)
+<g id="sym-F">: 进线 → 三角形 → 接地符号(三渐短线)
+
+### PCS组件框
+<g id="comp-PCS">: 矩形180×56, fill=rgba(0,212,255,0.08), stroke=#00d4ff → "PCS储能变流器" + "AC⇄DC"
+
+### BESS电池舱框
+<g id="comp-BESS">: 矩形220×72, fill=rgba(34,197,94,0.06), stroke=#22c55e → "电池储能系统BESS" + 容量/额定电压 + 簇数/单簇配置
+
+### 高压箱BCP框
+<g id="comp-BCP">: 矩形160×60, 虚线stroke-dasharray="5 3", stroke=#a78bfa → "高压箱BCP" + "KM+/KM-/KM-pre"
+
+### EMS控制域虚线框
+<g id="comp-EMS-zone">: 虚线矩形stroke-dasharray="8 4", stroke=#f59e0b → "EMS控制域"标签
+
+## SKILL-7：BMS与PCS关键交互信号
+| 信号 | 方向 | 类型 | 强制性 |
+| BMS允许充/放电 | BMS→PCS | 通信+CAN | 强制 |
+| PCS请求充/放功率 | PCS→BMS | 通信 | 强制 |
+| BMS限制功率(降额) | BMS→PCS | 通信 | 强制 |
+| BMS紧急停机 | BMS→PCS | 硬接线 | 强制(安全) |
+| 消防联动停机 | FSS→BMS/PCS | 硬接线 | 安全强制 |
+
+## SKILL-8：安全停机层级
+Level1预警:电芯温差>5°C,SOC越限,绝缘下降,通信丢包 → 仅报警
+Level2降功率:电芯温度>45°C,SOC<5%或>95%,绝缘严重下降 → 限功率至50%
+Level3紧急停机:电芯温度>55°C,电压<2.0V或>3.65V,绝缘极低 → 立即停机+断开交直流断路器
+Level4紧急切除:火灾确认(烟+温),可燃气体超标,手动急停 → 消防联动+所有断路器跳闸
+关键:消防联动FSS必须硬接线,不可依赖通信/PLC/软件判断
+
+## SKILL-9：常见致命错误（必须避免）
+符号错误:❌断路器没斜线变成隔离开关 ❌隔离开关画斜线变成断路器 ❌变压器不标接线组别 ❌避雷器不画接地
+线路错误:❌交叉点既不画点也不画弧 ❌母线画成普通线宽(必须≥3倍粗) ❌能量线和通信线都用实线
+标注错误:❌不标元件编号 ❌CT不标变比 ❌电缆不标截面积 ❌变压器参数不全
+安全错误(最严重):❌消防联动仅靠通信无硬接线 ❌直流侧没有熔断器 ❌漏画ESD急停回路 ❌防孤岛保护不标注 ❌绝缘监测不标注
+SVG专项:❌坐标靠估算不靠计算 ❌箭头终点不偏移 ❌Z轴顺序混乱 ❌虚线框位置估算 ❌文字宽度不估算(汉字=font_size×1.0,英文=font_size×0.6)
+`;
+
 const ESS_DRAWING_RULES = `
 # ═══════════════════════════════════════════════════════════
 # 储能系统图纸绘制规则（强制遵守，违反将导致图纸不可用）
@@ -745,6 +941,8 @@ const ESS_SYSTEM_PROMPT = `你是一个工商业储能系统解决方案AI智能
 archDiagram, wiringDiagram, wiringDiagram2 中的节点和连接定义了图纸元素。前端会按国标电气制图规则渲染SVG。
 
 ${ESS_DRAWING_RULES}
+
+${ESS_DIAGRAM_SKILL_V3}
 `;
 
 async function callLLM(messages, useStream) {
@@ -817,6 +1015,7 @@ async function generateSolution() {
     userPrompt.split('\n').forEach(line => { if(line.trim()) addLog(line, ''); });
     addLog('─── 输入结束 ───', 'step');
     addLog('画图规则: ' + ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).length + '条已注入system prompt', 'step');
+    addLog('Skill v3规则: ' + ESS_DIAGRAM_SKILL_V3.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).length + '条已注入system prompt', 'step');
     addLog(`调用${provider.toUpperCase()} API...`, 'step');
     const messages = [
       { role: 'system', content: ESS_SYSTEM_PROMPT },
