@@ -88,10 +88,26 @@ export default async function handler(req, res) {
       if (msg.reasoning_content && !msg.content) {
         msg.content = msg.reasoning_content;
       }
-      if (msg.content && msg.reasoning_content) {
-        const jsonMatch = msg.content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          msg.content = jsonMatch[0];
+      if (msg.content) {
+        let c = msg.content.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+        if (!c.startsWith('{')) {
+          const jsonMatch = c.match(/\{[\s\S]*\}/);
+          if (jsonMatch) c = jsonMatch[0];
+        }
+        try {
+          JSON.parse(c);
+          msg.content = c;
+        } catch (e) {
+          const allJsons = [];
+          const re = /\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}/g;
+          let m;
+          while ((m = re.exec(c)) !== null) {
+            try { allJsons.push({json: JSON.parse(m[0]), len: m[0].length}); } catch(e2) {}
+          }
+          if (allJsons.length > 0) {
+            allJsons.sort((a,b) => b.len - a.len);
+            msg.content = JSON.stringify(allJsons[0].json);
+          }
         }
       }
     }

@@ -966,7 +966,7 @@ function buildUserPrompt() {
   let prompt = `## 场地信息\n`;
   prompt += `- 项目名称: ${P.projName}\n- 地址: ${P.projAddr}\n- 区域: ${P.region}\n`;
   prompt += `## 变压器配置\n- 单台容量: ${P.txCap}kVA\n- 数量: ${P.txCount}台\n- 电压: ${P.txHv}kV/${P.txLv}V\n- 联结组别: ${P.txVector}\n- 短路阻抗: ${P.txZk}%\n- 有10kV配电室: ${P.use10kV ? '是' : '否'}\n`;
-  prompt += `## 用电负荷\n- 月用电旺季: ${P.loadMonthHigh}万kWh\n- 月用电淡季: ${P.loadMonthLow}万kWh\n- 最大负荷: ${P.loadMax}kW\n- 功率因数: ${P.pf}\n- 年工作天数: ${P.workDays}\n`;
+  prompt += `## 用电负荷\n- 月用电旺季: ${(P.loadMonthHigh/10000).toFixed(0)}万kWh\n- 月用电淡季: ${(P.loadMonthLow/10000).toFixed(0)}万kWh\n- 最大负荷: ${P.loadMax}kW\n- 功率因数: ${P.pf}\n- 年工作天数: ${P.workDays}\n`;
   prompt += `## 峰谷电价\n- 峰段: ${P.pricePeak}元/kWh (${P.hoursPeak}h)\n- 谷段: ${P.priceValley}元/kWh\n- 平段: ${P.priceFlat}元/kWh\n- 峰谷差: ${(P.pricePeak - P.priceValley).toFixed(3)}元/kWh\n`;
   if (sn) prompt += `## 特别说明\n${sn}\n`;
   prompt += `\n请根据以上信息，给出完整的储能系统配置方案。`;
@@ -1046,9 +1046,22 @@ async function generateSolution() {
       result = JSON.parse(jsonStr);
       addLog('JSON解析成功 ✓', 'ok');
     } catch (e) {
-      addLog('LLM输出非标准JSON, fallback到规则引擎', 'warn');
-      result = selectEquipment(P);
-      result._llmRaw = content;
+      addLog('JSON.parse失败: ' + e.message, 'warn');
+      addLog('尝试修复JSON...', 'step');
+      try {
+        let jsonStr2 = content.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+        const jsonMatch2 = jsonStr2.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
+        if (jsonMatch2) {
+          result = JSON.parse(jsonMatch2[0]);
+          addLog('修复后JSON解析成功 ✓', 'ok');
+        } else {
+          throw new Error('无法提取JSON');
+        }
+      } catch (e2) {
+        addLog('LLM输出非标准JSON, fallback到规则引擎', 'warn');
+        result = selectEquipment(P);
+        result._llmRaw = content;
+      }
     }
     result._llmSource = true;
     LAST_RESULT = result;
