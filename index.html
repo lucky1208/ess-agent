@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <style>
 :root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -373,7 +372,7 @@ ACC AC一体柜专题
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">并网运行</b>(PQ控制): 削峰填谷 + 需量管理 + 光伏MPPT</p>
 <p>↓ 检修/调度指令 或 电网故障/电能质量越限</p>
-<p><b style="color:#e06070)">离网运行</b>(V/f控制): 储能承担主电源 + 柴发后备 + 切除非关键负荷</p>
+<p><b style="color:#e06070">离网运行</b>(V/f控制): 储能承担主电源 + 柴发后备 + 切除非关键负荷</p>
 <p>→ 并离网切换 &lt;20ms (关键负荷不断电)</p>
 <p>→ 电网恢复 → 同期检测(幅值/频率/相位匹配) → 重新并网</p>
 </div>
@@ -476,7 +475,7 @@ ACC AC一体柜专题
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">Layer 1 - 日前调度(MILP):</b> 24h经济调度计划，15min粒度，考虑负荷/光伏预测</p>
 <p><b style="color:var(--orange)">Layer 2 - 日内滚动(MPC):</b> 1~4h滚动优化，修正预测偏差，5min粒度</p>
-<p><b style="color:#e06070)">Layer 3 - 实时控制(AGC):</b> 秒级功率跟踪，频率/电压调节，紧急功率分配</p>
+<p><b style="color:#e06070">Layer 3 - 实时控制(AGC):</b> 秒级功率跟踪，频率/电压调节，紧急功率分配</p>
 <p><b style="color:#50c878">Layer 4 - 本地自治:</b> 边缘网关就地逻辑，通信中断时独立运行，削峰填谷/防逆流</p>
 </div>
 </div>
@@ -507,7 +506,8 @@ ACC AC一体柜专题
 </div>
 
 <script>
-mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#185FA5',primaryTextColor:'#FAFAF5',primaryBorderColor:'#3a3e45',lineColor:'#C2C0B6',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px'},flowchart:{htmlLabels:true,curve:'basis'},sequence:{actorMargin:50,messageMargin:40}});
+function loadMermaid(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';s.onload=function(){mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#185FA5',primaryTextColor:'#FAFAF5',primaryBorderColor:'#3a3e45',lineColor:'#C2C0B6',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px'},flowchart:{htmlLabels:true,curve:'basis'},sequence:{actorMargin:50,messageMargin:40}});};document.head.appendChild(s);}
+loadMermaid();
 const MERMAID_DEFS = {
   'mm-1': `graph TB
     subgraph Grid["⚡ 大电网 (10kV/35kV)"]
@@ -903,6 +903,10 @@ const MERMAID_DEFS = {
 };
 
 async function renderMermaid(containerId){
+  if(typeof mermaid==='undefined'||!mermaid.render){
+    setTimeout(renderMermaid,500);
+    return;
+  }
   const containers = containerId
     ? [document.getElementById(containerId)]
     : document.querySelectorAll('[id^="mm-"]');
@@ -912,7 +916,7 @@ async function renderMermaid(containerId){
       const {svg}=await mermaid.render(el.id+'-svg',MERMAID_DEFS[el.id]);
       el.innerHTML=svg;
       el.dataset.rendered='1';
-    }catch(e){el.innerHTML='<pre style="color:#e06070;font-size:11px">'+e.message+'</pre>';}
+    }catch(e){el.innerHTML='<pre style="color:#e06070;font-size:11px">'+e.message+'</pre>';el.dataset.rendered='1';}
   }
 }
 
