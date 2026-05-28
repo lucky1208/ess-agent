@@ -19,6 +19,14 @@ a{color:var(--blue);text-decoration:none}
 .nav-tab{padding:14px 22px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .3s;font-size:14px}
 .nav-tab:hover{color:var(--text1)}
 .nav-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.category-tabs{display:flex;gap:0;background:var(--bg1);border-bottom:1px solid var(--border);padding:0 32px}
+.category-tab{padding:10px 28px;cursor:pointer;color:var(--text2);border-bottom:3px solid transparent;transition:all .3s;font-size:15px;font-weight:600}
+.category-tab:hover{color:var(--text1)}
+.category-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.sub-tabs{display:flex;gap:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px}
+.sub-tab{padding:10px 18px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .3s;font-size:13px}
+.sub-tab:hover{color:var(--text1)}
+.sub-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
 .main-container{min-height:calc(100vh - 110px)}
 .sec-title{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text1);display:flex;align-items:center;gap:8px}
 .sec-title svg{width:18px;height:18px;color:var(--blue)}
@@ -120,12 +128,27 @@ select.form-input{appearance:auto}
 </div>
 </header>
 
+<nav class="category-tabs">
+<div class="category-tab active" onclick="switchCategory('ess')">储能系统生成器</div>
+<div class="category-tab" onclick="switchCategory('microgrid')">微网系统生成器</div>
+</nav>
+
+<div id="essNav">
 <nav class="nav-tabs">
 <div class="nav-tab active" onclick="showPage('devices')" data-i18n="nav_devices">设备库</div>
 <div class="nav-tab" onclick="showPage('config')" data-i18n="nav_input">用户输入</div>
 <div class="nav-tab" onclick="showPage('diagrams')" data-i18n="nav_diagrams">生成图纸</div>
 <div class="nav-tab" onclick="showPage('cases')" data-i18n="nav_cases">应用案例</div>
 </nav>
+</div>
+
+<div id="microgridNav" style="display:none">
+<nav class="sub-tabs">
+<div class="sub-tab active" onclick="showMicroPage('mg-arch')">微网架构</div>
+<div class="sub-tab" onclick="showMicroPage('mg-ems')">微网能量管理</div>
+<div class="sub-tab" onclick="showMicroPage('mg-schedule')">微网调度优化</div>
+</nav>
+</div>
 
 <div class="main-container">
 
@@ -308,6 +331,146 @@ ACC AC一体柜专题
 </main>
 </div>
 
+<!-- ========== MICROGRID PAGES ========== -->
+<div id="page-mg-arch" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">微网(Microgrid) 架构全景图</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">基于Microgrid_Architecture.md | 设计人：卢继雄</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 一、微网电力拓扑总览（交流微网）</h3>
+<div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
+<p><b style="color:var(--blue)">⚡ 大电网</b> → <b style="color:var(--orange)">🔌 PCC并网开关柜(断路器QF01) + 双向关口表(0.2S级)</b> → <b style="color:var(--orange)">🔽 主变压器 10kV/0.4kV 2000kVA Dyn11</b> → <b style="color:var(--text1)">🔹 AC 400V母线(三相四线+PE)</b></p>
+<p style="margin-top:8px"><b style="color:#50c878">☀️ 光伏系统:</b> 550Wp组件阵列 → 组串式逆变器(MPPT) → AC 400V并网</p>
+<p><b style="color:#50c878">🔋 储能BESS:</b> 10MW/20MWh eBlock能量块 → PCS组(100kW×N) → AC 400V</p>
+<p><b style="color:#50c878">🛢️ 柴发:</b> 500kW备用 → ATS切换 → AC 400V</p>
+<p style="margin-top:8px"><b style="color:var(--text1)">💡 负荷:</b> 关键负荷(数据中心/核心产线/消防) + 可调节负荷(空调/照明/非核心产线)</p>
+<p><b style="color:#a070a0">🛡️ 保护:</b> 综保继电器(过流/速断/零序) + 防孤岛AFD + 电能质量监测</p>
+</div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 二、交直流混合微网架构（推荐方案）</h3>
+<div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
+<p><b style="color:var(--blue)">市电侧</b> → 10kV电网 → 主变 → PCC开关 → <b style="color:var(--orange)">AC 400V子网</b>(电机/照明等交流负荷)</p>
+<p><b style="color:#50c878">DC 750V直流子网:</b> 光伏→DC/DC升压(1100→750V) + 储能直挂DC(768V↔750V) + 充电桩/数据中心</p>
+<p><b style="color:#e06070">🔄 AC/DC互联变换器:</b> 双向400V↔750V 功率路由器，能量互通</p>
+</div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 三、四种典型微网拓扑对比</h3>
+<table class="result-table" style="font-size:12px"><tr><th>方案</th><th>拓扑</th><th>优点</th><th>缺点</th><th>适用场景</th></tr>
+<tr><td><b>A: 交流微网</b></td><td>电网→变压器→AC Bus→负荷</td><td>技术成熟、设备可选多</td><td>多次AC/DC变换损耗</td><td>最常见，工商业</td></tr>
+<tr><td><b>B: 直流微网</b></td><td>电网→AC/DC→DC Bus→负荷</td><td>光伏/储能直挂效率高</td><td>DC保护技术不成熟</td><td>数据中心/充电站</td></tr>
+<tr style="background:rgba(15,110,86,.06)"><td><b style="color:#50c878">C: 交直流混合 ★</b></td><td>AC Bus↔DC Bus双向</td><td>兼顾AC/DC优势</td><td>系统复杂度较高</td><td>光储充综合园区</td></tr>
+<tr><td><b>D: 多微网集群</b></td><td>微网间联络线互联</td><td>高可靠性、能量互助</td><td>协调控制最复杂</td><td>工业园区/校园</td></tr>
+</table>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 四、微网运行模式切换</h3>
+<div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
+<p><b style="color:var(--blue)">并网运行</b>(PQ控制): 削峰填谷 + 需量管理 + 光伏MPPT</p>
+<p>↓ 检修/调度指令 或 电网故障/电能质量越限</p>
+<p><b style="color:#e06070)">离网运行</b>(V/f控制): 储能承担主电源 + 柴发后备 + 切除非关键负荷</p>
+<p>→ 并离网切换 &lt;20ms (关键负荷不断电)</p>
+<p>→ 电网恢复 → 同期检测(幅值/频率/相位匹配) → 重新并网</p>
+</div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 五、关键参数速查</h3>
+<table class="result-table" style="font-size:11px"><tr><th>类别</th><th>参数</th><th>典型值</th><th>说明</th></tr>
+<tr><td>电网侧</td><td>并网电压</td><td>10kV/35kV</td><td>视项目容量</td></tr>
+<tr><td></td><td>关口表精度</td><td>0.2S级</td><td>双向计量</td></tr>
+<tr><td>变压器</td><td>容量/接线</td><td>2000kVA Dyn11</td><td>按最大负荷+储能充电</td></tr>
+<tr><td>储能</td><td>额定容量</td><td>10MW/20MWh</td><td>0.5C充放电倍率</td></tr>
+<tr><td></td><td>SOC范围</td><td>10%~90%</td><td>保护电池寿命</td></tr>
+<tr><td>保护</td><td>孤岛检测</td><td>&lt;2s</td><td>IEEE 1547</td></tr>
+<tr><td></td><td>并离网切换</td><td>&lt;20ms</td><td>关键负荷不断电</td></tr>
+</table>
+</div>
+</div>
+
+<div id="page-mg-ems" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">eBlock 微网能量管理系统(EMS)架构</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">基于eBlock_EMS_Architecture.md | 设计人：卢继雄</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 一、总体架构（四层）</h3>
+<div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
+<p><b style="color:var(--blue)">☁️ 云平台层:</b> 数据中台 + AI引擎(LSTM预测/异常检测) + 运维管理 + 电力交易(现货/辅助服务/碳交易) + 大屏可视化</p>
+<p><b style="color:var(--orange)">🏭 站控层:</b> SCADA Server(双机热备) + 优化调度引擎(MILP/MPC) + AGC/AVC + 策略下发&并离网切换 + 本地HMI</p>
+<p><b style="color:#a070a0">🔗 边缘控制层:</b> ARM/x86边缘网关 + 协议转换池 + 本地自治(削峰填谷/防逆流) + 数据缓存&断点续传 + 看门狗</p>
+<p><b style="color:#50c878">⚡ 设备层:</b> eBlock能量块(PACK+BMS+PCS)×N + 光伏逆变器 + 变压器&关口表 + 柴发 + 充电桩群 + 环境传感器</p>
+</div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 二、通信协议总线</h3>
+<table class="result-table" style="font-size:11px"><tr><th>连接</th><th>协议</th><th>物理介质</th><th>实时性</th><th>用途</th></tr>
+<tr><td>云↔站控</td><td>MQTT/HTTPs</td><td>光纤/4G</td><td>秒级</td><td>数据上报/指令下发</td></tr>
+<tr><td>站控↔边缘</td><td>IEC 104</td><td>千兆以太网</td><td>1~5s</td><td>电力通信标准</td></tr>
+<tr><td>边缘↔PCS</td><td>Modbus TCP</td><td>RJ45</td><td>1~5s</td><td>功率/模式控制</td></tr>
+<tr><td>边缘↔BMS</td><td>CAN 2.0B</td><td>屏蔽双绞线</td><td>100ms</td><td>SOC/故障/保护</td></tr>
+<tr><td>边缘↔电表</td><td>Modbus RTU</td><td>RS485</td><td>1s~15min</td><td>关口功率/电量</td></tr>
+<tr><td>边缘↔保护</td><td>IEC 61850 GOOSE</td><td>以太网</td><td>&lt;4ms</td><td>快速保护联跳</td></tr>
+<tr><td>边缘↔充电桩</td><td>OCPP 1.6J</td><td>以太网</td><td>1~5s</td><td>充电调度/计费</td></tr>
+</table>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 三、单台eBlock内部架构</h3>
+<div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
+<p><b style="color:#50c878">🔋 电池PACK:</b> LFP 280Ah, 1P240S, 额定768V/215kWh → BMS从控(电压/温度采集/被动均衡) → BMS主控(SOC/SOH卡尔曼滤波/故障诊断)</p>
+<p><b style="color:var(--orange)">⚡ PCS功率模块:</b> 三相全桥IGBT 100kW DC/AC双向 ≥98.5% → PCS控制器(TI TMS320F28379D双核, PQ/VF/Droop策略, SPWM调制)</p>
+<p><b style="color:var(--blue)">🔧 热管理:</b> 液冷机组 + 水温/流量监测 + CAN通信</p>
+</div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 四、关键通信时延</h3>
+<div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
+<p><b>正常调度:</b> 云→站控(MQTT日前计划15min) → 边缘(IEC104 5s) → PCS(Modbus TCP写入功率) → 回读 → 上送 ≈ 秒级</p>
+<p><b>急停/故障:</b> BMS→CAN故障帧 → 边缘→PCS紧急停机 → 站控告警 → 云推送 ≈ 毫秒级 (PCS本地DSP硬件保护PWM闭锁&lt;10μs)</p>
+<p><b>并离网切换:</b> 站控→边缘→PCS模式切换(VF→PQ) DSP切换&lt;20ms → BMS解除联锁</p>
+</div>
+</div>
+</div>
+
+<div id="page-mg-schedule" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">微网调度优化</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">设计人：卢继雄 | 联系电话：15026953905</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 一、优化目标函数</h3>
+<div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:13px;line-height:2;color:var(--text1)">
+<p>min Σ<t=1~T> [ C_grid(t)·P_grid(t) + C_diesel(t)·P_diesel(t) + C_deg·|ΔSOC(t)| ]</p>
+<p style="font-size:11px;color:var(--text2)">其中: C_grid=电网电价, P_grid=购电功率, C_diesel=柴发成本, C_deg=电池退化成本</p>
+</div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 二、约束条件</h3>
+<table class="result-table" style="font-size:11px"><tr><th>约束</th><th>公式</th><th>说明</th></tr>
+<tr><td>功率平衡</td><td>P_grid+P_pv+P_bess+P_diesel = P_load</td><td>供需实时平衡</td></tr>
+<tr><td>SOC限制</td><td>SOC_min ≤ SOC(t) ≤ SOC_max</td><td>10% ≤ SOC ≤ 90%</td></tr>
+<tr><td>储能功率</td><td>-P_charge_max ≤ P_bess(t) ≤ P_discharge_max</td><td>充放电功率限制</td></tr>
+<tr><td>并网功率</td><td>0 ≤ P_grid(t) ≤ P_grid_max</td><td>不允许向电网倒送(防逆流)</td></tr>
+<tr><td>柴发约束</td><td>P_diesel_min ≤ P_diesel(t) ≤ P_diesel_max</td><td>≥30%额定防积碳</td></tr>
+<tr><td>联络线</td><td>|P_tie(t)| ≤ P_tie_max</td><td>多微网间功率交换限制</td></tr>
+</table>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 三、调度策略层级</h3>
+<div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
+<p><b style="color:var(--blue)">Layer 1 - 日前调度(MILP):</b> 24h经济调度计划，15min粒度，考虑负荷/光伏预测</p>
+<p><b style="color:var(--orange)">Layer 2 - 日内滚动(MPC):</b> 1~4h滚动优化，修正预测偏差，5min粒度</p>
+<p><b style="color:#e06070)">Layer 3 - 实时控制(AGC):</b> 秒级功率跟踪，频率/电压调节，紧急功率分配</p>
+<p><b style="color:#50c878">Layer 4 - 本地自治:</b> 边缘网关就地逻辑，通信中断时独立运行，削峰填谷/防逆流</p>
+</div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 四、典型调度场景</h3>
+<table class="result-table" style="font-size:11px"><tr><th>场景</th><th>策略</th><th>储能动作</th><th>柴发</th></tr>
+<tr><td>白天峰段+光伏充足</td><td>光伏优先+储能放电</td><td>放电削峰</td><td>停机</td></tr>
+<tr><td>夜间谷段</td><td>谷电充电</td><td>充电填谷</td><td>停机</td></tr>
+<tr><td>并网→离网切换</td><td>储能转V/f主电源</td><td>放电承担全部负荷</td><td>15s后启动备用</td></tr>
+<tr><td>离网运行</td><td>光储协调+柴发补充</td><td>按SOC调整出力</td><td>≥30%额定</td></tr>
+<tr><td>电网恢复</td><td>同期检测→重新并网</td><td>VF→PQ模式切换</td><td>逐步退出</td></tr>
+</table>
+</div>
+</div>
+
 <footer class="footer" data-i18n="footer_text">
 版权所有@卢继雄  请尊重知识产权
 </footer>
@@ -478,6 +641,34 @@ function showPage(id){
   if(id==='devices')renderDeviceLibrary(currentFilter);
   if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);}
   if(id==='cases')renderCases();
+}
+
+function switchCategory(cat){
+  document.querySelectorAll('.category-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.category-tab')[cat==='ess'?0:1].classList.add('active');
+  const essNav=document.getElementById('essNav');
+  const mgNav=document.getElementById('microgridNav');
+  if(cat==='ess'){
+    essNav.style.display='block';
+    mgNav.style.display='none';
+    document.querySelectorAll('.tab-content').forEach(t=>t.style.display='');
+    document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
+    showPage('devices');
+  }else{
+    essNav.style.display='none';
+    mgNav.style.display='block';
+    document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+    showMicroPage('mg-arch');
+  }
+}
+
+function showMicroPage(id){
+  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+  const subPages=['mg-arch','mg-ems','mg-schedule'];
+  document.querySelectorAll('.sub-tab')[subPages.indexOf(id)].classList.add('active');
+  document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
+  const el=document.getElementById('page-'+id);
+  if(el) el.style.display='block';
 }
 
 function v(id){return document.getElementById(id).value}
