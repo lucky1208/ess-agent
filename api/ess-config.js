@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       model: cfg.model,
       messages,
       temperature: cfg.temperature !== undefined ? cfg.temperature : 0.3,
-      max_tokens: cfg.max_tokens || 8192,
+      max_tokens: cfg.max_tokens || 16384,
       stream: !!stream
     };
     if (cfg.reasoning_effort) body.reasoning_effort = cfg.reasoning_effort;

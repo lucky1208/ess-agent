@@ -22,9 +22,9 @@ a{color:var(--blue);text-decoration:none}
 .main-container{min-height:calc(100vh - 110px)}
 .sec-title{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text1);display:flex;align-items:center;gap:8px}
 .sec-title svg{width:18px;height:18px;color:var(--blue)}
-.form-group{margin-bottom:16px}
-.form-label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px}
-.form-input{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:13px;transition:border-color .3s}
+.form-group{margin-bottom:8px}
+.form-label{display:block;font-size:11px;color:var(--text2);margin-bottom:3px}
+.form-input{width:100%;padding:5px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text1);font-size:12px;transition:border-color .3s}
 .form-input:focus{outline:none;border-color:var(--blue)}
 .form-input::placeholder{color:#666}
 select.form-input{appearance:auto}
@@ -165,7 +165,7 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="region">省份/城市</label><input type="text" class="form-input" id="region" value="黑龙江大庆"></div>
 </div>
 <div class="form-group"><label class="form-label" data-i18n="proj_addr">项目地址</label><input type="text" class="form-input" id="projAddr" placeholder="如：黑龙江大庆市高新区" value="黑龙江大庆市高新区建设路249号"></div>
-<div class="sec-title" style="font-size:13px;margin-bottom:10px;margin-top:12px">
+<div class="sec-title" style="font-size:12px;margin-bottom:4px;margin-top:6px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
 <span data-i18n="tx_config">变压器配置</span>
 </div>
@@ -182,7 +182,7 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="tx_zk">短路阻抗 (%)</label><input type="number" class="form-input" id="txZk" value="4.3" step="0.1"></div>
 </div>
 <div class="form-group"><label class="form-label" data-i18n="has_hv_room">是否有10kV配电室</label><select class="form-input" id="hasHvRoom"><option value="1" data-i18n="hv_room_yes">有（推荐10kV接入）</option><option value="0" data-i18n="hv_room_no">无（将用0.4kV接入）</option></select></div>
-<div class="sec-title" style="font-size:13px;margin-bottom:10px;margin-top:12px">
+<div class="sec-title" style="font-size:12px;margin-bottom:4px;margin-top:6px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
 <span data-i18n="load_title">用电负荷</span>
 </div>
@@ -195,7 +195,7 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="pf">功率因数</label><input type="number" class="form-input" id="pf" value="0.9" step="0.05" min="0.7" max="1"></div>
 </div>
 <div class="form-group"><label class="form-label" data-i18n="work_days">年工作天数</label><input type="number" class="form-input" id="workDays" value="300" step="10"></div>
-<div class="sec-title" style="font-size:13px;margin-bottom:10px;margin-top:12px">
+<div class="sec-title" style="font-size:12px;margin-bottom:4px;margin-top:6px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 <span data-i18n="price_title">峰谷电价</span>
 </div>
@@ -207,7 +207,7 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="price_flat">平段 (元/kWh)</label><input type="number" class="form-input" id="priceFlat" value="0.637" step="0.01"></div>
 <div class="form-group"><label class="form-label" data-i18n="hours_peak">峰段时长 (h)</label><input type="number" class="form-input" id="hoursPeak" value="8" step="1"></div>
 </div>
-<div class="form-group" style="margin-top:12px"><label class="form-label" data-i18n="llm_provider">AI模型</label>
+<div class="form-group" style="margin-top:4px"><label class="form-label" data-i18n="llm_provider">AI模型</label>
     <select class="form-input" id="llmProvider">
       <option value="local" data-i18n="llm_local">本地小模型</option>
       <option value="deepseek" data-i18n="llm_deepseek">DeepSeek V4</option>
@@ -1166,20 +1166,40 @@ async function generateSolution() {
       addLog('JSON解析成功 ✓', 'ok');
     } catch (e) {
       addLog('JSON.parse失败: ' + e.message, 'warn');
-      addLog('尝试修复JSON...', 'step');
+      addLog('尝试修复JSON（补全截断）...', 'step');
       try {
         let jsonStr2 = content.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-        const jsonMatch2 = jsonStr2.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
-        if (jsonMatch2) {
-          result = JSON.parse(jsonMatch2[0]);
-          addLog('修复后JSON解析成功 ✓', 'ok');
-        } else {
-          throw new Error('无法提取JSON');
+        if (!jsonStr2.startsWith('{')) {
+          const m = jsonStr2.match(/\{[\s\S]*/);
+          if (m) jsonStr2 = m[0];
         }
+        const openB = (jsonStr2.match(/\{/g)||[]).length;
+        const closeB = (jsonStr2.match(/\}/g)||[]).length;
+        const openSq = (jsonStr2.match(/\[/g)||[]).length;
+        const closeSq = (jsonStr2.match(/\]/g)||[]).length;
+        if (jsonStr2.endsWith('"')||(jsonStr2.endsWith('\\'))) jsonStr2 = jsonStr2.replace(/["\\]+$/, '');
+        if (!jsonStr2.endsWith('"') && !jsonStr2.endsWith('}') && !jsonStr2.endsWith(']') && !jsonStr2.endsWith(',')) jsonStr2 += ',';
+        for(let i=0;i<closeSq-openSq;i++) jsonStr2 += ']';
+        for(let i=0;i<openB-closeB;i++) jsonStr2 += '}';
+        addLog('补全: +'+(openB-closeB)+'} +'+(closeSq-openSq)+']', 'step');
+        result = JSON.parse(jsonStr2);
+        addLog('补全后JSON解析成功 ✓', 'ok');
       } catch (e2) {
-        addLog('LLM输出非标准JSON, fallback到规则引擎', 'warn');
-        result = selectEquipment(P);
-        result._llmRaw = content;
+        addLog('补全失败，尝试正则提取...', 'step');
+        try {
+          let jsonStr3 = content.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+          const jsonMatch3 = jsonStr3.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
+          if (jsonMatch3) {
+            result = JSON.parse(jsonMatch3[0]);
+            addLog('正则提取JSON解析成功 ✓', 'ok');
+          } else {
+            throw new Error('无法提取JSON');
+          }
+        } catch (e3) {
+          addLog('LLM输出非标准JSON, fallback到规则引擎', 'warn');
+          result = selectEquipment(P);
+          result._llmRaw = content;
+        }
       }
     }
     result._llmSource = true;
@@ -3402,7 +3422,9 @@ function renderTopoSvg(R){
   const prodName=c?c.product.name:'储能系统';
   const prodModel=c?c.product.model:'';
   const txCap=P.txCount&&P.txCap?P.txCount+'×'+P.txCap+'kVA':'2×1250kVA';
-  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  const pcsImg=c&&c.product.img?`images/products/${c.product.img}`:'';
+  const batImg=pcsImg;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">`;
   s+=`<defs>`;
   s+=`<filter id="topoSh"><feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.12"/></filter>`;
   s+=`<linearGradient id="topoGridG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#e83030"/><stop offset="50%" style="stop-color:#cc2020"/><stop offset="100%" style="stop-color:#e83030"/></linearGradient>`;
@@ -3451,13 +3473,12 @@ function renderTopoSvg(R){
     const px=pcsStartX+i*pcsSpacing;
     const py=280;
     s+=`<line x1="${txX+40}" y1="${txY-10}" x2="${px-55}" y2="${py}" stroke="#e83030" stroke-width="2"/>`;
-    s+=`<rect x="${px-55}" y="${py-40}" width="110" height="100" rx="6" fill="url(#topoPcsG)" stroke="#888" stroke-width="1.5" filter="url(#topoSh)"/>`;
-    s+=`<rect x="${px-45}" y="${py-33}" width="90" height="8" rx="1" fill="#e8a838"/>`;
-    s+=`<text x="${px}" y="${py-10}" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">${pcsMW}MW</text>`;
-    s+=`<text x="${px}" y="${py+6}" text-anchor="middle" fill="#555" font-size="10">PCS一体机</text>`;
-    s+=`<text x="${px}" y="${py+22}" text-anchor="middle" fill="#888" font-size="8">并网P/Q | 离网V/F</text>`;
-    s+=`<text x="${px}" y="${py+38}" text-anchor="middle" fill="#888" font-size="8">效率≥95% | THDi≤3%</text>`;
-    s+=`<text x="${px}" y="${py+52}" text-anchor="middle" fill="#888" font-size="8">${i+1}# PCS</text>`;
+    s+=`<rect x="${px-55}" y="${py-40}" width="110" height="100" rx="6" fill="#f0f0f0" stroke="#888" stroke-width="1.5" filter="url(#topoSh)"/>`;
+    if(pcsImg){s+=`<image x="${px-48}" y="${py-35}" width="96" height="55" href="${pcsImg}" preserveAspectRatio="xMidYMid meet" style="border-radius:4px"/>`;}
+    else{s+=`<rect x="${px-45}" y="${py-33}" width="90" height="8" rx="1" fill="#e8a838"/>`;s+=`<text x="${px}" y="${py}" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">PCS一体机</text>`;}
+    s+=`<text x="${px}" y="${py+30}" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">${pcsMW}MW PCS一体机</text>`;
+    s+=`<text x="${px}" y="${py+44}" text-anchor="middle" fill="#888" font-size="8">并网P/Q | 离网V/F</text>`;
+    s+=`<text x="${px}" y="${py+56}" text-anchor="middle" fill="#888" font-size="8">${i+1}# PCS</text>`;
     s+=`<line x1="${emsX-50}" y1="${emsY}" x2="${px+55}" y2="${py-10}" stroke="#30a030" stroke-width="1" stroke-dasharray="5,3"/>`;
   }
   const batY=480;
@@ -3466,12 +3487,11 @@ function renderTopoSvg(R){
     const bx=px;
     s+=`<line x1="${px}" y1="${280+60}" x2="${bx}" y2="${batY-40}" stroke="#cc9900" stroke-width="2.5"/>`;
     s+=`<text x="${bx+15}" y="${(280+60+batY-40)/2}" fill="#cc9900" font-size="9">1500V dc</text>`;
-    s+=`<rect x="${bx-65}" y="${batY-40}" width="130" height="90" rx="6" fill="url(#topoBatG)" stroke="#888" stroke-width="1.5" filter="url(#topoSh)"/>`;
-    s+=`<rect x="${bx-55}" y="${batY-33}" width="110" height="6" rx="1" fill="#e87020"/>`;
-    s+=`<text x="${bx}" y="${batY-15}" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">储能电池系统</text>`;
-    s+=`<text x="${bx}" y="${batY+2}" text-anchor="middle" fill="#555" font-size="10">${prodName}</text>`;
-    s+=`<text x="${bx}" y="${batY+18}" text-anchor="middle" fill="#888" font-size="9">${capStr} (${i+1}号仓)</text>`;
-    s+=`<text x="${bx}" y="${batY+34}" text-anchor="middle" fill="#888" font-size="8">LFP / 液冷 / IP55</text>`;
+    s+=`<rect x="${bx-65}" y="${batY-40}" width="130" height="90" rx="6" fill="#f0f0f0" stroke="#888" stroke-width="1.5" filter="url(#topoSh)"/>`;
+    if(batImg){s+=`<image x="${bx-58}" y="${batY-35}" width="116" height="50" href="${batImg}" preserveAspectRatio="xMidYMid meet" style="border-radius:4px"/>`;}
+    else{s+=`<rect x="${bx-55}" y="${batY-33}" width="110" height="6" rx="1" fill="#e87020"/>`;s+=`<text x="${bx}" y="${batY-10}" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">储能电池系统</text>`;}
+    s+=`<text x="${bx}" y="${batY+24}" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">${prodName} ${capStr}</text>`;
+    s+=`<text x="${bx}" y="${batY+38}" text-anchor="middle" fill="#888" font-size="8">LFP / 液冷 / IP55</text>`;
     s+=`<line x1="${emsX-50}" y1="${emsY}" x2="${bx+65}" y2="${batY}" stroke="#30a030" stroke-width="1" stroke-dasharray="5,3"/>`;
   }
   const legY=640;
