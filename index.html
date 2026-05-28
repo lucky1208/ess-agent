@@ -29,6 +29,22 @@ a{color:var(--blue);text-decoration:none}
 .sub-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
 .mermaid-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;overflow-x:auto}
 .mermaid-wrap svg{max-width:100%}
+.sw-tabs{display:flex;gap:0;background:var(--bg3);border-bottom:1px solid var(--border);padding:0;margin-bottom:16px;border-radius:6px 6px 0 0;overflow:hidden}
+.sw-tab{padding:8px 16px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .3s;font-size:12px;font-weight:500}
+.sw-tab:hover{color:var(--text1)}
+.sw-tab.active{color:var(--blue);border-bottom-color:var(--blue);background:var(--bg2)}
+.sw-content{background:var(--bg2);border:1px solid var(--border);border-radius:0 0 6px 6px;padding:16px}
+.ck-group{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.ck-label{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);cursor:pointer;padding:4px 8px;border-radius:4px;transition:background .2s}
+.ck-label:hover{background:var(--bg3)}
+.ck-label input[type="checkbox"]{accent-color:var(--blue);width:14px;height:14px}
+.sw-select{padding:3px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:11px}
+.sw-input{width:60px;padding:3px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text1);font-size:11px;text-align:center}
+.sw-range{width:100%;accent-color:var(--blue);height:4px}
+.sw-row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:11px;color:var(--text2)}
+.sw-section{margin:12px 0 8px;padding:8px 12px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--blue)}
+.sw-section-title{font-size:12px;font-weight:600;color:var(--blue);margin-bottom:6px}
+.sw-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0}
 .main-container{min-height:calc(100vh - 110px)}
 .sec-title{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text1);display:flex;align-items:center;gap:8px}
 .sec-title svg{width:18px;height:18px;color:var(--blue)}
@@ -149,6 +165,7 @@ select.form-input{appearance:auto}
 <div class="sub-tab active" onclick="showMicroPage('mg-arch')">微网架构</div>
 <div class="sub-tab" onclick="showMicroPage('mg-ems')">微网能量管理</div>
 <div class="sub-tab" onclick="showMicroPage('mg-schedule')">微网调度优化</div>
+<div class="sub-tab" onclick="showMicroPage('mg-software')">软件平台配置</div>
 </nav>
 </div>
 
@@ -488,6 +505,248 @@ ACC AC一体柜专题
 <tr><td>离网运行</td><td>光储协调+柴发补充</td><td>按SOC调整出力</td><td>≥30%额定</td></tr>
 <tr><td>电网恢复</td><td>同期检测→重新并网</td><td>VF→PQ模式切换</td><td>逐步退出</td></tr>
 </table>
+</div>
+</div>
+
+<div id="page-mg-software" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">微网软件平台配置</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">设计人：卢继雄 | 联系电话：15026953905 | V5.0</div>
+
+<div class="sw-tabs">
+<div class="sw-tab active" onclick="showSwPage('sw-scada')">SCADA</div>
+<div class="sw-tab" onclick="showSwPage('sw-ems')">EMS</div>
+<div class="sw-tab" onclick="showSwPage('sw-dispatch')">调度</div>
+<div class="sw-tab" onclick="showSwPage('sw-trading')">交易</div>
+<div class="sw-tab" onclick="showSwPage('sw-data')">数据中台</div>
+</div>
+
+<!-- SCADA 监控平台 -->
+<div id="sw-scada" class="sw-content">
+<div class="sw-section"><div class="sw-section-title">基础功能(必选)</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 实时遥测遥信(电压/电流/功率/SOC/开关量)</label>
+<label class="ck-label"><input type="checkbox" checked> 设备状态监控(PCS/BMS/PV/柴发/变压器)</label>
+<label class="ck-label"><input type="checkbox" checked> 可视化大屏(GIS地图+单线图+仪表盘)</label>
+<label class="ck-label"><input type="checkbox" checked> 历史数据存储(时序库:TDengine/InfluxDB)</label>
+<label class="ck-label"><input type="checkbox" checked> 数据导出(CSV/Excel/API)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">高级功能(可选)</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 双机热备(主备SCADA自动切换)</label>
+<label class="ck-label"><input type="checkbox"> 视频监控集成(海康/大华SDK接入)</label>
+<label class="ck-label"><input type="checkbox" checked> 消防联动(烟感/温感→自动跳闸)</label>
+<label class="ck-label"><input type="checkbox"> 环境监控(温湿度/空调/水浸)</label>
+<label class="ck-label"><input type="checkbox"> 移动APP(iOS/Android远程巡检)</label>
+<label class="ck-label"><input type="checkbox"> 微信/钉钉告警推送</label>
+<label class="ck-label"><input type="checkbox"> 大屏定制开发(可视化组件库)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">告警管理</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 分级告警(一般/重要/紧急)</label>
+<label class="ck-label"><input type="checkbox" checked> 告警联动(弹出画面+声光+短信)</label>
+<label class="ck-label"><input type="checkbox" checked> 告警抑制(震荡抑制/雪崩过滤)</label>
+<label class="ck-label"><input type="checkbox" checked> 故障录波(COMTRADE格式)</label>
+<label class="ck-label"><input type="checkbox"> AI故障预测(ML异常检测)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">报表系统</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 日报/月报/年报(自动生成)</label>
+<label class="ck-label"><input type="checkbox" checked> 能效分析报告(损耗/效率/自消纳率)</label>
+<label class="ck-label"><input type="checkbox" checked> 碳排放报告(CCER/碳资产管理)</label>
+<label class="ck-label"><input type="checkbox"> 设备健康度报告(SOH衰减趋势)</label>
+</div></div>
+</div>
+
+<!-- EMS 能量管理 -->
+<div id="sw-ems" class="sw-content" style="display:none">
+<div class="sw-section"><div class="sw-section-title">控制模式</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 削峰填谷(TOU电价驱动)</label>
+<label class="ck-label"><input type="checkbox" checked> 需量管理(15min需量窗口)</label>
+<label class="ck-label"><input type="checkbox" checked> 防逆流控制(关口CT闭环)</label>
+<label class="ck-label"><input type="checkbox" checked> 光伏自消纳(最大化就地消纳)</label>
+<label class="ck-label"><input type="checkbox"> 无功补偿(SVG/PCS无功调度)</label>
+<label class="ck-label"><input type="checkbox"> 一次调频(电网辅助服务)</label>
+<label class="ck-label"><input type="checkbox"> 黑启动(离网自恢复)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">并离网切换</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 计划性离网(检修/调度)</label>
+<label class="ck-label"><input type="checkbox" checked> 被动孤岛检测(AFD+ROCOF)</label>
+<label class="ck-label"><input type="checkbox"> 无缝切换(&lt;20ms STS)</label>
+<label class="ck-label"><input type="checkbox"> 离网V/f控制</label>
+<label class="ck-label"><input type="checkbox"> 自动同期并网(检同期)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">控制策略自定义</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 时段策略(按时间表执行)</label>
+<label class="ck-label"><input type="checkbox"> 事件策略(触发条件→动作)</label>
+<label class="ck-label"><input type="checkbox"> Python脚本策略(用户自定义逻辑)</label>
+<label class="ck-label"><input type="checkbox"> AI自适应策略(强化学习)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">控制安全</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 指令二次确认</label>
+<label class="ck-label"><input type="checkbox" checked> 操作日志审计</label>
+<label class="ck-label"><input type="checkbox" checked> 遥控闭锁(检修挂牌)</label>
+<label class="ck-label"><input type="checkbox"> SOE事件顺序记录(1ms精度)</label>
+</div></div>
+</div>
+
+<!-- 调度优化引擎 -->
+<div id="sw-dispatch" class="sw-content" style="display:none">
+<div class="sw-section"><div class="sw-section-title">优化层级</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 日前优化(MILP 24h/15min粒度)</label>
+<label class="ck-label"><input type="checkbox" checked> 日内滚动(MPC 4h/5min粒度)</label>
+<label class="ck-label"><input type="checkbox"> 实时自动发电控制(AGC秒级)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">求解设置</div>
+<div class="sw-row">求解器: <select class="sw-select"><option>Gurobi</option><option>CBC</option><option>SCIP</option></select></div>
+<div class="sw-row">求解时间上限: <input type="number" class="sw-input" value="60"> 秒</div>
+<div class="sw-row">MIPGap: <input type="number" class="sw-input" value="1"> %</div>
+<div class="ck-group" style="margin-top:8px">
+<label class="ck-label"><input type="checkbox" checked> 热启动加速</label>
+<label class="ck-label"><input type="checkbox"> 场景法(N=10场景 考虑不确定性)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">预测模块</div>
+<div class="sw-row">负荷预测: <select class="sw-select"><option>LSTM</option><option>Prophet</option><option>XGBoost</option></select></div>
+<div class="sw-row">光伏预测: <select class="sw-select"><option>NWP+物理模型</option><option>纯数据驱动</option></select></div>
+<div class="sw-row">预测更新频率: <select class="sw-select"><option>15分钟</option><option>30分钟</option><option>5分钟</option></select></div>
+<div class="ck-group" style="margin-top:8px">
+<label class="ck-label"><input type="checkbox" checked> 自动剔除毛刺数据</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">优化目标权重</div>
+<div class="sw-row"><label style="min-width:70px">购电成本</label><input type="range" class="sw-range" min="0" max="100" value="50" oninput="this.nextElementSibling.textContent=this.value+'%'"><span>50%</span></div>
+<div class="sw-row"><label style="min-width:70px">电池衰减</label><input type="range" class="sw-range" min="0" max="100" value="30" oninput="this.nextElementSibling.textContent=this.value+'%'"><span>30%</span></div>
+<div class="sw-row"><label style="min-width:70px">弃光惩罚</label><input type="range" class="sw-range" min="0" max="100" value="15" oninput="this.nextElementSibling.textContent=this.value+'%'"><span>15%</span></div>
+<div class="sw-row"><label style="min-width:70px">需量惩罚</label><input type="range" class="sw-range" min="0" max="100" value="5" oninput="this.nextElementSibling.textContent=this.value+'%'"><span>5%</span></div>
+</div>
+<div class="sw-section"><div class="sw-section-title">约束配置</div>
+<div class="sw-row">SOC工作范围: <input type="number" class="sw-input" value="10">% ~ <input type="number" class="sw-input" value="90">%</div>
+<div class="sw-row">充电倍率上限: <input type="number" class="sw-input" value="0.5">C</div>
+<div class="sw-row">放电倍率上限: <input type="number" class="sw-input" value="0.5">C</div>
+<div class="sw-row">关口功率上限: <input type="number" class="sw-input" value="5000">kW</div>
+<div class="sw-row">柴发最低运行: <input type="number" class="sw-input" value="30">%额定</div>
+</div>
+</div>
+
+<!-- 电力交易平台 -->
+<div id="sw-trading" class="sw-content" style="display:none">
+<div class="sw-section"><div class="sw-section-title">参与市场类型</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 中长期合约(年度/月度双边协商)</label>
+<label class="ck-label"><input type="checkbox"> 电力现货市场(日前/实时出清)</label>
+<label class="ck-label"><input type="checkbox"> 辅助服务市场(调频/备用/调峰)</label>
+<label class="ck-label"><input type="checkbox"> 需求响应(削峰容量补偿)</label>
+<label class="ck-label"><input type="checkbox"> 绿证交易(GEC/I-REC)</label>
+<label class="ck-label"><input type="checkbox"> 碳交易(CCER/配额)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">交易策略</div>
+<div class="sw-row">报价方式: <select class="sw-select"><option>分时段阶梯报价</option><option>统一报价</option><option>动态边际成本报价</option></select></div>
+<div class="ck-group" style="margin-top:8px">
+<label class="ck-label"><input type="checkbox" checked> 日前市场套利</label>
+<label class="ck-label"><input type="checkbox" checked> 储能容量租赁</label>
+<label class="ck-label"><input type="checkbox"> 虚拟电厂VPP聚合参与</label>
+<label class="ck-label"><input type="checkbox"> P2P分布式交易</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">结算模块</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 分时计量结算</label>
+<label class="ck-label"><input type="checkbox" checked> 偏差考核(正负偏差惩罚)</label>
+<label class="ck-label"><input type="checkbox" checked> 辅助服务收益结算</label>
+<label class="ck-label"><input type="checkbox"> 区块链存证(能源区块链)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">数据接口</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 省电力交易中心对接(接口标准)</label>
+<label class="ck-label"><input type="checkbox" checked> 虚拟电厂平台对接(VPP API)</label>
+<label class="ck-label"><input type="checkbox" checked> 碳交易平台对接</label>
+</div></div>
+</div>
+
+<!-- 云边端数据中台 -->
+<div id="sw-data" class="sw-content" style="display:none">
+<div class="sw-section"><div class="sw-section-title">数据采集层</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> MQTT</label>
+<label class="ck-label"><input type="checkbox" checked> Modbus TCP</label>
+<label class="ck-label"><input type="checkbox"> DNP3</label>
+<label class="ck-label"><input type="checkbox"> OPC UA</label>
+</div>
+<div class="sw-row">边缘网关: <select class="sw-select"><option>ARM Cortex-A72</option><option>x86工控机</option></select></div>
+<div class="sw-row">本地存储: <select class="sw-select"><option>256GB SSD</option><option>512GB SSD</option><option>1TB HDD</option></select> (断网7天缓存)</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 死区压缩</label>
+<label class="ck-label"><input type="checkbox" checked> 有损压缩</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">数据传输层</div>
+<div class="sw-row">上行: <select class="sw-select"><option>MQTT QoS1</option><option>IEC 104</option><option>WebSocket</option></select></div>
+<div class="sw-row">下行: <select class="sw-select"><option>MQTT QoS2</option></select> (指令下发)</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> TLS 1.3</label>
+<label class="ck-label"><input type="checkbox" checked> 设备认证证书</label>
+<label class="ck-label"><input type="checkbox" checked> VPN: IPSec</label>
+<label class="ck-label"><input type="checkbox"> WireGuard</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">数据存储层</div>
+<div class="sw-row">实时库: <select class="sw-select"><option>Redis</option></select> (10ms读写)</div>
+<div class="sw-row">时序库: <select class="sw-select"><option>TDengine</option><option>InfluxDB</option><option>ClickHouse</option></select></div>
+<div class="sw-row">关系库: <select class="sw-select"><option>PostgreSQL</option><option>MySQL</option></select></div>
+<div class="sw-row">消息队列: <select class="sw-select"><option>Kafka</option><option>RabbitMQ</option></select></div>
+<div class="sw-row">冷数据归档: 保留<input type="number" class="sw-input" value="3">年→对象存储</div>
+</div>
+<div class="sw-section"><div class="sw-section-title">数据治理层</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 设备统一建模(IEC 61970 CIM)</label>
+<label class="ck-label"><input type="checkbox" checked> 数据质量清洗</label>
+<label class="ck-label"><input type="checkbox" checked> 数据血缘追踪</label>
+<label class="ck-label"><input type="checkbox"> 数据API开放(RESTful/GraphQL)</label>
+</div></div>
+<div class="sw-section"><div class="sw-section-title">应用层</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" checked> 运维工单系统</label>
+<label class="ck-label"><input type="checkbox" checked> 设备资产管理</label>
+<label class="ck-label"><input type="checkbox" checked> 用户权限管理(RBAC)</label>
+<label class="ck-label"><input type="checkbox" checked> 第三方系统集成(ERP/MES对接)</label>
+<label class="ck-label"><input type="checkbox"> 移动端应用</label>
+<label class="ck-label"><input type="checkbox"> 数字孪生(3D可视化)</label>
+</div></div>
+</div>
+
+<!-- 技术栈选型 -->
+<div class="sw-section" style="margin-top:20px">
+<div class="sw-section-title">技术栈选型</div>
+<div class="sw-grid3">
+<div class="sw-row">操作系统: <select class="sw-select"><option>Ubuntu Server 22.04</option><option>CentOS 8</option><option>Debian 12</option></select></div>
+<div class="sw-row">容器化: <label class="ck-label" style="padding:0"><input type="checkbox" checked> Docker</label> <label class="ck-label" style="padding:0"><input type="checkbox"> K8s</label> <label class="ck-label" style="padding:0"><input type="checkbox"> 裸机部署</label></div>
+<div class="sw-row">SCADA后端: <select class="sw-select"><option>Go</option><option>Python</option><option>C++</option></select></div>
+<div class="sw-row">SCADA前端: <select class="sw-select"><option>React</option><option>Vue3</option><option>Svelte</option></select></div>
+<div class="sw-row">可视化大屏: <select class="sw-select"><option>ECharts</option><option>Three.js</option><option>D3.js</option></select></div>
+<div class="sw-row">时序数据库: <select class="sw-select"><option>TDengine</option><option>InfluxDB</option><option>ClickHouse</option></select></div>
+<div class="sw-row">消息队列: <select class="sw-select"><option>EMQX</option><option>Kafka</option><option>NATS</option></select></div>
+<div class="sw-row">AI框架: <select class="sw-select"><option>PyTorch</option><option>ONNX Runtime</option><option>TensorFlow</option></select></div>
+<div class="sw-row">边缘OS: <select class="sw-select"><option>Ubuntu Core</option><option>Yocto Linux</option></select></div>
+<div class="sw-row">代码仓库: <select class="sw-select"><option>GitLab</option><option>GitHub</option></select> <label class="ck-label" style="padding:0"><input type="checkbox" checked> CI/CD Pipeline</label></div>
+</div>
+</div>
+
+<!-- 交付清单 -->
+<div class="sw-section">
+<div class="sw-section-title">交付清单</div>
+<div style="font-size:11px;line-height:2;color:var(--text2)">
+&#128230; 微网软件平台方案包<br>
+├─ 软件架构设计说明书 (PDF/Word)<br>
+├─ SCADA监控界面原型 (Figma/SVG)<br>
+├─ EMS控制逻辑流程图<br>
+├─ 调度优化数学模型文档<br>
+├─ 数据库ER图+表结构设计<br>
+├─ API接口文档 (OpenAPI 3.0)<br>
+├─ 通信点表 (Modbus寄存器映射表)<br>
+├─ 部署手册 (Docker Compose/K8s Helm)<br>
+├─ 验收测试大纲 (FAT/SAT)<br>
+└─ 软件报价清单 (License+实施费+年维保)
+</div>
 </div>
 </div>
 
@@ -1098,12 +1357,22 @@ function switchCategory(cat){
 
 function showMicroPage(id){
   document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
-  const subPages=['mg-arch','mg-ems','mg-schedule'];
+  const subPages=['mg-arch','mg-ems','mg-schedule','mg-software'];
   document.querySelectorAll('.sub-tab')[subPages.indexOf(id)].classList.add('active');
   document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
   const el=document.getElementById('page-'+id);
   if(el) el.style.display='block';
   renderMermaid();
+}
+
+function showSwPage(id){
+  document.querySelectorAll('.sw-tab').forEach(t=>t.classList.remove('active'));
+  const swPages=['sw-scada','sw-ems','sw-dispatch','sw-trading','sw-data'];
+  const idx=swPages.indexOf(id);
+  if(idx>=0) document.querySelectorAll('.sw-tab')[idx].classList.add('active');
+  document.querySelectorAll('.sw-content').forEach(t=>t.style.display='none');
+  const el=document.getElementById(id);
+  if(el) el.style.display='block';
 }
 
 function v(id){return document.getElementById(id).value}
