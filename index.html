@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <style>
 :root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -27,6 +28,9 @@ a{color:var(--blue);text-decoration:none}
 .sub-tab{padding:10px 18px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .3s;font-size:13px}
 .sub-tab:hover{color:var(--text1)}
 .sub-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.mermaid-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;overflow-x:auto}
+.mermaid-wrap .mermaid{display:flex;justify-content:center}
+.mermaid{font-size:13px}
 .main-container{min-height:calc(100vh - 110px)}
 .sec-title{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text1);display:flex;align-items:center;gap:8px}
 .sec-title svg{width:18px;height:18px;color:var(--blue)}
@@ -337,6 +341,80 @@ ACC AC一体柜专题
 <div style="font-size:12px;color:var(--text2);margin-bottom:16px">基于Microgrid_Architecture.md | 设计人：卢继雄</div>
 <div class="acc-section">
 <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 一、微网电力拓扑总览（交流微网）</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+graph TB
+    subgraph Grid["⚡ 大电网 (10kV/35kV)"]
+        G1["电网电源<br/>Grid Supply"]
+    end
+    subgraph PCC["🔌 公共连接点 PCC"]
+        PCC_SW["并网开关柜<br/>断路器 QF01<br/>PCC Breaker"]
+        PCC_Meter["双向关口表<br/>精度 0.2S<br/>CT/PT 采集"]
+    end
+    subgraph Transformer["🔽 主变压器"]
+        T1["10kV / 0.4kV<br/>干式变压器<br/>2000kVA<br/>Dyn11 接线"]
+    end
+    subgraph AC_Bus["🔹 交流母线 400V AC Bus"]
+        BusBar["AC 400V 50Hz<br/>三相四线 + PE<br/>铜排 busbar"]
+    end
+    subgraph DER["☀️🔋 分布式能源 DER"]
+        subgraph PV_System["光伏发电系统"]
+            PV_Panel["光伏组件阵列<br/>550Wp×N<br/>总容量 1MWp"]
+            PV_Inverter["组串式逆变器<br/>MPPT 跟踪<br/>AC 400V 输出"]
+            PV_Panel -- "DC 1100V<br/>PV 直流线缆" --> PV_Inverter
+        end
+        subgraph BESS["储能系统 BESS"]
+            BESS_Container["储能集装箱<br/>10MW/20MWh<br/>eBlock 能量块"]
+            subgraph PCS_Group["PCS 变流器组"]
+                PCS1["PCS #1<br/>100kW AC/DC"]
+                PCS2["PCS #2<br/>100kW AC/DC"]
+                PCS3["PCS #N<br/>100kW AC/DC"]
+            end
+            BESS_Container -- "DC 750~1000V<br/>直流电缆" --> PCS1
+            BESS_Container -- "DC 750~1000V" --> PCS2
+            BESS_Container -- "DC 750~1000V" --> PCS3
+        end
+        subgraph Diesel["🛢️ 柴发系统"]
+            Diesel_Gen["柴油发电机<br/>500kW 备用<br/>远程自启动"]
+        end
+    end
+    subgraph Loads["💡 负荷系统"]
+        subgraph Critical["关键负荷 (不可切除)"]
+            L_C1["数据中心<br/>UPS 供电"]
+            L_C2["核心生产线<br/>DCS 控制"]
+            L_C3["消防/安防"]
+        end
+        subgraph NonCritical["可调节负荷 (可切除)"]
+            L_N1["空调系统"]
+            L_N2["普通照明"]
+            L_N3["非核心产线"]
+        end
+    end
+    subgraph Protection["🛡️ 保护系统"]
+        Prot_Relay["综保继电器<br/>过流/速断/零序<br/>方向保护"]
+        AFD["防孤岛保护<br/>AFD 装置"]
+        PQ_Monitor["电能质量监测<br/>谐波/闪变/三相不平衡"]
+    end
+    G1 --> PCC_SW
+    PCC_SW -- "10kV 高压电缆" --> T1
+    PCC_SW --> PCC_Meter
+    T1 -- "400V 低压出线" --> BusBar
+    PCC_Meter -- "Modbus RTU<br/>RS485" --> EMS_Link["→ 边缘网关"]
+    PV_Inverter -- "QF02<br/>光伏并网断路器" --> BusBar
+    PCS1 -- "QF03-1<br/>储能断路器" --> BusBar
+    PCS2 -- "QF03-2<br/>储能断路器" --> BusBar
+    PCS3 -- "QF03-N<br/>储能断路器" --> BusBar
+    Diesel_Gen -- "QF04<br/>柴发断路器<br/>ATS 切换" --> BusBar
+    BusBar -- "QF05<br/>关键负荷出线" --> Critical
+    BusBar -- "QF06<br/>可调负荷出线" --> NonCritical
+    Prot_Relay -.-> BusBar
+    AFD -.-> PCC_SW
+    PQ_Monitor -.-> BusBar
+    style Grid fill:#bbdefb,stroke:#1565c0
+    style AC_Bus fill:#fff9c4,stroke:#f57f17
+    style DER fill:#e8f5e9,stroke:#2e7d32
+    style Loads fill:#fce4ec,stroke:#c62828
+    style Protection fill:#ede7f6,stroke:#4527a0
+</pre></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">⚡ 大电网</b> → <b style="color:var(--orange)">🔌 PCC并网开关柜(断路器QF01) + 双向关口表(0.2S级)</b> → <b style="color:var(--orange)">🔽 主变压器 10kV/0.4kV 2000kVA Dyn11</b> → <b style="color:var(--text1)">🔹 AC 400V母线(三相四线+PE)</b></p>
 <p style="margin-top:8px"><b style="color:#50c878">☀️ 光伏系统:</b> 550Wp组件阵列 → 组串式逆变器(MPPT) → AC 400V并网</p>
@@ -348,6 +426,47 @@ ACC AC一体柜专题
 </div>
 <div class="acc-section">
 <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 二、交直流混合微网架构（推荐方案）</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+graph TB
+    subgraph Grid_side["🔌 市电侧"]
+        Grid10kV["10kV 电网"]
+        Main_T["主变压器<br/>10kV/0.4kV"]
+        PCC_SW2["PCC 并网开关"]
+    end
+    subgraph AC_Side["🔹 交流子网 AC 400V"]
+        AC_BusBar["AC Bus 400V<br/>三相四线"]
+        AC_Load["交流负荷<br/>电机/照明"]
+        AC_BusBar --- AC_Load
+    end
+    subgraph DC_Side["🔸 直流子网 DC 750V"]
+        DC_BusBar["DC Bus 750V<br/>直流母线"]
+        PV_Array["光伏阵列<br/>DC 1100V 输入"]
+        DC_DC_PV["DC/DC 变换器<br/>MPPT 升压<br/>1100→750V"]
+        DC_Load["直流负荷<br/>充电桩/数据中心"]
+        DC_BusBar --- DC_Load
+    end
+    subgraph BESS2["🔋 储能 (直挂直流母线)"]
+        Battery_Stacks["电池堆<br/>1P240S×N<br/>额定 768V"]
+        BESS_DC_DC["DC/DC 双向<br/>768V↔750V"]
+    end
+    subgraph Interlink["🔄 AC/DC 互联变换器"]
+        AC_DC_Converter["双向 AC/DC<br/>400V ↔ 750V<br/>功率路由器<br/>能量互通"]
+    end
+    Grid10kV --> Main_T
+    Main_T --> PCC_SW2
+    PCC_SW2 --> AC_BusBar
+    PV_Array --> DC_DC_PV
+    DC_DC_PV --> DC_BusBar
+    Battery_Stacks --> BESS_DC_DC
+    BESS_DC_DC --> DC_BusBar
+    DC_BusBar <==> AC_DC_Converter
+    AC_DC_Converter <==> AC_BusBar
+    style Grid_side fill:#bbdefb,stroke:#1565c0
+    style AC_Side fill:#fff9c4,stroke:#f57f17
+    style DC_Side fill:#e8f5e9,stroke:#2e7d32
+    style BESS2 fill:#f3e5f5,stroke:#7b1fa2
+    style Interlink fill:#ffebee,stroke:#c62828
+</pre></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">市电侧</b> → 10kV电网 → 主变 → PCC开关 → <b style="color:var(--orange)">AC 400V子网</b>(电机/照明等交流负荷)</p>
 <p><b style="color:#50c878">DC 750V直流子网:</b> 光伏→DC/DC升压(1100→750V) + 储能直挂DC(768V↔750V) + 充电桩/数据中心</p>
@@ -356,6 +475,41 @@ ACC AC一体柜专题
 </div>
 <div class="acc-section">
 <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 三、四种典型微网拓扑对比</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+graph LR
+    subgraph T1["方案A: 交流微网 (最常见)"]
+        direction TB
+        A_G["电网"] --> A_T["变压器"] --> A_AC["AC Bus"]
+        A_AC --- A_L["AC负荷"]
+        A_PV["光伏(逆变为AC)"] --> A_AC
+        A_BESS["储能(PCS/AC)"] --> A_AC
+    end
+    subgraph T2["方案B: 直流微网"]
+        direction TB
+        B_G["电网"] --> B_ACDC["AC/DC"] --> B_DC["DC Bus"]
+        B_DC --- B_L["DC负荷"]
+        B_PV["光伏(直接DC)"] --> B_DC
+        B_BESS["储能(直挂DC)"] --> B_DC
+    end
+    subgraph T3["方案C: 交直流混合 (推荐)"]
+        direction TB
+        C_G["电网"] --> C_AC["AC Bus"]
+        C_AC --- C_LAC["AC负荷"]
+        C_DC["DC Bus"] --- C_LDC["DC负荷"]
+        C_PV["光伏→DC"] --> C_DC
+        C_BESS["储能→DC"] --> C_DC
+        C_AC <==>|"双向AC/DC"| C_DC
+    end
+    subgraph T4["方案D: 多微网集群"]
+        direction TB
+        D_MG1["微网 #1"] ---|"联络线"| D_MG2["微网 #2"]
+        D_MG2 ---|"联络线"| D_MG3["微网 #3"]
+        D_G["电网"] --- D_MG1
+        D_MG1 -.->|"EMS 集群协调"| D_EMS["集群EMS"]
+        D_MG2 -.-> D_EMS
+        D_MG3 -.-> D_EMS
+    end
+</pre></div>
 <table class="result-table" style="font-size:12px"><tr><th>方案</th><th>拓扑</th><th>优点</th><th>缺点</th><th>适用场景</th></tr>
 <tr><td><b>A: 交流微网</b></td><td>电网→变压器→AC Bus→负荷</td><td>技术成熟、设备可选多</td><td>多次AC/DC变换损耗</td><td>最常见，工商业</td></tr>
 <tr><td><b>B: 直流微网</b></td><td>电网→AC/DC→DC Bus→负荷</td><td>光伏/储能直挂效率高</td><td>DC保护技术不成熟</td><td>数据中心/充电站</td></tr>
@@ -365,6 +519,32 @@ ACC AC一体柜专题
 </div>
 <div class="acc-section">
 <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 四、微网运行模式切换</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+stateDiagram-v2
+    [*] --> 并网运行: 正常模式
+    并网运行 --> 计划离网: 检修/调度指令
+    并网运行 --> 非计划离网: 电网故障/电能质量越限
+    计划离网 --> 离网运行: 无缝切换(&lt;20ms)
+    非计划离网 --> 孤岛检测: AFD+被动检测
+    孤岛检测 --> 离网运行: 确认为孤岛
+    孤岛检测 --> 并网运行: 误判/电网恢复
+    离网运行 --> 并网同步: 电网恢复/指令复归
+    并网同步 --> 同期检测: 幅值/频率/相位匹配
+    同期检测 --> 并网运行: 同期成功
+    同期检测 --> 并网同步: 同期失败 重试
+    note right of 离网运行
+        V/f 控制模式
+        储能承担主电源
+        柴发作后备
+        切除非关键负荷
+    end note
+    note right of 并网运行
+        PQ 控制模式
+        削峰填谷策略
+        需量管理
+        光伏最大功率跟踪
+    end note
+</pre></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">并网运行</b>(PQ控制): 削峰填谷 + 需量管理 + 光伏MPPT</p>
 <p>↓ 检修/调度指令 或 电网故障/电能质量越限</p>
@@ -374,7 +554,95 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 五、关键参数速查</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 五、微网保护配置</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+graph TB
+    subgraph Grid_Prot["🔌 并网侧保护"]
+        P_PCC["PCC 保护<br/>QF01<br/>方向过流(67)<br/>低/过压(27/59)<br/>低/过频(81U/81O)<br/>防孤岛(AFD)"]
+    end
+    subgraph Transformer_Prot["🔽 变压器保护"]
+        P_T["主变保护<br/>速断(50)<br/>过流(51)<br/>零序(51N)<br/>瓦斯/温度"]
+    end
+    subgraph AC_Protection["🔹 交流侧保护"]
+        P_Bus["母线保护<br/>差动保护(87B)<br/>弧光保护"]
+        P_Feeder["馈线保护<br/>QF02~06<br/>过流/速断<br/>漏电流(剩余电流)"]
+    end
+    subgraph DER_Protection["⚡ DER侧保护"]
+        P_PV["光伏保护<br/>防孤岛<br/>逆功率<br/>DC 绝缘监测"]
+        P_BESS["储能保护<br/>SOC/SOH 保护<br/>电池过充/过放<br/>热失控预警<br/>绝缘监测(IMD)"]
+        P_Diesel["柴发保护<br/>逆功率<br/>过/低频<br/>转速保护"]
+    end
+    subgraph Load_Protection["💡 负荷侧保护"]
+        P_Critical["关键负荷<br/>ATS 切换<br/>UPS 旁路"]
+        P_NonCritical["可调负荷<br/>低压脱扣<br/>远程分闸"]
+    end
+    Grid_Prot --> Transformer_Prot
+    Transformer_Prot --> AC_Protection
+    P_Bus --> P_Feeder
+    P_Feeder --> P_PV
+    P_Feeder --> P_BESS
+    P_Feeder --> P_Diesel
+    P_Feeder --> P_Critical
+    P_Feeder --> P_NonCritical
+    style Grid_Prot fill:#bbdefb
+    style Transformer_Prot fill:#fff9c4
+    style AC_Protection fill:#fce4ec
+    style DER_Protection fill:#e8f5e9
+    style Load_Protection fill:#f3e5f5
+</pre></div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 六、通信控制网络</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+graph TB
+    subgraph ControlNet["🖥️ 控制网络"]
+        EMS_Station["站控 EMS<br/>SCADA + 优化引擎"]
+        GW_Main["边缘网关 GW-01<br/>(主)"]
+        GW_Backup["边缘网关 GW-02<br/>(备)"]
+        subgraph DeviceComms["设备通信链路"]
+            direction LR
+            C_PV["→ 光伏逆变器<br/>Modbus TCP"]
+            C_BMS["→ BMS 主控<br/>CAN 2.0B"]
+            C_PCS["→ PCS 控制器<br/>Modbus TCP"]
+            C_Meter["→ 关口表<br/>Modbus RTU"]
+            C_Relay["→ 保护继电器<br/>IEC 61850 GOOSE"]
+            C_DieselCtrl["→ 柴发控制器<br/>Modbus RTU"]
+            C_ATS["→ ATS/STS<br/>硬线 I/O"]
+            C_Sensor["→ 环境传感器<br/>4-20mA → RTU"]
+        end
+    end
+    subgraph PowerNet["⚡ 功率回路"]
+        direction LR
+        Pow_Grid["电网 →"]
+        Pow_T["变压器 →"]
+        Pow_Bus["AC Bus →"]
+        Pow_PV["光伏"]
+        Pow_BESS["储能"]
+        Pow_Diesel["柴发"]
+        Pow_Load["负荷"]
+    end
+    EMS_Station -->|"IEC 104"| GW_Main
+    EMS_Station -->|"IEC 104"| GW_Backup
+    GW_Main --> C_PV
+    GW_Main --> C_BMS
+    GW_Main --> C_PCS
+    GW_Main --> C_Meter
+    GW_Main --> C_Relay
+    GW_Main --> C_DieselCtrl
+    GW_Main --> C_ATS
+    GW_Main --> C_Sensor
+    GW_Main -.->|"VRRP 心跳"| GW_Backup
+    Pow_Grid --> Pow_T --> Pow_Bus
+    Pow_Bus --> Pow_PV
+    Pow_Bus --> Pow_BESS
+    Pow_Bus --> Pow_Diesel
+    Pow_Bus --> Pow_Load
+    style ControlNet fill:#e3f2fd,stroke:#1565c0
+    style PowerNet fill:#fff3e0,stroke:#e65100
+</pre></div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 七、关键参数速查</h3>
 <table class="result-table" style="font-size:11px"><tr><th>类别</th><th>参数</th><th>典型值</th><th>说明</th></tr>
 <tr><td>电网侧</td><td>并网电压</td><td>10kV/35kV</td><td>视项目容量</td></tr>
 <tr><td></td><td>关口表精度</td><td>0.2S级</td><td>双向计量</td></tr>
@@ -392,6 +660,56 @@ ACC AC一体柜专题
 <div style="font-size:12px;color:var(--text2);margin-bottom:16px">基于eBlock_EMS_Architecture.md | 设计人：卢继雄</div>
 <div class="acc-section">
 <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 一、总体架构（四层）</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+graph TB
+    subgraph Cloud["☁️ 云平台层"]
+        direction TB
+        A1["数据中台<br/>DataCenter"]
+        A2["AI引擎<br/>(LSTM预测/异常检测)"]
+        A3["运维管理<br/>O&M Platform"]
+        A4["电力交易<br/>现货/辅助服务/碳交易"]
+        A5["大屏可视化<br/>Dashboard"]
+        A1 --- A2 --- A3 --- A4 --- A5
+    end
+    subgraph Station["🏭 站控层 Station EMS"]
+        direction TB
+        B1["SCADA Server<br/>(双机热备)"]
+        B2["优化调度引擎<br/>(MILP / MPC)"]
+        B3["AGC / AVC<br/>自动发电/电压控制"]
+        B4["策略下发 & 并离网切换"]
+        B5["本地HMI<br/>就地监控屏"]
+        B1 --- B2 --- B3 --- B4 --- B5
+    end
+    subgraph Edge["🔗 协调控制层 Edge Gateway"]
+        direction LR
+        C1["边缘智能网关<br/>(ARM/x86 工控机)"]
+        C2["协议转换池<br/>Protocol Adapter"]
+        C3["本地自治逻辑<br/>(削峰填谷/防逆流)"]
+        C4["数据缓存 & 断点续传"]
+        C5["看门狗<br/>Watchdog"]
+        C1 --- C2 --- C3 --- C4 --- C5
+    end
+    subgraph Device["⚡ 设备层 Device Layer"]
+        direction TB
+        D1["eBlock 能量块 #1<br/>PACK⊕BMS⊕PCS"]
+        D2["eBlock 能量块 #2<br/>PACK⊕BMS⊕PCS"]
+        D3["eBlock 能量块 #N<br/>PACK⊕BMS⊕PCS"]
+        D4["光伏逆变器<br/>PV Inverter"]
+        D5["变压器 & 关口表<br/>Gateway Meter"]
+        D6["柴发控制器<br/>Diesel Gen"]
+        D7["充电桩群<br/>EV Chargers"]
+        D8["环境传感器<br/>温湿度/辐照度"]
+        D1 --- D2 --- D3
+        D4 --- D5 --- D6 --- D7 --- D8
+    end
+    Cloud <==>|"HTTPs / WebSocket<br/>MQTT / gRPC"| Station
+    Station <==>|"IEC 104<br/>MQTT / WebSocket"| Edge
+    Edge <==>|"Modbus TCP / RTU<br/>CAN 2.0B<br/>IEC 61850 GOOSE/MMS"| Device
+    style Cloud fill:#e1f5fe,stroke:#0288d1
+    style Station fill:#fff3e0,stroke:#e65100
+    style Edge fill:#f3e5f5,stroke:#7b1fa2
+    style Device fill:#e8f5e9,stroke:#2e7d32
+</pre></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">☁️ 云平台层:</b> 数据中台 + AI引擎(LSTM预测/异常检测) + 运维管理 + 电力交易(现货/辅助服务/碳交易) + 大屏可视化</p>
 <p><b style="color:var(--orange)">🏭 站控层:</b> SCADA Server(双机热备) + 优化调度引擎(MILP/MPC) + AGC/AVC + 策略下发&并离网切换 + 本地HMI</p>
@@ -400,7 +718,43 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 二、通信协议总线</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 二、通信协议 & 连接总线</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+flowchart TB
+    subgraph WAN["🌐 广域网 WAN"]
+        MQTT_Broker["MQTT Broker (EMQX)<br/>数据上云 / 下行指令"]
+        VPN["IPSec / WireGuard VPN<br/>安全隧道"]
+    end
+    subgraph StationNet["📡 站控局域网 LAN"]
+        Switch1["核心交换机<br/>VLAN 划分"]
+        SCADA["SCADA Server<br/>双机热备"]
+        SCADA --- Switch1
+    end
+    subgraph EdgeNet["🔌 边缘网段"]
+        Switch2["边缘交换机 S1"]
+        GW1["边缘网关 GW-01<br/>ARM Cortex-A72"]
+        GW2["边缘网关 GW-02<br/>(热备冗余)"]
+        Switch2 --- GW1
+        Switch2 --- GW2
+    end
+    subgraph Devices["⚙️ 终端设备"]
+        BMS["BMS 主控<br/>CAN 2.0B ↔ GW"]
+        PCS["PCS 控制器<br/>Modbus TCP ↔ GW"]
+        Meter["双向关口表 0.2S<br/>Modbus RTU RS485"]
+        PV_Inv["光伏逆变器<br/>Modbus TCP"]
+        Diesel["柴发控制器<br/>Modbus RTU RS485"]
+        Protection["保护装置<br/>IEC 61850 GOOSE"]
+    end
+    MQTT_Broker --> Switch1
+    VPN --> Switch1
+    Switch1 -- "IEC 104 / MQTT" --> Switch2
+    GW1 -- "CAN 2.0B 500kbps" --> BMS
+    GW1 -- "Modbus TCP:502" --> PCS
+    GW1 -- "RS485 Modbus RTU" --> Meter
+    GW1 -- "Modbus TCP" --> PV_Inv
+    GW1 -- "RS485 Modbus RTU" --> Diesel
+    GW1 -- "IEC 61850 GOOSE" --> Protection
+</pre></div>
 <table class="result-table" style="font-size:11px"><tr><th>连接</th><th>协议</th><th>物理介质</th><th>实时性</th><th>用途</th></tr>
 <tr><td>云↔站控</td><td>MQTT/HTTPs</td><td>光纤/4G</td><td>秒级</td><td>数据上报/指令下发</td></tr>
 <tr><td>站控↔边缘</td><td>IEC 104</td><td>千兆以太网</td><td>1~5s</td><td>电力通信标准</td></tr>
@@ -413,6 +767,27 @@ ACC AC一体柜专题
 </div>
 <div class="acc-section">
 <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 三、单台eBlock内部架构</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+flowchart LR
+    subgraph eBlock_Internal["eBlock 能量块 内部架构"]
+        direction TB
+        Battery_PACK["🔋 电池PACK<br/>LFP 280Ah 1P240S<br/>额定768V/215kWh"]
+        BMS_Slave["BMS 从控单元<br/>电压/温度采集<br/>被动均衡"]
+        BMS_Master["BMS 主控单元<br/>SOC/SOH 卡尔曼滤波<br/>故障诊断/保护"]
+        DC_Bus["直流母线 DC 750~1000V<br/>霍尔传感器+IMD"]
+        PCS_Module["PCS 功率模块<br/>三相全桥 IGBT 100kW<br/>DC/AC双向 ≥98.5%"]
+        PCS_Controller["PCS 控制器 DSP<br/>TI TMS320F28379D<br/>PQ/VF/Droop策略"]
+        AC_Output["交流输出 AC 400V 50Hz<br/>EMI滤波+断路器+STS"]
+        Thermal["热管理 液冷机组<br/>水温/流量监测"]
+        BMS_Slave -- "CAN 2.0B 500kbps<br/>菊花链" --> BMS_Master
+        Battery_PACK -- "电压采样/NTC/均衡线" --> BMS_Slave
+        BMS_Master -- "硬线: 高压互锁/急停" --> PCS_Controller
+        DC_Bus --> Battery_PACK
+        DC_Bus --> PCS_Module
+        PCS_Controller -- "PWM/ADC/IGBT驱动" --> PCS_Module
+        PCS_Module --> AC_Output
+    end
+</pre></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:#50c878">🔋 电池PACK:</b> LFP 280Ah, 1P240S, 额定768V/215kWh → BMS从控(电压/温度采集/被动均衡) → BMS主控(SOC/SOH卡尔曼滤波/故障诊断)</p>
 <p><b style="color:var(--orange)">⚡ PCS功率模块:</b> 三相全桥IGBT 100kW DC/AC双向 ≥98.5% → PCS控制器(TI TMS320F28379D双核, PQ/VF/Droop策略, SPWM调制)</p>
@@ -420,12 +795,63 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 四、关键通信时延</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 四、关键通信时延（时序图）</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+sequenceDiagram
+    participant Cloud as 云平台
+    participant Station as 站控EMS
+    participant Edge as 边缘网关
+    participant PCS as PCS控制器
+    participant BMS as BMS主控
+    Note over Cloud,BMS: ■ 正常调度指令下发 (秒级)
+    Cloud->>Station: MQTT: 下发日前SOC计划 (15min)
+    Station->>Edge: IEC 104: DCO 控制命令 (5s)
+    Edge->>PCS: Modbus TCP: Write 功率寄存器
+    PCS-->>Edge: Modbus TCP: Read 实际功率/电压
+    Edge-->>Station: IEC 104: 遥测上送
+    Station-->>Cloud: MQTT: 遥测打包上报
+    Note over Cloud,BMS: ■ 急停/故障保护 (毫秒级)
+    BMS->>Edge: CAN: 故障帧 (SOC/温度/绝缘)
+    Edge->>PCS: Modbus TCP: 紧急停机指令
+    Edge->>Station: MQTT QoS2: 故障告警
+    Station->>Cloud: MQTT QoS1: 告警推送
+    Note over Cloud,BMS: ■ 并离网切换 (&lt;20ms)
+    Station->>Edge: IEC 104: 离网切换命令
+    Edge->>PCS: Modbus TCP: 模式切换 VF→PQ
+    Edge->>BMS: CAN: 解除并网保护联锁
+</pre></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b>正常调度:</b> 云→站控(MQTT日前计划15min) → 边缘(IEC104 5s) → PCS(Modbus TCP写入功率) → 回读 → 上送 ≈ 秒级</p>
 <p><b>急停/故障:</b> BMS→CAN故障帧 → 边缘→PCS紧急停机 → 站控告警 → 云推送 ≈ 毫秒级 (PCS本地DSP硬件保护PWM闭锁&lt;10μs)</p>
 <p><b>并离网切换:</b> 站控→边缘→PCS模式切换(VF→PQ) DSP切换&lt;20ms → BMS解除联锁</p>
 </div>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 五、网络拓扑</h3>
+<div class="mermaid-wrap"><pre class="mermaid">
+graph TB
+    Internet["☁️ Internet"] --- Firewall["防火墙<br/>pfSense / IPSec VPN"]
+    Firewall --- CoreSwitch["核心交换机<br/>VLAN10:控制 VLAN20:数据"]
+    CoreSwitch --- SCADA_Server["SCADA服务器<br/>双网口bonding"]
+    CoreSwitch --- DB_Server["数据库服务器<br/>TDengine + Redis"]
+    CoreSwitch --- HMI["就地HMI<br/>昆仑通态/威纶通"]
+    CoreSwitch --- EdgeSwitch["边缘交换机 S1<br/>环网 RSTP"]
+    EdgeSwitch --- GW1["GW-01 边缘网关"]
+    EdgeSwitch --- GW2["GW-02 热备<br/>VRRP VIP漂移"]
+    GW1 --- RS485_1["RS485-1<br/>关口表+环境传感器"]
+    GW1 --- RS485_2["RS485-2<br/>柴发+消防"]
+    GW1 --- CAN_1["CAN-1<br/>eBlock #1~#5 BMS"]
+    GW1 --- CAN_2["CAN-2<br/>eBlock #6~#10 BMS"]
+    GW1 --- Eth_1["Modbus TCP<br/>光伏逆变器"]
+    GW1 --- Eth_2["Modbus TCP<br/>PCS 组"]
+    GW1 --- Eth_3["Modbus TCP<br/>充电桩群"]
+    style Internet fill:#bbdefb
+    style Firewall fill:#ffcdd2
+    style CoreSwitch fill:#fff9c4
+    style SCADA_Server fill:#c8e6c9
+    style DB_Server fill:#c8e6c9
+    style EdgeSwitch fill:#d1c4e9
+</pre></div>
 </div>
 </div>
 
@@ -486,6 +912,7 @@ ACC AC一体柜专题
 </div>
 
 <script>
+mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#185FA5',primaryTextColor:'#FAFAF5',primaryBorderColor:'#3a3e45',lineColor:'#C2C0B6',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px'},flowchart:{htmlLabels:true,curve:'basis'},sequence:{actorMargin:50,messageMargin:40}});
 const I18N={
 zh:{
 header_title:'Open ESS Agent — 开源储能系统解决方案AI智能体',
@@ -669,6 +1096,7 @@ function showMicroPage(id){
   document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
   const el=document.getElementById('page-'+id);
   if(el) el.style.display='block';
+  try{mermaid.run({querySelector:'#page-'+id+' .mermaid'});}catch(e){}
 }
 
 function v(id){return document.getElementById(id).value}
