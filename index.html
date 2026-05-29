@@ -30,6 +30,9 @@ a{color:var(--blue);text-decoration:none}
 .sub-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
 .mermaid-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;overflow-x:auto}
 .mermaid-wrap svg{max-width:100%}
+[id^="dmm-"]{display:none!important}
+.mermaid-wrap>div[id]{display:none!important}
+foreignObject>div[id^="d"]{display:none!important}
 .main-container{min-height:calc(100vh - 110px)}
 .sec-title{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text1);display:flex;align-items:center;gap:8px}
 .sec-title svg{width:18px;height:18px;color:var(--blue)}
@@ -175,8 +178,8 @@ select.form-input{appearance:auto}
 </header>
 
 <nav class="category-tabs">
-<div class="category-tab active" onclick="switchCategory('ess')">储能系统生成器</div>
-<div class="category-tab" onclick="switchCategory('microgrid')">微网系统生成器</div>
+<div class="category-tab active" onclick="switchCategory('ess')">储能方案智能体</div>
+<div class="category-tab" onclick="switchCategory('microgrid')">微网交付智能体</div>
 </nav>
 
 <div id="essNav">
@@ -1115,17 +1118,20 @@ const MERMAID_DEFS = {
 };
 
 async function renderMermaid(containerId){
-  const containers = containerId
-    ? [document.getElementById(containerId)]
-    : document.querySelectorAll('[id^="mm-"]');
+  if(typeof mermaid==='undefined'||!mermaid.render){setTimeout(()=>renderMermaid(containerId),500);return;}
+  let containers;
+  if(containerId){const p=document.getElementById(containerId);containers=p?Array.from(p.querySelectorAll('[id^="mm-"]')):[];}
+  else{containers=Array.from(document.querySelectorAll('[id^="mm-"]')).filter(el=>el.offsetParent!==null);}
   for(const el of containers){
     if(!el||!MERMAID_DEFS[el.id]||el.dataset.rendered) continue;
     try{
       const {svg}=await mermaid.render(el.id+'-svg',MERMAID_DEFS[el.id]);
       el.innerHTML=svg;
       el.dataset.rendered='1';
-    }catch(e){el.innerHTML='<pre style="color:#e06070;font-size:11px">'+e.message+'</pre>';}
+    }catch(e){delete el.dataset.rendered;}
   }
+  document.querySelectorAll('[id^="dmm-"]').forEach(e=>e.remove());
+  setTimeout(()=>{document.querySelectorAll('div[id]').forEach(e=>{if(e.id.startsWith('dmm-')||e.querySelector('.error-icon'))e.remove();});},200);
 }
 
 const I18N={
@@ -1306,12 +1312,13 @@ function switchCategory(cat){
 
 function showMicroPage(id){
   document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
-  const subPages=['mg-arch','mg-ems','mg-schedule','mg-deliver','mg-skills'];
-  document.querySelectorAll('.sub-tab')[subPages.indexOf(id)].classList.add('active');
+  const subPages=['mg-arch','mg-ems','mg-schedule','mg-software','mg-deliver','mg-skills'];
+  const tabIdx=subPages.indexOf(id);
+  if(tabIdx>=0) document.querySelectorAll('.sub-tab')[tabIdx].classList.add('active');
   document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
   const el=document.getElementById('page-'+id);
   if(el) el.style.display='block';
-  renderMermaid();
+  setTimeout(()=>renderMermaid('page-'+id),100);
   if(id==='mg-deliver'&&!LAST_MG_RESULT) generateMicrogridDelivery(false);
   if(id==='mg-skills') renderMgSkills();
 }
