@@ -1600,14 +1600,18 @@ async function renderMermaid(containerId){
   let containers;
   if(containerId){const p=document.getElementById(containerId);containers=p?Array.from(p.querySelectorAll('[id^="mm-"]')):[];}
   else{containers=Array.from(document.querySelectorAll('[id^="mm-"]')).filter(el=>el.offsetParent!==null);}
+  console.log('[renderMermaid] containerId:',containerId,'found containers:',containers.map(el=>el.id));
   for(const el of containers){
-    if(!el||!MERMAID_DEFS[el.id]||el.dataset.rendered) continue;
+    if(!el){console.log('[renderMermaid] skip: no element');continue;}
+    if(!MERMAID_DEFS[el.id]){console.log('[renderMermaid] skip: no def for',el.id);continue;}
+    if(el.dataset.rendered){console.log('[renderMermaid] skip: already rendered',el.id);continue;}
     try{
       let result=await mermaid.render(el.id+'-svg',MERMAID_DEFS[el.id]);
       let svg=result&&result.svg?result.svg:result;
       el.innerHTML=svg;
       el.dataset.rendered='1';
-    }catch(e){console.error('Mermaid render error for',el.id,':',e);delete el.dataset.rendered;}
+      console.log('[renderMermaid] rendered',el.id,'svg length',svg.length);
+    }catch(e){console.error('[renderMermaid] error for',el.id,':',e);delete el.dataset.rendered;}
   }
   document.querySelectorAll('[id^="dmm-"]').forEach(e=>e.remove());
   setTimeout(()=>{document.querySelectorAll('div[id]').forEach(e=>{if(e.id.startsWith('dmm-')||e.querySelector('.error-icon'))e.remove();});},200);
