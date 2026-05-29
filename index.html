@@ -1813,14 +1813,11 @@ function mgShowWiki(id){
   const tabs=['arch','ems','schedule','software'];
   const idx=tabs.indexOf(id);
   if(idx>=0) document.querySelectorAll('#page-mg-wiki .sw-tab')[idx].classList.add('active');
-  document.querySelectorAll('.micro-content').forEach(t=>{
-    if(t.id==='page-mg-wiki') t.style.display='block';
-    else if(['page-mg-arch','page-mg-ems','page-mg-schedule','page-mg-software'].includes(t.id)){
-      if(t.id==='page-mg-'+id) t.style.display='block';
-      else t.style.display='none';
-    }else if(t.id.startsWith('page-mg-')) t.style.display='none';
-  });
-  setTimeout(()=>renderMermaid('page-mg-'+id),200);
+  document.querySelectorAll('.micro-content').forEach(t=>{t.style.display='none';});
+  document.getElementById('page-mg-wiki').style.display='block';
+  const subEl=document.getElementById('page-mg-'+id);
+  if(subEl) subEl.style.display='block';
+  setTimeout(()=>renderMermaid('page-mg-'+id),300);
 }
 
 function showSwSub(id){
