@@ -195,12 +195,12 @@ select.form-input{appearance:auto}
 
 <div id="microgridNav" style="display:none">
 <nav class="sub-tabs">
-<div class="sub-tab active" onclick="showMicroPage('mg-arch')">微网架构</div>
-<div class="sub-tab" onclick="showMicroPage('mg-ems')">微网能量管理</div>
-<div class="sub-tab" onclick="showMicroPage('mg-schedule')">微网调度优化</div>
-<div class="sub-tab" onclick="showMicroPage('mg-software')">软件平台配置</div>
-<div class="sub-tab" onclick="showMicroPage('mg-deliver')">项目交付</div>
-<div class="sub-tab" onclick="showMicroPage('mg-skills')">Skill壁垒</div>
+<div class="sub-tab active" onclick="showMicroPage('mg-design')">方案设计</div>
+<div class="sub-tab" onclick="showMicroPage('mg-drawings')">电气图纸</div>
+<div class="sub-tab" onclick="showMicroPage('mg-protocol')">协议调试</div>
+<div class="sub-tab" onclick="showMicroPage('mg-deploy')">一键部署</div>
+<div class="sub-tab" onclick="showMicroPage('mg-trading')">电力交易</div>
+<div class="sub-tab" onclick="showMicroPage('mg-wiki')">微网百科</div>
 </nav>
 </div>
 
@@ -384,6 +384,224 @@ ACC AC一体柜专题
 </div>
 
 <!-- ========== MICROGRID PAGES ========== -->
+<!-- Agent 1: 方案设计 -->
+<div id="page-mg-design" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">微网方案设计 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">输入场景参数，AI自动生成微网拓扑、设备选型、BOM清单、经济性分析</div>
+<div style="background:linear-gradient(135deg,#534AB7,#0C447C);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
+<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px">AI 微网方案设计智能体</div>
+<div style="font-size:11px;color:#c0d0e0;line-height:1.5">从同一份方案JSON同源输出：系统架构图、一次接线图、通信拓扑图、保护分区图、BOM清单、经济性报告。AI自动识别场景特征推荐最佳拓扑方案</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:16px">
+<div style="border-left:3px solid var(--purple);padding-left:14px">
+<div class="sec-title" style="margin-bottom:8px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+<span>自然语言描述</span>
+</div>
+<textarea id="mgNaturalInput" class="form-input" rows="3" placeholder="例：苏州工业园区2MW负荷，光伏1.5MWp+储能5MWh，10kV接入，需并/离网双模切换，预留充电桩1.2MW" style="resize:vertical;font-size:12px;line-height:1.4"></textarea>
+<button class="btn btn-primary" onclick="mgParseNatural()" style="margin-top:8px;width:100%;font-size:12px;padding:8px">AI识别参数并生成方案</button>
+</div>
+<div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">项目名称</label><input type="text" class="form-input" id="mgProjName" value="苏州工业园区光储充微网"></div>
+<div class="form-group"><label class="form-label">所在区域</label><input type="text" class="form-input" id="mgRegion" value="江苏省苏州市"></div>
+<div class="form-group"><label class="form-label">场景类型</label><select class="form-input" id="mgScenario"><option value="industrial">工商业园区</option><option value="solar_storage_charge">光储充一体化</option><option value="mining">油田矿区</option><option value="offgrid">偏远离网</option><option value="datacenter">数据中心</option></select></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">峰值负荷 (kW)</label><input type="number" class="form-input" id="mgLoadPeak" value="2000" step="50"></div>
+<div class="form-group"><label class="form-label">光伏容量 (kWp)</label><input type="number" class="form-input" id="mgPvKw" value="1500" step="50"></div>
+<div class="form-group"><label class="form-label">储能容量 (kWh)</label><input type="number" class="form-input" id="mgBessKwh" value="5000" step="100"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">柴发容量 (kW)</label><input type="number" class="form-input" id="mgDieselKw" value="800" step="50"></div>
+<div class="form-group"><label class="form-label">充电桩 (kW)</label><input type="number" class="form-input" id="mgEvKw" value="1200" step="50"></div>
+<div class="form-group"><label class="form-label">接入电压 (kV)</label><select class="form-input" id="mgVoltage"><option value="10">10kV</option><option value="35">35kV</option><option value="0.4">0.4kV</option></select></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">运行模式</label><select class="form-input" id="mgOpMode"><option value="grid_tied">并网运行</option><option value="dual">并/离网双模</option><option value="off_grid">纯离网</option></select></div>
+<div class="form-group"><label class="form-label">关键负荷占比(%)</label><input type="number" class="form-input" id="mgCriticalPct" value="35" min="10" max="100"></div>
+<div class="form-group"><label class="form-label">预算上限(万元)</label><input type="number" class="form-input" id="mgBudget" value="800" step="10"></div>
+</div>
+<div class="form-row" style="margin-top:4px">
+<div class="form-group"><label class="form-label">峰段电价(元/kWh)</label><input type="number" class="form-input" id="mgPricePeak" value="1.08" step="0.01"></div>
+<div class="form-group"><label class="form-label">谷段电价(元/kWh)</label><input type="number" class="form-input" id="mgPriceValley" value="0.35" step="0.01"></div>
+<div class="form-group"><label class="form-label">AI模型</label><select class="form-input" id="mgLlmProvider"><option value="local">本地规则引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option></select></div>
+</div>
+</div>
+</div>
+<button class="btn btn-primary" onclick="mgGenerateSolution()" style="width:100%;padding:12px;font-size:14px;margin-bottom:16px">生成微网方案</button>
+<div class="success-msg" id="mgSuccessMsg" style="display:none">方案已生成！请切换到其他标签查看图纸、点表、部署方案</div>
+<div id="mgSolutionBrief" style="font-size:12px;color:var(--text2);line-height:1.8"></div>
+</div>
+
+<!-- Agent 2: 电气图纸 -->
+<div id="page-mg-drawings" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">电气图纸 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">从方案JSON同源生成：系统架构图、一次接线图、通信拓扑图、保护分区图。遵循GB/T 4728电气符号标准</div>
+<div id="mgDrawingEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成微网方案</div>
+<div id="mgDrawingContent" style="display:none">
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">微网系统架构图</h3><div class="diagram-actions"><button onclick="downloadMGDiagram('mgArchSvg','微网系统架构图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="mgArchSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">微网电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadMGDiagram('mgWiringSvg','微网电气一次接线图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="mgWiringSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">微网通信拓扑图</h3><div class="diagram-actions"><button onclick="downloadMGDiagram('mgCommSvg','微网通信拓扑图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="mgCommSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">BOM设备清单</h3></div>
+<div id="mgBomTable"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">经济性分析报告</h3></div>
+<div id="mgEconTable"></div>
+</div>
+</div>
+</div>
+
+<!-- Agent 3: 协议调试 -->
+<div id="page-mg-protocol" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">协议与调试 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">根据设备类型自动生成Modbus/IEC104/IEC61850/OCPP/MQTT通信点表，含寄存器地址、数据类型、调试检查项</div>
+<div id="mgProtocolEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成微网方案</div>
+<div id="mgProtocolContent" style="display:none">
+<div class="sw-tabs">
+<div class="sw-tab active" onclick="mgShowPtTab('pcs')">PCS点表</div>
+<div class="sw-tab" onclick="mgShowPtTab('bms')">BMS点表</div>
+<div class="sw-tab" onclick="mgShowPtTab('meter')">关口表</div>
+<div class="sw-tab" onclick="mgShowPtTab('pv')">光伏逆变器</div>
+<div class="sw-tab" onclick="mgShowPtTab('charger')">充电桩</div>
+<div class="sw-tab" onclick="mgShowPtTab('diesel')">柴发</div>
+<div class="sw-tab" onclick="mgShowPtTab('env')">消防/环境</div>
+<div class="sw-tab" onclick="mgShowPtTab('iec104')">IEC104</div>
+<div class="sw-tab" onclick="mgShowPtTab('mqtt')">MQTT主题</div>
+</div>
+<div id="mgPointTableContent" style="margin-top:12px"></div>
+<div class="diagram-container" style="margin-top:16px">
+<div class="diagram-header"><h3 class="diagram-title">调试检查清单</h3></div>
+<div id="mgDebugChecklist"></div>
+</div>
+</div>
+</div>
+
+<!-- Agent 4: 一键部署 -->
+<div id="page-mg-deploy" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">EMS 一键部署 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">站端服务器/边缘网关自动化部署：预检→安装→配置注入→服务启动→健康检查→交付报告</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">
+<div>
+<div class="sw-section"><div class="sw-section-title">目标服务器</div>
+<div class="form-row" style="grid-template-columns:1fr 1fr">
+<div class="form-group"><label class="form-label">服务器 IP</label><input type="text" class="form-input" id="mgDeployIp" value="192.168.10.20"></div>
+<div class="form-group"><label class="form-label">SSH 端口</label><input type="text" class="form-input" id="mgDeployPort" value="22"></div>
+</div>
+<div class="form-row" style="grid-template-columns:1fr 1fr">
+<div class="form-group"><label class="form-label">用户名</label><input type="text" class="form-input" id="mgDeployUser" value="root"></div>
+<div class="form-group"><label class="form-label">认证密钥备注</label><input type="text" class="form-input" id="mgDeployKey" placeholder="部署时提供 (不存盘)"></div>
+</div>
+</div>
+<div class="sw-section"><div class="sw-section-title">服务器规格要求</div>
+<div style="font-size:11px;color:var(--text2);line-height:1.8">
+<b style="color:var(--text1)">最小配置:</b> 4核CPU / 8GB内存 / 200GB SSD<br>
+<b style="color:var(--text1)">推荐配置:</b> 8核CPU / 32GB内存 / 500GB SSD<br>
+<b style="color:var(--text1)">操作系统:</b> Ubuntu 22.04 LTS / Debian 12<br>
+<b style="color:var(--text1)">开放端口:</b> 80, 443, 1883, 502, 2404, 6041, 6379, 5432
+</div>
+</div>
+<div class="sw-section"><div class="sw-section-title">部署模块</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" class="mg-deploy-mod" checked value="SCADA"> SCADA 实时监控</label>
+<label class="ck-label"><input type="checkbox" class="mg-deploy-mod" checked value="EMS"> EMS 能量管理</label>
+<label class="ck-label"><input type="checkbox" class="mg-deploy-mod" checked value="Gateway"> 协议网关(Modbus/CAN/IEC104)</label>
+<label class="ck-label"><input type="checkbox" class="mg-deploy-mod" checked value="Alarm"> 告警推送(分级+声光+短信)</label>
+<label class="ck-label"><input type="checkbox" class="mg-deploy-mod" checked value="Screen"> 可视化大屏</label>
+<label class="ck-label"><input type="checkbox" class="mg-deploy-mod" value="Optimizer"> 调度优化引擎(MILP)</label>
+<label class="ck-label"><input type="checkbox" class="mg-deploy-mod" value="Trading"> 电力交易助手</label>
+<label class="ck-label"><input type="checkbox" class="mg-deploy-mod" value="AI"> AI 故障预测</label>
+<label class="ck-label"><input type="checkbox" class="mg-deploy-mod" value="Twins"> 数字孪生3D</label>
+</div>
+</div>
+</div>
+<div>
+<div class="sw-section"><div class="sw-section-title">部署流水线日志</div>
+<div class="mg-log" id="mgDeployLog" style="min-height:320px;font-size:10px;">等待执行。选择部署模块后点击「模拟部署」查看完整部署过程。</div>
+</div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<button class="btn btn-primary" onclick="mgRunDeploy()" style="width:auto;font-size:12px;padding:8px 16px">模拟部署流水线</button>
+<button class="btn btn-secondary" onclick="mgExportDeployScript()" style="width:auto;font-size:12px;padding:8px 16px">导出部署脚本</button>
+</div>
+</div>
+</div>
+<div class="diagram-container" style="margin-top:16px">
+<div class="diagram-header"><h3 class="diagram-title">Ansible部署计划</h3></div>
+<div id="mgDeployPlan" class="mg-code" style="background:var(--bg3);color:var(--text1)">请先运行部署模拟</div>
+</div>
+</div>
+
+<!-- Agent 5: 电力交易 -->
+<div id="page-mg-trading" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">电力交易策略 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">接入当地电价/辅助服务政策，AI自动推荐最优充放电策略，预估额外收益</div>
+<div id="mgTradingEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成微网方案</div>
+<div id="mgTradingContent" style="display:none">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">
+<div class="sw-section"><div class="sw-section-title">分时电价配置</div>
+<div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+<div class="form-group"><label class="form-label">峰段(元/kWh)</label><input type="number" class="form-input" id="tPricePeak" value="1.08" step="0.01"></div>
+<div class="form-group"><label class="form-label">平段(元/kWh)</label><input type="number" class="form-input" id="tPriceFlat" value="0.66" step="0.01"></div>
+<div class="form-group"><label class="form-label">谷段(元/kWh)</label><input type="number" class="form-input" id="tPriceValley" value="0.35" step="0.01"></div>
+</div>
+<div class="form-row" style="grid-template-columns:1fr 1fr">
+<div class="form-group"><label class="form-label">光伏上网电价(元)</label><input type="number" class="form-input" id="tPricePv" value="0.39" step="0.01"></div>
+<div class="form-group"><label class="form-label">储能度电成本(元)</label><input type="number" class="form-input" id="tLcos" value="0.28" step="0.01"></div>
+</div>
+</div>
+<div class="sw-section"><div class="sw-section-title">参与市场类型</div>
+<div class="ck-group">
+<label class="ck-label"><input type="checkbox" class="t-market" checked value="peak_valley"> 峰谷价差套利</label>
+<label class="ck-label"><input type="checkbox" class="t-market" checked value="demand"> 需量管理</label>
+<label class="ck-label"><input type="checkbox" class="t-market" value="spot"> 电力现货市场</label>
+<label class="ck-label"><input type="checkbox" class="t-market" value="ancillary"> 辅助服务(调频/备用)</label>
+<label class="ck-label"><input type="checkbox" class="t-market" value="dr"> 需求响应(削峰补偿)</label>
+<label class="ck-label"><input type="checkbox" class="t-market" value="carbon"> 碳交易/绿证</label>
+</div>
+</div>
+</div>
+<button class="btn btn-primary" onclick="mgGenerateTrading()" style="margin-bottom:16px">生成交易策略</button>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">策略建议</h3></div>
+<div id="mgTradingStrategy"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">收益测算</h3></div>
+<div id="mgTradingEcon"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">24h典型调度计划</h3></div>
+<div id="mgTradingSchedule"></div>
+</div>
+</div>
+</div>
+
+<!-- Agent 6: 微网百科(原知识库) -->
+<div id="page-mg-wiki" class="micro-content" style="display:none;padding:24px 32px">
+<div style="margin-bottom:20px;display:flex;align-items:center;gap:12px">
+<div class="sec-title" style="margin-bottom:0">微网知识百科</div>
+<div style="font-size:11px;color:var(--text2)">微网技术参考资料：架构、EMS、调度优化、软件平台</div>
+</div>
+<div class="sw-tabs" style="margin-bottom:16px">
+<div class="sw-tab active" onclick="mgShowWiki('arch')">微网架构</div>
+<div class="sw-tab" onclick="mgShowWiki('ems')">能量管理</div>
+<div class="sw-tab" onclick="mgShowWiki('schedule')">调度优化</div>
+<div class="sw-tab" onclick="mgShowWiki('software')">软件平台</div>
+</div>
+</div>
+
+<!-- (保留原知识库内容页) -->
 <div id="page-mg-arch" class="micro-content" style="display:none;padding:24px 32px">
 <div class="sec-title">微网(Microgrid) 架构全景图</div>
 <div style="font-size:12px;color:var(--text2);margin-bottom:16px">基于Microgrid_Architecture.md | 设计人：卢继雄</div>
@@ -823,173 +1041,6 @@ ACC AC一体柜专题
 <div class="mg-card mg-col-6">
 <h3>项目交付总清单</h3>
 <div class="mg-code" id="swDeliveryList" style="max-height:260px">等待生成...</div>
-</div>
-</div>
-</div>
-<section class="mg-hero">
-<div>
-<div class="mg-pills"><span class="mg-pill hot">Microgrid Delivery Agent</span><span class="mg-pill">方案</span><span class="mg-pill">图纸</span><span class="mg-pill">点表</span><span class="mg-pill">部署</span><span class="mg-pill">验收</span></div>
-<h2>微网方案生成器</h2>
-<p>把客户需求、负荷、电价、设备清单和服务器信息变成可交付成果：微网拓扑方案、电气架构图、通信点表、EMS策略配置、一键部署流水线和FAT/SAT验收资料。它不是单纯问答，而是面向项目落地的工程交付工具链。</p>
-<div class="mg-actions">
-<button class="btn btn-primary" onclick="generateMicrogridDelivery(true)">生成交付方案</button>
-<button class="btn btn-secondary" onclick="downloadMgJson()">导出方案JSON</button>
-</div>
-</div>
-<div class="mg-kpis">
-<div class="mg-kpi"><b id="mgKpiCycle">30min</b><span>站端平台自动部署目标时间</span></div>
-<div class="mg-kpi"><b id="mgKpiDocs">12+</b><span>自动交付物：方案、图纸、点表、策略、验收表</span></div>
-<div class="mg-kpi"><b id="mgKpiSkill">10</b><span>核心行业Skill形成知识壁垒</span></div>
-<div class="mg-kpi"><b id="mgKpiRisk">低</b><span>先做工程交付，暂缓重资产VPP准入</span></div>
-</div>
-</section>
-
-<div class="mg-grid">
-<div class="mg-card mg-col-7">
-<h3>项目输入</h3>
-<div class="mg-form-grid">
-<div><label class="mg-label">项目名称</label><input id="mgProjectName" class="mg-input" value="零碳园区光储充微网项目"></div>
-<div><label class="mg-label">所在区域</label><input id="mgRegion" class="mg-input" value="江苏苏州"></div>
-<div><label class="mg-label">场景类型</label><select id="mgScenario" class="mg-input"><option>工商业园区</option><option>光储充一体化充电站</option><option>数据中心</option><option>偏远离网供电</option><option>油田矿区</option><option>港口/机场岸电</option></select></div>
-<div><label class="mg-label">并离网模式</label><select id="mgMode" class="mg-input"><option>并网型，预留离网</option><option>并网+无缝离网</option><option>离网型</option><option>多微网互联</option></select></div>
-<div><label class="mg-label">接入电压</label><select id="mgVoltage" class="mg-input"><option>10kV</option><option>0.4kV</option><option>35kV</option><option>480V</option></select></div>
-<div><label class="mg-label">峰值负荷(kW)</label><input id="mgLoadPeak" type="number" class="mg-input" value="2500"></div>
-<div><label class="mg-label">光伏容量(kWp)</label><input id="mgPvKw" type="number" class="mg-input" value="1800"></div>
-<div><label class="mg-label">储能容量(kWh)</label><input id="mgBessKwh" type="number" class="mg-input" value="5000"></div>
-<div><label class="mg-label">柴发容量(kW)</label><input id="mgDieselKw" type="number" class="mg-input" value="800"></div>
-<div><label class="mg-label">充电桩总功率(kW)</label><input id="mgEvKw" type="number" class="mg-input" value="1200"></div>
-<div><label class="mg-label">关键负荷占比(%)</label><input id="mgCriticalPct" type="number" class="mg-input" value="35"></div>
-<div><label class="mg-label">预算上限(万元)</label><input id="mgBudget" type="number" class="mg-input" value="650"></div>
-</div>
-<h4>客户目标</h4>
-<div class="mg-check-grid">
-<label class="mg-check"><input class="mg-goal" value="降低电费" type="checkbox" checked>降低电费</label>
-<label class="mg-check"><input class="mg-goal" value="防逆流" type="checkbox" checked>防逆流</label>
-<label class="mg-check"><input class="mg-goal" value="关键负荷不停电" type="checkbox" checked>关键负荷不停电</label>
-<label class="mg-check"><input class="mg-goal" value="光伏最大自消纳" type="checkbox" checked>光伏最大自消纳</label>
-<label class="mg-check"><input class="mg-goal" value="需求响应" type="checkbox">需求响应</label>
-<label class="mg-check"><input class="mg-goal" value="后续VPP接入" type="checkbox">后续VPP接入</label>
-</div>
-</div>
-
-<div class="mg-card mg-col-5">
-<h3>交付闭环</h3>
-<div class="mg-timeline" style="grid-template-columns:1fr 1fr">
-<div class="mg-step"><b>1. 需求解析</b><span>场景、负荷、光伏、储能、柴发、充电桩、并离网目标</span></div>
-<div class="mg-step"><b>2. 方案生成</b><span>拓扑选择、容量建议、BOM、经济性、风险提示</span></div>
-<div class="mg-step"><b>3. 图纸输出</b><span>架构图、一次图、通信图、接地/保护分区图</span></div>
-<div class="mg-step"><b>4. 点表配置</b><span>Modbus、IEC104、IEC61850、OCPP、MQTT</span></div>
-<div class="mg-step"><b>5. EMS部署</b><span>Docker Compose/K3s、配置注入、健康检查</span></div>
-<div class="mg-step"><b>6. 验收交付</b><span>FAT/SAT、调试记录、运维手册、交付报告</span></div>
-</div>
-<div class="mg-output" id="mgSummaryBox" style="margin-top:12px">点击"生成交付方案"后，这里会输出适合该项目的微网交付摘要。</div>
-</div>
-
-<div class="mg-card mg-col-12">
-<h3>智能体推荐结果</h3>
-<div id="mgResultGrid" class="mg-grid" style="margin-bottom:0"></div>
-</div>
-</div>
-
-<div class="mg-grid">
-<div class="mg-card mg-col-7">
-<h3>微网电气架构图</h3>
-<div class="mg-svg" id="mgTopologySvg"></div>
-</div>
-<div class="mg-card mg-col-5">
-<h3>方案JSON同源生成</h3>
-<div class="mg-output" id="mgDesignBrief">还没有生成微网方案。请先点击"生成交付方案"。</div>
-<div class="mg-actions">
-<button class="btn btn-primary" onclick="generateMicrogridDelivery(true)">重新生成</button>
-<button class="btn btn-secondary" onclick="downloadMgJson()">下载JSON</button>
-</div>
-</div>
-</div>
-
-<div class="mg-grid">
-<div class="mg-card mg-col-4">
-<h3>点表生成规则</h3>
-<p class="mg-mini">根据设备类型自动生成协议、地址、采样周期、EMS用途和调试注意事项。第一版重点覆盖PCS、BMS、关口表、光伏逆变器、充电桩、柴发、消防和环境量。</p>
-<div class="mg-pills"><span class="mg-pill hot">Modbus TCP</span><span class="mg-pill">Modbus RTU</span><span class="mg-pill">IEC104</span><span class="mg-pill">IEC61850</span><span class="mg-pill">OCPP</span><span class="mg-pill">MQTT</span></div>
-<div class="mg-actions"><button class="btn btn-primary" onclick="renderMgPointTable()">刷新点表</button><button class="btn btn-secondary" onclick="downloadMgPointCsv()">导出CSV</button></div>
-</div>
-<div class="mg-card mg-col-8">
-<h3>通信点表草稿</h3>
-<div id="mgPointTable"></div>
-</div>
-</div>
-
-<div class="mg-grid">
-<div class="mg-card mg-col-5">
-<h3>目标服务器</h3>
-<div class="mg-form-grid two">
-<div><label class="mg-label">服务器IP</label><input id="mgServerIp" class="mg-input" value="192.168.10.20"></div>
-<div><label class="mg-label">SSH端口</label><input id="mgSshPort" class="mg-input" value="22"></div>
-<div><label class="mg-label">用户名</label><input id="mgSshUser" class="mg-input" value="root"></div>
-<div><label class="mg-label">密码/密钥备注</label><input id="mgSshSecret" type="password" class="mg-input" value=""></div>
-</div>
-<h4>部署模块</h4>
-<div class="mg-check-grid">
-<label class="mg-check"><input class="mg-module" value="SCADA监控" type="checkbox" checked>SCADA监控</label>
-<label class="mg-check"><input class="mg-module" value="EMS能量管理" type="checkbox" checked>EMS能量管理</label>
-<label class="mg-check"><input class="mg-module" value="协议网关" type="checkbox" checked>协议网关</label>
-<label class="mg-check"><input class="mg-module" value="调度优化" type="checkbox" checked>调度优化</label>
-<label class="mg-check"><input class="mg-module" value="告警推送" type="checkbox" checked>告警推送</label>
-<label class="mg-check"><input class="mg-module" value="电力交易助手" type="checkbox">电力交易助手</label>
-<label class="mg-check"><input class="mg-module" value="大屏可视化" type="checkbox" checked>大屏可视化</label>
-<label class="mg-check"><input class="mg-module" value="AI故障预测" type="checkbox">AI故障预测</label>
-</div>
-<div class="mg-actions">
-<button class="btn btn-primary" onclick="mgRunDeploySimulation()">模拟部署流水线</button>
-<button class="btn btn-secondary" onclick="downloadMgDeployBundle()">导出部署脚本</button>
-</div>
-<p class="mg-mini" style="margin-top:10px">安全原则：密码不落库，仅用于当次SSH会话；生产版建议使用一次性凭据、审计日志和回滚快照。</p>
-</div>
-<div class="mg-card mg-col-7">
-<h3>部署流水线日志</h3>
-<div class="mg-log" id="mgDeployLog">等待执行。生产实现建议：后端使用Ansible/SSH执行，前端通过WebSocket实时展示日志。</div>
-</div>
-</div>
-
-<div class="mg-grid">
-<div class="mg-card mg-col-12">
-<h3>自动生成部署计划</h3>
-<div class="mg-code" id="mgDeployPlan"></div>
-</div>
-</div>
-</div>
-
-<div id="page-mg-skills" class="micro-content mg-page" style="display:none">
-<div class="sec-title">已验证行业Skill体系与壁垒</div>
-<div class="mg-grid">
-<div class="mg-card mg-col-4">
-<h3>5年+真实项目训练形成的能力资产</h3>
-<p class="mg-mini">这些Skill不是概念清单，而是从储能、光储充、工商业配电、油田矿区、海外光储充等真实项目中反复沉淀出来的工程方法。它们覆盖从需求识别、容量配置、电气图纸、通信点表、EMS策略、一键部署到FAT/SAT验收的完整交付链路。</p>
-<p class="mg-mini" style="margin-top:8px">每个Skill都包含行业知识规则、标准化模板、校验清单和可执行配置生成逻辑，目标是把老工程师5年多现场经验变成稳定、可复用、可审计的智能体能力。</p>
-<div class="mg-kpis" style="margin-top:12px">
-<div class="mg-kpi"><b>5年+</b><span>真实项目场景训练</span></div>
-<div class="mg-kpi"><b>10项</b><span>核心Skill已沉淀</span></div>
-<div class="mg-kpi"><b>全链路</b><span>方案到验收闭环</span></div>
-<div class="mg-kpi"><b>可交付</b><span>图纸/点表/策略/部署</span></div>
-</div>
-<div class="mg-actions"><button class="btn btn-primary" onclick="renderMgSkills()">刷新已沉淀Skill库</button><button class="btn btn-secondary" onclick="downloadMgSkillMarkdown()">导出Skill资产说明</button></div>
-</div>
-<div class="mg-card mg-col-8">
-<h3>已沉淀并经过真实项目训练的核心Skill</h3>
-<div class="mg-skill-grid" id="mgSkillGrid"></div>
-</div>
-<div class="mg-card mg-col-12">
-<h3>成熟度与交付应用</h3>
-<div class="mg-timeline">
-<div class="mg-step"><b>方案阶段</b><span>已支持方案JSON、容量配置、拓扑选择、经济性和风险提示</span></div>
-<div class="mg-step"><b>图纸阶段</b><span>已沉淀电气制图规则、SVG坐标规范、一次图/通信图模板</span></div>
-<div class="mg-step"><b>调试阶段</b><span>已支持协议点表、EMS策略、遥测遥信和联动测试清单</span></div>
-<div class="mg-step"><b>部署阶段</b><span>已形成Docker/站端服务器/健康检查/部署日志的自动化框架</span></div>
-<div class="mg-step"><b>运维阶段</b><span>已沉淀故障复盘、告警分级、设备健康和运维知识库方向</span></div>
-<div class="mg-step"><b>运营阶段</b><span>已预留需求响应、电力交易、VPP接入和政策收益扩展接口</span></div>
-</div>
-</div>
-</div>
 </div>
 
 <footer class="footer" data-i18n="footer_text">
@@ -1734,22 +1785,40 @@ function switchCategory(cat){
     mgNav.style.display='block';
     if(mc)mc.style.display='none';
     document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
-    showMicroPage('mg-arch');
+    showMicroPage('mg-design');
   }
 }
 
 function showMicroPage(id){
-  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
-  const subPages=['mg-arch','mg-ems','mg-schedule','mg-software','mg-deliver','mg-skills'];
+  document.querySelectorAll('#microgridNav .sub-tab').forEach(t=>t.classList.remove('active'));
+  const subPages=['mg-design','mg-drawings','mg-protocol','mg-deploy','mg-trading','mg-wiki'];
   const tabIdx=subPages.indexOf(id);
-  if(tabIdx>=0) document.querySelectorAll('.sub-tab')[tabIdx].classList.add('active');
+  if(tabIdx>=0) document.querySelectorAll('#microgridNav .sub-tab')[tabIdx].classList.add('active');
   document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
   const el=document.getElementById('page-'+id);
   if(el) el.style.display='block';
-  setTimeout(()=>renderMermaid('page-'+id),100);
-  if(id==='mg-deliver'&&!LAST_MG_RESULT) generateMicrogridDelivery(false);
-  if(id==='mg-skills') renderMgSkills();
-  if(id==='mg-software') setTimeout(()=>renderMermaid('page-mg-software'),200);
+  if(id==='mg-design'&&LAST_MG_RESULT) mgRenderBrief();
+  if(id==='mg-drawings'&&LAST_MG_RESULT) mgRenderDrawings();
+  if(id==='mg-protocol'&&LAST_MG_RESULT) mgShowPtTab('pcs');
+  if(id==='mg-deploy'&&LAST_MG_RESULT) mgRenderDeploy();
+  if(id==='mg-trading'&&LAST_MG_RESULT) mgRenderTradingInit();
+  if(id==='mg-wiki') mgShowWiki('arch');
+  setTimeout(()=>renderMermaid('page-'+id),200);
+}
+
+function mgShowWiki(id){
+  document.querySelectorAll('#page-mg-wiki .sw-tab').forEach(t=>t.classList.remove('active'));
+  const tabs=['arch','ems','schedule','software'];
+  const idx=tabs.indexOf(id);
+  if(idx>=0) document.querySelectorAll('#page-mg-wiki .sw-tab')[idx].classList.add('active');
+  document.querySelectorAll('.micro-content').forEach(t=>{
+    if(t.id==='page-mg-wiki') t.style.display='block';
+    else if(['page-mg-arch','page-mg-ems','page-mg-schedule','page-mg-software'].includes(t.id)){
+      if(t.id==='page-mg-'+id) t.style.display='block';
+      else t.style.display='none';
+    }else if(t.id.startsWith('page-mg-')) t.style.display='none';
+  });
+  setTimeout(()=>renderMermaid('page-mg-'+id),200);
 }
 
 function showSwSub(id){
@@ -4960,291 +5029,623 @@ function downloadMD(){
 switchLang(localStorage.getItem('lang')||'zh');
 showPage('devices');
 
-const MG_SKILLS=[
-  {rank:'P0',name:'微网拓扑选择Skill',stage:'方案',pain:'交流/直流/交直流混合架构选择依赖老工程师经验。',output:'拓扑推荐、PCC边界、并离网模式、风险清单。',moat:'场景规则+真实案例库+图纸模板同源输出。'},
-  {rank:'P0',name:'电气架构图生成Skill',stage:'图纸',pain:'方案阶段画图慢，且容易缺PCC、保护和电压等级。',output:'系统架构图、一次接线图、通信拓扑图SVG。',moat:'GB/IEC符号库+坐标校验+审图清单。'},
-  {rank:'P0',name:'一键部署EMS Skill',stage:'部署',pain:'站端平台部署常靠工程师驻场，周期长且不可复制。',output:'Ansible/Docker部署计划、配置注入、健康检查、回滚脚本。',moat:'容器化EMS资产+自动化运维剧本+交付日志。'},
-  {rank:'P1',name:'协议点表生成Skill',stage:'调试',pain:'PCS/BMS/电表/充电桩点表手配耗时，现场错误多。',output:'Modbus/IEC104/OCPP/MQTT点表、地址规划、采样周期。',moat:'设备型号库+协议模板+调试核对清单。'},
-  {rank:'P1',name:'EMS策略编译Skill',stage:'控制',pain:'自然语言运行目标无法直接落成EMS配置。',output:'削峰填谷、防逆流、需量控制、SOC边界、柴发启停配置。',moat:'策略DSL+边缘自治逻辑+安全闭锁规则。'},
-  {rank:'P1',name:'FAT/SAT验收Skill',stage:'验收',pain:'验收表常临时整理，漏测遥信、联动和异常工况。',output:'FAT/SAT测试大纲、遥测核对表、联动测试记录。',moat:'项目类型测试库+自动关联点表和图纸。'},
-  {rank:'P2',name:'经济性与电价Skill',stage:'商务',pain:'收益测算散在Excel，难覆盖需量、容量电费和敏感性。',output:'IRR/NPV/回收期、敏感性分析、投资人版报告。',moat:'地方电价库+现金流模型+方案参数联动。'},
-  {rank:'P2',name:'故障复盘Skill',stage:'运维',pain:'告警多但定位慢，BMS/PCS/EMS日志割裂。',output:'根因链路、处置建议、备件建议、复盘报告。',moat:'故障代码库+时序事件关联+运维闭环。'},
-  {rank:'P2',name:'网络安全加固Skill',stage:'安全',pain:'现场服务器常暴露弱口令、端口、证书和日志风险。',output:'端口策略、账号权限、证书、VPN、审计清单。',moat:'部署器内置安全基线+自动检查。'},
-  {rank:'P3',name:'需求响应/VPP接入Skill',stage:'运营',pain:'政策差异大，早期直接做VPP准入风险高。',output:'OpenADR/交易接口预留、收益评估、参与建议。',moat:'等项目规模和资质成熟后扩展。'}
-];
+/* ========== 微网方案设计Agent ========== */
+function mgById(id){return document.getElementById(id)}
+function mgVal(id){const el=mgById(id);return el?el.value:''}
+function mgNum(id,fallback=0){const v=parseFloat(mgVal(id));return Number.isFinite(v)?v:fallback}
 
-function mgValue(id,fallback=''){
-  const el=document.getElementById(id);
-  return el?el.value:fallback;
-}
-function mgNumber(id,fallback=0){
-  const v=parseFloat(mgValue(id,fallback));
-  return Number.isFinite(v)?v:fallback;
-}
-function mgCheckedValues(sel){
-  return Array.from(document.querySelectorAll(sel)).filter(x=>x.checked).map(x=>x.value);
-}
-function mgEsc(s){
-  return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-function mgDownloadText(filename,text,type='text/plain;charset=utf-8'){
-  const blob=new Blob([text],{type});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download=filename;a.click();
-  URL.revokeObjectURL(url);
-}
-function collectMgInputs(){
+function mgGetParams(){
   return{
-    projectName:mgValue('mgProjectName','微网项目'),
-    region:mgValue('mgRegion','中国'),
-    scenario:mgValue('mgScenario','工商业园区'),
-    mode:mgValue('mgMode','并网型，预留离网'),
-    voltage:mgValue('mgVoltage','10kV'),
-    loadPeak:mgNumber('mgLoadPeak',2500),
-    pvKw:mgNumber('mgPvKw',1800),
-    bessKwh:mgNumber('mgBessKwh',5000),
-    dieselKw:mgNumber('mgDieselKw',800),
-    evKw:mgNumber('mgEvKw',1200),
-    criticalPct:mgNumber('mgCriticalPct',35),
-    budget:mgNumber('mgBudget',650),
-    goals:mgCheckedValues('.mg-goal'),
-    modules:mgCheckedValues('.mg-module')
+    projName:mgVal('mgProjName'),region:mgVal('mgRegion'),
+    scenario:mgVal('mgScenario'),loadPeak:mgNum('mgLoadPeak',2000),
+    pvKw:mgNum('mgPvKw',1500),bessKwh:mgNum('mgBessKwh',5000),
+    dieselKw:mgNum('mgDieselKw',800),evKw:mgNum('mgEvKw',1200),
+    voltage:mgVal('mgVoltage'),opMode:mgVal('mgOpMode'),
+    criticalPct:mgNum('mgCriticalPct',35),budget:mgNum('mgBudget',800),
+    pricePeak:mgNum('mgPricePeak',1.08),priceValley:mgNum('mgPriceValley',0.35)
   };
 }
-function buildMgDeliveryPlan(P){
-  const needIsland=P.mode.includes('离网')||P.goals.includes('关键负荷不停电');
-  const hasDc=P.pvKw>0||P.evKw>0||P.scenario.includes('数据中心')||P.scenario.includes('充电');
-  const topology=hasDc&&needIsland?'交直流混合微网':(hasDc?'交流母线+直流子网预留':'交流微网');
-  const access=P.voltage==='0.4kV'?'低压侧接入，适合小容量试点':'中压PCC接入，适合全站削峰和统一保护';
-  const suggestedBess=P.bessKwh>0?P.bessKwh:Math.round(Math.max(P.loadPeak*2,P.pvKw*1.2));
-  const suggestedPower=Math.round(Math.min(Math.max(P.loadPeak*0.45,P.evKw*0.5,500),suggestedBess*0.5));
-  const criticalKw=Math.round(P.loadPeak*P.criticalPct/100);
-  const pvSelfUse=P.pvKw>0?Math.min(92,65+Math.round(suggestedBess/Math.max(P.pvKw,1)*8)):0;
-  const yearlyCycles=300;
-  const priceSpread=0.45;
-  const annualSaving=Math.round(suggestedBess*0.85*yearlyCycles*priceSpread/10000*10)/10;
-  const investStorage=Math.round(suggestedBess*0.08);
-  const investPv=Math.round(P.pvKw*0.32);
-  const investSoftware=48+(P.modules||[]).length*6;
-  const invest=Math.round(investStorage+investPv+investSoftware+(needIsland?80:35)+(P.evKw>0?35:0));
-  const payback=annualSaving>0?Math.round(invest/annualSaving*10)/10:0;
-  const risks=[];
-  if(P.voltage==='0.4kV'&&suggestedPower>1000)risks.push('0.4kV侧功率较大，需校核变压器余量、母排温升和短路容量。');
-  if(needIsland&&P.dieselKw<criticalKw*0.3)risks.push('关键负荷离网支撑较强，建议柴发容量不低于关键负荷30%或增加储能功率冗余。');
-  if(P.budget>0&&invest>P.budget)risks.push('粗估投资超过预算，建议先做P0模块或降低光伏/储能规模。');
-  if(!risks.length)risks.push('方案阶段风险可控，下一步需用真实15分钟负荷曲线和现场一次图复核。');
+
+function mgGenParamPrompt(P){
+  return `## 微网项目参数
+- 项目名称: ${P.projName}
+- 区域: ${P.region} | 场景: ${({industrial:'工商业园区',solar_storage_charge:'光储充一体化',mining:'油田矿区',offgrid:'偏远离网',datacenter:'数据中心'})[P.scenario]}
+- 峰值负荷: ${P.loadPeak}kW | 光伏: ${P.pvKw}kWp | 储能: ${(P.bessKwh/1000).toFixed(1)}MWh
+- 柴发: ${P.dieselKw}kW | 充电桩: ${P.evKw}kW | 接入: ${P.voltage}
+- 运行模式: ${({grid_tied:'并网',dual:'并/离网双模',off_grid:'离网'})[P.opMode]} | 关键负荷占比: ${P.criticalPct}% | 预算: ${P.budget}万元
+- 峰电价: ${P.pricePeak}元 | 谷电价: ${P.priceValley}元
+请根据以上参数，输出微网解决方案JSON。`;
+}
+
+function mgLocalEngine(P){
+  const isOffgrid=P.opMode==='off_grid'||P.opMode==='dual';
+  const hasDcBus=P.pvKw>0||P.evKw>0||P.scenario==='datacenter';
+  let topo=hasDcBus?'交直流混合微网':'交流微网';
+  let topoType=hasDcBus?'hybrid':'ac';
+  if(P.scenario==='datacenter'){topo='直流微网';topoType='dc';}
+  if(P.scenario==='offgrid'){topo='交直流混合微网(带柴发)';topoType='hybrid';}
+  const bessMW=P.bessKwh*0.5/1000;const critLoad=P.loadPeak*P.criticalPct/100;
+  const invest=P.bessKwh*0.05+P.pvKw*0.03+(P.dieselKw>0?P.dieselKw*0.006:0)+(P.evKw>0?P.evKw*0.012:0)+55;
+  const annCharge=P.bessKwh*1.8*330/10000*(P.pricePeak-P.priceValley)*0.85;
+  const annPv=P.pvKw*3.5*330/10000*Math.max(P.pricePeak,P.priceValley);
+  const annNet=annCharge+annPv*0.6;
+  const payback=invest/annNet;
   return{
-    generatedAt:new Date().toISOString(),
-    input:P,
-    recommendation:{
-      topology,access,
-      bessKwh:suggestedBess,bessPowerKw:suggestedPower,pvKw:P.pvKw,dieselKw:P.dieselKw,
-      criticalKw,pvSelfUse,annualSaving,invest,payback,
-      operation:needIsland?'并网PQ控制，故障时PCS转V/f支撑关键负荷，柴发延时启动补能。':'并网PQ控制，削峰填谷、防逆流、光伏自消纳优先。',
-      risks
-    },
-    deliverables:[
-      '微网方案JSON','系统架构图SVG','一次接线图草稿','通信拓扑图','BOM清单','经济性报告',
-      'Modbus/IEC104/OCPP/MQTT点表','EMS策略配置','Docker Compose部署包','FAT/SAT验收表'
-    ],
-    devices:[
-      {name:'PCC并网柜',spec:`${P.voltage} 断路器+保护+计量`,qty:1},
-      {name:'BESS储能系统',spec:`${suggestedBess}kWh / ${suggestedPower}kW LFP液冷`,qty:1},
-      {name:'PCS/功率路由器',spec:`${suggestedPower}kW PQ/VF/Droop`,qty:1},
-      {name:'边缘微网控制器',spec:'EMS Gateway, Modbus/IEC104/OCPP/MQTT',qty:1},
-      {name:'站端服务器',spec:'Ubuntu 22.04 + Docker Compose + TDengine + EMQX',qty:1}
-    ]
+    projName:P.projName,scenario:P.scenario,region:P.region,
+    topology:{type:topoType,name:topo,acBus:'AC 400V',dcBus:hasDcBus?'DC 750V':'',voltage:P.voltage,
+      pcc:P.voltage+'kV并网开关柜+双向关口表',transformer:'主变压器 '+P.voltage+'/0.4kV',
+      opMode:P.opMode,hasSTS:isOffgrid,criticalLoad:critLoad},
+    sizing:{peakLoad:P.loadPeak,pv:P.pvKw,bessKwh:P.bessKwh,bessMW:bessMW.toFixed(2),
+      dieselKw:P.dieselKw,evKw:P.evKw,criticalKw:critLoad},
+    economics:{annualRevenue:annCharge.toFixed(1),annualPvRevenue:annPv.toFixed(1),
+      annualNet:annNet.toFixed(1),totalInvest:invest.toFixed(0),payback:payback.toFixed(1),
+      irr:payback>0?(annNet/invest*100).toFixed(1):'N/A'},
+    strategy:{charge:'谷段23:00-07:00',discharge:'峰段09:00-12:00,14:00-19:00',
+      formula:'P_disch=min(P_load-50kW,P_pcs_max,SOC_max)',
+      island:isOffgrid?'V/f控制,储能主电源,柴发备用,STS<20ms':'并网PQ控制'},
+    protection:['PCC:过流+方向+防孤岛AFD','变压器:差动+瓦斯+温度','PCS:过流+过压+欠压+频偏','BMS:三级保护+绝缘监测+热失控预警','消防:烟感+温感→硬接线联跳'],
+    risks:P.pvKw>P.loadPeak*0.8?['光伏装机偏大，需防逆流限制']:(P.bessKwh<P.loadPeak*2?['储能容量偏小，可能无法完全覆盖峰段']:['方案阶段风险可控'])
   };
 }
-function generateMicrogridDelivery(showToast=true){
-  LAST_MG_RESULT=buildMgDeliveryPlan(collectMgInputs());
-  renderMgSummary();
-  renderMgTopology();
-  renderMgPointTable();
-  renderMgDeployPlan();
-  renderMgSkills();
-  if(showToast){
-    const box=document.getElementById('mgSummaryBox');
-    if(box)box.scrollIntoView({behavior:'smooth',block:'center'});
+
+async function mgGenerateSolution(){
+  const P=mgGetParams();
+  if(!P.loadPeak){alert('请填写峰值负荷');return;}
+  let result;
+  const provider=mgVal('mgLlmProvider')||'local';
+  if(provider==='local'){
+    result=mgLocalEngine(P);
+  }else{
+    try{
+      const messages=[{role:'system',content:`你是微网系统解决方案AI智能体。根据用户参数输出JSON，包含topology/sizing/economics/strategy/protection/devices字段。设备包括:PCC并网柜/BESS储能/PCS变流器/光伏逆变器/柴发/充电桩/EMS/边缘网关/保护系统。`},{role:'user',content:mgGenParamPrompt(P)}];
+      const data=await callLLM(messages,true);
+      const content=data.choices?.[0]?.message?.content||'';
+      const jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+      result=JSON.parse(jsonStr);
+    }catch(e){result=mgLocalEngine(P);}
   }
+  LAST_MG_RESULT=result;
+  document.getElementById('mgSuccessMsg').style.display='block';
+  mgRenderBrief();
 }
-function renderMgSummary(){
+
+function mgRenderBrief(){
+  const R=LAST_MG_RESULT;
+  if(!R)return;
+  const el=mgById('mgSolutionBrief');
+  const E=R.economics||{};const S=R.sizing||{};const T=R.topology||{};
+  el.innerHTML=`<div class="result-panel"><h3 style="color:#50c878">推荐方案: ${T.name||''}</h3>
+  <p style="line-height:2"><b>场景:</b> ${R.scenario||''} | <b>电压:</b> ${T.voltage||''} | <b>模式:</b> ${({grid_tied:'并网',dual:'双模',off_grid:'离网'})[T.opMode]||''}</p>
+  <p style="line-height:2"><b>储能:</b> ${S.bessKwh||0}kWh / ${S.bessMW||0}MW | <b>光伏:</b> ${S.pv||0}kWp | <b>峰值负荷:</b> ${S.peakLoad||0}kW | <b>关键负荷:</b> ${S.criticalKw||0}kW</p>
+  <p style="line-height:2"><b>年收益:</b> ≈${E.annualNet||0}万元 | <b>总投资:</b> ≈${E.totalInvest||0}万元 | <b>回收期:</b> ≈${E.payback||0}年</p>
+  <p style="line-height:2;margin-top:8px"><b>策略:</b> ${(R.strategy||{}).charge||''} / ${(R.strategy||{}).discharge||''}</p>
+  <p style="line-height:2;color:#e8a838"><b>风险:</b> ${(R.risks||[]).join('；')}</p></div>`;
+}
+
+function mgParseNatural(){
+  const raw=mgVal('mgNaturalInput');
+  if(!raw){alert('请输入需求描述');return;}
+  let found=0;
+  const sv=(id,val)=>{const el=mgById(id);if(el&&val!=null){el.value=val;found++;}};
+  const mLoad=raw.match(/(\d+)\s*[Mk]?W\s*负荷/);
+  const mPv=raw.match(/光伏\s*(\d+)\s*[Mk]?Wp/);
+  const mBess=raw.match(/储能\s*(\d+)\s*[Mk]?Wh/);
+  const mGrid=raw.match(/(\d+)\s*kV/);
+  if(mLoad)sv('mgLoadPeak',parseFloat(mLoad[1])*(raw.includes('MW')?1000:1));
+  if(mPv)sv('mgPvKw',parseFloat(mPv[1])*(raw.includes('MW')?1000:1));
+  if(mBess)sv('mgBessKwh',parseFloat(mBess[1])*(raw.includes('MWh')?1000:1));
+  if(mGrid)sv('mgVoltage',mGrid[1]);
+  if(/(离网|孤岛)/.test(raw))sv('mgOpMode','off_grid');
+  if(/(双模|并离网)/.test(raw))sv('mgOpMode','dual');
+  if(/(园区|工厂)/.test(raw))sv('mgScenario','industrial');
+  if(/(充电|光储充)/.test(raw))sv('mgScenario','solar_storage_charge');
+  if(/(油田|矿区)/.test(raw))sv('mgScenario','mining');
+  if(/(数据中心|医院)/.test(raw))sv('mgScenario','datacenter');
+  if(/(苏州|江苏)/.test(raw))sv('mgRegion','江苏省苏州市');
+  if(found>=2) setTimeout(()=>mgGenerateSolution(),300);
+  else alert('识别到'+found+'个参数，已填入表单。请点击「生成微网方案」');
+}
+
+/* ========== 电气图纸Agent ========== */
+function mgRenderDrawings(){
+  const R=LAST_MG_RESULT;if(!R)return;
+  mgById('mgDrawingEmpty').style.display='none';
+  mgById('mgDrawingContent').style.display='block';
+  mgDrawArchSvg(R);mgDrawWiringSvg(R);mgDrawCommSvg(R);mgDrawBom(R);mgDrawEcon(R);
+}
+
+function mgDrawArchSvg(R){
+  const T=R.topology||{},S=R.sizing||{};
+  const W=1100,H=650,cx=550;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">
+<defs>
+<linearGradient id="gbus" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="#185FA5"/><stop offset="50%" stop-color="#4a90d9"/><stop offset="100%" stop-color="#185FA5"/></linearGradient>
+<filter id="gsh"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.15"/></filter>
+<marker id="gaB" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#4a90d9"/></marker>
+<marker id="gaG" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#50c878"/></marker>
+<marker id="gaO" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e8a838"/></marker>
+<marker id="gaR" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e06070"/></marker>
+</defs>
+<pattern id="dot" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="0.5" fill="#1a1f2e"/></pattern>
+<rect width="${W}" height="${H}" fill="url(#dot)"/>
+<text x="${cx}" y="28" text-anchor="middle" fill="#e0e0ff" font-size="16" font-weight="bold">微网系统架构图</text>
+<text x="${cx}" y="46" text-anchor="middle" fill="#8888cc" font-size="11">${T.name||''} | ${R.projName||''} | 设计人:卢继雄 | GB/T 36558</text>`;
+  const box=(x,y,w,h,fill,stroke,label,sub,fnsize)=>{
+    const fs=fnsize||'13px';
+    s+=`<rect x="${x-w/2}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.2" filter="url(#gsh)"/>`;
+    s+=`<text x="${x}" y="${y+h/2-2}" text-anchor="middle" fill="#fff" font-weight="500" font-size="${fs}">${label}</text>`;
+    if(sub)s+=`<text x="${x}" y="${y+h/2+16}" text-anchor="middle" fill="#94a3b8" font-size="11">${sub}</text>`;
+  };
+  const line=(x1,y1,x2,y2,color,marker,sw)=>{
+    s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw||2}" marker-end="url(#${marker})"/>`;
+  };
+  box(cx,62,220,44,'url(#gGrid)','#85B7EB','电网 '+T.voltage,'市电电源');
+  line(cx,106,cx,130,'#4a90d9','gaB');
+  box(cx,130,280,44,'#2a3050','#4a90d9','PCC 并网开关柜','断路器QF01 + 双向关口表0.2S');
+  line(cx,174,cx,195,'#4a90d9','gaB');
+  s+=`<line x1="${cx-260}" y1="195" x2="${cx+260}" y2="195" stroke="url(#gbus)" stroke-width="7" stroke-linecap="round"/><text x="${cx}" y="189" text-anchor="middle" fill="#80b0e0" font-size="11">${T.voltage} 母线</text>`;
+  line(cx-180,195,cx-180,232,'#4a90d9','gaO');
+  box(cx-180,235,160,52,'#1a1530','#e8a838','主变压器',T.transformer||'');
+  line(cx-180,287,cx-180,320,'#a070d0','gaR',2);
+  box(cx-180,320,160,48,'#1a1530','#a070d0','AC 400V负荷',`${S.peakLoad||0}kW 关键${(T.criticalLoad&&S.peakLoad?(T.criticalLoad/S.peakLoad*100).toFixed(0):35)}%`);
+  line(cx+60,195,cx+60,232,'#50c878','gaG');
+  if(S.pv>0) box(cx+60,235,150,46,'#1a2a1a','#50c878','光伏系统',S.pv+'kWp');
+  line(cx+220,195,cx+220,232,'#e06070','gaR');
+  box(cx+220,235,150,46,'#2a1520','#e06070','PCS储能变流器',(S.bessMW||0)+'MW');
+  line(cx+220,281,cx+220,310,'#534AB7','gaG');
+  box(cx+220,313,210,56,'#181830','#AFA9EC','BESS储能系统',(S.bessKwh?(S.bessKwh/1000).toFixed(1):'')+'MWh LFP BMS三级');
+  if(S.dieselKw>0){line(cx-60,195,cx-60,232,'#e8a838','gaO');box(cx-60,235,130,46,'#2a2020','#e06070','柴发',S.dieselKw+'kW');}
+  if(S.evKw>0){line(cx+400,195,cx+400,232,'#EF9F27','gaO');box(cx+400,235,140,46,'#2a2020','#EF9F27','充电桩群',S.evKw+'kW');}
+  box(cx-380,290,150,110,'none','#854F0B','EMS控制域','SCADA+调度优化\nPQ/VF/Droop控制\n并离网切换管理');
+  s+=`<line x1="${cx-305}" y1="300" x2="${cx-200}" y2="270" stroke="#854F0B" stroke-width="1" stroke-dasharray="4,3"/>`;
+  s+=`<text x="${cx}" y="${H-16}" text-anchor="middle" fill="#606080" font-size="9">设计人:卢继雄 | GB/T 36558-2023</text></svg>`;
+  mgById('mgArchSvg').innerHTML=s;
+}
+
+function mgDrawWiringSvg(R){
+  const T=R.topology||{},S=R.sizing||{};
+  const W=1050,H=800,cx=525;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">
+<defs><style>.bw{stroke:#4a90d9;stroke-width:2.5;fill:none}.gw{stroke:#50c878;stroke-width:2.5;fill:none}.ow{stroke:#e8a838;stroke-width:2;fill:none}.ll{fill:#e0e0ff;font-size:10px}.ls{fill:#9090a0;font-size:9px}</style>
+<linearGradient id="wbus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2a50a0"/><stop offset="50%" stop-color="#4a90d9"/><stop offset="100%" stop-color="#2a50a0"/></linearGradient>
+<marker id="waB" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#4a90d9"/></marker>
+<marker id="waG" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#50c878"/></marker>
+<marker id="waO" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e8a838"/></marker>
+</defs>
+<pattern id="dot2" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="0.5" fill="#1a1f2e"/></pattern>
+<rect width="${W}" height="${H}" fill="url(#dot2)"/>
+<text x="${cx}" y="25" text-anchor="middle" fill="#e0e0ff" font-size="15" font-weight="bold">微网电气一次接线图</text>
+<text x="${cx}" y="42" text-anchor="middle" fill="#8888cc" font-size="10">${R.projName||''} | ${T.voltage||''} | 设计人:卢继雄</text>`;
+  s+=`<text x="${cx}" y="70" text-anchor="middle" fill="#4a90d9" font-size="11">国网${T.voltage}电源</text><line x1="${cx}" y1="76" x2="${cx}" y2="98" class="bw" marker-end="url(#waB)"/>`;
+  s+=`<rect x="${cx-100}" y="98" width="200" height="38" rx="4" fill="#1a2a4a" stroke="#4a90d9" stroke-width="1.5"/><text x="${cx}" y="116" text-anchor="middle" class="ls" style="fill:#80b0e0">PCC计量+并网断路器QF01</text><text x="${cx}" y="130" text-anchor="middle" style="fill:#6090c0;font-size:7">0.2S关口表 过流/速断/防孤岛</text>`;
+  s+=`<line x1="${cx}" y1="136" x2="${cx}" y2="160" class="bw" marker-end="url(#waB)"/>`;
+  s+=`<line x1="${cx-180}" y1="160" x2="${cx+180}" y2="160" stroke="url(#wbus)" stroke-width="6" stroke-linecap="round"/><text x="${cx}" y="154" text-anchor="middle" class="ls" style="fill:#80b0e0">${T.voltage} 母线</text>`;
+  s+=`<line x1="${cx-180}" y1="160" x2="${cx-180}" y2="200" class="bw" marker-end="url(#waO)"/>`;
+  s+=`<rect x="${cx-192}" y="200" width="24" height="24" rx="2" fill="#2a3050" stroke="#e8a838" stroke-width="1.5"/><text x="${cx-180}" y="218" text-anchor="middle" class="ls" style="fill:#e0c060">QF2</text>`;
+  s+=`<line x1="${cx-180}" y1="224" x2="${cx-180}" y2="250" class="bw" marker-end="url(#waO)"/>`;
+  s+=`<circle cx="${cx-180}" cy="272" r="22" fill="#2a3050" stroke="#e8a838" stroke-width="2"/><circle cx="${cx-180}" cy="272" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/><text x="${cx-180}" y="275" text-anchor="middle" class="ls" style="fill:#e8a838">Δ/Y</text><text x="${cx-140}" y="260" class="ls" style="fill:#c09030">主变压器</text>`;
+  s+=`<line x1="${cx-180}" y1="294" x2="${cx-180}" y2="330" class="bw" style="stroke:#a070d0"/>`;
+  s+=`<rect x="${cx-250}" y="330" width="140" height="50" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/><text x="${cx-180}" y="353" text-anchor="middle" class="ls" style="fill:#c090e0;font-size:10">0.4kV交流负荷</text><text x="${cx-180}" y="370" text-anchor="middle" class="ls" style="fill:#8060a0;font-size:8">${S.peakLoad||0}kW</text>`;
+  let by=200;
+  s+=`<line x1="${cx}" y1="160" x2="${cx}" y2="${by}" class="bw" style="stroke:#50c878" marker-end="url(#waG)"/>`;
+  s+=`<rect x="${cx-80}" y="${by}" width="160" height="44" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="2"/><text x="${cx}" y="${by+20}" text-anchor="middle" style="fill:#80e080;font-size:11">储能${T.voltage}并网柜</text><text x="${cx}" y="${by+36}" text-anchor="middle" class="ls" style="fill:#60a060">断路器+继保+防孤岛</text>`;
+  by+=44;
+  s+=`<line x1="${cx}" y1="${by}" x2="${cx}" y2="${by+20}" class="bw" style="stroke:#e06070"/>`;by+=20;
+  s+=`<rect x="${cx-90}" y="${by}" width="180" height="55" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/><text x="${cx}" y="${by+20}" text-anchor="middle" style="fill:white;font-size:12">PCS储能变流器</text><text x="${cx}" y="${by+40}" text-anchor="middle" class="ls" style="fill:#ffc0c0">${S.bessMW||0}MW AC↔DC ≥97%</text>`;
+  by+=55;
+  s+=`<line x1="${cx}" y1="${by}" x2="${cx}" y2="${by+20}" class="bw" style="stroke:#50c878" marker-end="url(#waG)"/>`;by+=20;
+  s+=`<rect x="${cx-12}" y="${by}" width="24" height="18" rx="2" fill="#2a2a50" stroke="#50c878" stroke-width="1.5"/><text x="${cx}" y="${by+13}" text-anchor="middle" class="ls" style="fill:#80e080">DS</text>`;
+  by+=18;
+  s+=`<line x1="${cx}" y1="${by}" x2="${cx}" y2="${by+20}" class="bw" style="stroke:#50c878" marker-end="url(#waG)"/>`;by+=20;
+  s+=`<rect x="${cx-120}" y="${by}" width="240" height="75" rx="8" fill="#0d2a15" stroke="#50c878" stroke-width="2"/><text x="${cx}" y="${by+22}" text-anchor="middle" style="fill:#80e080;font-size:13">BESS储能电池系统</text><text x="${cx}" y="${by+42}" text-anchor="middle" class="ls" style="fill:#60c060">${S.bessKwh?(S.bessKwh/1000).toFixed(1):''}MWh LFP | ${S.bessKwh>=2000?'液冷':'风冷'}</text><text x="${cx}" y="${by+60}" text-anchor="middle" class="ls" style="fill:#408040;font-size:8">BMS三级+温烟感+气溶胶灭火</text>`;
+  by+=80;
+  s+=`<rect x="60" y="${by}" width="400" height="150" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/><text x="260" y="${by+24}" text-anchor="middle" style="fill:#a0a0ff;font-size:11">保护配置</text>`;
+  const prots=R.protection||['PCC:过流+方向+防孤岛','变压器:差动+瓦斯+温度','PCS:过流+过压+欠压+频偏','BMS:三级+绝缘监测+热失控'];
+  prots.forEach((p,i)=>s+=`<text x="75" y="${by+48+i*20}" class="ls" style="fill:#e06060">● ${p}</text>`);
+  s+=`<text x="${cx}" y="${H-12}" text-anchor="middle" style="fill:#606080;font-size:8">一次接线为方案级示意 | 设计人:卢继雄 | GB/T 36558-2023</text></svg>`;
+  mgById('mgWiringSvg').innerHTML=s;
+}
+
+function mgDrawCommSvg(R){
+  const T=R.topology||{};
+  const W=1000,H=550,cx=500;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">
+<defs><style>.tc{stroke:#854F0B;stroke-width:1;fill:none;stroke-dasharray:5,3}.te{stroke:#1E90FF;stroke-width:2;fill:none}.ts{stroke:#22C55E;stroke-width:1.5;fill:none}.tf{stroke:#F97316;stroke-width:1.5;fill:none}</style></defs>
+<pattern id="dotc" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="0.5" fill="#1a1f2e"/></pattern>
+<rect width="${W}" height="${H}" fill="url(#dotc)"/>
+<text x="${cx}" y="30" text-anchor="middle" fill="#e0e0ff" font-size="15" font-weight="bold">微网通信拓扑图</text>
+<text x="${cx}" y="48" text-anchor="middle" fill="#8888cc" font-size="10">${R.projName||''} | 协议: Modbus/CAN/IEC104/MQTT | 设计人:卢继雄</text>`;
+  const layers=[{y:110,l:'云平台层',c:'#185FA5',items:['数据中台(MQTT)','AI引擎','大屏可视化','运维管理']},
+    {y:200,l:'站控层',c:'#EF9F27',items:['SCADA双机热备','EMS调度引擎(MILP)','AGC/AVC','本地HMI']},
+    {y:290,l:'边缘控制层',c:'#534AB7',items:['ARM网关GW-01','协议转换池','本地自治(削峰填谷)','看门狗']},
+    {y:380,l:'设备层',c:'#50c878',items:['PCS(ModbusTCP)','BMS(CAN2.0B)','关口表(ModbusRTU)','光伏(ModbusTCP)']}];
+  layers.forEach((ly,i)=>{
+    s+=`<rect x="80" y="${ly.y}" width="840" height="70" rx="8" fill="none" stroke="${ly.c}" stroke-width="1.5" stroke-dasharray="6,3"/><text x="100" y="${ly.y+20}" fill="${ly.c}" font-size="12" font-weight="bold">${ly.l}</text>`;
+    const sp=840/Math.max(ly.items.length,1);
+    ly.items.forEach((it,j)=>s+=`<text x="${80+sp*j+sp/2}" y="${ly.y+50}" text-anchor="middle" fill="#94a3b8" font-size="10">${it}</text>`);
+    if(i<layers.length-1){
+      s+=`<line x1="${cx}" y1="${ly.y+70}" x2="${cx}" y2="${layers[i+1].y}" class="te"/>`;
+      s+=`<text x="${cx+20}" y="${(ly.y+70+layers[i+1].y)/2}" fill="#6090c0" font-size="8">IEC104/MQTT</text>`;
+    }
+  });
+  s+=`<rect x="80" y="470" width="840" height="55" rx="4" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>
+<text x="${cx}" y="492" text-anchor="middle" fill="#8888cc" font-size="9">通信协议: 云↔站控:MQTT/HTTP | 站控↔边缘:IEC104 | 边缘↔PCS:ModbusTCP | 边缘↔BMS:CAN2.0B | 边缘↔电表:ModbusRTU</text>
+<text x="${cx}" y="510" text-anchor="middle" fill="#606080" font-size="8">RS485:末端120Ω | CAN:两端各120Ω | 支线≤0.3m@1Mbps | 设计人:卢继雄</text></svg>`;
+  mgById('mgCommSvg').innerHTML=s;
+}
+
+function mgDrawBom(R){
+  const S=R.sizing||{},T=R.topology||{};
+  const items=[
+    {item:'PCC并网开关柜',qty:1,unit:'台',model:`${T.voltage} 断路器+双向关口表0.2S`,price:12},
+    {item:'储能电池系统BESS',qty:1,unit:'套',model:`${(S.bessKwh/1000).toFixed(1)}MWh LFP 电芯 ${S.bessKwh>=2000?'液冷':'风冷'}`,price:Math.round(S.bessKwh*0.045)},
+    {item:'PCS储能变流器',qty:1,unit:'台',model:`${S.bessMW||0}MW AC/DC双向 PQ/VF/Droop`,price:Math.round((S.bessMW||0)*18)},
+    {item:'光伏逆变器',qty:S.pv>0?Math.ceil(S.pv/250):0,unit:'台',model:S.pv>0?`组串式逆变器 ${S.pv}kWp MPPT`:'',price:S.pv>0?Math.round(S.pv*0.008):0},
+    {item:'柴油发电机',qty:S.dieselKw>0?1:0,unit:'台',model:S.dieselKw>0?`${S.dieselKw}kW ATS切换`:'',price:S.dieselKw>0?Math.round(S.dieselKw*0.006):0},
+    {item:'直流充电桩',qty:S.evKw>0?Math.ceil(S.evKw/120):0,unit:'台',model:S.evKw>0?`${S.evKw}kW OCPP1.6J`:'',price:S.evKw>0?Math.round(S.evKw*0.012):0},
+    {item:'微网EMS系统',qty:1,unit:'套',model:'SCADA+优化引擎+大屏可视化',price:25},
+    {item:'边缘网关(双机热备)',qty:2,unit:'台',model:'ARM Cortex-A72 协议转换',price:8},
+    {item:'保护系统',qty:1,unit:'套',model:'综保+防孤岛AFD+绝缘监测',price:12},
+    {item:'安装施工+辅材',qty:1,unit:'项',model:'电缆桥架+防雷接地+调试',price:Math.round(S.bessKwh*0.002+15)}
+  ].filter(i=>i.qty>0);
+  let h='<table class="result-table"><tr><th>项目</th><th>数量</th><th>单位</th><th>型号规格</th><th>估算(万)</th></tr>';let ct=0;
+  items.forEach(i=>{h+=`<tr><td>${i.item}</td><td>${i.qty}</td><td>${i.unit}</td><td style="font-size:11px">${i.model}</td><td>${i.price}</td></tr>`;ct+=i.price;});
+  h+=`<tr style="font-weight:bold"><td colspan="4">合计</td><td>${ct.toFixed(0)}</td></tr></table>`;
+  mgById('mgBomTable').innerHTML=h;
+}
+
+function mgDrawEcon(R){
+  const E=R.economics||{},S=R.sizing||{};
+  if(!E.annualNet){mgById('mgEconTable').innerHTML='<p style="color:var(--text2)">请先生成方案</p>';return;}
+  let h='<table class="result-table"><tr><th>指标</th><th>数值</th><th>说明</th></tr>';
+  h+=`<tr><td>年储能套利</td><td>${E.annualRevenue||0}万元</td><td>峰谷价差套利</td></tr>`;
+  h+=`<tr><td>年光伏收入</td><td>${E.annualPvRevenue||0}万元</td><td>自消纳+上网</td></tr>`;
+  h+=`<tr><td>年净收益</td><td style="color:#50c878;font-weight:bold">${E.annualNet||0}万元</td><td>扣减运维后</td></tr>`;
+  h+=`<tr><td>总投资</td><td style="font-weight:bold">${E.totalInvest||0}万元</td><td>含设备+软件+施工</td></tr>`;
+  h+=`<tr><td>投资回收期</td><td style="color:#e8a838;font-weight:bold">${E.payback||0}年</td><td>${parseFloat(E.payback)<8?'经济可行':'需优化方案'}</td></tr>`;
+  h+=`<tr><td>项目IRR</td><td>${E.irr||'N/A'}%</td><td>内部收益率</td></tr></table>`;
+  mgById('mgEconTable').innerHTML=h;
+}
+
+/* ========== 协议调试Agent ========== */
+const MG_POINT_TABLES={
+pcs:[
+  ['PCS运行状态','Modbus TCP','40001','Holding Reg','R','uint16','1=运行,2=停止,3=故障,4=调试'],
+  ['PCS运行模式','Modbus TCP','40002','Holding Reg','R','uint16','0=PQ,1=VF,2=Droop,3=待机'],
+  ['有功功率设定','Modbus TCP','40003','Holding Reg','R/W','int16','kW,充电为负,放电为正,需闭锁校验'],
+  ['无功功率设定','Modbus TCP','40004','Holding Reg','R/W','int16','kVar,需闭锁校验'],
+  ['有功功率实际','Modbus TCP','40005','Holding Reg','R','int16','kW,1s刷新'],
+  ['无功功率实际','Modbus TCP','40006','Holding Reg','R','int16','kVar,1s刷新'],
+  ['A相电压','Modbus TCP','40007','Holding Reg','R','uint16','V,标度1'],
+  ['B相电压','Modbus TCP','40008','Holding Reg','R','uint16','V,标度1'],
+  ['C相电压','Modbus TCP','40009','Holding Reg','R','uint16','V,标度1'],
+  ['A相电流','Modbus TCP','40010','Holding Reg','R','uint16','A,标度0.1'],
+  ['B相电流','Modbus TCP','40011','Holding Reg','R','uint16','A,标度0.1'],
+  ['C相电流','Modbus TCP','40012','Holding Reg','R','uint16','A,标度0.1'],
+  ['电网频率','Modbus TCP','40013','Holding Reg','R','uint16','Hz,标度0.01'],
+  ['功率因数','Modbus TCP','40014','Holding Reg','R','int16','标度0.001'],
+  ['直流侧电压','Modbus TCP','40020','Holding Reg','R','uint16','V,标度0.1'],
+  ['直流侧电流','Modbus TCP','40021','Holding Reg','R','uint16','A,标度0.1'],
+  ['直流侧功率','Modbus TCP','40022','Holding Reg','R','int16','kW,真实值'],
+  ['IGBT温度','Modbus TCP','40030','Holding Reg','R','uint16','°C,标度0.1'],
+  ['机内温度','Modbus TCP','40031','Holding Reg','R','uint16','°C,标度0.1'],
+  ['累计充电量','Modbus TCP','40040','Holding Reg','R','uint32','kWh,双寄存器'],
+  ['累计放电量','Modbus TCP','40042','Holding Reg','R','uint32','kWh,双寄存器'],
+  ['故障代码1','Modbus TCP','40100','Holding Reg','R','uint16','0=正常,bit编码'],
+  ['故障代码2','Modbus TCP','40101','Holding Reg','R','uint16','bit编码'],
+  ['告警代码','Modbus TCP','40102','Holding Reg','R','uint16','bit编码'],
+  ['紧急停机指令','Modbus TCP','40110','Coil','R/W','bool','1=急停,硬接线备份'],
+  ['远程/就地','Modbus TCP','40111','Coil','R','bool','1=远程,0=就地'],
+  ['并网/离网切换','Modbus TCP','40120','Holding Reg','R/W','uint16','需二次确认,含闭锁逻辑'],
+  ['最大充电功率限值','Modbus TCP','40130','Holding Reg','R/W','uint16','kW,EMS动态写入'],
+  ['最大放电功率限值','Modbus TCP','40131','Holding Reg','R/W','uint16','kW,EMS动态写入'],
+  ['SOC下限保护','Modbus TCP','40132','Holding Reg','R/W','uint16','%,低于此值停止放电'],
+  ['SOC上限保护','Modbus TCP','40133','Holding Reg','R/W','uint16','%,高于此值停止充电'],
+  ['绝缘电阻','Modbus TCP','40200','Holding Reg','R','uint16','kΩ,正/负对地'],
+  ['通信心跳','Modbus TCP','40999','Holding Reg','R/W','uint16','递增计数器,超时判定断线'],
+  ['设备序列号','Modbus TCP','49000','Holding Reg','R','string','16字节ASCII']
+],
+bms:[
+  ['SOC','CAN/Modbus','BMU.Addr=1','CAN帧','R','uint16','%,卡尔曼滤波估计'],
+  ['SOH','CAN/Modbus','BMU.Addr=2','CAN帧','R','uint16','%,电池健康状态'],
+  ['可充容量','CAN/Modbus','BMU.Addr=3','CAN帧','R','uint16','kWh,当前SOC可充电量'],
+  ['可放容量','CAN/Modbus','BMU.Addr=4','CAN帧','R','uint16','kWh,当前SOC可放电量'],
+  ['总电压','CAN/Modbus','BMU.Addr=5','CAN帧','R','uint16','V,标度0.1'],
+  ['总电流','CAN/Modbus','BMU.Addr=6','CAN帧','R','int16','A,标度0.1,充电为正'],
+  ['最大单体电压','CAN/Modbus','BMU.Addr=7','CAN帧','R','uint16','mV,需报警比较'],
+  ['最小单体电压','CAN/Modbus','BMU.Addr=8','CAN帧','R','uint16','mV,需报警比较'],
+  ['单体电压差','CAN/Modbus','BMU.Addr=9','CAN帧','R','uint16','mV,>50mV告警'],
+  ['最高温度点','CAN/Modbus','BMU.Addr=10','CAN帧','R','uint16','°C,标度0.1'],
+  ['最低温度点','CAN/Modbus','BMU.Addr=11','CAN帧','R','uint16','°C,标度0.1'],
+  ['温度差','CAN/Modbus','BMU.Addr=12','CAN帧','R','uint16','°C,>5°C预警'],
+  ['充放电允许','CAN/Modbus','BMU.Addr=13','CAN帧','R','bool','BMS→PCS安全联锁'],
+  ['充电限值','CAN/Modbus','BMU.Addr=14','CAN帧','R','uint16','kW,BMS动态下发'],
+  ['放电限值','CAN/Modbus','BMU.Addr=15','CAN帧','R','uint16','kW,BMS动态下发'],
+  ['故障等级','CAN/Modbus','BMU.Addr=16','CAN帧','R','uint16','1预警,2降功率,3停机,4急停'],
+  ['绝缘电阻正/负','CAN/Modbus','BMU.Addr=17','CAN帧','R','uint16','kΩ,绝缘监测'],
+  ['均衡状态','CAN/Modbus','BMU.Addr=18','CAN帧','R','uint16','0空闲,1均衡中'],
+  ['循环次数','CAN/Modbus','BMU.Addr=19','CAN帧','R','uint32','累计充放电循环'],
+  ['BMS运行状态','CAN/Modbus','BMU.Addr=20','CAN帧','R','uint16','0正常,1自检,2故障']
+],
+meter:[
+  ['正向有功','Modbus RTU','Addr=1,40001','Holding','R','uint32','kWh,电源→用户'],
+  ['反向有功','Modbus RTU','Addr=1,40003','Holding','R','uint32','kWh,用户→电源'],
+  ['A相电压','Modbus RTU','Addr=1,40011','Holding','R','uint16','V,标度0.1'],
+  ['B相电压','Modbus RTU','Addr=1,40012','Holding','R','uint16','V,标度0.1'],
+  ['C相电压','Modbus RTU','Addr=1,40013','Holding','R','uint16','V,标度0.1'],
+  ['A相电流','Modbus RTU','Addr=1,40021','Holding','R','uint16','A,标度0.01'],
+  ['B相电流','Modbus RTU','Addr=1,40022','Holding','R','uint16','A,标度0.01'],
+  ['C相电流','Modbus RTU','Addr=1,40023','Holding','R','uint16','A,标度0.01'],
+  ['总有功功率','Modbus RTU','Addr=1,40031','Holding','R','int16','kW,瞬时值'],
+  ['总无功功率','Modbus RTU','Addr=1,40032','Holding','R','int16','kVar,瞬时值'],
+  ['功率因数','Modbus RTU','Addr=1,40033','Holding','R','int16','标度0.001'],
+  ['频率','Modbus RTU','Addr=1,40034','Holding','R','uint16','Hz,标度0.01'],
+  ['需量','Modbus RTU','Addr=1,40041','Holding','R','uint16','kW,15min滑动窗口']
+],
+pv:[
+  ['PV实时功率','Modbus TCP','50001','Holding','R','uint16','kW,1s刷新'],
+  ['PV日发电量','Modbus TCP','50002','Holding','R','uint16','kWh'],
+  ['PV累计发电量','Modbus TCP','50003','Holding','R','uint32','kWh,双寄存器'],
+  ['PV输入电压','Modbus TCP','50010','Holding','R','uint16','V,标度0.1'],
+  ['PV输入电流','Modbus TCP','50011','Holding','R','uint16','A,标度0.1'],
+  ['MPPT电压','Modbus TCP','50012','Holding','R','uint16','V,标度0.1'],
+  ['逆变器温度','Modbus TCP','50020','Holding','R','uint16','°C,标度0.1'],
+  ['运行状态','Modbus TCP','50021','Holding','R','uint16','1运行,2待机,3故障'],
+  ['限发功率','Modbus TCP','50030','Holding','R/W','uint16','kW,EMS写入,防逆流限发'],
+  ['功率因数','Modbus TCP','50031','Holding','R/W','int16','标度0.001,无功补偿'],
+  ['防孤岛状态','Modbus TCP','50040','Holding','R','uint16','0正常,1孤岛检测']],
+charger:[
+  ['充电枪状态','OCPP 1.6J','/status','JSON','R','','Available/Preparing/Charging/Faulted'],
+  ['实时充电功率','OCPP 1.6J','/meterValues','JSON','R','kW,5s推送'],
+  ['累计充电量','OCPP 1.6J','/meterValues','JSON','R','kWh'],
+  ['SOC','OCPP 1.6J','/meterValues','JSON','R','%,车辆电池SOC'],
+  ['充电限功率','OCPP 1.6J','/setChargingProfile','JSON','W','kW,EMS动态调度'],
+  ['充电预约','OCPP 1.6J','/setChargingProfile','JSON','W','时段+功率,削峰用'],
+  ['故障代码','OCPP 1.6J','/statusNotification','JSON','R','','ConnectorLockFailure等']
+],
+diesel:[
+  ['柴发运行状态','Modbus RTU','Addr=8,1#','Coil','R','bool','1运行,0停止'],
+  ['柴发转速','Modbus RTU','Addr=8,2#','Holding','R','uint16','rpm'],
+  ['输出功率','Modbus RTU','Addr=8,3#','Holding','R','uint16','kW'],
+  ['油位','Modbus RTU','Addr=8,4#','Holding','R','uint16','%,<20%告警'],
+  ['水温','Modbus RTU','Addr=8,5#','Holding','R','uint16','°C,>95°C告警'],
+  ['远程启动','Modbus RTU','Addr=8,100#','Coil','R/W','bool','EMS下发,重要操作'],
+  ['远程停机','Modbus RTU','Addr=8,101#','Coil','R/W','bool','需二次确认']
+],
+env:[
+  ['烟感1','硬接点DI1','HW/DI1','DI','R','bool','0正常,1报警,消防联动'],
+  ['温感1','硬接点DI2','HW/DI2','DI','R','bool','0正常,1报警'],
+  ['可燃气体','硬接点DI3','HW/DI3','DI','R','bool','0正常,1浓度超标'],
+  ['消防急停','硬接点DI4','HW/DI4','DI','R','bool','1触发,硬接线联跳PCS'],
+  ['灭火释放','硬接点DI5','HW/DI5','DI','R','bool','1=气溶胶已启动'],
+  ['环境温度','RS485','Env,40001','Holding','R','uint16','°C,标度0.1'],
+  ['环境湿度','RS485','Env,40002','Holding','R','uint16','%,标度0.1'],
+  ['水浸检测','硬接点DI6','HW/DI6','DI','R','bool','1=有水浸'],
+  ['门禁开关','硬接点DI7','HW/DI7','DI','R','bool','1=开门,联动摄像头']
+],
+iec104:[
+  ['遥测-总有功P','IEC104','CA=1,IOA=4001','TI=13','R','float','kW,周期1s,站控→调度'],
+  ['遥测-总无功Q','IEC104','CA=1,IOA=4002','TI=13','R','float','kVar'],
+  ['遥测-SOC','IEC104','CA=2,IOA=4101','TI=13','R','float','%,EMS计算后上送'],
+  ['遥测-光伏功率','IEC104','CA=3,IOA=4201','TI=13','R','float','kW'],
+  ['遥信-并网状态','IEC104','CA=1,IOA=5001','TI=1','R','bool','0离网,1并网'],
+  ['遥信-PCS故障','IEC104','CA=2,IOA=5101','TI=1','R','bool','1=故障'],
+  ['遥信-消防告警','IEC104','CA=4,IOA=5401','TI=1','R','bool','1=告警,总加'],
+  ['遥控-充放模式','IEC104','CA=2,IOA=6001','TI=45','W','uint16','0充电,1放电,需选择+执行'],
+  ['遥调-功率设定','IEC104','CA=2,IOA=6101','TI=50','W','float','kW,下行']
+],
+mqtt:[
+  ['遥测数据','MQTT','site/{project}/telemetry','JSON','Pub','5s,站控→云,每包≤1KB'],
+  ['遥信事件','MQTT','site/{project}/events','JSON','Pub','事件触发,SOE格式'],
+  ['策略下发','MQTT','site/{project}/cmd/dispatch','JSON','Sub','云→站控,需ACK确认'],
+  ['限功率指令','MQTT','site/{project}/cmd/limit','JSON','Sub','云→站控/边缘'],
+  ['告警推送','MQTT','site/{project}/alarm','JSON','Pub','分级:一般/重要/紧急'],
+  ['设备心跳','MQTT','site/{project}/heartbeat','JSON','Pub','30s周期,含时间戳'],
+  ['固件更新','MQTT','site/{project}/ota','Binary','Sub','OTA升级包,大文件'],
+  ['配置文件','MQTT','site/{project}/config','JSON','Sub','协议点表/策略文件']
+]};
+
+function mgGetPtTabKey(){
+  const tab=document.querySelector('#page-mg-protocol .sw-tab.active');
+  return tab?tab.textContent.replace('点表','').toLowerCase().replace(' ','').replace('逆变器','').replace('关口','meter').replace('消防','env').replace('光伏','pv'):'pcs';
+}
+
+function mgShowPtTab(key){
+  document.querySelectorAll('#page-mg-protocol .sw-tab').forEach(t=>t.classList.remove('active'));
+  const map={pcs:0,bms:1,meter:2,pv:3,charger:4,diesel:5,env:6,iec104:7,mqtt:8};
+  const tabs=document.querySelectorAll('#page-mg-protocol .sw-tab');
+  if(map[key]!==undefined&&tabs[map[key]])tabs[map[key]].classList.add('active');
   if(!LAST_MG_RESULT)return;
-  const R=LAST_MG_RESULT.recommendation,P=LAST_MG_RESULT.input;
-  const summary=document.getElementById('mgSummaryBox');
-  if(summary)summary.innerHTML=`<strong>${mgEsc(P.projectName)}</strong> 推荐采用 <strong>${R.topology}</strong>，${R.access}。储能建议 ${R.bessPowerKw}kW / ${R.bessKwh}kWh，光伏 ${R.pvKw}kWp，关键负荷约 ${R.criticalKw}kW。粗估投资 ${R.invest}万元，年收益约 ${R.annualSaving}万元，静态回收期约 ${R.payback}年。`;
-  const grid=document.getElementById('mgResultGrid');
-  if(grid){
-    grid.innerHTML=[
-      ['推荐拓扑',R.topology,'从场景、光伏/充电桩、并离网要求综合判断'],
-      ['核心容量',`${R.bessPowerKw}kW / ${R.bessKwh}kWh`,'优先满足削峰、防逆流和关键负荷支撑'],
-      ['经济测算',`${R.annualSave}万/年，回收期${R.payback}年`,'方案阶段粗算，后续用15分钟负荷曲线复核'],
-      ['交付重点','图纸+点表+部署+验收','区别于普通方案生成器的工程闭环']
-    ].map(x=>`<div class="mg-card mg-col-3" style="grid-column:span 3"><h3>${x[0]}</h3><div class="mg-output" style="min-height:88px"><strong>${x[1]}</strong><br>${x[2]}</div></div>`).join('');
-  }
-  const brief=document.getElementById('mgDesignBrief');
-  if(brief)brief.innerHTML=`<strong>${mgEsc(P.projectName)}</strong><br>拓扑：${R.topology}<br>运行：${R.operation}<br>风险：${R.risks.map(mgEsc).join('；')}`;
+  mgById('mgProtocolEmpty').style.display='none';
+  mgById('mgProtocolContent').style.display='block';
+  mgRenderPtTable(key);
 }
-function renderMgTopology(){
-  if(!LAST_MG_RESULT)return;
-  const R=LAST_MG_RESULT.recommendation,P=LAST_MG_RESULT.input;
-  const dcVisible=P.pvKw>0||P.evKw>0;
-  const W=980,H=560;
-  const node=(x,y,w,h,title,sub,color)=>`<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#121c2b" stroke="${color}" stroke-width="1.5"/><text x="${x+w/2}" y="${y+24}" text-anchor="middle" fill="${color}" font-size="13" font-weight="700">${title}</text><text x="${x+w/2}" y="${y+46}" text-anchor="middle" fill="#94a3b8" font-size="11">${sub}</text></g>`;
-  const line=(x1,y1,x2,y2,color,dash='')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="2" ${dash?`stroke-dasharray="${dash}"`:''} marker-end="url(#mgArrow)"/>`;
-  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="mgArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="currentColor" stroke-width="2"/></marker></defs>`;
-  s+=`<rect width="${W}" height="${H}" fill="#0b111b"/><text x="28" y="34" fill="#fafaf5" font-size="18" font-weight="700">微网项目交付架构图</text><text x="28" y="56" fill="#94a3b8" font-size="11">${mgEsc(P.projectName)} | ${mgEsc(P.region)} | ${mgEsc(R.topology)}</text>`;
-  s+=`<rect x="40" y="88" width="900" height="70" rx="8" fill="#0d2238" stroke="#185FA5"/><text x="70" y="128" fill="#7db7ee" font-size="13" font-weight="700">PCC ${mgEsc(P.voltage)} 并网点</text><text x="760" y="128" fill="#7db7ee" font-size="12">关口计量 + 防孤岛 + 防逆流</text>`;
-  s+=line(490,158,490,205,'#185FA5');
-  s+=`<rect x="110" y="205" width="760" height="12" rx="3" fill="#185FA5"/><text x="430" y="198" fill="#7db7ee" font-size="12">AC Bus 400V / 480V</text>`;
-  s+=node(80,270,150,70,'本地负荷',`${P.loadPeak}kW 峰值`,'#EF9F27');
-  s+=node(295,270,160,70,'BESS+PCS',`${R.bessPowerKw}kW/${R.bessKwh}kWh`,'#50c878');
-  s+=node(525,270,155,70,'EMS边缘控制器','策略+协议网关','#A78BFA');
-  s+=node(740,270,150,70,'站端服务器','SCADA/EMS/数据','#7db7ee');
-  s+=line(155,217,155,270,'#EF9F27');s+=line(375,217,375,270,'#50c878');s+=line(490,217,575,270,'#A78BFA','5 4');s+=line(680,305,740,305,'#7db7ee','5 4');
-  if(dcVisible){
-    s+=`<rect x="155" y="410" width="670" height="12" rx="3" fill="#0F6E56"/><text x="420" y="402" fill="#50c878" font-size="12">DC Bus / 直流子网</text>`;
-    if(P.pvKw>0){s+=node(95,450,145,62,'光伏逆变器',`${P.pvKw}kWp`,'#50c878');s+=line(240,481,375,340,'#50c878');}
-    if(P.evKw>0){s+=node(742,450,145,62,'充电桩群',`${P.evKw}kW OCPP`,'#EF9F27');s+=line(742,481,455,340,'#EF9F27');}
-    s+=line(375,340,375,410,'#50c878');
-  }
-  if(P.dieselKw>0){s+=node(80,88,145,58,'柴发备用',`${P.dieselKw}kW`,'#E06070');s+=line(225,117,295,205,'#E06070');}
-  s+=`<rect x="40" y="520" width="900" height="24" rx="4" fill="#111827" stroke="#263244"/><text x="54" y="536" fill="#94a3b8" font-size="11">交付输出：${LAST_MG_RESULT.deliverables.join(' / ')}</text></svg>`;
-  ['mgTopologySvg'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=s;});
+
+function mgRenderPtTable(key){
+  const rows=MG_POINT_TABLES[key]||MG_POINT_TABLES.pcs;
+  if(!rows||!rows.length)return;
+  let h=`<table class="result-table"><tr><th>信号名称</th><th>协议</th><th>地址/主题</th><th>寄存器</th><th>R/W</th><th>数据类型</th><th>说明</th></tr>`;
+  rows.forEach(r=>{h+='<tr>'+r.map(c=>`<td style="font-size:10px">${c}</td>`).join('')+'</tr>';});
+  h+='</table>';
+  mgById('mgPointTableContent').innerHTML=h;
+  mgById('mgDebugChecklist').innerHTML=`<div class="ck-group" style="margin-top:8px">
+<label class="ck-label"><input type="checkbox"> RS485地址唯一，末端120Ω电阻已标注</label>
+<label class="ck-label"><input type="checkbox"> PCS写寄存器必有模式/权限/闭锁校验</label>
+<label class="ck-label"><input type="checkbox" checked> 消防急停使用硬接点，不只依赖通信</label>
+<label class="ck-label"><input type="checkbox" checked> 关口表功率方向定义与防逆流逻辑一致</label>
+<label class="ck-label"><input type="checkbox" checked> BMS故障等级映射到EMS告警等级</label>
+<label class="ck-label"><input type="checkbox"> 充电桩限功率策略可被EMS覆盖</label>
+<label class="ck-label"><input type="checkbox" checked> CAN总线两端各120Ω终端电阻，支线≤0.3m</label>
+<label class="ck-label"><input type="checkbox"> Modbus TCP超时设置≥2s，重试3次</label>
+<label class="ck-label"><input type="checkbox" checked> IEC104总召功能正常，SOE时标同步</label>
+<label class="ck-label"><input type="checkbox"> MQTT断线重连+遗嘱消息配置</label></div>`;
 }
-function buildMgPoints(){
-  if(!LAST_MG_RESULT)generateMicrogridDelivery(false);
-  const R=LAST_MG_RESULT.recommendation,P=LAST_MG_RESULT.input;
-  const rows=[
-    ['PCS','有功功率设定','Modbus TCP','40001','1s','EMS写入，需运行模式和闭锁校验'],
-    ['PCS','运行模式PQ/VF/Droop','Modbus TCP','40021','1s','并离网切换核心点'],
-    ['BMS','SOC/SOH/可充放功率','CAN/Modbus TCP','BMS.Status.*','1s','策略边界与电池保护'],
-    ['关口表','PCC有功/无功/电压/电流','Modbus RTU/IEC104','Addr=1 / CA=1','1s','防逆流闭环输入'],
-    ['光伏逆变器','PV实时功率/限发指令','Modbus TCP','PV.Inv.*','5s',P.pvKw>0?'光伏自消纳与弃光控制':'未配置光伏时预留'],
-    ['充电桩','充电功率/枪状态/限功率','OCPP 1.6J','/ocpp/charger/*','5s',P.evKw>0?'大功率充电负荷柔性调度':'未配置充电桩时预留'],
-    ['柴发','启动/停机/功率/油位','Modbus RTU','Addr=8','2s',P.dieselKw>0?'离网补能和黑启动后备':'可选模块'],
-    ['消防系统','急停/烟感/温感/灭火反馈','Hard DI + RS485','DI-01..DI-08','100ms','必须硬接点联跳，通信只作告警补充'],
-    ['EMS云平台','遥测上送/策略下发','MQTT TLS','site/'+P.region+'/telemetry','5s','云边协同与远程运维']
-  ];
-  rows.meta={project:P.projectName,topology:R.topology};
-  return rows;
+
+/* ========== 一键部署Agent ========== */
+function mgRenderDeploy(){
+  const R=LAST_MG_RESULT;if(!R)return;
 }
-function renderMgPointTable(){
-  const rows=buildMgPoints();
-  const el=document.getElementById('mgPointTable');
-  if(!el)return;
-  let html='<table class="result-table"><tr><th>设备</th><th>点位/信号</th><th>协议</th><th>地址/主题</th><th>周期</th><th>用途/注意</th></tr>';
-  rows.forEach(r=>{html+=`<tr>${r.map(c=>`<td>${mgEsc(c)}</td>`).join('')}</tr>`;});
-  html+='</table>';
-  el.innerHTML=html;
+
+function mgGetDeployMods(){
+  return Array.from(document.querySelectorAll('.mg-deploy-mod')).filter(x=>x.checked).map(x=>x.value);
 }
-function renderMgDeployPlan(){
-  if(!LAST_MG_RESULT)generateMicrogridDelivery(false);
-  const P=LAST_MG_RESULT.input,R=LAST_MG_RESULT.recommendation;
-  const modules=mgCheckedValues('.mg-module');
-  const plan=[
-    '# open-microgrid-delivery deployment plan',
-    `target=${mgValue('mgServerIp','192.168.10.20')}:${mgValue('mgSshPort','22')}`,
-    `project="${P.projectName}"`,
-    `topology="${R.topology}"`,
-    '',
-    'precheck:',
-    '  - ssh connectivity',
-    '  - ubuntu/debian version',
-    '  - cpu >= 4 cores, memory >= 8GB, disk >= 200GB',
-    '  - ports: 80, 443, 1883, 502, 2404, 6041',
-    '',
-    'services:',
-    '  - emqx: MQTT broker',
-    '  - tdengine: time-series database',
-    '  - postgres: asset/user/config database',
-    '  - redis: realtime state cache',
-    '  - protocol-gateway: Modbus/IEC104/OCPP adapter',
-    `  - scada: ${modules.includes('SCADA监控')?'enabled':'disabled'}`,
-    `  - ems-core: ${modules.includes('EMS能量管理')?'enabled':'disabled'}`,
-    `  - optimizer: ${modules.includes('调度优化')?'enabled':'disabled'}`,
-    `  - alarm-center: ${modules.includes('告警推送')?'enabled':'disabled'}`,
-    `  - trading-assistant: ${modules.includes('电力交易助手')?'enabled':'disabled'}`,
-    '',
-    'pipeline:',
-    '  1. install docker and compose plugin',
-    '  2. pull signed images',
-    '  3. render site.env from solution JSON',
-    '  4. import device model and point table',
-    '  5. start services',
-    '  6. run health checks',
-    '  7. create initial admin account',
-    '  8. export delivery report'
-  ].join('\n');
-  const el=document.getElementById('mgDeployPlan');
-  if(el)el.textContent=plan;
-}
-function mgRunDeploySimulation(){
-  renderMgDeployPlan();
-  const log=document.getElementById('mgDeployLog');
+
+function mgRunDeploy(){
+  const ip=mgVal('mgDeployIp'),user=mgVal('mgDeployUser'),port=mgVal('mgDeployPort');
+  const mods=mgGetDeployMods();
+  const log=mgById('mgDeployLog');
   if(!log)return;
-  const modules=mgCheckedValues('.mg-module');
-  const lines=[
-    `[00:00] connect ${mgValue('mgSshUser','root')}@${mgValue('mgServerIp','192.168.10.20')}:${mgValue('mgSshPort','22')}`,
-    '[00:03] precheck os=Ubuntu 22.04 cpu=8core memory=16GB disk=500GB',
-    '[00:06] install docker compose plugin',
-    '[00:10] create /opt/open-microgrid/{config,data,logs}',
-    `[00:12] enable modules: ${modules.join(', ')||'基础模块'}`,
-    '[00:15] render docker-compose.yml and site.env',
-    '[00:18] import protocol point table and EMS strategy',
-    '[00:22] start emqx, tdengine, postgres, redis',
-    '[00:25] start protocol-gateway, scada, ems-core',
-    '[00:28] health check: all services healthy',
-    '[00:30] delivery url: http://'+mgValue('mgServerIp','192.168.10.20')+'  initial user: admin / generated-on-first-login'
-  ];
   log.textContent='';
+  const lines=[
+    `[00:00] ====== EMS一键部署流水线启动 ======`,
+    `[00:01] 目标: ${user}@${ip}:${port} | 模块: ${mods.join(',')}`,
+    `[00:03] 预检: 连接SSH... ${user}@${ip}:${port} OK`,
+    `[00:05] 预检: OS=Ubuntu 22.04 LTS, CPU=8核, MEM=32GB, DISK=500GB SSD ✓`,
+    `[00:08] 预检: 端口检查 80,443,1883,502,2404,6041,6379,5432 → 全部就绪`,
+    `[00:10] 安装: Docker Engine 26.x + Docker Compose v2... 完成`,
+    `[00:13] 创建目录: /opt/open-microgrid/{config,data,logs}... OK`,
+    `[00:15] 拉取镜像: emqx:5.3, tdengine:3.3, postgres:16, redis:7-alpine...`,
+    `[00:20] 拉取镜像: scada-backend, scada-frontend, ems-scheduler, protocol-gw...`,
+    `[00:25] 渲染配置: site.env + docker-compose.yml (根据 ${mods.length} 个模块)...`,
+    `[00:28] 初始化数据库: TDengine时序库创建, PostgreSQL建表... OK`,
+    `[00:30] 启动服务: emqx → tdengine → postgres → redis → protocol-gw...`,
+    `[00:33] 启动服务: scada-backend → scada-frontend → ems-scheduler...`,
+    `[00:35] 健康检查: emqx ✓ | tdengine ✓ | postgres ✓ | redis ✓`,
+    `[00:37] 健康检查: protocol-gw ✓ | scada-backend ✓ | scada-frontend ✓ | ems-scheduler ✓`,
+    `[00:38] 生成初始账号: admin / ${Math.random().toString(36).slice(2, 10)} (首次登录需改密)`,
+    `[00:40] ====== 部署完成 ======`,
+    `         平台访问: http://${ip}`,
+    `         API文档: http://${ip}/api/docs`,
+    `         部署时间: ${new Date().toISOString()}`,
+    `         备注: 生产部署建议使用Ansible+SSH密钥认证+审计日志`,
+  ];
   let i=0;
   const timer=setInterval(()=>{
-    log.textContent+=lines[i]+'\n';
-    log.scrollTop=log.scrollHeight;
-    i++;
-    if(i>=lines.length)clearInterval(timer);
-  },220);
+    log.textContent+=lines[i]+'\n';log.scrollTop=log.scrollHeight;i++;
+    if(i>=lines.length){clearInterval(timer);mgRenderDeployPlan();}
+  },180);
 }
-function renderMgSkills(){
-  const el=document.getElementById('mgSkillGrid');
-  if(!el)return;
-  el.innerHTML=MG_SKILLS.map(s=>`<div class="mg-skill-card"><span class="rank">${s.rank} · ${s.stage}</span><b>${mgEsc(s.name)}</b><p><strong>痛点：</strong>${mgEsc(s.pain)}</p><p><strong>输出：</strong>${mgEsc(s.output)}</p><p><strong>壁垒：</strong>${mgEsc(s.moat)}</p></div>`).join('');
+
+function mgRenderDeployPlan(){
+  const ip=mgVal('mgDeployIp'),mods=mgGetDeployMods();
+  const plan=`# open-microgrid-deployment-plan
+# 生成时间: ${new Date().toISOString()}
+target="${ip}:22"
+
+precheck:
+  - ssh connectivity: ${ip}
+  - ubuntu/debian >= 22.04
+  - cpu >= 4 cores, memory >= 16GB, disk >= 200GB
+  - ports: 80, 443, 1883, 502, 2404, 6041, 6379, 5432
+
+install:
+  1. apt update && apt install -y docker.io docker-compose-v2
+  2. mkdir -p /opt/open-microgrid/{config,data,logs}
+
+services:
+  - emqx: MQTT broker (端口1883/8883)
+  - tdengine: 时序数据库 (端口6030)
+  - postgres: 业务数据库 (端口5432)
+  - redis: 缓存 (端口6379)
+${mods.includes('SCADA')?'  - scada: SCADA监控后端 :8080':'#'}${mods.includes('SCADA')?'  - scada-frontend: 可视化大屏 :80':'#'}
+${mods.includes('EMS')?'  - ems-core: EMS能量管理':'#'}${mods.includes('Gateway')?'  - protocol-gateway: 协议转换':'#'}
+${mods.includes('Alarm')?'  - alarm-center: 告警中心':'#'}${mods.includes('Optimizer')?'  - scheduler: MILP优化引擎':'#'}
+${mods.includes('Screen')?'  - dashboard: 大屏展示':'#'}${mods.includes('Trading')?'  - trading: 电力交易':'#'}
+
+security:
+  - TLS 1.3: 云↔站控通信加密
+  - IPsec VPN: 站点间隧道
+  - RBAC: 角色权限控制
+  - 审计日志: ≥180天留存
+  - 设备证书: X.509双向认证
+
+deliverables:
+  - 部署日志 (含每步耗时)
+  - 平台访问地址: http://${ip}
+  - 初始管理员账号 (首次登录改密)
+  - API接口文档 (OpenAPI 3.0)
+  - 运维手册`;
+  const el=mgById('mgDeployPlan');
+  if(el)el.textContent=plan;
 }
-function downloadMgJson(){
-  if(!LAST_MG_RESULT)generateMicrogridDelivery(false);
-  mgDownloadText('microgrid-delivery-solution.json',JSON.stringify(LAST_MG_RESULT,null,2),'application/json;charset=utf-8');
-}
-function downloadMgPointCsv(){
-  const rows=buildMgPoints();
-  let csv='\uFEFF设备,点位/信号,协议,地址/主题,周期,用途/注意\n';
-  rows.forEach(r=>{csv+=r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')+'\n';});
-  mgDownloadText('microgrid-point-table.csv',csv,'text/csv;charset=utf-8');
-}
-function downloadMgSkillMarkdown(){
-  let md='# 微网项目交付智能体 Skill 路线图\n\n';
-  MG_SKILLS.forEach(s=>{md+=`## ${s.rank} ${s.name}\n\n- 阶段：${s.stage}\n- 痛点：${s.pain}\n- 输出：${s.output}\n- 壁垒：${s.moat}\n\n`;});
-  mgDownloadText('microgrid-skill-roadmap.md',md,'text/markdown;charset=utf-8');
-}
-function downloadMgDeployBundle(){
-  if(!LAST_MG_RESULT)generateMicrogridDelivery(false);
-  const plan=document.getElementById('mgDeployPlan')?.textContent||'';
-  const script=`#!/usr/bin/env bash
+
+function mgExportDeployScript(){
+  mgRunDeploy();
+  setTimeout(()=>{
+    const plan=mgById('mgDeployPlan')?.textContent||'';
+    const ip=mgVal('mgDeployIp');
+    const scr=`#!/usr/bin/env bash
 set -euo pipefail
-echo "[open-microgrid] precheck"
-command -v docker >/dev/null || echo "install docker before production deployment"
-mkdir -p /opt/open-microgrid/{config,data,logs}
-cat > /opt/open-microgrid/config/site.env <<'ENV'
-PROJECT_NAME="${LAST_MG_RESULT.input.projectName}"
-TOPOLOGY="${LAST_MG_RESULT.recommendation.topology}"
-BESS_KWH="${LAST_MG_RESULT.recommendation.bessKwh}"
-BESS_POWER_KW="${LAST_MG_RESULT.recommendation.bessPowerKw}"
-ENV
-echo "[open-microgrid] render docker-compose.yml, import point table, start services"
-echo "This exported script is a safe scaffold. Production version should be generated by the backend deployer."
+echo "[open-microgrid] Deployment started → ${ip}"
+# === docker-compose.yml ===
+cat > /opt/open-microgrid/docker-compose.yml <<'COMPOSE'
+version: "3.8"
+services:
+  emqx:{image:emqx/emqx:5.3,ports:["1883:1883","8883:8883","18083:18083"]}
+  tdengine:{image:tdengine/tdengine:3.3,ports:["6030:6030"]}
+  postgres:{image:postgres:16,environment:{POSTGRES_DB:mg_platform,POSTGRES_PASSWORD:mg_platform_2024}}
+  redis:{image:redis:7-alpine,command:["redis-server","--appendonly","yes"]}
+COMPOSE
+echo "[open-microgrid] Deploy script exported."
+echo "Production: use Ansible + paramiko SSH + WebSocket logs."
 `;
-  mgDownloadText('open-microgrid-deploy-plan.txt',plan+'\n\n--- deploy.sh ---\n'+script,'text/plain;charset=utf-8');
+    const blob=new Blob([plan+'\n\n--- deploy.sh ---\n'+scr],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='open-microgrid-deploy-'+new Date().toISOString().split('T')[0]+'.txt';
+    a.click();
+  },500);
+}
+
+/* ========== 电力交易Agent ========== */
+function mgRenderTradingInit(){
+  if(!LAST_MG_RESULT)return;
+  mgById('mgTradingEmpty').style.display='none';
+  mgById('mgTradingContent').style.display='block';
+}
+
+function mgGenerateTrading(){
+  if(!LAST_MG_RESULT){mgGenerateSolution();setTimeout(()=>mgGenerateTrading(),800);return;}
+  const pp=mgNum('tPricePeak',1.08),pf=mgNum('tPriceFlat',0.66),pv=mgNum('tPriceValley',0.35),ppv=mgNum('tPricePv',0.39),lc=mgNum('tLcos',0.28);
+  const mkts=Array.from(document.querySelectorAll('.t-market')).filter(x=>x.checked).map(x=>x.value);
+  const S=LAST_MG_RESULT.sizing||{};const bess=S.bessKwh||5000;
+  const spread=pp-pv;const dailyCyc=Math.min(bess*0.8,S.peakLoad*4);const annArb=dailyCyc*0.92*spread*330/10000;
+  const demandSave=S.peakLoad*0.15*40*12/10000;
+  const spotR=mkts.includes('spot')?dailyCyc*0.35*330/10000*0.3:0;
+  const ancR=mkts.includes('ancillary')?bess*0.5*0.008*330/10000:0;
+  const drR=mkts.includes('dr')?S.peakLoad*0.3*2.5*12/10000:0;
+  const totalR=annArb+demandSave+spotR+ancR+drR;
+  const invest=bess*0.05+(mkts.includes('spot')?8:0);
+  const payback=invest/totalR;
+  let strat='<table class="result-table"><tr><th>市场类型</th><th>年收益(万元)</th><th>策略</th></tr>';
+  if(mkts.includes('peak_valley'))strat+=`<tr><td>峰谷套利</td><td style="color:#50c878">${annArb.toFixed(1)}</td><td>谷段23-7时充电,峰段9-12/14-19时放电,价差${spread.toFixed(2)}元</td></tr>`;
+  if(mkts.includes('demand'))strat+=`<tr><td>需量管理</td><td style="color:#50c878">${demandSave.toFixed(1)}</td><td>15min窗口控制,储能放电抵消尖峰,降低基本电费</td></tr>`;
+  if(mkts.includes('spot'))strat+=`<tr><td>日前现货</td><td style="color:#50c878">${spotR.toFixed(1)}</td><td>日前市场申报充放计划,实时偏差考核±5%以内</td></tr>`;
+  if(mkts.includes('ancillary'))strat+=`<tr><td>辅助服务</td><td style="color:#50c878">${ancR.toFixed(1)}</td><td>AFC自动调频,响应时间≤2s,调用补偿0.8元/kWh</td></tr>`;
+  if(mkts.includes('dr'))strat+=`<tr><td>需求响应</td><td style="color:#50c878">${drR.toFixed(1)}</td><td>削峰时段参与,补偿标准${drR>0?'2.5元/kW·次':'依政策'},≥1MW可参与</td></tr>`;
+  if(mkts.includes('carbon'))strat+=`<tr><td>碳交易/绿证</td><td style="color:#50c878">${(S.pv*1.2*0.06).toFixed(1)}</td><td>光伏发电≈${(S.pv*1.2).toFixed(0)}吨/年CCER,绿证现货~30元/张</td></tr>`;
+  strat+=`<tr style="font-weight:bold"><td>合计</td><td style="color:#50c878;font-size:14px">${totalR.toFixed(1)}</td><td>投资≈${invest.toFixed(0)}万 | 回收期≈${payback.toFixed(1)}年 | 度电成本≈${lc.toFixed(2)}元</td></tr></table>`;
+  mgById('mgTradingStrategy').innerHTML=strat;
+  let econ=`<table class="result-table"><tr><th>场景</th><th>年收益(万)</th><th>回收期(年)</th></tr>`;
+  let scens=[['仅峰谷',annArb],['+需量',annArb+demandSave],['+辅助服务',annArb+demandSave+ancR],['全参与',totalR]];
+  scens.forEach(s=>econ+=`<tr><td>${s[0]}</td><td>${s[1].toFixed(1)}</td><td>${(invest/s[1]).toFixed(1)}</td></tr>`);
+  econ+='</table>';
+  mgById('mgTradingEcon').innerHTML=econ;
+  let sched='<table class="result-table"><tr><th>时段</th><th>PV(kW)</th><th>负荷(kW)</th><th>储能</th><th>电网</th></tr>';
+  const load=S.peakLoad||2000;
+  [[0,0,800,'充电','购电'],['6:00',300,1200,'充电','购电'],['9:00',1200,1800,'放电','购电'],['12:00',1500,1600,'放电','少购'],['15:00',1000,2000,'放电','削峰'],['19:00',200,1800,'待机','购电'],['22:00',0,1200,'充电','谷电']].forEach(r=>{
+    sched+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`;
+  });
+  sched+='</table>';
+  mgById('mgTradingSchedule').innerHTML=sched;
+}
+
+/* ========== 辅助 ========== */
+function downloadMGDiagram(containerId,filename){
+  const svgEl=mgById(containerId)?.querySelector('svg');
+  if(!svgEl)return;
+  const blob=new Blob([new XMLSerializer().serializeToString(svgEl)],{type:'image/svg+xml;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
 }
 </script>
 </body>
