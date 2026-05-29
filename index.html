@@ -155,6 +155,8 @@ select.form-input{appearance:auto}
 .mg-skill-card p{font-size:11px;color:var(--text2);line-height:1.7}
 .mg-skill-card .rank{display:inline-block;margin-bottom:8px;padding:2px 7px;border-radius:10px;background:rgba(15,110,86,.18);color:#50c878;font-size:10px}
 .mg-code{background:#0b111b;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'Cascadia Code','Fira Code',monospace;font-size:11px;color:#b7d7ff;white-space:pre-wrap;max-height:360px;overflow:auto}
+.sw-tab{padding:6px 14px;font-size:12px;cursor:pointer;border-radius:5px;transition:all .2s}
+.sw-sub-content{margin-top:0}
 .mg-log{background:#090d14;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'Cascadia Code','Fira Code',monospace;font-size:11px;color:#d6e7ff;line-height:1.7;min-height:180px;max-height:300px;overflow:auto}
 @media(max-width:1200px){}
 @media(max-width:1000px){.mg-hero{grid-template-columns:1fr}.mg-col-3,.mg-col-4,.mg-col-5,.mg-col-6,.mg-col-7,.mg-col-8{grid-column:span 12}.mg-form-grid,.mg-form-grid.two{grid-template-columns:1fr}.mg-timeline{grid-template-columns:1fr 1fr}.mg-check-grid{grid-template-columns:1fr}}
@@ -196,6 +198,7 @@ select.form-input{appearance:auto}
 <div class="sub-tab active" onclick="showMicroPage('mg-arch')">微网架构</div>
 <div class="sub-tab" onclick="showMicroPage('mg-ems')">微网能量管理</div>
 <div class="sub-tab" onclick="showMicroPage('mg-schedule')">微网调度优化</div>
+<div class="sub-tab" onclick="showMicroPage('mg-software')">软件平台配置</div>
 <div class="sub-tab" onclick="showMicroPage('mg-deliver')">项目交付</div>
 <div class="sub-tab" onclick="showMicroPage('mg-skills')">Skill壁垒</div>
 </nav>
@@ -540,7 +543,289 @@ ACC AC一体柜专题
 </div>
 </div>
 
-<div id="page-mg-deliver" class="micro-content mg-page" style="display:none">
+<div id="page-mg-software" class="micro-content mg-page" style="display:none">
+<section class="mg-hero">
+<div>
+<div class="mg-pills"><span class="mg-pill hot">Software Platform</span><span class="mg-pill">SCADA</span><span class="mg-pill">EMS</span><span class="mg-pill">调度</span><span class="mg-pill">交易</span><span class="mg-pill">数据中台</span></div>
+<h2>微网软件平台配置</h2>
+<p>面向微网项目的5大核心软件子平台配置：SCADA监控、EMS能量管理、调度优化、电力交易和数据中台。每个子平台包含技术栈选型、核心功能模块、部署架构和交付清单，支持一键生成项目级配置文件。</p>
+<div class="mg-actions">
+<button class="btn btn-primary" onclick="generateSoftwareConfig()">生成平台配置方案</button>
+<button class="btn btn-secondary" onclick="exportSoftwareConfig()">导出配置清单</button>
+</div>
+</div>
+<div class="mg-kpis">
+<div class="mg-kpi"><b>5</b><span>核心软件子平台</span></div>
+<div class="mg-kpi"><b>Go+React</b><span>后端Go微服务+前端React</span></div>
+<div class="mg-kpi"><b>50+</b><span>可配置功能模块</span></div>
+<div class="mg-kpi"><b>Docker</b><span>容器化一键部署</span></div>
+</div>
+</section>
+
+<div class="mg-grid">
+<div class="mg-card mg-col-12">
+<h3>子平台选择</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+<button class="btn btn-primary sw-tab active" onclick="showSwSub('scada')" id="swTab-scada">SCADA监控</button>
+<button class="btn btn-secondary sw-tab" onclick="showSwSub('ems')" id="swTab-ems">EMS能量管理</button>
+<button class="btn btn-secondary sw-tab" onclick="showSwSub('dispatch')" id="swTab-dispatch">调度优化</button>
+<button class="btn btn-secondary sw-tab" onclick="showSwSub('trading')" id="swTab-trading">电力交易</button>
+<button class="btn btn-secondary sw-tab" onclick="showSwSub('datacenter')" id="swTab-datacenter">数据中台</button>
+</div>
+</div>
+</div>
+
+<div id="sw-scada" class="sw-sub-content">
+<div class="mg-grid">
+<div class="mg-card mg-col-6">
+<h3>SCADA监控平台</h3>
+<p class="mg-mini">SCADA(Supervisory Control And Data Acquisition)是微网系统的实时监控中枢，负责数据采集、设备监控、遥控操作、告警管理和画面展示。支持IEC 61850/104/Modbus RTU/TCP多协议接入。</p>
+<h4>技术栈</h4>
+<table class="result-table" style="font-size:11px">
+<tr><th>层</th><th>技术</th><th>用途</th></tr>
+<tr><td>前端</td><td>React 18 + Ant Design 5</td><td>监控画面、实时曲线</td></tr>
+<tr><td>实时</td><td>WebSocket + MQTT</td><td>遥测遥信推送</td></tr>
+<tr><td>后端</td><td>Go 1.22 + Gin</td><td>API网关、协议解析</td></tr>
+<tr><td>协议</td><td>lib60870 + lib61850</td><td>IEC 104/61850通信</td></tr>
+<tr><td>时序库</td><td>TDengine 3.x</td><td>遥测历史存储</td></tr>
+<tr><td>缓存</td><td>Redis 7.x</td><td>实时数据缓存、告警</td></tr>
+<tr><td>部署</td><td>Docker + K3s</td><td>容器编排</td></tr>
+</table>
+</div>
+<div class="mg-card mg-col-6">
+<h3>核心功能模块</h3>
+<div class="mg-skill-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+<div class="mg-skill-card"><b>实时数据采集</b><p>IEC 104/61850/Modbus多协议采集，1s遥测刷新，变化上送+定时全扫</p></div>
+<div class="mg-skill-card"><b>画面展示</b><p>SVG接线图、棒图、实时曲线、列表，支持自定义组态</p></div>
+<div class="mg-skill-card"><b>遥控操作</b><p>断路器分合、PCS启停、档位调节，操作防误闭锁</p></div>
+<div class="mg-skill-card"><b>告警管理</b><p>越限/突变/通信中断/SOE，分级推送到APP/短信/邮件</p></div>
+<div class="mg-skill-card"><b>历史查询</b><p>TDengine时序查询，1s粒度365天，趋势对比+导出</p></div>
+<div class="mg-skill-card"><b>权限管理</b><p>RBAC角色权限，操作审计，双因子认证</p></div>
+</div>
+</div>
+</div>
+<div class="mg-grid">
+<div class="mg-card mg-col-6">
+<h3>部署架构</h3>
+<div class="mermaid-wrap" id="mm-scada-arch"></div>
+</div>
+<div class="mg-card mg-col-6">
+<h3>交付清单</h3>
+<table class="result-table" style="font-size:11px">
+<tr><th>序号</th><th>交付物</th><th>格式</th><th>备注</th></tr>
+<tr><td>1</td><td>SCADA安装包</td><td>Docker Image</td><td>x86+ARM64</td></tr>
+<tr><td>2</td><td>画面配置文件</td><td>SVG+JSON</td><td>含接线图/趋势/列表</td></tr>
+<tr><td>3</td><td>协议点表映射</td><td>Excel</td><td>IEC104→内部点号</td></tr>
+<tr><td>4</td><td>告警配置表</td><td>Excel</td><td>限值/延时/级别</td></tr>
+<tr><td>5</td><td>权限配置</td><td>JSON</td><td>角色/用户/操作</td></tr>
+<tr><td>6</td><td>部署文档</td><td>Markdown</td><td>环境要求+步骤</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<div id="sw-ems" class="sw-sub-content" style="display:none">
+<div class="mg-grid">
+<div class="mg-card mg-col-6">
+<h3>EMS能量管理平台</h3>
+<p class="mg-mini">EMS(Energy Management System)是微网的大脑，负责储能SOC管理、充放电策略、防逆流控制、削峰填谷、光伏消纳优化和并离网无缝切换。基于eBlock能量块架构，支持多PCS协调控制。</p>
+<h4>技术栈</h4>
+<table class="result-table" style="font-size:11px">
+<tr><th>层</th><th>技术</th><th>用途</th></tr>
+<tr><td>策略引擎</td><td>Go + 规则引擎(Drools)</td><td>充放电策略执行</td></tr>
+<tr><td>优化求解</td><td>Pyomo + CBC/Gurobi</td><td>MILP日前调度</td></tr>
+<tr><td>预测</td><td>Prophet + LSTM</td><td>负荷/光伏预测</td></tr>
+<tr><td>实时控制</td><td>Go + gRPC</td><td>PCS指令下发＜1s</td></tr>
+<tr><td>事件总线</td><td>NATS JetStream</td><td>策略触发/联动</td></tr>
+<tr><td>持久化</td><td>PostgreSQL 16</td><td>策略/计划/日志</td></tr>
+</table>
+</div>
+<div class="mg-card mg-col-6">
+<h3>核心功能模块</h3>
+<div class="mg-skill-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+<div class="mg-skill-card"><b>充放电策略</b><p>峰谷套利、需量管理、防逆流、SOC保护，策略优先级可配</p></div>
+<div class="mg-skill-card"><b>SOC管理</b><p>10%~90%区间保护，均充/浮充自动切换，簇间均衡</p></div>
+<div class="mg-skill-card"><b>削峰填谷</b><p>实时负荷跟踪，动态调整充放电功率，需量控制</p></div>
+<div class="mg-skill-card"><b>防逆流</b><p>三重保障：策略层+PCS功率限制+逆流保护装置</p></div>
+<div class="mg-skill-card"><b>并离网切换</b><p>PCC检测→PCS V/f建压→负荷转移→同期并网，＜200ms</p></div>
+<div class="mg-skill-card"><b>光储协调</b><p>PV消纳优先，弃光最小化，储能吸收余量</p></div>
+</div>
+</div>
+</div>
+<div class="mg-grid">
+<div class="mg-card mg-col-6">
+<h3>部署架构</h3>
+<div class="mermaid-wrap" id="mm-ems-arch"></div>
+</div>
+<div class="mg-card mg-col-6">
+<h3>交付清单</h3>
+<table class="result-table" style="font-size:11px">
+<tr><th>序号</th><th>交付物</th><th>格式</th><th>备注</th></tr>
+<tr><td>1</td><td>EMS安装包</td><td>Docker Image</td><td>含策略引擎+优化器</td></tr>
+<tr><td>2</td><td>策略配置文件</td><td>YAML</td><td>充放电/防逆流/SOC</td></tr>
+<tr><td>3</td><td>预测模型</td><td>ONNX</td><td>负荷+光伏预测</td></tr>
+<tr><td>4</td><td>PCS通信点表</td><td>Excel</td><td>Modbus寄存器映射</td></tr>
+<tr><td>5</td><td>并离网逻辑</td><td>流程图+代码</td><td>V/f和PQ切换</td></tr>
+<tr><td>6</td><td>FAT测试用例</td><td>Excel</td><td>策略场景覆盖</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<div id="sw-dispatch" class="sw-sub-content" style="display:none">
+<div class="mg-grid">
+<div class="mg-card mg-col-6">
+<h3>调度优化平台</h3>
+<p class="mg-mini">调度优化平台实现微网的多时间尺度优化调度：日前MILP经济调度→日内MPC滚动修正→实时AGC功率跟踪→本地边缘自治。支持需求响应(DR)和虚拟电厂(VPP)接口。</p>
+<h4>技术栈</h4>
+<table class="result-table" style="font-size:11px">
+<tr><th>层</th><th>技术</th><th>用途</th></tr>
+<tr><td>日前优化</td><td>Pyomo + CBC</td><td>MILP 24h经济调度</td></tr>
+<tr><td>滚动优化</td><td>CasADi + IPOPT</td><td>MPC 1-4h滚动</td></tr>
+<tr><td>实时调度</td><td>Go + C</td><td>AGC秒级跟踪</td></tr>
+<tr><td>预测服务</td><td>Prophet + LightGBM</td><td>负荷/光伏/电价</td></tr>
+<tr><td>消息队列</td><td>NATS + Redis Stream</td><td>调度指令下发</td></tr>
+<tr><td>可视化</td><td>React + ECharts</td><td>甘特图/计划对比</td></tr>
+</table>
+</div>
+<div class="mg-card mg-col-6">
+<h3>核心功能模块</h3>
+<div class="mg-skill-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+<div class="mg-skill-card"><b>日前调度</b><p>MILP求解24h最优计划，15min粒度，考虑电价/负荷/光伏预测</p></div>
+<div class="mg-skill-card"><b>日内滚动</b><p>MPC 1-4h滚动修正，5min粒度，修正预测偏差</p></div>
+<div class="mg-skill-card"><b>实时AGC</b><p>秒级功率跟踪，频率/电压调节，紧急功率分配</p></div>
+<div class="mg-skill-card"><b>边缘自治</b><p>通信中断时就地运行，削峰填谷+防逆流保底</p></div>
+<div class="mg-skill-card"><b>需求响应</b><p>DR信号接收→负荷削减→储能放电→补偿结算</p></div>
+<div class="mg-skill-card"><b>VPP接口</b><p>聚合多微网上报容量，响应调度指令(预留)</p></div>
+</div>
+</div>
+</div>
+<div class="mg-grid">
+<div class="mg-card mg-col-6">
+<h3>调度层级示意</h3>
+<div class="mermaid-wrap" id="mm-dispatch-arch"></div>
+</div>
+<div class="mg-card mg-col-6">
+<h3>交付清单</h3>
+<table class="result-table" style="font-size:11px">
+<tr><th>序号</th><th>交付物</th><th>格式</th><th>备注</th></tr>
+<tr><td>1</td><td>调度服务安装包</td><td>Docker Image</td><td>日前+日内+实时</td></tr>
+<tr><td>2</td><td>优化模型配置</td><td>YAML</td><td>目标函数/约束/参数</td></tr>
+<tr><td>3</td><td>预测模型</td><td>ONNX+Pickle</td><td>负荷/光伏/电价</td></tr>
+<tr><td>4</td><td>调度计划模板</td><td>JSON</td><td>典型日/季节/节假日</td></tr>
+<tr><td>5</td><td>DR/VPP接口</td><td>OpenAPI 3.0</td><td>对接电网调度</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<div id="sw-trading" class="sw-sub-content" style="display:none">
+<div class="mg-grid">
+<div class="mg-card mg-col-6">
+<h3>电力交易平台</h3>
+<p class="mg-mini">电力交易平台对接省级/区域电力交易中心，支持现货市场报量报价、辅助服务市场参与、绿证交易和需求响应补偿结算。适用于已获取售电资质或通过聚合商接入的微网项目。</p>
+<h4>技术栈</h4>
+<table class="result-table" style="font-size:11px">
+<tr><th>层</th><th>技术</th><th>用途</th></tr>
+<tr><td>报价引擎</td><td>Go + 规则引擎</td><td>自动报量报价</td></tr>
+<tr><td>结算</td><td>Go + PostgreSQL</td><td>出清结算/偏差考核</td></tr>
+<tr><td>风控</td><td>Python + Pandas</td><td>价格预测/风险量化</td></tr>
+<tr><td>接口</td><td>REST + IEC 61850</td><td>交易中心对接</td></tr>
+<tr><td>前端</td><td>React + AntV L7</td><td>地图/曲线/报表</td></tr>
+</table>
+</div>
+<div class="mg-card mg-col-6">
+<h3>核心功能模块</h3>
+<div class="mg-skill-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+<div class="mg-skill-card"><b>现货交易</b><p>日频/实时市场报量报价，基于边际成本自动决策</p></div>
+<div class="mg-skill-card"><b>辅助服务</b><p>调频/调峰/备用容量申报，AGC跟踪性能评分</p></div>
+<div class="mg-skill-card"><b>绿证交易</b><p>绿电核发→绿证出售，对接GEC系统</p></div>
+<div class="mg-skill-card"><b>偏差管理</b><p>计划vs实际偏差监控，考核费用预估</p></div>
+<div class="mg-skill-card"><b>结算报表</b><p>日出清结果，月度结算单，收益归因分析</p></div>
+</div>
+</div>
+</div>
+<div class="mg-grid">
+<div class="mg-card mg-col-12">
+<h3>适用条件与准入门槛</h3>
+<table class="result-table" style="font-size:11px">
+<tr><th>市场</th><th>准入条件</th><th>微网适用性</th><th>备注</th></tr>
+<tr><td>现货市场</td><td>≥10MW并网，售电资质</td><td style="color:#e06070">多数微网不满足</td><td>可通过聚合商</td></tr>
+<tr><td>辅助服务</td><td>≥5MW，AGC性能≥0.7</td><td style="color:var(--orange)">大微网可能满足</td><td>调频收益较高</td></tr>
+<tr><td>需求响应</td><td>≥1MW可削减</td><td style="color:#50c878">大多微网满足</td><td>入门门槛最低</td></tr>
+<tr><td>绿证交易</td><td>有光伏/风电等绿电</td><td style="color:#50c878">光储微网满足</td><td>额外收益来源</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<div id="sw-datacenter" class="sw-sub-content" style="display:none">
+<div class="mg-grid">
+<div class="mg-card mg-col-6">
+<h3>数据中台</h3>
+<p class="mg-mini">数据中台是微网软件平台的数据底座，统一汇聚SCADA遥测、EMS策略日志、调度计划、交易结算等多源数据，提供数据治理、指标计算、报表服务和开放API，支撑上层应用和BI分析。</p>
+<h4>技术栈</h4>
+<table class="result-table" style="font-size:11px">
+<tr><th>层</th><th>技术</th><th>用途</th></tr>
+<tr><td>采集</td><td>Debezium + Kafka</td><td>CDC实时数据同步</td></tr>
+<tr><td>存储</td><td>TDengine + PostgreSQL</td><td>时序+关系混合</td></tr>
+<tr><td>计算</td><td>Apache Flink</td><td>实时指标/聚合</td></tr>
+<tr><td>分析</td><td>DuckDB + Metabase</td><td>即席查询/BI</td></tr>
+<tr><td>API</td><td>Go + GraphQL</td><td>统一数据服务</td></tr>
+<tr><td>治理</td><td>Apache Atlas</td><td>元数据/数据血缘</td></tr>
+</table>
+</div>
+<div class="mg-card mg-col-6">
+<h3>核心功能模块</h3>
+<div class="mg-skill-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+<div class="mg-skill-card"><b>数据汇聚</b><p>Kafka多Topic接入，SCADA/EMS/调度/交易数据统一汇聚</p></div>
+<div class="mg-skill-card"><b>实时指标</b><p>Flink流计算：SOC均值/功率总和/收益累计/效率</p></div>
+<div class="mg-skill-card"><b>数据治理</b><p>数据质量校验、缺失补值、异常标记、血缘追踪</p></div>
+<div class="mg-skill-card"><b>报表服务</b><p>日报/月报/年报自动生成，PDF/Excel导出</p></div>
+<div class="mg-skill-card"><b>开放API</b><p>GraphQL统一查询，第三方系统对接</p></div>
+<div class="mg-skill-card"><b>BI分析</b><p>Metabase仪表盘，趋势/对比/归因可视化</p></div>
+</div>
+</div>
+</div>
+<div class="mg-grid">
+<div class="mg-card mg-col-6">
+<h3>数据流向架构</h3>
+<div class="mermaid-wrap" id="mm-datacenter-arch"></div>
+</div>
+<div class="mg-card mg-col-6">
+<h3>交付清单</h3>
+<table class="result-table" style="font-size:11px">
+<tr><th>序号</th><th>交付物</th><th>格式</th><th>备注</th></tr>
+<tr><td>1</td><td>数据中台安装包</td><td>Docker Compose</td><td>Kafka+Flink+TDengine</td></tr>
+<tr><td>2</td><td>数据模型</td><td>DDL + ER图</td><td>时序+关系表结构</td></tr>
+<tr><td>3</td><td>Flink作业</td><td>JAR</td><td>实时指标计算</td></tr>
+<tr><td>4</td><td>报表模板</td><td>JSON</td><td>日/月/年报</td></tr>
+<tr><td>5</td><td>API文档</td><td>GraphQL Schema</td><td>开放数据接口</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<div class="mg-grid" style="margin-top:8px">
+<div class="mg-card mg-col-6">
+<h3>总体技术栈选型</h3>
+<table class="result-table" style="font-size:11px">
+<tr><th>类别</th><th>选型</th><th>理由</th></tr>
+<tr><td>后端语言</td><td style="color:var(--blue)">Go 1.22</td><td>高并发、低延迟、单二进制部署，适合站端</td></tr>
+<tr><td>前端框架</td><td style="color:var(--blue)">React 18 + TypeScript</td><td>生态成熟、组件丰富、Ant Design 5</td></tr>
+<tr><td>时序数据库</td><td>TDengine 3.x</td><td>10倍InfluxDB写入性能，储能遥测首选</td></tr>
+<tr><td>关系数据库</td><td>PostgreSQL 16</td><td>策略/计划/结算，JSONB+GIS</td></tr>
+<tr><td>消息中间件</td><td>NATS JetStream</td><td>轻量、Go原生、适合边缘</td></tr>
+<tr><td>容器编排</td><td>K3s (轻量K8s)</td><td>单节点/3节点，资源占用低</td></tr>
+<tr><td>CI/CD</td><td>GitLab CI + Ansible</td><td>站端自动部署</td></tr>
+</table>
+</div>
+<div class="mg-card mg-col-6">
+<h3>项目交付总清单</h3>
+<div class="mg-code" id="swDeliveryList" style="max-height:260px">等待生成...</div>
+</div>
+</div>
+</div>
 <section class="mg-hero">
 <div>
 <div class="mg-pills"><span class="mg-pill hot">Microgrid Delivery Agent</span><span class="mg-pill">方案</span><span class="mg-pill">图纸</span><span class="mg-pill">点表</span><span class="mg-pill">部署</span><span class="mg-pill">验收</span></div>
@@ -1114,7 +1399,147 @@ const MERMAID_DEFS = {
     style CoreSwitch fill:#fff9c4
     style SCADA_Server fill:#c8e6c9
     style DB_Server fill:#c8e6c9
-    style EdgeSwitch fill:#d1c4e9`
+    style EdgeSwitch fill:#d1c4e9`,
+  'mm-scada-arch': `graph TB
+    subgraph Client["客户端层"]
+        Web["Web浏览器<br/>React + AntD"]
+        App["运维APP<br/>React Native"]
+    end
+    subgraph API["API网关层"]
+        Gin["Gin Router<br/>Go 1.22"]
+        Auth["认证鉴权<br/>JWT + RBAC"]
+    end
+    subgraph Service["服务层"]
+        Collect["数据采集服务<br/>IEC104/61850"]
+        Control["遥控服务<br/>防误闭锁"]
+        Alarm["告警服务<br/>规则引擎"]
+        History["历史服务<br/>TDengine"]
+    end
+    subgraph Data["数据层"]
+        TD["TDengine 3.x<br/>遥测时序"]
+        Redis["Redis 7.x<br/>实时缓存"]
+        PG["PostgreSQL<br/>配置/权限"]
+    end
+    subgraph Protocol["协议层"]
+        IEC104["IEC 104<br/>lib60870"]
+        IEC61850["IEC 61850<br/>lib61850"]
+        Modbus["Modbus<br/>RTU/TCP"]
+    end
+    Web --> Gin
+    App --> Gin
+    Gin --> Auth
+    Gin --> Collect
+    Gin --> Control
+    Gin --> Alarm
+    Gin --> History
+    Collect --> TD
+    Collect --> Redis
+    History --> TD
+    Alarm --> Redis
+    Control --> PG
+    Collect --> IEC104
+    Collect --> IEC61850
+    Collect --> Modbus`,
+  'mm-ems-arch': `graph TB
+    subgraph Input["输入层"]
+        Forecast["预测服务<br/>Prophet + LSTM"]
+        Price["电价信号<br/>电网/交易"]
+        SOC["SOC监测<br/>BMS上报"]
+    end
+    subgraph Engine["策略引擎"]
+        Rule["规则引擎<br/>Drools"]
+        MILP["优化求解<br/>Pyomo + CBC"]
+        MPC["滚动优化<br/>CasADi"]
+    end
+    subgraph Action["执行层"]
+        PCS_Cmd["PCS指令下发<br/>gRPC <1s"]
+        Grid_Mode["并离网切换<br/>VF/PQ模式"]
+        Anti_Rev["防逆流控制<br/>三重保障"]
+    end
+    subgraph Bus["事件总线"]
+        NATS["NATS JetStream<br/>策略触发/联动"]
+    end
+    subgraph DB["持久化"]
+        PG2["PostgreSQL 16<br/>策略/计划/日志"]
+    end
+    Forecast --> Rule
+    Price --> Rule
+    SOC --> Rule
+    Rule --> MILP
+    Rule --> MPC
+    MILP --> PCS_Cmd
+    MPC --> PCS_Cmd
+    Rule --> Grid_Mode
+    Rule --> Anti_Rev
+    Rule --> NATS
+    MILP --> PG2
+    NATS --> PCS_Cmd`,
+  'mm-dispatch-arch': `graph TB
+    subgraph L1["Layer 1 日前调度"]
+        MILP2["MILP求解器<br/>Pyomo + CBC<br/>24h 15min粒度"]
+        DayAhead["日前计划<br/>经济最优"]
+    end
+    subgraph L2["Layer 2 日内滚动"]
+        MPC2["MPC控制器<br/>CasADi + IPOPT<br/>1-4h 5min粒度"]
+        Rolling["滚动修正<br/>偏差纠正"]
+    end
+    subgraph L3["Layer 3 实时AGC"]
+        AGC["AGC控制器<br/>Go + C<br/>秒级跟踪"]
+        Realtime["实时功率<br/>频率/电压"]
+    end
+    subgraph L4["Layer 4 边缘自治"]
+        Local["就地逻辑<br/>通信中断保底"]
+        Fallback["削峰填谷<br/>防逆流"]
+    end
+    MILP2 --> DayAhead
+    DayAhead --> MPC2
+    MPC2 --> Rolling
+    Rolling --> AGC
+    AGC --> Realtime
+    Realtime --> Local
+    Local --> Fallback
+    L1 -.- L2
+    L2 -.- L3
+    L3 -.- L4`,
+  'mm-datacenter-arch': `graph LR
+    subgraph Source["数据源"]
+        S1["SCADA<br/>遥测遥信"]
+        S2["EMS<br/>策略日志"]
+        S3["调度<br/>计划/执行"]
+        S4["交易<br/>结算/出清"]
+    end
+    subgraph Ingest["数据采集"]
+        CDC["Debezium CDC"]
+        Kafka["Kafka<br/>多Topic"]
+    end
+    subgraph Storage["数据存储"]
+        TDEngine["TDengine<br/>时序数据"]
+        Postgres["PostgreSQL<br/>关系数据"]
+    end
+    subgraph Compute["数据计算"]
+        Flink["Flink<br/>实时指标"]
+        DuckDB["DuckDB<br/>即席查询"]
+    end
+    subgraph Serve["数据服务"]
+        GraphQL["GraphQL API"]
+        Metabase["Metabase BI"]
+        Report["报表服务"]
+    end
+    S1 --> CDC
+    S2 --> CDC
+    S3 --> CDC
+    S4 --> CDC
+    CDC --> Kafka
+    Kafka --> TDEngine
+    Kafka --> Postgres
+    TDEngine --> Flink
+    Postgres --> Flink
+    Flink --> GraphQL
+    TDEngine --> DuckDB
+    Postgres --> DuckDB
+    DuckDB --> Metabase
+    DuckDB --> Report
+    GraphQL --> Metabase`
 };
 
 async function renderMermaid(containerId){
@@ -1296,15 +1721,18 @@ function switchCategory(cat){
   document.querySelectorAll('.category-tab')[cat==='ess'?0:1].classList.add('active');
   const essNav=document.getElementById('essNav');
   const mgNav=document.getElementById('microgridNav');
+  const mc=document.querySelector('.main-container');
   if(cat==='ess'){
     essNav.style.display='block';
     mgNav.style.display='none';
+    if(mc)mc.style.display='';
     document.querySelectorAll('.tab-content').forEach(t=>t.style.display='');
     document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
     showPage('devices');
   }else{
     essNav.style.display='none';
     mgNav.style.display='block';
+    if(mc)mc.style.display='none';
     document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
     showMicroPage('mg-arch');
   }
@@ -1321,6 +1749,49 @@ function showMicroPage(id){
   setTimeout(()=>renderMermaid('page-'+id),100);
   if(id==='mg-deliver'&&!LAST_MG_RESULT) generateMicrogridDelivery(false);
   if(id==='mg-skills') renderMgSkills();
+  if(id==='mg-software') setTimeout(()=>renderMermaid('page-mg-software'),200);
+}
+
+function showSwSub(id){
+  document.querySelectorAll('.sw-sub-content').forEach(t=>t.style.display='none');
+  document.querySelectorAll('.sw-tab').forEach(t=>{t.classList.remove('btn-primary');t.classList.add('btn-secondary');t.classList.remove('active');});
+  const el=document.getElementById('sw-'+id);
+  if(el) el.style.display='block';
+  const tab=document.getElementById('swTab-'+id);
+  if(tab){tab.classList.remove('btn-secondary');tab.classList.add('btn-primary');tab.classList.add('active');}
+  setTimeout(()=>renderMermaid('sw-'+id),200);
+}
+
+const SW_DELIVERY_ITEMS=[
+  {platform:'SCADA',items:['SCADA Docker Image (x86+ARM64)','SVG画面配置+JSON','IEC104/61850点表映射Excel','告警配置表Excel','RBAC权限配置JSON','部署文档Markdown']},
+  {platform:'EMS',items:['EMS Docker Image','策略配置YAML (充放电/防逆流/SOC)','预测模型ONNX','PCS Modbus点表Excel','并离网切换流程图+代码','FAT测试用例Excel']},
+  {platform:'调度',items:['调度服务Docker Image','优化模型YAML','预测模型ONNX+Pickle','调度计划模板JSON','DR/VPP OpenAPI 3.0']},
+  {platform:'交易',items:['交易服务Docker Image','报价策略配置YAML','结算规则Excel','交易中心接口文档','风控参数配置']},
+  {platform:'数据中台',items:['Docker Compose (Kafka+Flink+TDengine)','DDL+ER图','Flink实时指标JAR','报表模板JSON','GraphQL Schema']}
+];
+
+function generateSoftwareConfig(){
+  const lines=[];
+  SW_DELIVERY_ITEMS.forEach(p=>{
+    lines.push('【'+p.platform+'】');
+    p.items.forEach((it,i)=>lines.push('  '+(i+1)+'. '+it));
+    lines.push('');
+  });
+  lines.push('─'.repeat(40));
+  lines.push('总计: '+SW_DELIVERY_ITEMS.reduce((s,p)=>s+p.items.length,0)+' 项交付物');
+  lines.push('平台: '+SW_DELIVERY_ITEMS.map(p=>p.platform).join(' + '));
+  lines.push('技术栈: Go 1.22 + React 18 + TDengine 3.x + PostgreSQL 16');
+  document.getElementById('swDeliveryList').textContent=lines.join('\n');
+}
+
+function exportSoftwareConfig(){
+  generateSoftwareConfig();
+  const text=document.getElementById('swDeliveryList').textContent;
+  const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='软件平台交付清单_'+new Date().toISOString().slice(0,10)+'.txt';
+  a.click();
 }
 
 function v(id){return document.getElementById(id).value}
