@@ -1805,7 +1805,7 @@ function showMicroPage(id){
   if(id==='mg-deploy'&&LAST_MG_RESULT) mgRenderDeploy();
   if(id==='mg-trading'&&LAST_MG_RESULT) mgRenderTradingInit();
   if(id==='mg-wiki') mgShowWiki('arch');
-  setTimeout(()=>renderMermaid('page-'+id),200);
+  setTimeout(()=>renderMermaid(),300);
 }
 
 function mgShowWiki(id){
@@ -1817,7 +1817,7 @@ function mgShowWiki(id){
   document.getElementById('page-mg-wiki').style.display='block';
   const subEl=document.getElementById('page-mg-'+id);
   if(subEl) subEl.style.display='block';
-  setTimeout(()=>renderMermaid('page-mg-'+id),300);
+  setTimeout(()=>renderMermaid(),300);
 }
 
 function showSwSub(id){
