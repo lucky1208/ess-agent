@@ -592,6 +592,23 @@ ACC AC一体柜专题
 <div class="sw-tab" onclick="mgShowWiki('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>调度优化</div>
 <div class="sw-tab" onclick="mgShowWiki('software')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>软件平台</div>
 </div>
+
+<div style="padding:16px;background:linear-gradient(135deg,rgba(24,95,165,.08),rgba(15,110,86,.08));border:1px solid var(--border);border-radius:8px;margin-bottom:16px">
+<div style="font-size:14px;font-weight:bold;color:var(--text1);margin-bottom:4px">5年项目实战训练出的10项核心Skill</div>
+<div style="font-size:11px;color:var(--text2);margin-bottom:12px">设计人：卢继雄 | 每项Skill均经多个微网项目验证迭代</div>
+<div class="mg-grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">
+<div class="mg-skill-card" style="border-left:3px solid #185FA5"><b style="color:#4a90d9">微网拓扑选择 Skill</b><p>交流微网、直流微网、交直流混合、光储充、柴储、孤岛黑启动方案自动选择</p></div>
+<div class="mg-skill-card" style="border-left:3px solid #0F6E56"><b style="color:#50c878">一次图审图 Skill</b><p>检查PCC、CT/PT、断路器、接地、防孤岛、防逆流、保护分区是否缺失</p></div>
+<div class="mg-skill-card" style="border-left:3px solid var(--orange)"><b style="color:var(--orange)">通信点表生成 Skill</b><p>设备清单 → Modbus/IEC104/MQTT/OCPP点表Excel + EMS配置</p></div>
+<div class="mg-skill-card" style="border-left:3px solid #a070a0"><b style="color:#c090d0">EMS策略编译 Skill</b><p>自然语言目标 → 可执行策略配置：削峰填谷、防逆流、需量控制、SOC边界、充电桩限功率</p></div>
+<div class="mg-skill-card" style="border-left:3px solid #e06070"><b style="color:#e06070">一键部署 Skill</b><p>服务器预检 → Docker/TDengine/EMQX/Postgres/EMS服务部署 → 健康检查 → 交付报告</p></div>
+<div class="mg-skill-card" style="border-left:3px solid #50c878"><b style="color:#50c878">调试验收 Skill</b><p>自动生成FAT/SAT测试项、遥测遥信核对表、告警联动测试表、充放电测试记录</p></div>
+<div class="mg-skill-card" style="border-left:3px solid #4a90d9"><b style="color:#4a90d9">电价收益 Skill</b><p>各地电价/需量/容量电费 → IRR、NPV、回收期、敏感性分析</p></div>
+<div class="mg-skill-card" style="border-left:3px solid var(--orange)"><b style="color:var(--orange)">故障复盘 Skill</b><p>BMS/PCS/EMS告警日志 → 根因分析、处置建议、备件建议</p></div>
+<div class="mg-skill-card" style="border-left:3px solid #185FA5"><b style="color:#4a90d9">投标文件 Skill</b><p>客户需求书 → 技术方案、配置清单、偏离表、实施计划、验收标准</p></div>
+<div class="mg-skill-card" style="border-left:3px solid #0F6E56"><b style="color:#50c878">网络安全加固 Skill</b><p>站端EMS的SSH、证书、端口、VPN、日志审计、账号权限自动检查</p></div>
+</div>
+</div>
 </div>
 
 <!-- (保留原知识库内容页) -->
@@ -2266,6 +2283,68 @@ function showSwSub(id){
   if(tab) tab.classList.add('active');
   setTimeout(()=>renderMermaid('sw-'+id),200);
 }
+
+const MG_SKILLS_SUMMARY=`
+## 微网交付10项Skill规则 (5年实战训练)
+
+### Skill 1: 微网拓扑选择
+- R1: 纯离网+柴发→柴储拓扑(柴发主电源,储能平抑波动)
+- R2: 纯离网+无柴发→孤岛黑启动(储能V/f建压)
+- R3: 充电桩>0 AND 光伏>0→光储充一体化(DC 750V/400V双母线)
+- R4: 有直流负荷→交直流混合(AC400V+DC750V)
+- R5: 默认→交流微网(单一AC400V)
+- R6: 10kV接入→需升压变+并网柜+双向关口表0.2S级
+
+### Skill 2: 一次图审图
+- 必检: PCC断路器/CT(0.2S+0.5级)/PT/每馈线断路器/接地(TN-S)/防孤岛(AFD+频偏+压偏)/防逆流(策略+硬件)/保护分区(差动/过流/三级BMS)/消防硬接线联跳
+
+### Skill 3: 通信点表生成
+- PCS: Modbus TCP 40001-40100, 含有功/无功/SOC/运行状态/功率设定
+- BMS: CAN→网关转Modbus, 含总电压/总电流/SOC/SOH/温度/绝缘
+- 关口表: Modbus RTU, 0.2S级双向计量
+- IEC104: 遥测(TI=13)/遥信(TI=1)/遥控(TI=45)/遥调(TI=50)
+- MQTT: site/{proj}/telemetry|events|cmd/dispatch|alarm
+- OCPP: 充电桩状态/功率/SOC/交易
+
+### Skill 4: EMS策略编译
+- 削峰填谷(P1): 谷充峰放,功率=min(PCS额定,变压器余量)
+- 防逆流(P0): 三重保障(策略+PCS限功率+逆流继电器)
+- 需量控制(P1): 实时功率>需量95%→储能放电
+- SOC边界(P0): <10%停放,>90%停充,<5%急停
+- 充电桩限功率(P2): 负荷+充电>容量→按优先级降功率
+- 并离网切换(P0): PCC异常→V/f控制→电网恢复→同期→PQ控制
+
+### Skill 5: 一键部署
+- 预检: CPU≥4核/内存≥8GB/磁盘≥200GB/端口可用
+- 部署: Docker→TDengine(6041)→EMQX(1883)→PostgreSQL(5432)→EMS(8080)
+- 健康检查: /health→200, 超时60s重试3次
+
+### Skill 6: 调试验收
+- FAT: 遥测精度≤0.5%/遥信动作/遥控执行/保护动作
+- SAT: 72h连续运行/并离网切换3次<20ms/充放循环5次/告警联动
+
+### Skill 7: 电价收益
+- 峰谷套利: Σ(放电×峰价-充电×谷价)×时长×天数×(1-衰减)^n
+- 需量节省: (原需量-新需量)×需量电价
+- IRR/NPV/回收期+敏感性(±20%)
+
+### Skill 8: 故障复盘
+- BMS: 过温→查温控/过压→查PCS/绝缘降低→查潮湿/热失控→立即停机
+- PCS: 过流→查负荷/过压→查电网/通信中断→查网络
+- EMS: 策略失败→查点表/SOC跳变→查BMS
+
+### Skill 9: 投标文件
+- 生成: 技术方案+配置清单+偏离表+实施计划+验收标准
+- 偏离: 每需求项必须响应,偏离需替代方案
+- 实施: 设计2周+采购4-8周+施工2-4周+调试1-2周+验收1周
+
+### Skill 10: 网络安全加固
+- SSH: 仅密钥认证/禁root/改端口/MaxAuthTries=3
+- TLS: EMQX(mqtts:8883)+API(https:443)
+- 端口最小化+防火墙+VPN(WireGuard)
+- 审计: auditd+日志保留≥180天+远程syslog
+- 账号: 最小权限/独立用户/密钥轮换90天
+`;
 
 const SW_DELIVERY_ITEMS=[
   {platform:'SCADA',items:['SCADA Docker Image (x86+ARM64)','SVG画面配置+JSON','IEC104/61850点表映射Excel','告警配置表Excel','RBAC权限配置JSON','部署文档Markdown']},
@@ -5558,8 +5637,9 @@ async function mgGenerateSolution(){
       mgAddLog('─── 发送给LLM的完整输入 ───','step');
       userPrompt.split('\n').forEach(line=>{if(line.trim())mgAddLog(line,'');});
       mgAddLog('─── 输入结束 ───','step');
+      mgAddLog('Skill规则: '+MG_SKILLS_SUMMARY.split('\n').filter(l=>l.trim()&&l.startsWith('-')).length+'条已注入system prompt','step');
       mgAddLog(`调用${provider.toUpperCase()} API (SSE流式)...`,'step');
-      const messages=[{role:'system',content:`你是微网系统解决方案AI智能体。根据用户参数输出JSON，包含topology/sizing/economics/strategy/protection/devices字段。设备包括:PCC并网柜/BESS储能/PCS变流器/光伏逆变器/柴发/充电桩/EMS/边缘网关/保护系统。`},{role:'user',content:userPrompt}];
+      const messages=[{role:'system',content:`你是微网系统解决方案AI智能体。根据用户参数输出JSON，包含topology/sizing/economics/strategy/protection/devices字段。设备包括:PCC并网柜/BESS储能/PCS变流器/光伏逆变器/柴发/充电桩/EMS/边缘网关/保护系统。\n\n${MG_SKILLS_SUMMARY}`},{role:'user',content:userPrompt}];
       const data=await callLLM(messages,true,provider);
       mgAddLog(`流式响应完成, tokens: ${data.usage?.total_tokens||'?'}`,'ok');
       const content=data.choices?.[0]?.message?.content||'';
