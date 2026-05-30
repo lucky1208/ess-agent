@@ -395,28 +395,28 @@ ACC AC一体柜专题
 </div>
 <div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">项目名称</label><input type="text" class="form-input" id="mgProjName" value="苏州工业园区光储充微网"></div>
-<div class="form-group"><label class="form-label">所在区域</label><input type="text" class="form-input" id="mgRegion" value="江苏省苏州市"></div>
-<div class="form-group"><label class="form-label">场景类型</label><select class="form-input" id="mgScenario"><option value="industrial">工商业园区</option><option value="solar_storage_charge">光储充一体化</option><option value="mining">油田矿区</option><option value="offgrid">偏远离网</option><option value="datacenter">数据中心</option></select></div>
+<div class="form-group"><label class="form-label">项目名称</label><input type="text" class="form-input" id="mgProjName" value="美国Fremont光储充 1.4MWh"></div>
+<div class="form-group"><label class="form-label">所在区域</label><input type="text" class="form-input" id="mgRegion" value="California, USA"></div>
+<div class="form-group"><label class="form-label">场景类型</label><select class="form-input" id="mgScenario"><option value="industrial">工商业园区</option><option value="solar_storage_charge" selected>光储充一体化</option><option value="mining">油田矿区</option><option value="offgrid">偏远离网</option><option value="datacenter">数据中心</option></select></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">峰值负荷 (kW)</label><input type="number" class="form-input" id="mgLoadPeak" value="2000" step="50"></div>
-<div class="form-group"><label class="form-label">光伏容量 (kWp)</label><input type="number" class="form-input" id="mgPvKw" value="1500" step="50"></div>
-<div class="form-group"><label class="form-label">储能容量 (kWh)</label><input type="number" class="form-input" id="mgBessKwh" value="5000" step="100"></div>
+<div class="form-group"><label class="form-label">峰值负荷 (kW)</label><input type="number" class="form-input" id="mgLoadPeak" value="800" step="50"></div>
+<div class="form-group"><label class="form-label">光伏容量 (kWp)</label><input type="number" class="form-input" id="mgPvKw" value="500" step="50"></div>
+<div class="form-group"><label class="form-label">储能容量 (kWh)</label><input type="number" class="form-input" id="mgBessKwh" value="1400" step="100"></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">柴发容量 (kW)</label><input type="number" class="form-input" id="mgDieselKw" value="800" step="50"></div>
-<div class="form-group"><label class="form-label">充电桩 (kW)</label><input type="number" class="form-input" id="mgEvKw" value="1200" step="50"></div>
-<div class="form-group"><label class="form-label">接入电压 (kV)</label><select class="form-input" id="mgVoltage"><option value="10">10kV</option><option value="35">35kV</option><option value="0.4">0.4kV</option></select></div>
+<div class="form-group"><label class="form-label">柴发容量 (kW)</label><input type="number" class="form-input" id="mgDieselKw" value="0" step="50"></div>
+<div class="form-group"><label class="form-label">充电桩 (kW)</label><input type="number" class="form-input" id="mgEvKw" value="360" step="50"></div>
+<div class="form-group"><label class="form-label">接入电压 (kV)</label><select class="form-input" id="mgVoltage"><option value="10">10kV</option><option value="35">35kV</option><option value="0.4">0.4kV</option><option value="0.48">480V(美标)</option></select></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">运行模式</label><select class="form-input" id="mgOpMode"><option value="grid_tied">并网运行</option><option value="dual">并/离网双模</option><option value="off_grid">纯离网</option></select></div>
-<div class="form-group"><label class="form-label">关键负荷占比(%)</label><input type="number" class="form-input" id="mgCriticalPct" value="35" min="10" max="100"></div>
-<div class="form-group"><label class="form-label">预算上限(万元)</label><input type="number" class="form-input" id="mgBudget" value="800" step="10"></div>
+<div class="form-group"><label class="form-label">运行模式</label><select class="form-input" id="mgOpMode"><option value="grid_tied">并网运行</option><option value="dual" selected>并/离网双模</option><option value="off_grid">纯离网</option></select></div>
+<div class="form-group"><label class="form-label">关键负荷占比(%)</label><input type="number" class="form-input" id="mgCriticalPct" value="40" min="10" max="100"></div>
+<div class="form-group"><label class="form-label">预算上限(万美元)</label><input type="number" class="form-input" id="mgBudget" value="85" step="10"></div>
 </div>
 <div class="form-row" style="margin-top:4px">
-<div class="form-group"><label class="form-label">峰段电价(元/kWh)</label><input type="number" class="form-input" id="mgPricePeak" value="1.08" step="0.01"></div>
-<div class="form-group"><label class="form-label">谷段电价(元/kWh)</label><input type="number" class="form-input" id="mgPriceValley" value="0.35" step="0.01"></div>
+<div class="form-group"><label class="form-label">峰段电价($/kWh)</label><input type="number" class="form-input" id="mgPricePeak" value="0.42" step="0.01"></div>
+<div class="form-group"><label class="form-label">谷段电价($/kWh)</label><input type="number" class="form-input" id="mgPriceValley" value="0.12" step="0.01"></div>
 <div class="form-group"><label class="form-label">AI模型</label><select class="form-input" id="mgLlmProvider"><option value="local">本地规则引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option></select></div>
 </div>
 </div>
