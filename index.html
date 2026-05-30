@@ -250,24 +250,28 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label">变压器单台容量 (kVA)</label><input type="number" class="form-input" id="txCap" value="1250" step="50"></div>
 <div class="form-group"><label class="form-label" data-i18n="tx_count">变压器数量</label><input type="number" class="form-input" id="txCount" value="2" min="1" max="10"></div>
 <div class="form-group"><label class="form-label">变压器高压侧 (kV)</label><input type="number" class="form-input" id="txHv" value="10" step="0.1"></div>
+</div>
+<div class="form-row" style="margin-bottom:4px">
 <div class="form-group"><label class="form-label">变压器低压侧 (V)</label><input type="number" class="form-input" id="txLv" value="400" step="10"></div>
 <div class="form-group"><label class="form-label">变压器联结组别</label><select class="form-input" id="txVector"><option>Dyn11</option><option>Yyn0</option></select></div>
 <div class="form-group"><label class="form-label">变压器短路阻抗 (%)</label><input type="number" class="form-input" id="txZk" value="4.3" step="0.1"></div>
 </div>
 <div class="form-row" style="margin-bottom:4px">
-<div class="form-group"><label class="form-label" data-i18n="has_hv_room">是否有10kV配电室</label><select class="form-input" id="hasHvRoom"><option value="1" data-i18n="hv_room_yes">有（推荐10kV接入）</option><option value="0" data-i18n="hv_room_no">无（将用0.4kV接入）</option></select></div>
-</div>
-<div class="form-row" style="margin-bottom:4px">
 <div class="form-group"><label class="form-label" data-i18n="load_month_high">月用电-旺季 (万kWh)</label><input type="number" class="form-input" id="loadMonthHigh" value="35" step="1"></div>
 <div class="form-group"><label class="form-label" data-i18n="load_month_low">月用电-淡季 (万kWh)</label><input type="number" class="form-input" id="loadMonthLow" value="15" step="1"></div>
 <div class="form-group"><label class="form-label" data-i18n="load_max">最大负荷 (kW)</label><input type="number" class="form-input" id="loadMax" value="1000" step="50"></div>
+</div>
+<div class="form-row" style="margin-bottom:4px">
 <div class="form-group"><label class="form-label" data-i18n="pf">功率因数</label><input type="number" class="form-input" id="pf" value="0.9" step="0.05" min="0.7" max="1"></div>
 <div class="form-group"><label class="form-label" data-i18n="work_days">年工作天数</label><input type="number" class="form-input" id="workDays" value="300" step="10"></div>
+<div class="form-group"><label class="form-label" data-i18n="has_hv_room">是否有10kV配电室</label><select class="form-input" id="hasHvRoom"><option value="1" data-i18n="hv_room_yes">有（推荐10kV接入）</option><option value="0" data-i18n="hv_room_no">无（将用0.4kV接入）</option></select></div>
 </div>
 <div class="form-row" style="margin-bottom:4px">
 <div class="form-group"><label class="form-label" data-i18n="price_peak">峰段 (元/kWh)</label><input type="number" class="form-input" id="pricePeak" value="0.833" step="0.01"></div>
 <div class="form-group"><label class="form-label" data-i18n="price_valley">谷段 (元/kWh)</label><input type="number" class="form-input" id="priceValley" value="0.441" step="0.01"></div>
 <div class="form-group"><label class="form-label" data-i18n="price_flat">平段 (元/kWh)</label><input type="number" class="form-input" id="priceFlat" value="0.637" step="0.01"></div>
+</div>
+<div class="form-row" style="margin-bottom:4px">
 <div class="form-group"><label class="form-label" data-i18n="hours_peak">峰段时长 (h)</label><input type="number" class="form-input" id="hoursPeak" value="8" step="1"></div>
 <div class="form-group"><label class="form-label" data-i18n="llm_provider">AI模型</label>
     <select class="form-input" id="llmProvider">
