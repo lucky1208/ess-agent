@@ -2286,65 +2286,90 @@ function showSwSub(id){
 }
 
 const MG_SKILLS_SUMMARY=`
-## 微网交付10项Skill规则 (5年实战训练)
+## 微网交付10项Skill规则 (来源: software_net_*.md 专业版)
 
-### Skill 1: 微网拓扑选择
-- R1: 纯离网+柴发→柴储拓扑(柴发主电源,储能平抑波动)
-- R2: 纯离网+无柴发→孤岛黑启动(储能V/f建压)
-- R3: 充电桩>0 AND 光伏>0→光储充一体化(DC 750V/400V双母线)
-- R4: 有直流负荷→交直流混合(AC400V+DC750V)
-- R5: 默认→交流微网(单一AC400V)
-- R6: 10kV接入→需升压变+并网柜+双向关口表0.2S级
+### Skill 1: 微网拓扑选择 (software_net_topology_selection.md)
+- 6大拓扑: TypeA交流微网/TypeB直流微网/TypeC交直流混合/TypeD光储充一体化/TypeE柴储混合/TypeF孤岛黑启动
+- 决策步骤: 电网可用性→负荷类型(直流>60%→DC/交流>80%→AC)→光储比例(>2:1→DC耦合/有充电桩→光储充D)→可靠性(关键负荷>30%→黑启动+柴发)→经济性(初投资紧→AC/全生命周期→ACDC混合)
+- 并网10kV: 需升压变+PCC并网柜+双向关口表0.2S级+防孤岛AFD
+- 光储充(TypeD): 光伏→DC750V→BESS→DC/DC→充电桩, AC400V并网出口, 效率>96%
+- 离网黑启动: 储能V/f建压→柴发同期并网→负荷逐步投入, STS切换<20ms
+- 交直流混合(TypeC): AC子网400V+DC子网750V, 双向变流器ILC耦合, 容量配比AC:DC=6:4~8:2
 
-### Skill 2: 一次图审图
-- 必检: PCC断路器/CT(0.2S+0.5级)/PT/每馈线断路器/接地(TN-S)/防孤岛(AFD+频偏+压偏)/防逆流(策略+硬件)/保护分区(差动/过流/三级BMS)/消防硬接线联跳
+### Skill 2: 一次图审图 (software_net_sld_review.md)
+- 审图4级: L1概念→L2初设→L3施工图→L4竣工图
+- 必检14项: 图框标题栏/图名图号/电压等级标注/PCC断路器/CT(0.2S+0.5级)/PT/每馈线断路器+隔离开关/接地(TN-S)/防孤岛(AFD+频偏+压偏)/防逆流(策略+PCS限功率+逆流继电器)/保护分区(差动/过流/三级BMS)/消防硬接线联跳/电缆型号截面积/直流侧DS开关
+- 保护配合: 速断<过流<过负荷, 级差≥0.3s, BMS三级:一级预警→二级停机→三级急停
+- 防孤岛3重: AFD(频率偏移51.5/49.5Hz)+电压偏移(+10%/-15%)+电网失压检测
+- 防逆流3重: 策略层(功率限制)+PCS层(限功率输出)+硬件层(逆流继电器跳闸)
 
-### Skill 3: 通信点表生成
-- PCS: Modbus TCP 40001-40100, 含有功/无功/SOC/运行状态/功率设定
-- BMS: CAN→网关转Modbus, 含总电压/总电流/SOC/SOH/温度/绝缘
-- 关口表: Modbus RTU, 0.2S级双向计量
-- IEC104: 遥测(TI=13)/遥信(TI=1)/遥控(TI=45)/遥调(TI=50)
-- MQTT: site/{proj}/telemetry|events|cmd/dispatch|alarm
-- OCPP: 充电桩状态/功率/SOC/交易
+### Skill 3: 通信点表生成 (software_net_point_table.md)
+- 协议选型: 间隔层设备<15m→RS485 ModbusRTU, >15m→ModbusTCP, 调度→IEC104, 云→MQTT, 充电桩→OCPP1.6J
+- PCS(ModbusTCP): 40001有功/40002无功/40003功率设定/40004运行模式(0=PQ,1=VF,2=Droop)/40005SOC, 端口502, 响应<100ms
+- BMS(CAN2.0B→网关转ModbusTCP): 总电压/总电流/SOC/SOH/最大温度/最小温度/绝缘电阻/簇数/告警状态, CAN 1Mbps, 终端120Ω
+- 关口表(ModbusRTU): 0.2S级双向计量, 正反向有功/无功/功率因数/电压/电流/频率, 9600bps, 偶校验
+- IEC104: 遥测TI=13/遥信TI=1/遥控TI=45/遥调TI=50, ASDU长度≤253字节, COT:20=响应站召唤
+- MQTT: site/{proj_id}/telemetry|events|cmd/dispatch|alarm, QoS1(遥测)/QoS0(事件), retain=false, JSON payload
+- OCPP1.6J: 充电桩状态/功率/SOC/交易ID/启动停止, WebSocket+JSON, 心跳30s
+- 地址分配: PCS 40001-40200/BMS 40301-40500/电表 40601-40700/逆变器 40801-40900/柴发 41001-41100
+- 线缆规范: RS485末端120Ω/CAN两端各120Ω/支线≤0.3m@1Mbps/ModbusTCP CAT6A
 
-### Skill 4: EMS策略编译
-- 削峰填谷(P1): 谷充峰放,功率=min(PCS额定,变压器余量)
-- 防逆流(P0): 三重保障(策略+PCS限功率+逆流继电器)
-- 需量控制(P1): 实时功率>需量95%→储能放电
-- SOC边界(P0): <10%停放,>90%停充,<5%急停
-- 充电桩限功率(P2): 负荷+充电>容量→按优先级降功率
-- 并离网切换(P0): PCC异常→V/f控制→电网恢复→同期→PQ控制
+### Skill 4: EMS策略编译 (software_net_ems_strategy.md)
+- 策略层级: Layer0安全保护(不可覆盖)→Layer1系统约束→Layer2模式运行(互斥)→Layer3策略叠加(可叠加)
+- 削峰填谷(Mode-A,Layer2): 谷段充电(23:00-07:00)/峰段放电(09:00-12:00,14:00-19:00), P_disch=min(P_load-50kW, P_pcs_max, SOC_max)
+- 防逆流(Mode-B,Layer2): 三重保障(策略层功率限制+PCS限功率输出+逆流继电器硬件跳闸), 逆流阈值=5%P_pcc
+- 需量控制(Mode-C,Layer2): 实时功率>需量95%→储能放电, 优化目标=min(月最大需量)
+- SOC管理(Layer1): LFP:停放10%/停充90%/急停5%/过充95%; NMC:停放15%/停充85%/急停8%/过充90%
+- 充电桩限功率(Mode-F,Layer2): 负荷+充电>容量→按优先级降功率(办公>生产>充电), 降功率步长10%
+- 并离网切换(Layer0): PCC异常(电压>115%或<85%,频率>51.5或<49.5Hz)→V/f控制→电网恢复10s→同期→PQ控制
+- 光伏消纳(Mode-D,Layer2): 光伏>负荷时储能充电吸收, SOC>90%时限制光伏出力
+- 策略冲突消解: P0(安全)>P1(约束)>P2(模式)>P3(叠加), 叠加速率≤10%P_pcs/min
 
-### Skill 5: 一键部署
-- 预检: CPU≥4核/内存≥8GB/磁盘≥200GB/端口可用
-- 部署: Docker→TDengine(6041)→EMQX(1883)→PostgreSQL(5432)→EMS(8080)
-- 健康检查: /health→200, 超时60s重试3次
+### Skill 5: 一键部署 (software_net_oneclick_deploy.md)
+- 预检: CPU≥4核/内存≥8GB/磁盘≥200GB/端口6041,1883,5432,8080可用/Docker≥20.10/Compose≥2.0
+- 部署顺序: Docker→TDengine(6041时序库)→EMQX(1883MQTT)→PostgreSQL(5432关系库)→Redis(6379缓存)→EMS(8080业务)→Nginx(443/80反向代理)
+- Docker Compose: 每服务独立容器, 健康检查healthcheck, restart:unless-stopped, 日志limit 50m
+- 健康检查: /health→200, 超时60s重试3次, 全部通过才算部署成功
+- 数据初始化: TDengine建库建超级表/PostgreSQL建表导入点表/EMQX创建ACL规则/EMS导入策略YAML
 
-### Skill 6: 调试验收
-- FAT: 遥测精度≤0.5%/遥信动作/遥控执行/保护动作
-- SAT: 72h连续运行/并离网切换3次<20ms/充放循环5次/告警联动
+### Skill 6: 调试验收 (software_net_fat_sat.md)
+- FAT(工厂验收): 遥测精度≤0.5%/遥信动作正确率100%/遥控执行成功率100%/保护动作正确率100%/SOC精度≤3%
+- SAT(现场验收): 72h连续运行无故障/并离网切换3次均<20ms/充放电循环5次/告警联动正确/消防联跳<200ms
+- 对点调试: 逐点验证点表地址/数据类型/缩放因子/工程值/读写属性, 一次通过率>90%
+- 性能指标: 遥测刷新<1s/遥控执行<500ms/告警上报<2s/历史查询10万点<3s
 
-### Skill 7: 电价收益
-- 峰谷套利: Σ(放电×峰价-充电×谷价)×时长×天数×(1-衰减)^n
-- 需量节省: (原需量-新需量)×需量电价
-- IRR/NPV/回收期+敏感性(±20%)
+### Skill 7: 电价收益 (software_net_tariff_revenue.md)
+- 电费构成: 用电电费(电量×分时电价)+基本电费(需量/容量)+力调电费(PF调整)+政府基金
+- 峰谷套利: Σ(放电量×峰价-充电量×谷价)×时长×天数×(1-衰减率)^n, 衰减LFP:0.02/年, NMC:0.03/年
+- 需量节省: (原需量-新需量)×需量电价×12月, 储能削峰降低月最大需量
+- IRR求解: Σ[净现金流t/(1+IRR)^t]=0, 目标IRR>8%
+- NPV: Σ[净现金流t/(1+折现率)^t]-初投资, NPV>0可行
+- 回收期: 累计净现金流=0的年数, 目标<8年
+- 敏感性分析: 投资±20%/电价±20%/衰减±20%/天数±10%, 找最敏感因子
+- 辅助服务: 调峰补偿0.05-0.15元/kWh/调频补偿5-15元/MW·次/备用补偿
 
-### Skill 8: 故障复盘
-- BMS: 过温→查温控/过压→查PCS/绝缘降低→查潮湿/热失控→立即停机
-- PCS: 过流→查负荷/过压→查电网/通信中断→查网络
-- EMS: 策略失败→查点表/SOC跳变→查BMS
+### Skill 8: 故障复盘 (software_net_fault_review.md)
+- BMS告警→根因: 过温→查温控风扇/过压→查PCS输出/绝缘降低→查潮湿进水/热失控→立即停机+灭火/通信中断→查CAN线+终端电阻
+- PCS告警→根因: 过流→查负荷突增/过压→查电网电压/欠压→查电网/过温→查散热风扇/孤岛保护动作→查PCC状态
+- EMS告警→根因: 策略执行失败→查点表地址+数据类型/SOC跳变→查BMS通信+采样/功率偏差>10%→查PCS响应
+- 告警分级: P0紧急(立即停机)/P1重要(限功率)/P2一般(记录)/P3提示(不动作)
+- 备件建议: PCS模块2台/BMS从控板5块/风扇10个/保险丝20个/继电器5个
 
-### Skill 9: 投标文件
-- 生成: 技术方案+配置清单+偏离表+实施计划+验收标准
-- 偏离: 每需求项必须响应,偏离需替代方案
-- 实施: 设计2周+采购4-8周+施工2-4周+调试1-2周+验收1周
+### Skill 9: 投标文件 (software_net_bid_document.md)
+- 生成内容: 技术方案+配置清单BOM+偏离表+实施计划+验收标准+质保承诺
+- 偏离响应: 每需求项必须逐条响应, 偏离需提供替代方案+等效性论证
+- 实施周期: 设计2周+采购4-8周+施工2-4周+调试1-2周+验收1周, 总计10-17周
+- 资质要求: 电力工程施工总承包≥3级/承装(修试)≥4级/安全生产许可证
 
-### Skill 10: 网络安全加固
-- SSH: 仅密钥认证/禁root/改端口/MaxAuthTries=3
-- TLS: EMQX(mqtts:8883)+API(https:443)
-- 端口最小化+防火墙+VPN(WireGuard)
-- 审计: auditd+日志保留≥180天+远程syslog
-- 账号: 最小权限/独立用户/密钥轮换90天
+### Skill 10: 网络安全加固 (software_net_security_hardening.md)
+- SSH加固: 仅密钥认证(禁密码)/禁root登录/改端口(非22)/MaxAuthTries=3/LoginGraceTime=30s
+- TLS加密: EMQX(mqtts:8883,证书)/API(https:443,证书)/WebSocket(wss:443)
+- 端口最小化: 仅开放443/80/1883/8883/8080, 其余全部关闭
+- 防火墙: iptables白名单, 仅允许可信IP访问管理端口
+- VPN: WireGuard点对点, 远程运维必须走VPN
+- 审计: auditd记录所有sudo/SSH/文件修改, 日志保留≥180天, 远程syslog转发
+- 账号: 最小权限/独立服务用户/密钥轮换90天/密码复杂度≥12位
+- 等保: 二级等保最小要求, 三级等保增加入侵检测+安全审计
 `;
 
 const SW_DELIVERY_ITEMS=[
@@ -5846,29 +5871,61 @@ function mgDrawWiringSvg(R){
 
 function mgDrawCommSvg(R){
   const T=R.topology||{};
-  const W=1000,H=550,cx=500;
+  const W=1000,H=620,cx=500;
   let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">
 <defs><style>.tc{stroke:#854F0B;stroke-width:1;fill:none;stroke-dasharray:5,3}.te{stroke:#1E90FF;stroke-width:2;fill:none}.ts{stroke:#22C55E;stroke-width:1.5;fill:none}.tf{stroke:#F97316;stroke-width:1.5;fill:none}</style></defs>
 <pattern id="dotc" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="0.5" fill="#1a1f2e"/></pattern>
 <rect width="${W}" height="${H}" fill="url(#dotc)"/>
-<text x="${cx}" y="30" text-anchor="middle" fill="#e0e0ff" font-size="15" font-weight="bold">微网通信拓扑图</text>
-<text x="${cx}" y="48" text-anchor="middle" fill="#8888cc" font-size="10">${R.projName||''} | 协议: Modbus/CAN/IEC104/MQTT | 设计人:卢继雄</text>`;
-  const layers=[{y:110,l:'云平台层',c:'#185FA5',items:['数据中台(MQTT)','AI引擎','大屏可视化','运维管理']},
-    {y:200,l:'站控层',c:'#EF9F27',items:['SCADA双机热备','EMS调度引擎(MILP)','AGC/AVC','本地HMI']},
-    {y:290,l:'边缘控制层',c:'#534AB7',items:['ARM网关GW-01','协议转换池','本地自治(削峰填谷)','看门狗']},
-    {y:380,l:'设备层',c:'#50c878',items:['PCS(ModbusTCP)','BMS(CAN2.0B)','关口表(ModbusRTU)','光伏(ModbusTCP)']}];
+<text x="${cx}" y="28" text-anchor="middle" fill="#e0e0ff" font-size="15" font-weight="bold">微网通信拓扑图</text>
+<text x="${cx}" y="46" text-anchor="middle" fill="#8888cc" font-size="10">${R.projName||''} | 协议栈: ModbusRTU/TCP, CAN2.0B, IEC104, MQTT, OCPP1.6J | 设计人:卢继雄</text>`;
+  const layers=[
+    {y:70,l:'云平台层',c:'#185FA5',items:[
+      {n:'数据中台',p:'MQTT v5.0',d:'mqtts:8883 TLS'},
+      {n:'AI引擎',p:'HTTP/REST',d:'https:443 JSON'},
+      {n:'大屏可视化',p:'WebSocket',d:'wss:443 SVG+JSON'},
+      {n:'运维管理',p:'MQTT+SSH',d:'VPN WireGuard'}
+    ]},
+    {y:175,l:'站控层',c:'#EF9F27',items:[
+      {n:'SCADA双机热备',p:'IEC104 Server',d:'2404端口 TI=1/13/45/50'},
+      {n:'EMS调度引擎',p:'ModbusTCP Client',d:'内部策略YAML MILP'},
+      {n:'AGC/AVC',p:'IEC104',d:'COT=20 ASDU≤253B'},
+      {n:'本地HMI',p:'HTTP/WebSocket',d:'localhost:8080'}
+    ]},
+    {y:280,l:'边缘控制层',c:'#534AB7',items:[
+      {n:'ARM网关GW-01',p:'多协议转换',d:'Modbus↔IEC104↔MQTT'},
+      {n:'本地自治',p:'EMS Lite',d:'削峰填谷+防逆流'},
+      {n:'看门狗',p:'GPIO+心跳',d:'超时30s→硬复位'}
+    ]},
+    {y:385,l:'设备层',c:'#50c878',items:[
+      {n:'PCS',p:'ModbusTCP',d:'端口502 40001-40200 响应<100ms'},
+      {n:'BMS',p:'CAN2.0B',d:'1Mbps 终端120Ω 40301-40500'},
+      {n:'关口表',p:'ModbusRTU',d:'9600bps偶校验 40601-40700 0.2S级'},
+      {n:'光伏逆变器',p:'ModbusTCP',d:'端口502 40801-40900'},
+      {n:'充电桩',p:'OCPP1.6J',d:'WebSocket+JSON 心跳30s'}
+    ]}
+  ];
   layers.forEach((ly,i)=>{
-    s+=`<rect x="80" y="${ly.y}" width="840" height="70" rx="8" fill="none" stroke="${ly.c}" stroke-width="1.5" stroke-dasharray="6,3"/><text x="100" y="${ly.y+20}" fill="${ly.c}" font-size="12" font-weight="bold">${ly.l}</text>`;
-    const sp=840/Math.max(ly.items.length,1);
-    ly.items.forEach((it,j)=>s+=`<text x="${80+sp*j+sp/2}" y="${ly.y+50}" text-anchor="middle" fill="#94a3b8" font-size="10">${it}</text>`);
+    s+=`<rect x="60" y="${ly.y}" width="880" height="85" rx="8" fill="none" stroke="${ly.c}" stroke-width="1.5" stroke-dasharray="6,3"/>`;
+    s+=`<text x="80" y="${ly.y+18}" fill="${ly.c}" font-size="12" font-weight="bold">${ly.l}</text>`;
+    const sp=880/Math.max(ly.items.length,1);
+    ly.items.forEach((it,j)=>{
+      const ix=60+sp*j+sp/2;
+      s+=`<text x="${ix}" y="${ly.y+38}" text-anchor="middle" fill="#e0e0ff" font-size="10" font-weight="500">${it.n}</text>`;
+      s+=`<text x="${ix}" y="${ly.y+53}" text-anchor="middle" fill="${ly.c}" font-size="9">${it.p}</text>`;
+      s+=`<text x="${ix}" y="${ly.y+68}" text-anchor="middle" fill="#606080" font-size="8">${it.d}</text>`;
+    });
     if(i<layers.length-1){
-      s+=`<line x1="${cx}" y1="${ly.y+70}" x2="${cx}" y2="${layers[i+1].y}" class="te"/>`;
-      s+=`<text x="${cx+20}" y="${(ly.y+70+layers[i+1].y)/2}" fill="#6090c0" font-size="8">IEC104/MQTT</text>`;
+      const protos=['MQTT/HTTPS','IEC104','ModbusTCP/CAN/OCPP'];
+      s+=`<line x1="${cx}" y1="${ly.y+85}" x2="${cx}" y2="${layers[i+1].y}" class="te"/>`;
+      s+=`<text x="${cx+30}" y="${(ly.y+85+layers[i+1].y)/2}" fill="#6090c0" font-size="9" font-weight="500">${protos[i]||''}</text>`;
     }
   });
-  s+=`<rect x="80" y="470" width="840" height="55" rx="4" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>
-<text x="${cx}" y="492" text-anchor="middle" fill="#8888cc" font-size="9">通信协议: 云↔站控:MQTT/HTTP | 站控↔边缘:IEC104 | 边缘↔PCS:ModbusTCP | 边缘↔BMS:CAN2.0B | 边缘↔电表:ModbusRTU</text>
-<text x="${cx}" y="510" text-anchor="middle" fill="#606080" font-size="8">RS485:末端120Ω | CAN:两端各120Ω | 支线≤0.3m@1Mbps | 设计人:卢继雄</text></svg>`;
+  s+=`<rect x="60" y="490" width="880" height="110" rx="4" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>
+<text x="${cx}" y="510" text-anchor="middle" fill="#8888cc" font-size="9">协议栈: 云↔站控: MQTT(mqtts:8883)/HTTPS(443) | 站控↔边缘: IEC104(2404) | 边缘↔设备: ModbusTCP(502)/CAN2.0B(1Mbps)/ModbusRTU(9600)/OCPP1.6J(WS)</text>
+<text x="${cx}" y="528" text-anchor="middle" fill="#707090" font-size="8">Modbus地址分配: PCS 40001-40200 | BMS 40301-40500 | 电表 40601-40700 | 逆变器 40801-40900 | 柴发 41001-41100</text>
+<text x="${cx}" y="546" text-anchor="middle" fill="#707090" font-size="8">IEC104: 遥测TI=13 遥信TI=1 遥控TI=45 遥调TI=50 | MQTT Topic: site/{proj}/telemetry|events|cmd|alarm | OCPP: RemoteStartTransaction/StatusNotification</text>
+<text x="${cx}" y="564" text-anchor="middle" fill="#707090" font-size="8">线缆规范: RS485末端120Ω | CAN两端各120Ω 支线≤0.3m@1Mbps | ModbusTCP CAT6A | 光纤单模10km</text>
+<text x="${cx}" y="582" text-anchor="middle" fill="#606080" font-size="8">数据安全: TLS1.3加密 | QoS1(遥测)/QoS0(事件) | ACL白名单 | 设计人:卢继雄 | GB/T 36558-2023</text></svg>`;
   mgById('mgCommSvg').innerHTML=s;
 }
 
