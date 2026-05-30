@@ -1592,7 +1592,10 @@ async function renderMermaid(containerId){
     try{
       let result=await mermaid.render(el.id+'-svg',MERMAID_DEFS[el.id]);
       let svg=result&&result.svg?result.svg:result;
-      el.innerHTML=svg;
+      let tmp=document.createElement('div');
+      tmp.innerHTML=svg;
+      let svgEl=tmp.querySelector('svg');
+      el.innerHTML=svgEl?svgEl.outerHTML:svg;
       el.dataset.rendered='1';
       console.log('[renderMermaid] rendered',el.id,'svg length',svg.length);
     }catch(e){console.error('[renderMermaid] error for',el.id,':',e);delete el.dataset.rendered;}
