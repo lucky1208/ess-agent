@@ -1202,17 +1202,18 @@ const MERMAID_DEFS = {
         D_MG2 -.-> D_EMS
         D_MG3 -.-> D_EMS
     end`,
-  'mm-4': `stateDiagram-v2
-    [*] --> 并网运行
-    并网运行 --> 计划离网: 检修指令
-    并网运行 --> 非计划离网: 电网故障
-    计划离网 --> 离网运行: 无缝切换
-    非计划离网 --> 孤岛检测: AFD检测
-    孤岛检测 --> 离网运行: 确认孤岛
-    孤岛检测 --> 并网运行: 误判恢复
-    离网运行 --> 并网同步: 电网恢复
-    并网同步 --> 并网运行: 同期成功
-    并网同步 --> 并网同步: 同期失败`,
+  'mm-4': `graph TD
+    A["开始"] --> B["并网运行"]
+    B --> C["计划离网: 检修/调度指令"]
+    B --> D["非计划离网: 电网故障/电能质量越限"]
+    C --> E["离网运行 (V/f控制)"]
+    D --> F["孤岛检测: AFD+被动检测"]
+    F --> E
+    F --> B
+    E --> G["并网同步: 电网恢复/指令复归"]
+    G --> H["同期检测: 幅值/频率/相位匹配"]
+    H --> B
+    H --> G`,
   'mm-5': `graph TB
     subgraph Grid_Prot["🔌 并网侧保护"]
         P_PCC["PCC 保护<br/>QF01<br/>方向过流(67)<br/>低/过压(27/59)<br/>低/过频(81U/81O)<br/>防孤岛(AFD)"]
@@ -1332,9 +1333,9 @@ const MERMAID_DEFS = {
         D1 --- D2 --- D3
         D4 --- D5 --- D6 --- D7 --- D8
     end
-    Cloud <-->|"HTTPs / WebSocket<br/>MQTT / gRPC"| Station
-    Station <-->|"IEC 104<br/>MQTT / WebSocket"| Edge
-    Edge <-->|"Modbus TCP / RTU<br/>CAN 2.0B<br/>IEC 61850 GOOSE/MMS"| Device
+    Cloud <--> Station
+    Station <--> Edge
+    Edge <--> Device
     style Cloud fill:#e1f5fe,stroke:#0288d1
     style Station fill:#fff3e0,stroke:#e65100
     style Edge fill:#f3e5f5,stroke:#7b1fa2
@@ -1366,13 +1367,13 @@ const MERMAID_DEFS = {
     end
     MQTT_Broker --> Switch1
     VPN --> Switch1
-    Switch1 -- "IEC 104 / MQTT" --> Switch2
-    GW1 -- "CAN 2.0B 500kbps" --> BMS
-    GW1 -- "Modbus TCP:502" --> PCS
-    GW1 -- "RS485 Modbus RTU" --> Meter
-    GW1 -- "Modbus TCP" --> PV_Inv
-    GW1 -- "RS485 Modbus RTU" --> Diesel
-    GW1 -- "IEC 61850 GOOSE" --> Protection`,
+    Switch1 --> Switch2
+    GW1 --> BMS
+    GW1 --> PCS
+    GW1 --> Meter
+    GW1 --> PV_Inv
+    GW1 --> Diesel
+    GW1 --> Protection`,
   'mm-9': `flowchart LR
     subgraph eBlock_Internal["eBlock 能量块 内部架构"]
         direction TB
@@ -1384,12 +1385,12 @@ const MERMAID_DEFS = {
         PCS_Controller["PCS 控制器 DSP<br/>TI TMS320F28379D<br/>PQ/VF/Droop策略"]
         AC_Output["交流输出 AC 400V 50Hz<br/>EMI滤波+断路器+STS"]
         Thermal["热管理 液冷机组<br/>水温/流量监测"]
-        BMS_Slave -- "CAN 2.0B 500kbps<br/>菊花链" --> BMS_Master
-        Battery_PACK -- "电压采样/NTC/均衡线" --> BMS_Slave
-        BMS_Master -- "硬线: 高压互锁/急停" --> PCS_Controller
+        BMS_Slave --> BMS_Master
+        Battery_PACK --> BMS_Slave
+        BMS_Master --> PCS_Controller
         DC_Bus --> Battery_PACK
         DC_Bus --> PCS_Module
-        PCS_Controller -- "PWM/ADC/IGBT驱动" --> PCS_Module
+        PCS_Controller --> PCS_Module
         PCS_Module --> AC_Output
     end`,
   'mm-10': `sequenceDiagram
@@ -1398,22 +1399,22 @@ const MERMAID_DEFS = {
     participant Edge as 边缘网关
     participant PCS as PCS控制器
     participant BMS as BMS主控
-    Note over Cloud,BMS: ■ 正常调度指令下发 (秒级)
-    Cloud->>Station: MQTT: 下发日前SOC计划 (15min)
-    Station->>Edge: IEC 104: DCO 控制命令 (5s)
-    Edge->>PCS: Modbus TCP: Write 功率寄存器
-    PCS-->>Edge: Modbus TCP: Read 实际功率/电压
-    Edge-->>Station: IEC 104: 遥测上送
-    Station-->>Cloud: MQTT: 遥测打包上报
-    Note over Cloud,BMS: ■ 急停/故障保护 (毫秒级)
-    BMS->>Edge: CAN: 故障帧 (SOC/温度/绝缘)
-    Edge->>PCS: Modbus TCP: 紧急停机指令
-    Edge->>Station: MQTT QoS2: 故障告警
-    Station->>Cloud: MQTT QoS1: 告警推送
-    Note over Cloud,BMS: ■ 并离网切换 (&lt;20ms)
-    Station->>Edge: IEC 104: 离网切换命令
-    Edge->>PCS: Modbus TCP: 模式切换 VF→PQ
-    Edge->>BMS: CAN: 解除并网保护联锁`,
+    Note over Cloud,BMS: 正常调度指令下发 秒级
+    Cloud->>Station: 下发日前SOC计划 15min
+    Station->>Edge: DCO控制命令 5s
+    Edge->>PCS: Write功率寄存器
+    PCS-->>Edge: Read实际功率
+    Edge-->>Station: 遥测上送
+    Station-->>Cloud: 遥测打包上报
+    Note over Cloud,BMS: 急停故障保护 毫秒级
+    BMS->>Edge: CAN故障帧
+    Edge->>PCS: 紧急停机指令
+    Edge->>Station: 故障告警
+    Station->>Cloud: 告警推送
+    Note over Cloud,BMS: 并离网切换 小于20ms
+    Station->>Edge: 离网切换命令
+    Edge->>PCS: 模式切换 VF转PQ
+    Edge->>BMS: 解除并网保护联锁`,
   'mm-11': `graph TB
     Internet["☁️ Internet"] --- Firewall["防火墙<br/>pfSense / IPSec VPN"]
     Firewall --- CoreSwitch["核心交换机<br/>VLAN10:控制 VLAN20:数据"]
