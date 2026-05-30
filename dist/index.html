@@ -1061,6 +1061,8 @@ ACC AC一体柜专题
 function loadMermaid(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';s.onload=function(){mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#185FA5',primaryTextColor:'#FAFAF5',primaryBorderColor:'#3a3e45',lineColor:'#C2C0B6',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px'},layout:'dagre',flowchart:{htmlLabels:false,curve:'basis'},sequence:{actorMargin:50,messageMargin:40}});};document.head.appendChild(s);}
 loadMermaid();
 
+const SVG_MAP={'mm-1':'microgrid_arch_topology_1.svg','mm-2':'microgrid_arch_acdc_2.svg','mm-3':'microgrid_arch_4types_3.svg','mm-4':'microgrid_mode_switch_4.svg','mm-5':'microgrid_protection_5.svg','mm-6':'microgrid_comms_network_6.svg','mm-7':'ems_arch_4layers_mm7.svg','mm-8':'ems_comms_protocols_mm8.svg','mm-9':'ems_eblock_internal_mm9.svg','mm-10':'ems_dispatch_layers_mm10.svg','mm-11':'ems_network_topology_mm11.svg'};
+
 const MERMAID_DEFS = {
   'mm-1': `<svg width="100%" viewBox="0 0 680 520" role="img" style="" xmlns="http://www.w3.org/2000/svg">
 <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">一、微网电力拓扑总览（交流微网）</title>
@@ -2032,7 +2034,7 @@ async function renderMermaid(containerId){
     if(!el){console.log('[renderMermaid] skip: no element');continue;}
     if(!MERMAID_DEFS[el.id]){console.log('[renderMermaid] skip: no def for',el.id);continue;}
     if(el.dataset.rendered){console.log('[renderMermaid] skip: already rendered',el.id);continue;}
-    if(MERMAID_DEFS[el.id].trimStart().startsWith('<svg')){el.innerHTML=MERMAID_DEFS[el.id];el.dataset.rendered='1';continue;}
+    if(SVG_MAP[el.id]){el.innerHTML='<img src="'+SVG_MAP[el.id]+'" style="max-width:100%;display:block"/>';el.dataset.rendered='1';continue;}
     try{
       let result=await mermaid.render(el.id+'-svg',MERMAID_DEFS[el.id]);
       let svg=result&&result.svg?result.svg:result;
