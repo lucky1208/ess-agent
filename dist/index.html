@@ -433,11 +433,6 @@ ACC AC一体柜专题
 <div style="font-size:12px;color:var(--text2);margin-bottom:16px">从方案JSON同源生成：系统架构图、一次接线图、通信拓扑图、保护分区图。遵循GB/T 4728电气符号标准</div>
 <div id="mgDrawingEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成微网方案</div>
 <div id="mgDrawingContent" style="display:none">
-<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-<button class="btn btn-primary" onclick="mgGenerateDrawings()" style="padding:8px 20px;font-size:13px">AI生成图纸</button>
-<div class="form-group" style="margin:0;min-width:140px"><label class="form-label" style="font-size:11px">图纸AI模型</label><select class="form-input" id="mgDrawingProvider" style="font-size:12px;padding:4px 8px"><option value="local">本地SVG模板</option><option value="bailian">Qwen3.7-Max</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1</option></select></div>
-<span style="font-size:11px;color:var(--text2)">本地模板秒出 | AI模型可生成定制化图纸+BOM+经济性</span>
-</div>
 <div id="mgDrawingLog" class="mg-log" style="display:none;margin-bottom:16px"></div>
 <div class="diagram-container">
 <div class="diagram-header"><h3 class="diagram-title">微网系统架构图</h3><div class="diagram-actions"><button onclick="downloadMGDiagram('mgArchSvg','微网系统架构图.svg')">下载 SVG</button></div></div>
@@ -5683,6 +5678,7 @@ async function mgGenerateSolution(){
   LAST_MG_RESULT=result;
   document.getElementById('mgSuccessMsg').style.display='block';
   mgRenderBrief();
+  mgAutoGenDrawings(result,provider);
 }
 
 function mgRenderBrief(){
@@ -5727,8 +5723,8 @@ function mgRenderDrawings(){
   const R=LAST_MG_RESULT;if(!R)return;
   mgById('mgDrawingEmpty').style.display='none';
   mgById('mgDrawingContent').style.display='block';
-  const provider=mgVal('mgDrawingProvider')||'local';
-  if(provider==='local'){mgDrawArchSvg(R);mgDrawWiringSvg(R);mgDrawCommSvg(R);mgDrawBom(R);mgDrawEcon(R);}
+  const hasArch=mgById('mgArchSvg').innerHTML.trim();
+  if(!hasArch){mgDrawArchSvg(R);mgDrawWiringSvg(R);mgDrawCommSvg(R);mgDrawBom(R);mgDrawEcon(R);}
 }
 
 function mgDrawArchSvg(R){
@@ -5884,10 +5880,9 @@ function mgDrawEcon(R){
   mgById('mgEconTable').innerHTML=h;
 }
 
-async function mgGenerateDrawings(){
-  const R=LAST_MG_RESULT;
-  if(!R){alert('请先在「方案设计」中生成微网方案');return;}
-  const provider=mgVal('mgDrawingProvider')||'local';
+async function mgAutoGenDrawings(R,providerFromSolution){
+  if(!R)return;
+  const provider=providerFromSolution||'local';
   const logEl=document.getElementById('mgDrawingLog');
   if(logEl){logEl.innerHTML='';logEl.style.display='block';}
   const dlog=(msg,type)=>{
@@ -5904,7 +5899,7 @@ async function mgGenerateDrawings(){
     dlog('3张SVG图 + BOM + 经济性分析 渲染完成 ✓','ok');
     return;
   }
-  dlog(`[${provider.toUpperCase()}] 构建图纸生成Prompt...`,'step');
+  dlog(`[${provider.toUpperCase()}] 方案已生成，自动配套生成图纸+BOM+经济性...`,'step');
   const S=R.sizing||{},T=R.topology||{},E=R.economics||{};
   const userPrompt=`## 微网方案参数（已生成）
 - 项目: ${R.projName||''} | 拓扑: ${T.name||''} | 电压: ${T.voltage||''}
@@ -5913,19 +5908,30 @@ async function mgGenerateDrawings(){
 - 运行模式: ${T.opMode||''} | PCC: ${T.pcc||''}
 - 保护: ${(R.protection||[]).join('; ')}
 - 经济性: 总投${E.totalInvest||0}万, 年净${E.annualNet||0}万, 回收${E.payback||0}年
+- 充放电策略: 充${(R.strategy||{}).charge||''} / 放${(R.strategy||{}).discharge||''}
 
-请根据以上方案，输出JSON，包含以下5个字段：
-1. archDiagram: 微网系统架构图完整SVG字符串(viewBox 0 0 1100 700, 暗色主题#0d1117背景, 含电网/PCC/母线/变压器/PCS/BESS/光伏/柴发/充电桩/EMS控制域)
-2. wiringDiagram: 微网电气一次接线图完整SVG字符串(viewBox 0 0 1050 800, 含断路器符号/母线/变压器ΔY/PCS/直流侧DS开关/BESS/保护配置, 标注GB/T 4728符号)
-3. commDiagram: 微网通信拓扑图完整SVG字符串(viewBox 0 0 1000 550, 含4层:云平台/站控/边缘/设备, 标注协议Modbus/CAN/IEC104/MQTT)
+请根据以上方案，依据Skill规则(Skill1拓扑选择+Skill2一次图审图+Skill3通信点表)生成专业电气图纸。
+
+输出JSON，包含以下5个字段：
+1. archDiagram: 微网系统架构图完整SVG字符串(viewBox 0 0 1100 700, 暗色主题#0d1117背景, 含电网/PCC/母线/变压器/PCS/BESS/光伏/柴发/充电桩/EMS控制域, Skill1拓扑选择规则决定拓扑类型)
+2. wiringDiagram: 微网电气一次接线图完整SVG字符串(viewBox 0 0 1050 800, 含断路器符号/母线/变压器ΔY/PCS/直流侧DS开关/BESS/保护配置, Skill2一次图审图规则确保PCC/CT/PT/保护分区完整, 标注GB/T 4728符号)
+3. commDiagram: 微网通信拓扑图完整SVG字符串(viewBox 0 0 1000 550, 含4层:云平台/站控/边缘/设备, Skill3通信点表规则定义协议:PCS=ModbusTCP/BMS=CAN/关口表=ModbusRTU/云=MQTT/站控=IEC104)
 4. bom: BOM设备清单数组, 每项{item,qty,unit,model,price} (price单位万元)
-5. economics: 经济性分析对象{annualRevenue,annualPvRevenue,annualNet,totalInvest,payback,irr}
+5. economics: 经济性分析对象{annualRevenue,annualPvRevenue,annualNet,totalInvest,payback,irr} (Skill7电价收益规则:IRR/NPV/回收期/敏感性)
 
 SVG要求: 暗色背景#0d1117, 蓝色电网#4a90d9, 绿色储能#50c878, 橙色柴发#e8a838, 红色保护#e06070, 紫色通信#534AB7, 底部标注"设计人:卢继雄 | GB/T 36558-2023"`;
   dlog('Prompt长度: '+userPrompt.length+'字符','step');
-  dlog('注入规则: ESS_DRAWING_RULES('+ESS_DRAWING_RULES.split('\\n').filter(l=>l.trim()).length+'行) + ESS_DIAGRAM_SKILL_V3 + MG_SKILLS_SUMMARY','step');
+  const ruleLines=ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()).length;
+  const skillRules=MG_SKILLS_SUMMARY.split('\n').filter(l=>l.trim()&&l.startsWith('-')).length;
+  dlog('注入规则: ESS_DRAWING_RULES('+ruleLines+'行) + ESS_DIAGRAM_SKILL_V3 + MG_SKILLS('+skillRules+'条)','step');
   try{
-    const systemMsg=`你是微网电气图纸AI工程师。根据用户提供的微网方案参数，生成3张专业SVG电气图+设备BOM清单+经济性分析。
+    const systemMsg=`你是微网电气图纸AI工程师。根据用户提供的微网方案参数，依据10项Skill规则生成3张专业SVG电气图+设备BOM清单+经济性分析。
+
+核心Skill驱动规则：
+- Skill1(微网拓扑选择): 决定架构图拓扑类型(纯离网→柴储/光储充→DC双母线/默认→交流微网)
+- Skill2(一次图审图): 接线图必须通过PCC/CT/PT/保护分区完整性检查
+- Skill3(通信点表): 通信拓扑图协议分配(PCS=ModbusTCP/BMS=CAN2.0B/关口表=ModbusRTU/IEC104/MQTT)
+- Skill7(电价收益): 经济性分析含IRR/NPV/回收期/敏感性分析
 
 输出要求：
 1. 必须输出合法JSON，包含archDiagram/wiringDiagram/commDiagram/bom/economics五个字段
@@ -5947,7 +5953,7 @@ ${MG_SKILLS_SUMMARY}`;
     const content=data.choices?.[0]?.message?.content||'';
     const reasoning=data.choices?.[0]?.message?.reasoning_content||'';
     if(reasoning){
-      dlog('─── AI思考过程 ───','step');
+      dlog('─── AI思考过程(前30行) ───','step');
       reasoning.split('\n').filter(l=>l.trim()).slice(0,30).forEach(line=>dlog(line,''));
       dlog('─── 思考结束 ───','step');
     }
@@ -6000,9 +6006,9 @@ ${MG_SKILLS_SUMMARY}`;
       mgById('mgEconTable').innerHTML=h;
       dlog('经济性分析渲染 ✓','ok');
     }else{dlog('LLM未返回经济性，fallback本地','warn');mgDrawEcon(R);}
-    dlog('AI图纸生成全部完成 ✓','ok');
+    dlog('AI图纸+BOM+经济性 全部生成完成 ✓','ok');
   }catch(e){
-    dlog('LLM调用失败: '+e.message,'warn');
+    dlog('LLM图纸生成失败: '+e.message,'warn');
     dlog('Fallback到本地SVG模板...','warn');
     mgDrawArchSvg(R);mgDrawWiringSvg(R);mgDrawCommSvg(R);mgDrawBom(R);mgDrawEcon(R);
     dlog('本地模板渲染完成 ✓','ok');
