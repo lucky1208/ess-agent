@@ -2028,16 +2028,15 @@ const MERMAID_DEFS = {
 };
 
 async function renderMermaid(containerId){
-  if(typeof mermaid==='undefined'||!mermaid.render){setTimeout(()=>renderMermaid(containerId),500);return;}
   let containers;
   if(containerId){const p=document.getElementById(containerId);containers=p?Array.from(p.querySelectorAll('[id^="mm-"]')):[];}
   else{containers=Array.from(document.querySelectorAll('[id^="mm-"]')).filter(el=>el.offsetParent!==null);}
-  console.log('[renderMermaid] containerId:',containerId,'found containers:',containers.map(el=>el.id));
   for(const el of containers){
-    if(!el){console.log('[renderMermaid] skip: no element');continue;}
-    if(!MERMAID_DEFS[el.id]){console.log('[renderMermaid] skip: no def for',el.id);continue;}
-    if(el.dataset.rendered){console.log('[renderMermaid] skip: already rendered',el.id);continue;}
-    if(SVG_MAP[el.id]){el.innerHTML='<img src="'+SVG_MAP[el.id]+'" style="max-width:100%;display:block"/>';el.dataset.rendered='1';continue;}
+    if(!el)continue;
+    if(el.dataset.rendered)continue;
+    if(SVG_MAP[el.id]){el.innerHTML='<img src="'+SVG_MAP[el.id]+'" style="max-width:100%;display:block" onerror="console.error(\'SVG 404:\',\''+SVG_MAP[el.id]+'\')"/>';el.dataset.rendered='1';continue;}
+    if(!MERMAID_DEFS[el.id])continue;
+    if(typeof mermaid==='undefined'||!mermaid.render){setTimeout(()=>renderMermaid(containerId),500);return;}
     try{
       let result=await mermaid.render(el.id+'-svg',MERMAID_DEFS[el.id]);
       let svg=result&&result.svg?result.svg:result;
@@ -2048,7 +2047,6 @@ async function renderMermaid(containerId){
       svgStr=svgStr.replace(/translate\(undefined,\s*NaN\)/g,'translate(0,0)');
       el.innerHTML=svgStr;
       el.dataset.rendered='1';
-      console.log('[renderMermaid] rendered',el.id,'svg length',svg.length);
     }catch(e){console.error('[renderMermaid] error for',el.id,':',e);delete el.dataset.rendered;}
   }
   document.querySelectorAll('[id^="dmm-"]').forEach(e=>e.remove());

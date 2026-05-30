@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
-import { cpSync } from 'fs'
+import { cpSync, readdirSync, copyFileSync, mkdirSync, existsSync } from 'fs'
 
 export default defineConfig({
   root: '.',
@@ -15,10 +15,15 @@ export default defineConfig({
     }
   },
   publicDir: false,
-  plugins: [{
-    name: 'copy-images',
-    closeBundle() {
-      cpSync(resolve(__dirname, 'images'), resolve(__dirname, 'dist/images'), { recursive: true })
+  plugins:[{
+    name:'copy-assets',
+    closeBundle(){
+      cpSync(resolve(__dirname,'images'),resolve(__dirname,'dist/images'),{recursive:true})
+      const svgDir=__dirname;
+      const svgFiles=readdirSync(svgDir).filter(f=>f.endsWith('.svg'));
+      svgFiles.forEach(f=>{
+        copyFileSync(resolve(svgDir,f),resolve(__dirname,'dist',f));
+      });
     }
   }]
 })
