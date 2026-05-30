@@ -328,13 +328,13 @@ ACC AC一体柜专题
 </h3>
 <div class="device-grid" style="margin-bottom:0">
 <div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('ACC_DETAIL','ACC-480-P750 AC一体柜')">
-<div class="dev-img-wrap"><img src="/assets/X-522_X261_product-Tukia3DJ.jpeg" alt="ACC-480" onerror="this.parentElement.innerHTML='<span style=color:var(--text2);font-size:12px>AC一体柜</span>'"></div>
+<div class="dev-img-wrap"><img src="images/products/X-522_X261_product.jpeg" alt="ACC-480" onerror="this.parentElement.innerHTML='<span style=color:var(--text2);font-size:12px>AC一体柜</span>'"></div>
 <div class="dev-header"><div><div class="dev-name">ACC-480-P750 AC一体机</div><div class="dev-model">ACC-480-P750-UL</div></div><span class="dev-badge badge-orange">480kWh</span></div>
 <div class="dev-specs"><span class="spec-item">750kW内置PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈10t</span></div>
 <div class="dev-features"><span class="feature-tag">PCS+升压变+开关柜一体</span><span class="feature-tag">即插即用</span><span class="feature-tag">最大4并→1.92MWh</span></div>
 </div>
 <div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('LL760_DETAIL','760kWh液冷储能柜')">
-<div class="dev-img-wrap"><img src="/assets/GRID-5M_product-CI7pnyej.jpeg" alt="760LL" onerror="this.parentElement.innerHTML='<span style=color:var(--text2);font-size:12px>液冷储能柜</span>'"></div>
+<div class="dev-img-wrap"><img src="images/products/GRID-5M_product.jpeg" alt="760LL" onerror="this.parentElement.innerHTML='<span style=color:var(--text2);font-size:12px>液冷储能柜</span>'"></div>
 <div class="dev-header"><div><div class="dev-name">760kWh液冷储能柜</div><div class="dev-model">光储充一体化标准柜</div></div><span class="dev-badge badge-green">760kWh</span></div>
 <div class="dev-specs"><span class="spec-item">380kW PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈38t</span></div>
 <div class="dev-features"><span class="feature-tag">光储充一体化</span><span class="feature-tag">7000次循环</span><span class="feature-tag">最大8并→6.08MWh</span></div>
@@ -1080,7 +1080,7 @@ const MERMAID_DEFS = {
         subgraph PV_System["光伏发电系统"]
             PV_Panel["光伏组件阵列<br/>550Wp×N<br/>总容量 1MWp"]
             PV_Inverter["组串式逆变器<br/>MPPT 跟踪<br/>AC 400V 输出"]
-            PV_Panel -- "DC 1100V<br/>PV 直流线缆" --> PV_Inverter
+            PV_Panel --> PV_Inverter
         end
         subgraph BESS["储能系统 BESS"]
             BESS_Container["储能集装箱<br/>10MW/20MWh<br/>eBlock 能量块"]
@@ -1089,9 +1089,9 @@ const MERMAID_DEFS = {
                 PCS2["PCS #2<br/>100kW AC/DC"]
                 PCS3["PCS #N<br/>100kW AC/DC"]
             end
-            BESS_Container -- "DC 750~1000V<br/>直流电缆" --> PCS1
-            BESS_Container -- "DC 750~1000V" --> PCS2
-            BESS_Container -- "DC 750~1000V" --> PCS3
+            BESS_Container --> PCS1
+            BESS_Container --> PCS2
+            BESS_Container --> PCS3
         end
         subgraph Diesel["🛢️ 柴发系统"]
             Diesel_Gen["柴油发电机<br/>500kW 备用<br/>远程自启动"]
@@ -1115,17 +1115,17 @@ const MERMAID_DEFS = {
         PQ_Monitor["电能质量监测<br/>谐波/闪变/三相不平衡"]
     end
     G1 --> PCC_SW
-    PCC_SW -- "10kV 高压电缆" --> T1
+    PCC_SW --> T1
     PCC_SW --> PCC_Meter
-    T1 -- "400V 低压出线" --> BusBar
-    PCC_Meter -- "Modbus RTU<br/>RS485" --> EMS_Link["→ 边缘网关"]
-    PV_Inverter -- "QF02<br/>光伏并网断路器" --> BusBar
-    PCS1 -- "QF03-1<br/>储能断路器" --> BusBar
-    PCS2 -- "QF03-2<br/>储能断路器" --> BusBar
-    PCS3 -- "QF03-N<br/>储能断路器" --> BusBar
-    Diesel_Gen -- "QF04<br/>柴发断路器<br/>ATS 切换" --> BusBar
-    BusBar -- "QF05<br/>关键负荷出线" --> Critical
-    BusBar -- "QF06<br/>可调负荷出线" --> NonCritical
+    T1 --> BusBar
+    PCC_Meter --> EMS_Link["→ 边缘网关"]
+    PV_Inverter --> BusBar
+    PCS1 --> BusBar
+    PCS2 --> BusBar
+    PCS3 --> BusBar
+    Diesel_Gen --> BusBar
+    BusBar --> Critical
+    BusBar --> NonCritical
     Prot_Relay -.-> BusBar
     AFD -.-> PCC_SW
     PQ_Monitor -.-> BusBar
@@ -1173,63 +1173,46 @@ const MERMAID_DEFS = {
     style DC_Side fill:#e8f5e9,stroke:#2e7d32
     style BESS2 fill:#f3e5f5,stroke:#7b1fa2
     style Interlink fill:#ffebee,stroke:#c62828`,
-  'mm-3': `graph LR
+  'mm-3': `graph TB
     subgraph T1["方案A: 交流微网 (最常见)"]
-        direction TB
         A_G["电网"] --> A_T["变压器"] --> A_AC["AC Bus"]
-        A_AC --- A_L["AC负荷"]
+        A_AC --> A_L["AC负荷"]
         A_PV["光伏(逆变为AC)"] --> A_AC
         A_BESS["储能(PCS/AC)"] --> A_AC
     end
     subgraph T2["方案B: 直流微网"]
-        direction TB
         B_G["电网"] --> B_ACDC["AC/DC"] --> B_DC["DC Bus"]
-        B_DC --- B_L["DC负荷"]
+        B_DC --> B_L["DC负荷"]
         B_PV["光伏(直接DC)"] --> B_DC
         B_BESS["储能(直挂DC)"] --> B_DC
     end
     subgraph T3["方案C: 交直流混合 (推荐)"]
-        direction TB
         C_G["电网"] --> C_AC["AC Bus"]
-        C_AC --- C_LAC["AC负荷"]
-        C_DC["DC Bus"] --- C_LDC["DC负荷"]
+        C_AC --> C_LAC["AC负荷"]
+        C_DC["DC Bus"] --> C_LDC["DC负荷"]
         C_PV["光伏→DC"] --> C_DC
         C_BESS["储能→DC"] --> C_DC
-        C_AC <-->|"双向AC/DC"| C_DC
+        C_AC <--> C_DC
     end
     subgraph T4["方案D: 多微网集群"]
-        direction TB
-        D_MG1["微网 #1"] ---|"联络线"| D_MG2["微网 #2"]
-        D_MG2 ---|"联络线"| D_MG3["微网 #3"]
-        D_G["电网"] --- D_MG1
-        D_MG1 -.->|"EMS 集群协调"| D_EMS["集群EMS"]
+        D_MG1["微网 #1"] --> D_MG2["微网 #2"]
+        D_MG2 --> D_MG3["微网 #3"]
+        D_G["电网"] --> D_MG1
+        D_MG1 -.-> D_EMS["集群EMS"]
         D_MG2 -.-> D_EMS
         D_MG3 -.-> D_EMS
     end`,
   'mm-4': `stateDiagram-v2
-    [*] --> 并网运行: 正常模式
-    并网运行 --> 计划离网: 检修/调度指令
-    并网运行 --> 非计划离网: 电网故障/电能质量越限
-    计划离网 --> 离网运行: 无缝切换(&lt;20ms)
-    非计划离网 --> 孤岛检测: AFD+被动检测
-    孤岛检测 --> 离网运行: 确认为孤岛
-    孤岛检测 --> 并网运行: 误判/电网恢复
-    离网运行 --> 并网同步: 电网恢复/指令复归
-    并网同步 --> 同期检测: 幅值/频率/相位匹配
-    同期检测 --> 并网运行: 同期成功
-    同期检测 --> 并网同步: 同期失败 重试
-    note right of 离网运行
-        V/f 控制模式
-        储能承担主电源
-        柴发作后备
-        切除非关键负荷
-    end note
-    note right of 并网运行
-        PQ 控制模式
-        削峰填谷策略
-        需量管理
-        光伏最大功率跟踪
-    end note`,
+    [*] --> 并网运行
+    并网运行 --> 计划离网: 检修指令
+    并网运行 --> 非计划离网: 电网故障
+    计划离网 --> 离网运行: 无缝切换
+    非计划离网 --> 孤岛检测: AFD检测
+    孤岛检测 --> 离网运行: 确认孤岛
+    孤岛检测 --> 并网运行: 误判恢复
+    离网运行 --> 并网同步: 电网恢复
+    并网同步 --> 并网运行: 同期成功
+    并网同步 --> 并网同步: 同期失败`,
   'mm-5': `graph TB
     subgraph Grid_Prot["🔌 并网侧保护"]
         P_PCC["PCC 保护<br/>QF01<br/>方向过流(67)<br/>低/过压(27/59)<br/>低/过频(81U/81O)<br/>防孤岛(AFD)"]
@@ -1600,14 +1583,18 @@ async function renderMermaid(containerId){
   let containers;
   if(containerId){const p=document.getElementById(containerId);containers=p?Array.from(p.querySelectorAll('[id^="mm-"]')):[];}
   else{containers=Array.from(document.querySelectorAll('[id^="mm-"]')).filter(el=>el.offsetParent!==null);}
+  console.log('[renderMermaid] containerId:',containerId,'found containers:',containers.map(el=>el.id));
   for(const el of containers){
-    if(!el||!MERMAID_DEFS[el.id]||el.dataset.rendered) continue;
+    if(!el){console.log('[renderMermaid] skip: no element');continue;}
+    if(!MERMAID_DEFS[el.id]){console.log('[renderMermaid] skip: no def for',el.id);continue;}
+    if(el.dataset.rendered){console.log('[renderMermaid] skip: already rendered',el.id);continue;}
     try{
       let result=await mermaid.render(el.id+'-svg',MERMAID_DEFS[el.id]);
       let svg=result&&result.svg?result.svg:result;
       el.innerHTML=svg;
       el.dataset.rendered='1';
-    }catch(e){console.error('Mermaid render error for',el.id,':',e);delete el.dataset.rendered;}
+      console.log('[renderMermaid] rendered',el.id,'svg length',svg.length);
+    }catch(e){console.error('[renderMermaid] error for',el.id,':',e);delete el.dataset.rendered;}
   }
   document.querySelectorAll('[id^="dmm-"]').forEach(e=>e.remove());
   setTimeout(()=>{document.querySelectorAll('div[id]').forEach(e=>{if(e.id.startsWith('dmm-')||e.querySelector('.error-icon'))e.remove();});},200);
