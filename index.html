@@ -423,6 +423,7 @@ ACC AC一体柜专题
 </div>
 <button class="btn btn-primary" onclick="mgGenerateSolution()" style="width:100%;padding:12px;font-size:14px;margin-bottom:16px">生成微网方案</button>
 <div class="success-msg" id="mgSuccessMsg" style="display:none">方案已生成！请切换到其他标签查看图纸、点表、部署方案</div>
+<div id="mgAnalysisLog" class="mg-log" style="display:none;margin-top:12px"></div>
 <div id="mgSolutionBrief" style="font-size:12px;color:var(--text2);line-height:1.8"></div>
 </div>
 
@@ -2863,9 +2864,16 @@ async function callLLM(messages, useStream, providerOverride) {
 
 let _streamLogReasoningEl = null;
 let _streamLogContentEl = null;
+let _currentLogId = 'analysisLog';
+
+function getActiveLogId() {
+  const mgPages = document.querySelectorAll('.micro-content');
+  for (const p of mgPages) { if (p.offsetParent !== null && p.querySelector('#mgAnalysisLog')) return 'mgAnalysisLog'; }
+  return 'analysisLog';
+}
 
 function updateStreamLog(text, type) {
-  const logEl = document.getElementById('analysisLog');
+  const logEl = document.getElementById(_currentLogId) || document.getElementById('analysisLog');
   if (!logEl) return;
   if (type === 'reasoning') {
     if (!_streamLogReasoningEl) {
@@ -2913,6 +2921,7 @@ async function generateSolution() {
   const origText = btn.innerHTML;
   btn.innerHTML = '<span class="spinner"></span> 分析中...';
   btn.disabled = true;
+  _currentLogId='analysisLog';_streamLogReasoningEl=null;_streamLogContentEl=null;
   const logEl = document.getElementById('analysisLog');
   if (logEl) { logEl.innerHTML = ''; logEl.style.display = 'block'; }
   const addLog = (msg, type) => {
@@ -5526,19 +5535,65 @@ function mgLocalEngine(P){
 async function mgGenerateSolution(){
   const P=mgGetParams();
   if(!P.loadPeak){alert('请填写峰值负荷');return;}
+  _currentLogId='mgAnalysisLog';
+  _streamLogReasoningEl=null;_streamLogContentEl=null;
+  const mgLogEl=document.getElementById('mgAnalysisLog');
+  if(mgLogEl){mgLogEl.innerHTML='';mgLogEl.style.display='block';}
+  const mgAddLog=(msg,type)=>{
+    if(!mgLogEl)return;
+    const d=document.createElement('div');
+    d.style.cssText=`font-size:12px;padding:2px 0;color:${type==='step'?'#80b0e0':type==='ok'?'#50c878':type==='warn'?'#e8a838':'#C2C0B6'};word-break:break-all;`;
+    d.textContent=msg;mgLogEl.appendChild(d);mgLogEl.scrollTop=mgLogEl.scrollHeight;
+  };
   let result;
   const provider=mgVal('mgLlmProvider')||'local';
   if(provider==='local'){
+    mgAddLog('[本地规则引擎] 启动微网方案生成...','step');
     result=mgLocalEngine(P);
+    mgAddLog('规则引擎匹配完成 ✓','ok');
   }else{
     try{
-      const messages=[{role:'system',content:`你是微网系统解决方案AI智能体。根据用户参数输出JSON，包含topology/sizing/economics/strategy/protection/devices字段。设备包括:PCC并网柜/BESS储能/PCS变流器/光伏逆变器/柴发/充电桩/EMS/边缘网关/保护系统。`},{role:'user',content:mgGenParamPrompt(P)}];
+      mgAddLog(`[${provider.toUpperCase()}] 构建微网领域Prompt...`,'step');
+      const userPrompt=mgGenParamPrompt(P);
+      mgAddLog('─── 发送给LLM的完整输入 ───','step');
+      userPrompt.split('\n').forEach(line=>{if(line.trim())mgAddLog(line,'');});
+      mgAddLog('─── 输入结束 ───','step');
+      mgAddLog(`调用${provider.toUpperCase()} API (SSE流式)...`,'step');
+      const messages=[{role:'system',content:`你是微网系统解决方案AI智能体。根据用户参数输出JSON，包含topology/sizing/economics/strategy/protection/devices字段。设备包括:PCC并网柜/BESS储能/PCS变流器/光伏逆变器/柴发/充电桩/EMS/边缘网关/保护系统。`},{role:'user',content:userPrompt}];
       const data=await callLLM(messages,true,provider);
+      mgAddLog(`流式响应完成, tokens: ${data.usage?.total_tokens||'?'}`,'ok');
       const content=data.choices?.[0]?.message?.content||'';
+      const reasoning=data.choices?.[0]?.message?.reasoning_content||'';
+      if(reasoning){
+        mgAddLog('─── AI思考过程 ───','step');
+        reasoning.split('\n').forEach(line=>{if(line.trim())mgAddLog(line,'');});
+        mgAddLog('─── 思考结束 ───','step');
+      }
+      mgAddLog('解析LLM输出JSON...','step');
       const jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
-      result=JSON.parse(jsonStr);
-    }catch(e){result=mgLocalEngine(P);}
+      mgAddLog('JSON长度: '+jsonStr.length+'字符','step');
+      try{result=JSON.parse(jsonStr);mgAddLog('JSON解析成功 ✓','ok');}
+      catch(e2){
+        mgAddLog('JSON.parse失败: '+e2.message,'warn');
+        mgAddLog('尝试修复JSON（补全截断）...','step');
+        let fixed=jsonStr;let ok=false;
+        let openB=(fixed.match(/{/g)||[]).length,closeB=(fixed.match(/}/g)||[]).length;
+        let openSq=(fixed.match(/\[/g)||[]).length,closeSq=(fixed.match(/]/g)||[]).length;
+        if(openB>closeB||openSq>closeSq){
+          fixed+='}'.repeat(Math.max(0,openB-closeB))+']'.repeat(Math.max(0,openSq-closeSq));
+          mgAddLog('补全: +'+(openB-closeB)+'} +'+(closeSq-openSq)+']','step');
+          try{result=JSON.parse(fixed);ok=true;mgAddLog('补全后JSON解析成功 ✓','ok');}catch(e3){}
+        }
+        if(!ok){
+          mgAddLog('补全失败，尝试正则提取...','step');
+          const m=fixed.match(/\{[\s\S]*\}/);
+          if(m){try{result=JSON.parse(m[0]);ok=true;mgAddLog('正则提取JSON解析成功 ✓','ok');}catch(e4){}}
+        }
+        if(!ok)throw new Error('JSON解析失败');
+      }
+    }catch(e){mgAddLog('LLM调用失败: '+e.message,'warn');mgAddLog('Fallback到本地规则引擎...','warn');result=mgLocalEngine(P);}
   }
+  _currentLogId='analysisLog';
   LAST_MG_RESULT=result;
   document.getElementById('mgSuccessMsg').style.display='block';
   mgRenderBrief();
