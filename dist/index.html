@@ -1058,7 +1058,7 @@ ACC AC一体柜专题
 </div>
 
 <script>
-function loadMermaid(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';s.onload=function(){mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#185FA5',primaryTextColor:'#FAFAF5',primaryBorderColor:'#3a3e45',lineColor:'#C2C0B6',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px'},flowchart:{htmlLabels:true,curve:'basis'},sequence:{actorMargin:50,messageMargin:40}});};document.head.appendChild(s);}
+function loadMermaid(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';s.onload=function(){mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#185FA5',primaryTextColor:'#FAFAF5',primaryBorderColor:'#3a3e45',lineColor:'#C2C0B6',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px'},layout:'dagre',flowchart:{htmlLabels:false,curve:'basis'},sequence:{actorMargin:50,messageMargin:40}});};document.head.appendChild(s);}
 loadMermaid();
 
 const MERMAID_DEFS = {
@@ -1595,7 +1595,9 @@ async function renderMermaid(containerId){
       let tmp=document.createElement('div');
       tmp.innerHTML=svg;
       let svgEl=tmp.querySelector('svg');
-      el.innerHTML=svgEl?svgEl.outerHTML:svg;
+      let svgStr=svgEl?svgEl.outerHTML:svg;
+      svgStr=svgStr.replace(/translate\(undefined,\s*NaN\)/g,'translate(0,0)');
+      el.innerHTML=svgStr;
       el.dataset.rendered='1';
       console.log('[renderMermaid] rendered',el.id,'svg length',svg.length);
     }catch(e){console.error('[renderMermaid] error for',el.id,':',e);delete el.dataset.rendered;}
