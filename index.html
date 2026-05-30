@@ -246,19 +246,17 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="region">省份/城市</label><input type="text" class="form-input" id="region" value="黑龙江大庆"></div>
 <div class="form-group"><label class="form-label" data-i18n="proj_addr">项目地址</label><input type="text" class="form-input" id="projAddr" placeholder="如：黑龙江大庆市高新区" value="黑龙江大庆市高新区建设路249号"></div>
 </div>
-<div style="font-size:11px;color:var(--blue);font-weight:bold;margin:2px 0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> 变压器</div>
 <div class="form-row" style="margin-bottom:4px">
-<div class="form-group"><label class="form-label" data-i18n="tx_cap">单台容量 (kVA)</label><input type="number" class="form-input" id="txCap" value="1250" step="50"></div>
+<div class="form-group"><label class="form-label">变压器单台容量 (kVA)</label><input type="number" class="form-input" id="txCap" value="1250" step="50"></div>
 <div class="form-group"><label class="form-label" data-i18n="tx_count">变压器数量</label><input type="number" class="form-input" id="txCount" value="2" min="1" max="10"></div>
-<div class="form-group"><label class="form-label" data-i18n="tx_hv">高压侧 (kV)</label><input type="number" class="form-input" id="txHv" value="10" step="0.1"></div>
-<div class="form-group"><label class="form-label" data-i18n="tx_lv">低压侧 (V)</label><input type="number" class="form-input" id="txLv" value="400" step="10"></div>
-<div class="form-group"><label class="form-label" data-i18n="tx_vector">联结组别</label><select class="form-input" id="txVector"><option>Dyn11</option><option>Yyn0</option></select></div>
-<div class="form-group"><label class="form-label" data-i18n="tx_zk">短路阻抗 (%)</label><input type="number" class="form-input" id="txZk" value="4.3" step="0.1"></div>
+<div class="form-group"><label class="form-label">变压器高压侧 (kV)</label><input type="number" class="form-input" id="txHv" value="10" step="0.1"></div>
+<div class="form-group"><label class="form-label">变压器低压侧 (V)</label><input type="number" class="form-input" id="txLv" value="400" step="10"></div>
+<div class="form-group"><label class="form-label">变压器联结组别</label><select class="form-input" id="txVector"><option>Dyn11</option><option>Yyn0</option></select></div>
+<div class="form-group"><label class="form-label">变压器短路阻抗 (%)</label><input type="number" class="form-input" id="txZk" value="4.3" step="0.1"></div>
 </div>
 <div class="form-row" style="margin-bottom:4px">
 <div class="form-group"><label class="form-label" data-i18n="has_hv_room">是否有10kV配电室</label><select class="form-input" id="hasHvRoom"><option value="1" data-i18n="hv_room_yes">有（推荐10kV接入）</option><option value="0" data-i18n="hv_room_no">无（将用0.4kV接入）</option></select></div>
 </div>
-<div style="font-size:11px;color:var(--orange);font-weight:bold;margin:2px 0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> 负荷</div>
 <div class="form-row" style="margin-bottom:4px">
 <div class="form-group"><label class="form-label" data-i18n="load_month_high">月用电-旺季 (万kWh)</label><input type="number" class="form-input" id="loadMonthHigh" value="35" step="1"></div>
 <div class="form-group"><label class="form-label" data-i18n="load_month_low">月用电-淡季 (万kWh)</label><input type="number" class="form-input" id="loadMonthLow" value="15" step="1"></div>
@@ -266,7 +264,6 @@ select.form-input{appearance:auto}
 <div class="form-group"><label class="form-label" data-i18n="pf">功率因数</label><input type="number" class="form-input" id="pf" value="0.9" step="0.05" min="0.7" max="1"></div>
 <div class="form-group"><label class="form-label" data-i18n="work_days">年工作天数</label><input type="number" class="form-input" id="workDays" value="300" step="10"></div>
 </div>
-<div style="font-size:11px;color:#50c878;font-weight:bold;margin:2px 0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 电价</div>
 <div class="form-row" style="margin-bottom:4px">
 <div class="form-group"><label class="form-label" data-i18n="price_peak">峰段 (元/kWh)</label><input type="number" class="form-input" id="pricePeak" value="0.833" step="0.01"></div>
 <div class="form-group"><label class="form-label" data-i18n="price_valley">谷段 (元/kWh)</label><input type="number" class="form-input" id="priceValley" value="0.441" step="0.01"></div>
