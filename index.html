@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
 <style>
 :root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -629,57 +630,73 @@ ACC AC一体柜专题
 <!-- Agent 5.5: 数字孪生 -->
 <div id="page-mg-twin" class="micro-content" style="display:none;padding:0;overflow:hidden">
 <style>
-.twin-scene{position:relative;width:100%;min-height:calc(100vh - 80px);background:#0a0f1d;overflow:hidden}
-.twin-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,240,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
-.twin-fog{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(10,15,29,.9));pointer-events:none}
-.twin-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.twin-particle{position:absolute;width:2px;height:2px;border-radius:50%;animation:twinFloat 5s ease-in infinite;opacity:0}
-@keyframes twinFloat{0%{opacity:0;transform:translateY(0)}15%{opacity:.5}85%{opacity:.2}100%{opacity:0;transform:translateY(-180px)}}
-.twin-card{position:relative;background:rgba(10,15,29,.88);border:1px solid rgba(0,240,255,.12);border-radius:8px;padding:14px;backdrop-filter:blur(10px);transition:all .3s ease;cursor:pointer;overflow:hidden}
-.twin-card:hover{transform:translateY(-3px) scale(1.01);border-color:rgba(0,240,255,.35);box-shadow:0 6px 24px rgba(0,0,0,.5),0 0 16px var(--twin-glow,rgba(0,240,255,.15))}
-.twin-live{display:inline-block;width:7px;height:7px;border-radius:50%;background:#50c878;animation:twinPulse 1.5s ease-in-out infinite;margin-right:5px}
+.twin-wrap{position:relative;width:100%;height:calc(100vh - 80px);min-height:500px;background:#0a0f1d;overflow:hidden}
+#twinCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.twin-hud{position:absolute;inset:0;z-index:10;pointer-events:none}
+.twin-hud>*{pointer-events:auto}
+.twin-top{position:absolute;top:0;left:0;right:0;padding:10px 16px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;background:linear-gradient(180deg,rgba(10,15,29,.85),transparent);pointer-events:auto}
+.twin-live{display:inline-block;width:7px;height:7px;border-radius:50%;background:#50c878;animation:twinPulse 1.5s ease-in-out infinite;margin-right:4px}
 @keyframes twinPulse{0%,100%{opacity:1;box-shadow:0 0 4px #50c878}50%{opacity:.3;box-shadow:0 0 10px #50c878}}
+.twin-btn{font-size:9px;padding:1px 7px;border-radius:3px;cursor:pointer;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.2);color:#00f0ff;transition:all .2s}
+.twin-btn:hover{background:rgba(0,240,255,.15);border-color:rgba(0,240,255,.4)}
+.twin-btn.active{background:rgba(0,240,255,.2);border-color:#00f0ff;box-shadow:0 0 8px rgba(0,240,255,.3)}
+.twin-info{position:absolute;top:50px;right:12px;width:260px;max-height:calc(100% - 110px);overflow-y:auto;background:rgba(10,15,29,.92);border:1px solid rgba(0,240,255,.15);border-radius:8px;backdrop-filter:blur(12px);padding:14px;display:none;pointer-events:auto}
+.twin-info.show{display:block;animation:twinSlideIn .3s ease}
+@keyframes twinSlideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.twin-info-title{font-size:12px;font-weight:bold;color:#00f0ff;letter-spacing:.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(0,240,255,.1)}
+.twin-info-row{display:flex;justify-content:space-between;padding:3px 0;font-size:10px}
+.twin-info-row .k{color:rgba(255,255,255,.35)}.twin-info-row .v{color:rgba(255,255,255,.7);font-family:monospace}
+.twin-stats{position:absolute;bottom:0;left:0;right:0;padding:8px 16px;display:flex;gap:10px;flex-wrap:wrap;background:linear-gradient(0deg,rgba(10,15,29,.9),transparent);pointer-events:auto}
+.twin-stat{background:rgba(10,15,29,.8);border:1px solid rgba(0,240,255,.1);border-radius:6px;padding:6px 12px;text-align:center;backdrop-filter:blur(8px);min-width:100px}
+.twin-stat-label{font-size:8px;color:rgba(255,255,255,.25);letter-spacing:.5px;text-transform:uppercase}
+.twin-stat-val{font-size:20px;font-weight:bold;line-height:1.1;margin-top:2px}
+.twin-debug-bar{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:4px 8px;background:rgba(10,15,29,.85);border:1px solid rgba(0,240,255,.1);border-radius:20px;backdrop-filter:blur(8px);pointer-events:auto}
+.twin-debug-btn{font-size:8px;padding:2px 8px;border-radius:10px;cursor:pointer;background:rgba(0,240,255,.05);border:1px solid rgba(0,240,255,.12);color:rgba(255,255,255,.4);transition:all .2s;white-space:nowrap}
+.twin-debug-btn:hover{color:#00f0ff;border-color:rgba(0,240,255,.3);background:rgba(0,240,255,.1)}
+.twin-copilot{position:absolute;bottom:60px;right:12px;width:280px;max-height:200px;background:rgba(10,15,29,.92);border:1px solid rgba(0,240,255,.15);border-radius:8px;backdrop-filter:blur(12px);padding:10px;display:none;pointer-events:auto}
+.twin-copilot.show{display:block}
+.twin-copilot-input{width:100%;background:rgba(0,240,255,.05);border:1px solid rgba(0,240,255,.15);border-radius:4px;padding:4px 8px;font-size:10px;color:#e0e0ff;outline:none}
+.twin-copilot-input::placeholder{color:rgba(255,255,255,.2)}
+.twin-copilot-msg{font-size:9px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5}
 .twin-led{display:inline-block;width:5px;height:5px;border-radius:50%;margin:0 2px}
 .twin-led-on{background:#50c878;box-shadow:0 0 5px #50c878}
 .twin-led-warn{background:#e8a838;box-shadow:0 0 5px #e8a838}
 .twin-led-off{background:#333}
-.twin-cell{border-radius:2px;transition:background .5s}
-.twin-big-num{font-size:32px;font-weight:bold;line-height:1;text-shadow:0 0 24px currentColor}
-.twin-header{position:relative;z-index:10;padding:12px 20px 0}
-.twin-body{position:relative;z-index:10;padding:0 20px 16px}
-.twin-footer{position:relative;z-index:10;padding:6px 20px 10px;text-align:center}
-.twin-flow-line{stroke-dasharray:10 5;animation:twinFlowDash .8s linear infinite}
-@keyframes twinFlowDash{to{stroke-dashoffset:-15}}
-.twin-flow-particle{animation:twinParticleMove 2s linear infinite}
-@keyframes twinParticleMove{0%{opacity:0}10%{opacity:.9}90%{opacity:.9}100%{opacity:0}}
-.twin-device-label{font-size:10px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase}
-.twin-rim{box-shadow:inset 0 0 20px rgba(0,240,255,.04),0 0 1px rgba(0,240,255,.15)}
-.twin-soc-ring{animation:twinSocBreathe 2s ease-in-out infinite}
-@keyframes twinSocBreathe{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3)}}
 </style>
-<div class="twin-scene" id="twinScene">
-<div class="twin-grid"></div>
-<div class="twin-particles" id="twinParticles"></div>
-<div class="twin-fog"></div>
-<div class="twin-header">
-<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:6px">
-<div style="font-size:15px;font-weight:bold;color:#e0e0ff;letter-spacing:.5px;white-space:nowrap">数字孪生 &amp; 虚拟现实</div>
+<div class="twin-wrap" id="twinWrap">
+<canvas id="twinCanvas"></canvas>
+<div class="twin-hud">
+<div class="twin-top">
+<div style="font-size:14px;font-weight:bold;color:#e0e0ff;letter-spacing:.5px;white-space:nowrap">数字孪生 &amp; 虚拟现实</div>
 <span class="twin-live"></span><span style="font-size:9px;color:#50c878;font-weight:bold">LIVE</span>
-<button onclick="mgTwinView('overview')" style="font-size:9px;padding:1px 6px;background:linear-gradient(135deg,#0a3d6b,#0a2d4b);border:1px solid rgba(0,240,255,.3);color:#00f0ff;border-radius:3px;cursor:pointer">全景</button>
-<button onclick="mgTwinView('pcs')" style="font-size:9px;padding:1px 6px;background:rgba(80,200,120,.06);color:#50c878;border:1px solid rgba(80,200,120,.25);border-radius:3px;cursor:pointer">PCS</button>
-<button onclick="mgTwinView('batt')" style="font-size:9px;padding:1px 6px;background:rgba(74,144,217,.06);color:#4a90d9;border:1px solid rgba(74,144,217,.25);border-radius:3px;cursor:pointer">电池</button>
-<button onclick="mgTwinView('trans')" style="font-size:9px;padding:1px 6px;background:rgba(232,168,56,.06);color:#e8a838;border:1px solid rgba(232,168,56,.25);border-radius:3px;cursor:pointer">变压</button>
-<button onclick="mgTwinView('pv')" style="font-size:9px;padding:1px 6px;background:rgba(255,215,0,.06);color:#ffd700;border:1px solid rgba(255,215,0,.25);border-radius:3px;cursor:pointer">光伏</button>
-<button onclick="mgTwinView('ev')" style="font-size:9px;padding:1px 6px;background:rgba(160,112,208,.06);color:#a070d0;border:1px solid rgba(160,112,208,.25);border-radius:3px;cursor:pointer">充电桩</button>
-<button onclick="mgTwinView('ems')" style="font-size:9px;padding:1px 6px;background:rgba(0,240,255,.06);color:#00f0ff;border:1px solid rgba(0,240,255,.25);border-radius:3px;cursor:pointer">EMS</button>
-<span style="margin:0 2px;color:rgba(255,255,255,.1)">|</span>
-<button onclick="mgTwinStartFlow()" style="font-size:9px;padding:1px 6px;background:rgba(0,240,255,.1);color:#00f0ff;border:1px solid rgba(0,240,255,.3);border-radius:3px;cursor:pointer">▶</button>
-<button onclick="mgTwinStopFlow()" style="font-size:9px;padding:1px 6px;background:rgba(255,255,255,.03);color:#666;border:1px solid rgba(255,255,255,.08);border-radius:3px;cursor:pointer">■</button>
+<button class="twin-btn active" onclick="mgTwinCamPreset('overview')">全景</button>
+<button class="twin-btn" onclick="mgTwinCamPreset('grid')">电网</button>
+<button class="twin-btn" onclick="mgTwinCamPreset('pcs')">PCS</button>
+<button class="twin-btn" onclick="mgTwinCamPreset('batt')">电池</button>
+<button class="twin-btn" onclick="mgTwinCamPreset('trans')">变压</button>
+<button class="twin-btn" onclick="mgTwinCamPreset('pv')">光伏</button>
+<button class="twin-btn" onclick="mgTwinCamPreset('ev')">充电桩</button>
+<button class="twin-btn" onclick="mgTwinCamPreset('ems')">EMS</button>
+<span style="margin:0 2px;color:rgba(255,255,255,.08)">|</span>
+<button class="twin-btn" onclick="mgTwinToggleFlow()" id="twinFlowBtn">▶ 流动</button>
+<button class="twin-btn" onclick="mgTwinToggleCopilot()">AI Copilot</button>
 </div>
+<div class="twin-info" id="twinInfo"></div>
+<div class="twin-debug-bar">
+<button class="twin-debug-btn" onclick="mgTwinDebug('poweron')">上电自检</button>
+<button class="twin-debug-btn" onclick="mgTwinDebug('comm')">四遥验证</button>
+<button class="twin-debug-btn" onclick="mgTwinDebug('strategy')">策略闭环</button>
+<button class="twin-debug-btn" onclick="mgTwinDebug('protect')">保护联动</button>
+<button class="twin-debug-btn" onclick="mgTwinDebug('fault')">故障模拟</button>
+<button class="twin-debug-btn" onclick="mgTwinDebug('blackstart')">黑启动</button>
+<button class="twin-debug-btn" onclick="mgTwinDebug('acceptance')">并网验收</button>
 </div>
-<div class="twin-body" id="mgTwinContent"></div>
-<div class="twin-footer">
-<div style="font-size:9px;color:rgba(255,255,255,.18)">基于 minimax_net_digital_twin_vr_v3.md | PBR物理渲染+GLSL能量流+WebXR | 设计人: 卢继雄 | 规范: GB/T 42288</div>
+<div class="twin-copilot" id="twinCopilot">
+<div style="font-size:10px;color:#00f0ff;font-weight:bold;margin-bottom:6px">ESS Copilot</div>
+<input class="twin-copilot-input" id="twinCopilotInput" placeholder="问: 为什么PCS没输出？" onkeydown="if(event.key==='Enter')mgTwinAskCopilot()">
+<div class="twin-copilot-msg" id="twinCopilotMsg">就绪。可问设备状态、故障诊断、策略建议。</div>
+</div>
+<div class="twin-stats" id="twinStats"></div>
 </div>
 </div>
 </div>
@@ -2359,7 +2376,7 @@ function showMicroPage(id){
   if(id==='mg-energy') mgShowEnergy('monitor');
   if(id==='mg-deploy'&&LAST_MG_RESULT) mgRenderDeploy();
   if(id==='mg-trading'&&LAST_MG_RESULT) mgRenderTradingInit();
-  if(id==='mg-twin') mgTwinView('overview');
+  if(id==='mg-twin') mgTwinInit();
   if(id==='mg-wiki') mgShowWiki('arch');
   setTimeout(()=>renderMermaid(),300);
 }
@@ -6917,257 +6934,408 @@ function mgTestAlarm(level){
 function mgClearAlarms(){mgEnergyState.alarms=[];mgShowEnergy('alarm');}
 function mgAckAlarm(btn){btn.textContent='已确认';btn.disabled=true;btn.style.opacity='0.5';mgOpLog('告警确认','');}
 
-/* ========== 数字孪生Agent V3 — 工业写实中心辐射式 ========== */
-let mgTwinFlowTimer=null;
-let mgTwinFlowPhase=0;
+/* ========== 数字孪生Agent V4 — Three.js 3D PBR + 能量流粒子 + HUD交互 ========== */
+let mgTwin3D=null;
+let mgTwinFlowOn=true;
+let mgTwinSelected=null;
 
-function mgTwinInitParticles(){
-  const c=document.getElementById('twinParticles');
-  if(!c||c.children.length>0)return;
-  const colors=['#00f0ff','#50c878','#ffd700','#a070d0','#4a90d9'];
-  for(let i=0;i<40;i++){
-    const p=document.createElement('div');
-    p.className='twin-particle';
-    p.style.cssText=`left:${Math.random()*100}%;bottom:${Math.random()*30}%;background:${colors[i%5]};animation-delay:${Math.random()*5}s;animation-duration:${4+Math.random()*4}s;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px`;
-    c.appendChild(p);
+function mgTwinInit(){
+  if(mgTwin3D)return;
+  const canvas=document.getElementById('twinCanvas');
+  if(!canvas)return;
+  mgTwin3D={canvas,scene:null,camera:null,renderer:null,composer:null,devices:{},flowParticles:[],clock:null,raycaster:null,mouse:null,animId:null};
+  const THREE_CDN='https://cdn.jsdelivr.net/npm/three@0.160.0';
+  import(THREE_CDN+'/build/three.module.js').then(async(THREE)=>{
+    const{EffectComposer}=await import(THREE_CDN+'/examples/jsm/postprocessing/EffectComposer.js');
+    const{RenderPass}=await import(THREE_CDN+'/examples/jsm/postprocessing/RenderPass.js');
+    const{UnrealBloomPass}=await import(THREE_CDN+'/examples/jsm/postprocessing/UnrealBloomPass.js');
+    const{OrbitControls}=await import(THREE_CDN+'/examples/jsm/controls/OrbitControls.js');
+    const T=THREE;
+    const d=mgTwin3D;
+    d.clock=new T.Clock();
+    d.raycaster=new T.Raycaster();
+    d.mouse=new T.Vector2();
+    d.scene=new T.Scene();
+    d.scene.background=new T.Color(0x0a0f1d);
+    d.scene.fog=new T.Fog(0x0a0f1d,60,200);
+    const aspect=canvas.clientWidth/canvas.clientHeight;
+    const frustumSize=50;
+    d.camera=new T.OrthographicCamera(-frustumSize*aspect/2,frustumSize*aspect/2,frustumSize/2,-frustumSize/2,0.1,500);
+    d.camera.position.set(30,25,30);
+    d.camera.lookAt(0,0,0);
+    d.renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
+    d.renderer.setSize(canvas.clientWidth,canvas.clientHeight);
+    d.renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    d.renderer.shadowMap.enabled=true;
+    d.renderer.shadowMap.type=T.PCFSoftShadowMap;
+    d.renderer.toneMapping=T.ACESFilmicToneMapping;
+    d.renderer.toneMappingExposure=1.2;
+    const controls=new OrbitControls(d.camera,canvas);
+    controls.enableDamping=true;
+    controls.dampingFactor=0.08;
+    controls.maxPolarAngle=Math.PI/2.2;
+    controls.minDistance=10;
+    controls.maxDistance=120;
+    d.controls=controls;
+    const hemiLight=new T.HemisphereLight(0x4a6fa5,0x1a1a2e,0.6);
+    d.scene.add(hemiLight);
+    const dirLight=new T.DirectionalLight(0xffffff,1.2);
+    dirLight.position.set(20,30,10);
+    dirLight.castShadow=true;
+    dirLight.shadow.mapSize.set(2048,2048);
+    dirLight.shadow.camera.left=-40;dirLight.shadow.camera.right=40;
+    dirLight.shadow.camera.top=40;dirLight.shadow.camera.bottom=-40;
+    d.scene.add(dirLight);
+    const rimLight=new T.PointLight(0x00f0ff,0.4,80);
+    rimLight.position.set(0,1,0);
+    d.scene.add(rimLight);
+    const gridH=new T.GridHelper(100,50,0x1e3a5f,0x0d1a2e);
+    gridH.material.opacity=0.3;gridH.material.transparent=true;
+    d.scene.add(gridH);
+    const groundGeo=new T.PlaneGeometry(100,100);
+    const groundMat=new T.MeshStandardMaterial({color:0x1a1a2e,roughness:0.9,metalness:0.0});
+    const ground=new T.Mesh(groundGeo,groundMat);
+    ground.rotation.x=-Math.PI/2;ground.position.y=-0.01;ground.receiveShadow=true;
+    d.scene.add(ground);
+    function makeCabinet(w,h,depth,color,metalness,roughness,label,brand){
+      const group=new T.Group();
+      const bodyGeo=new T.BoxGeometry(w,h,depth);
+      const bodyMat=new T.MeshStandardMaterial({color,metalness,roughness});
+      const body=new T.Mesh(bodyGeo,bodyMat);
+      body.castShadow=true;body.receiveShadow=true;
+      group.add(body);
+      const edgeGeo=new T.EdgesGeometry(bodyGeo);
+      const edgeMat=new T.LineBasicMaterial({color:0x00f0ff,transparent:true,opacity:0.15});
+      group.add(new T.LineSegments(edgeGeo,edgeMat));
+      if(label){
+        const canvas2=document.createElement('canvas');canvas2.width=256;canvas2.height=64;
+        const ctx=canvas2.getContext('2d');
+        ctx.fillStyle='rgba(0,0,0,0)';ctx.fillRect(0,0,256,64);
+        ctx.font='bold 22px monospace';ctx.fillStyle='#00f0ff';ctx.textAlign='center';
+        ctx.fillText(label,128,28);
+        if(brand){ctx.font='14px monospace';ctx.fillStyle='rgba(255,255,255,.4)';ctx.fillText(brand,128,50);}
+        const tex=new T.CanvasTexture(canvas2);
+        const labelMat=new T.MeshBasicMaterial({map:tex,transparent:true});
+        const labelMesh=new T.Mesh(new T.PlaneGeometry(w*0.9,h*0.15),labelMat);
+        labelMesh.position.set(0,h*0.35,depth/2+0.01);
+        group.add(labelMesh);
+      }
+      return group;
+    }
+    function addLED(group,x,y,z,color){
+      const led=new T.Mesh(new T.SphereGeometry(0.08,8,8),new T.MeshStandardMaterial({color,emissive:color,emissiveIntensity:2}));
+      led.position.set(x,y,z);group.add(led);return led;
+    }
+    const pcsGroup=makeCabinet(2.4,4,1.2,0x2a3a4a,0.4,0.2,'PCS 500kW','HYBRID INVERTER');
+    pcsGroup.position.set(0,2,0);
+    addLED(pcsGroup,-0.8,3.6,0.61,0x50c878);addLED(pcsGroup,-0.5,3.6,0.61,0x50c878);addLED(pcsGroup,-0.2,3.6,0.61,0xe8a838);addLED(pcsGroup,0.1,3.6,0.61,0x50c878);
+    d.scene.add(pcsGroup);d.devices.pcs={mesh:pcsGroup,pos:new T.Vector3(0,2,0),name:'PCS 500kW 混合逆变器',color:'#50c878'};
+    const battGroup=makeCabinet(6,4,2.8,0x3a4a5a,0.8,0.3,'BESS 1.4MWh','GOTION GRID-5MWh');
+    battGroup.position.set(12,2,0);
+    for(let i=0;i<5;i++){
+      const layer=new T.Mesh(new T.BoxGeometry(5.4,0.6,2.4),new T.MeshStandardMaterial({color:0x1a2a3a,metalness:0.5,roughness:0.4}));
+      layer.position.set(0,-1.5+i*0.7,0);layer.castShadow=true;
+      battGroup.add(layer);
+    }
+    addLED(battGroup,-2.5,3.6,1.41,0x50c878);addLED(battGroup,-2.2,3.6,1.41,0x50c878);addLED(battGroup,-1.9,3.6,1.41,0x4a90d9);
+    d.scene.add(battGroup);d.devices.batt={mesh:battGroup,pos:new T.Vector3(12,2,0),name:'BESS 1.4MWh 储能柜',color:'#4a90d9'};
+    const transGroup=new T.Group();
+    const tankGeo=new T.CylinderGeometry(1.2,1.2,3,16);
+    const tankMat=new T.MeshStandardMaterial({color:0x5a6a7a,metalness:0.6,roughness:0.3});
+    const tank=new T.Mesh(tankGeo,tankMat);tank.castShadow=true;
+    tank.position.y=1.5;transGroup.add(tank);
+    for(let i=0;i<6;i++){
+      const fin=new T.Mesh(new T.BoxGeometry(0.1,2.5,0.8),tankMat);
+      const angle=i*Math.PI/3;
+      fin.position.set(Math.cos(angle)*1.3,1.5,Math.sin(angle)*1.3);
+      fin.rotation.y=angle;transGroup.add(fin);
+    }
+    const tEdge=new T.EdgesGeometry(new T.CylinderGeometry(1.22,1.22,3.02,16));
+    transGroup.add(new T.LineSegments(tEdge,new T.LineBasicMaterial({color:0xe8a838,transparent:true,opacity:0.2})));
+    transGroup.position.set(-10,0,0);
+    d.scene.add(transGroup);d.devices.trans={mesh:transGroup,pos:new T.Vector3(-10,2,0),name:'变压器 10kV/0.4kV 1600kVA',color:'#e8a838'};
+    const pvGroup=new T.Group();
+    for(let r=0;r<3;r++)for(let c=0;c<5;c++){
+      const panel=new T.Mesh(new T.BoxGeometry(2.8,0.08,1.6),new T.MeshStandardMaterial({color:0x1a3a6a,metalness:0.3,roughness:0.1}));
+      panel.position.set(c*3.2-6.4,0,r*2-2);
+      panel.rotation.x=-0.26;
+      panel.castShadow=true;
+      pvGroup.add(panel);
+    }
+    const pvFrame=new T.Mesh(new T.BoxGeometry(17,0.15,6.5),new T.MeshStandardMaterial({color:0x4a4a5a,metalness:0.7,roughness:0.3}));
+    pvFrame.position.y=-0.1;pvGroup.add(pvFrame);
+    const pvPole1=new T.Mesh(new T.CylinderGeometry(0.1,0.12,3,8),new T.MeshStandardMaterial({color:0x5a5a6a,metalness:0.8,roughness:0.2}));
+    pvPole1.position.set(-5,-1.5,0);pvGroup.add(pvPole1);
+    const pvPole2=pvPole1.clone();pvPole2.position.set(5,-1.5,0);pvGroup.add(pvPole2);
+    pvGroup.position.set(0,4,-12);
+    d.scene.add(pvGroup);d.devices.pv={mesh:pvGroup,pos:new T.Vector3(0,4,-12),name:'PV 500kWp 光伏阵列',color:'#ffd700'};
+    const gridTower=new T.Group();
+    const towerMat=new T.MeshStandardMaterial({color:0x6a6a7a,metalness:0.7,roughness:0.3});
+    const pole1=new T.Mesh(new T.CylinderGeometry(0.15,0.2,10,6),towerMat);pole1.position.set(-1,5,0);pole1.castShadow=true;gridTower.add(pole1);
+    const pole2=pole1.clone();pole2.position.set(1,5,0);gridTower.add(pole2);
+    const crossbar=new T.Mesh(new T.BoxGeometry(3,0.15,0.15),towerMat);crossbar.position.y=9.5;gridTower.add(crossbar);
+    const crossbar2=crossbar.clone();crossbar2.position.y=7;gridTower.add(crossbar2);
+    for(let i=0;i<3;i++){
+      const insulator=new T.Mesh(new T.CylinderGeometry(0.12,0.15,0.4,8),new T.MeshStandardMaterial({color:0x4a7a4a,metalness:0.3,roughness:0.5}));
+      insulator.position.set(-0.8+i*0.8,9.7,0);gridTower.add(insulator);
+    }
+    gridTower.position.set(-18,0,-5);
+    d.scene.add(gridTower);d.devices.grid={mesh:gridTower,pos:new T.Vector3(-18,5,-5),name:'10kV 电网并网点',color:'#4a90d9'};
+    const evGroup=new T.Group();
+    for(let i=0;i<3;i++){
+      const pole=makeCabinet(0.8,3,0.6,0x3a2a4a,0.4,0.2);
+      pole.position.set(i*1.5-1.5,1.5,0);
+      addLED(pole,0,2.6,0.31,i===0?0x50c878:i===1?0xe8a838:0x333333);
+      evGroup.add(pole);
+    }
+    evGroup.position.set(8,0,10);
+    d.scene.add(evGroup);d.devices.ev={mesh:evGroup,pos:new T.Vector3(8,1.5,10),name:'EV 充电桩 360kW',color:'#a070d0'};
+    const emsGroup=makeCabinet(1.6,4,0.8,0x2a3a4a,0.4,0.2,'EMS','FastAPI+Node-RED');
+    emsGroup.position.set(-5,2,8);
+    addLED(emsGroup,-0.4,3.6,0.41,0x00f0ff);addLED(emsGroup,0,3.6,0.41,0x50c878);
+    d.scene.add(emsGroup);d.devices.ems={mesh:emsGroup,pos:new T.Vector3(-5,2,8),name:'EMS 控制柜',color:'#00f0ff'};
+    const loadGroup=new T.Group();
+    const bldg=new T.Mesh(new T.BoxGeometry(6,5,4),new T.MeshStandardMaterial({color:0x2a2a3a,metalness:0.3,roughness:0.6,transparent:true,opacity:0.7}));
+    bldg.position.y=2.5;bldg.castShadow=true;loadGroup.add(bldg);
+    for(let w=0;w<4;w++)for(let h=0;h<3;h++){
+      const win=new T.Mesh(new T.PlaneGeometry(0.6,0.8),new T.MeshStandardMaterial({color:0xffd700,emissive:0xffd700,emissiveIntensity:0.3,transparent:true,opacity:0.5}));
+      win.position.set(-2+w*1.4,1.5+h*1.3,2.01);loadGroup.add(win);
+    }
+    loadGroup.position.set(5,0,10);
+    d.scene.add(loadGroup);d.devices.load={mesh:loadGroup,pos:new T.Vector3(5,2.5,10),name:'工业负荷',color:'#a070d0'};
+    function createFlowLine(from,to,color,thickness){
+      const pts=[];
+      const steps=20;
+      for(let i=0;i<=steps;i++){
+        const t=i/steps;
+        const x=from.x+(to.x-from.x)*t;
+        const y=from.y+(to.y-from.y)*t+Math.sin(t*Math.PI)*2;
+        const z=from.z+(to.z-from.z)*t;
+        pts.push(new T.Vector3(x,y,z));
+      }
+      const curve=new T.CatmullRomCurve3(pts);
+      const tubeGeo=new T.TubeGeometry(curve,steps,thickness,8,false);
+      const tubeMat=new T.MeshStandardMaterial({color,emissive:color,emissiveIntensity:0.5,transparent:true,opacity:0.6});
+      const tube=new T.Mesh(tubeGeo,tubeMat);
+      d.scene.add(tube);
+      const particleCount=30;
+      const positions=new Float32Array(particleCount*3);
+      const pGeo=new T.BufferGeometry();
+      pGeo.setAttribute('position',new T.BufferAttribute(positions,3));
+      const pMat=new T.PointsMaterial({color,size:thickness*8,transparent:true,opacity:0.8,blending:T.AdditiveBlending,depthWrite:false});
+      const particles=new T.Points(pGeo,pMat);
+      d.scene.add(particles);
+      return{curve,particles,positions,particleCount,speed:0.3+offset:Math.random()};
+    }
+    const flowLines=[];
+    flowLines.push(createFlowLine(new T.Vector3(-18,5,-5),new T.Vector3(-10,3,0),0x4a90d9,0.15));
+    flowLines.push(createFlowLine(new T.Vector3(-10,3,0),new T.Vector3(0,3,0),0xe8a838,0.12));
+    flowLines.push(createFlowLine(new T.Vector3(0,3,0),new T.Vector3(12,3,0),0x4a90d9,0.15));
+    flowLines.push(createFlowLine(new T.Vector3(0,4,-12),new T.Vector3(0,3,-2),0xffd700,0.12));
+    flowLines.push(createFlowLine(new T.Vector3(0,3,0),new T.Vector3(8,2,10),0x50c878,0.1));
+    flowLines.push(createFlowLine(new T.Vector3(0,3,0),new T.Vector3(5,2,10),0xa070d0,0.1));
+    d.flowLines=flowLines;
+    const composer=new EffectComposer(d.renderer);
+    composer.addPass(new RenderPass(d.scene,d.camera));
+    const bloom=new UnrealBloomPass(new T.Vector2(canvas.clientWidth,canvas.clientHeight),0.8,0.3,0.85);
+    composer.addPass(bloom);
+    d.composer=composer;
+    canvas.addEventListener('click',(e)=>{
+      const rect=canvas.getBoundingClientRect();
+      d.mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+      d.mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+      d.raycaster.setFromCamera(d.mouse,d.camera);
+      const meshes=Object.values(d.devices).map(dev=>dev.mesh);
+      const intersects=d.raycaster.intersectObjects(meshes,true);
+      if(intersects.length>0){
+        let hitObj=intersects[0].object;
+        while(hitObj.parent&&!Object.values(d.devices).some(dev=>dev.mesh===hitObj)){hitObj=hitObj.parent;}
+        const devEntry=Object.entries(d.devices).find(([k,v])=>v.mesh===hitObj);
+        if(devEntry)mgTwinSelectDevice(devEntry[0]);
+      }else{
+        mgTwinSelectDevice(null);
+      }
+    });
+    function animate(){
+      d.animId=requestAnimationFrame(animate);
+      const time=d.clock.getElapsedTime();
+      controls.update();
+      if(mgTwinFlowOn&&d.flowLines){
+        d.flowLines.forEach(fl=>{
+          for(let i=0;i<fl.particleCount;i++){
+            const t=((time*fl.speed+i/fl.particleCount+fl.offset)%1);
+            const pt=fl.curve.getPoint(t);
+            fl.positions[i*3]=pt.x;
+            fl.positions[i*3+1]=pt.y;
+            fl.positions[i*3+2]=pt.z;
+          }
+          fl.particles.geometry.attributes.position.needsUpdate=true;
+        });
+      }
+      const E=mgEnergyState;
+      if(d.devices.pcs){
+        const pcsMat=d.devices.pcs.mesh.children[0].material;
+        if(pcsMat&&pcsMat.emissive)pcsMat.emissiveIntensity=0.05+Math.sin(time*2)*0.03;
+      }
+      if(d.devices.batt){
+        const battMat=d.devices.batt.mesh.children[0].material;
+        if(battMat&&battMat.emissive){
+          const socN=E.soc/100;
+          battMat.emissive.set(socN>0.5?0x004400:socN>0.2?0x442200:0x440000);
+          battMat.emissiveIntensity=0.1+Math.sin(time*1.5)*0.05;
+        }
+      }
+      d.composer.render();
+    }
+    animate();
+    mgTwin3D=d;
+    mgTwinUpdateStats();
+    window.addEventListener('resize',()=>{
+      if(!mgTwin3D||!mgTwin3D.renderer)return;
+      const c=document.getElementById('twinCanvas');
+      if(!c)return;
+      const w=c.clientWidth,h=c.clientHeight;
+      mgTwin3D.renderer.setSize(w,h);
+      mgTwin3D.composer.setSize(w,h);
+      const a=w/h;
+      const fs=50;
+      mgTwin3D.camera.left=-fs*a/2;mgTwin3D.camera.right=fs*a/2;
+      mgTwin3D.camera.top=fs/2;mgTwin3D.camera.bottom=-fs/2;
+      mgTwin3D.camera.updateProjectionMatrix();
+    });
+  }).catch(err=>{console.warn('Three.js 3D init failed:',err);});
+}
+
+function mgTwinCamPreset(preset){
+  if(!mgTwin3D||!mgTwin3D.camera)return;
+  const presets={
+    overview:{pos:[30,25,30],target:[0,0,0]},
+    grid:{pos:[-25,15,-5],target:[-18,5,-5]},
+    pcs:{pos:[5,6,5],target:[0,2,0]},
+    batt:{pos:[18,6,5],target:[12,2,0]},
+    trans:{pos:[-15,8,5],target:[-10,2,0]},
+    pv:{pos:[0,12,-5],target:[0,4,-12]},
+    ev:{pos:[12,6,15],target:[8,1.5,10]},
+    ems:{pos:[-8,6,12],target:[-5,2,8]}
+  };
+  const p=presets[preset]||presets.overview;
+  const cam=mgTwin3D.camera;
+  const ctrl=mgTwin3D.controls;
+  const startPos=cam.position.clone();
+  const startTarget=ctrl.target.clone();
+  const endPos=new (cam.position.constructor)(...p.pos);
+  const endTarget=new (ctrl.target.constructor)(...p.target);
+  const startTime=Date.now();
+  function fly(){
+    const t=Math.min((Date.now()-startTime)/800,1);
+    const ease=t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+    cam.position.lerpVectors(startPos,endPos,ease);
+    ctrl.target.lerpVectors(startTarget,endTarget,ease);
+    ctrl.update();
+    if(t<1)requestAnimationFrame(fly);
+  }
+  fly();
+  document.querySelectorAll('.twin-btn').forEach(b=>b.classList.remove('active'));
+  const btns=document.querySelectorAll('.twin-btn');
+  const idx=Object.keys(presets).indexOf(preset);
+  if(idx>=0&&btns[idx])btns[idx].classList.add('active');
+}
+
+function mgTwinSelectDevice(key){
+  mgTwinSelected=key;
+  const info=document.getElementById('twinInfo');
+  if(!info)return;
+  if(!key){info.classList.remove('show');return;}
+  const E=mgEnergyState;
+  const S=LAST_MG_RESULT?.sizing||{peakLoad:800,pv:500,bessKwh:1400,bessMW:1.4,evKw:360};
+  const devData={
+    pcs:{title:'PCS 500kW 混合逆变器',rows:[['功率',Math.abs(E.pcsPower).toFixed(0)+'kW'],['模式',E.pcsPower>0?'放电':'充电'],['运行',E.runningMode],['效率','97.2%'],['通信','ModbusTCP:502'],['DC输入','600-900V'],['AC输出','380V 50Hz'],['控制','PQ/Vf/Droop/VSG']]},
+    batt:{title:'BESS 1.4MWh 储能柜',rows:[['SOC',E.soc.toFixed(1)+'%'],['SOH',E.soh+'%'],['容量',(S.bessKwh/1000).toFixed(1)+'MWh'],['电芯','LFP 280Ah'],['电压','672VDC'],['温度',E.bmsTempMin+'-'+E.bmsTempMax+'℃'],['冷却','液冷(乙二醇)'],['通信','CAN2.0B+Modbus']]},
+    trans:{title:'变压器 10kV/0.4kV',rows:[['容量','1600kVA'],['变比','10kV/0.4kV'],['接线','Dyn11'],['阻抗','Uk=6%'],['冷却','ONAN'],['效率','>98.5%'],['温升','<65K'],['重量','3200kg']]},
+    grid:{title:'10kV 电网并网点',rows:[['功率',E.gridPower.toFixed(0)+'kW'],['模式',E.gridMode==='grid_tied'?'并网PQ':'离网V/f'],['频率',E.gridFreq.toFixed(2)+'Hz'],['电压',E.gridVoltage.toFixed(0)+'V'],['CT变比','100/5A'],['电表','0.2S级双向'],['PCC','QF01合闸'],['保护','防孤岛+防逆流']]},
+    pv:{title:'PV 500kWp 光伏阵列',rows:[['出力',E.pvPower.toFixed(0)+'kW'],['装机',S.pv+'kWp'],['组件','550Wp N型TOPCon'],['逆变器','100kW×5'],['MPPT','2路/逆变器'],['利用率',(S.pv>0?(E.pvPower/S.pv*100).toFixed(0):0)+'%'],['通信','ModbusTCP'],['年发电',(S.pv*5*330/1000).toFixed(0)+'MWh']]},
+    ev:{title:'EV 充电桩 360kW',rows:[['功率',E.evPower.toFixed(0)+'kW'],['总功率',S.evKw+'kW'],['桩数','6台 DC快充'],['单桩','60kW 双枪'],['协议','OCPP1.6J'],['通信','WebSocket'],['效率','>95%'],['计费','扫码+APP']]},
+    ems:{title:'EMS 控制柜',rows:[['策略',E.activeStrategy],['模式',E.runningMode],['SCADA','Node-RED'],['EMS','FastAPI'],['DB','TDengine+PG'],['消息','EMQX MQTT v5'],['通信','Modbus/CAN/OCPP'],['OS','Ubuntu 22.04']]}
+  };
+  const d=devData[key];
+  if(!d){info.classList.remove('show');return;}
+  info.innerHTML=`<div class="twin-info-title">${d.title}</div>${d.rows.map(([k,v])=>`<div class="twin-info-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}`;
+  info.classList.add('show');
+  if(mgTwin3D?.devices[key])mgTwinCamPreset(key);
+}
+
+function mgTwinToggleFlow(){
+  mgTwinFlowOn=!mgTwinFlowOn;
+  const btn=document.getElementById('twinFlowBtn');
+  if(btn)btn.textContent=mgTwinFlowOn?'■ 停止':'▶ 流动';
+  if(!mgTwinFlowOn&&mgTwin3D?.flowLines){
+    mgTwin3D.flowLines.forEach(fl=>{fl.positions.fill(0);fl.particles.geometry.attributes.position.needsUpdate=true;});
   }
 }
 
-function mgTwinView(view){
-  mgTwinInitParticles();
-  const el=document.getElementById('mgTwinContent');
+function mgTwinToggleCopilot(){
+  const el=document.getElementById('twinCopilot');
+  if(el)el.classList.toggle('show');
+}
+
+function mgTwinAskCopilot(){
+  const input=document.getElementById('twinCopilotInput');
+  const msg=document.getElementById('twinCopilotMsg');
+  if(!input||!msg)return;
+  const q=input.value.trim();if(!q)return;
+  const E=mgEnergyState;
+  let answer='分析中...';
+  if(q.includes('PCS')||q.includes('输出')||q.includes('停机')){
+    answer=`PCS当前功率${E.pcsPower.toFixed(0)}kW，模式${E.runningMode}。${E.pcsPower===0?'可能原因：1)SOC已达限值 2)EMS策略限制 3)PCS通讯中断。建议检查EMS策略和PCS状态字。':'PCS正常运行中。'}`;
+  }else if(q.includes('SOC')||q.includes('电池')){
+    answer=`电池SOC ${E.soc.toFixed(1)}%，SOH ${E.soh}%，温度${E.bmsTempMin}-${E.bmsTempMax}℃。${E.soc<20?'⚠ SOC过低，建议立即充电！':E.soc>90?'SOC较高，可考虑放电套利。':'SOC正常。'}`;
+  }else if(q.includes('收益')||q.includes('电价')){
+    answer='当前策略为削峰填谷，预计日收益≈¥800-1200（基于峰谷价差0.7元/kWh）。详细收益请查看能源管理→运营分析。';
+  }else{
+    answer=`收到问题："${q}"。当前系统状态：电网${E.gridPower.toFixed(0)}kW，PCS ${E.pcsPower.toFixed(0)}kW，SOC ${E.soc.toFixed(0)}%，光伏${E.pvPower.toFixed(0)}kW。如需详细诊断，请描述具体设备或现象。`;
+  }
+  msg.innerHTML=`<b style="color:#00f0ff">Q:</b> ${q}<br><b style="color:#50c878">A:</b> ${answer}`;
+  input.value='';
+}
+
+function mgTwinDebug(action){
+  const labels={poweron:'上电自检',comm:'四遥验证',strategy:'策略闭环',protect:'保护联动',fault:'故障模拟',blackstart:'黑启动',acceptance:'并网验收'};
+  const msg=labels[action]||action;
+  if(mgTwin3D?.devices){
+    Object.values(mgTwin3D.devices).forEach(dev=>{
+      if(dev.mesh&&dev.mesh.children[0]){
+        const mat=dev.mesh.children[0].material;
+        if(mat&&mat.emissive){
+          mat.emissive.set(action==='fault'?0xff0000:0x00ff00);
+          mat.emissiveIntensity=0.3;
+          setTimeout(()=>{mat.emissiveIntensity=0.05;},2000);
+        }
+      }
+    });
+  }
+  mgOpLog('数字孪生调试',msg);
+}
+
+function mgTwinUpdateStats(){
+  const el=document.getElementById('twinStats');
   if(!el)return;
   const E=mgEnergyState;
   const S=LAST_MG_RESULT?.sizing||{peakLoad:800,pv:500,bessKwh:1400,bessMW:1.4,evKw:360};
-  if(view==='overview') el.innerHTML=mgTwinOverviewV3(S,E);
-  else el.innerHTML=mgTwinDeviceV3(view,S,E);
-}
-
-function mgTwinOverviewV3(S,E){
   const socColor=E.soc<20?'#e06070':E.soc<50?'#e8a838':'#50c878';
-  const socPct=E.soc;
-  const battLayers=Array.from({length:5},(_,li)=>{
-    const layerSoc=Math.max(0,Math.min(100,socPct-li*20+20));
-    const fillH=Math.round(layerSoc*0.44);
-    return `<div style="position:relative;width:52px;height:44px;background:linear-gradient(180deg,#2a3a4a,#1a2a3a);border:1px solid rgba(74,144,217,.35);border-radius:3px;overflow:hidden"><div style="position:absolute;bottom:0;left:0;right:0;height:${fillH}px;background:linear-gradient(180deg,${socColor}88,${socColor}44);transition:height .8s"></div><div style="position:absolute;top:2px;right:3px;font-size:6px;color:rgba(255,255,255,.35)">#${String(li+1).padStart(2,'0')}</div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7px;color:rgba(255,255,255,.5);font-weight:bold">G-ET</div></div>`;
-  }).join('');
-  const pvRows=Array.from({length:3},(_,r)=>`<div style="display:flex;gap:3px">${Array.from({length:5},(_,c)=>`<div style="width:18px;height:10px;background:${E.pvPower>10?'linear-gradient(135deg,#1a3a6a,#2a5a9a)':'rgba(255,215,0,.08)'};border:1px solid ${E.pvPower>10?'rgba(100,150,255,.3)':'rgba(255,215,0,.15)'};border-radius:1px;transform:perspective(80px) rotateX(15deg)"></div>`).join('')}</div>`).join('');
-  const evPoles=Array.from({length:3},(_,i)=>`<div style="width:28px;height:52px;background:linear-gradient(180deg,#2a2a3a,#1a1a2a);border:1px solid rgba(160,112,208,.3);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px"><span class="twin-led ${i===0&&E.evPower>10?'twin-led-on':i===1?'twin-led-warn':'twin-led-off'}"></span><div style="width:8px;height:14px;border-radius:2px;background:rgba(160,112,208,.15);border:1px solid rgba(160,112,208,.2)"></div><span style="font-size:6px;color:rgba(255,255,255,.3)">${i+1}#</span></div>`).join('');
-  return `
-  <div style="position:relative;width:100%;aspect-ratio:16/9;min-height:480px;margin-bottom:16px">
-    <svg viewBox="0 0 960 540" width="100%" height="100%" id="mgTwinSvg" style="display:block">
-      <defs>
-        <radialGradient id="twinBgGrad" cx="50%" cy="45%" r="55%"><stop offset="0%" stop-color="#0f1a2e"/><stop offset="100%" stop-color="#0a0f1d"/></radialGradient>
-        <filter id="twinGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <filter id="twinGlowBig"><feGaussianBlur stdDeviation="6" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <marker id="fArrB" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7" fill="#4a90d9"/></marker>
-        <marker id="fArrG" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7" fill="#50c878"/></marker>
-        <marker id="fArrO" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7" fill="#e8a838"/></marker>
-        <marker id="fArrY" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7" fill="#ffd700"/></marker>
-        <marker id="fArrP" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7" fill="#a070d0"/></marker>
-        <marker id="fArrC" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7" fill="#00f0ff"/></marker>
-      </defs>
-      <rect width="960" height="540" fill="url(#twinBgGrad)"/>
-      <g id="mgFlowParticles"></g>
-      <g opacity=".15"><line x1="0" y1="270" x2="960" y2="270" stroke="#00f0ff" stroke-width=".5" stroke-dasharray="4 8"/><line x1="480" y1="0" x2="480" y2="540" stroke="#00f0ff" stroke-width=".5" stroke-dasharray="4 8"/></g>
-      <g transform="translate(480,260)" filter="url(#twinGlowBig)">
-        <rect x="-70" y="-55" width="140" height="110" rx="6" fill="#0d1a2a" stroke="#00f0ff" stroke-width="1.5" opacity=".9"/>
-        <rect x="-66" y="-51" width="132" height="20" rx="3" fill="rgba(0,240,255,.08)"/>
-        <text x="0" y="-36" text-anchor="middle" fill="#00f0ff" font-size="10" font-weight="bold" font-family="monospace">PCS HYBRID INVERTER</text>
-        <text x="0" y="-10" text-anchor="middle" fill="#50c878" font-size="22" font-weight="bold" filter="url(#twinGlow)">${Math.abs(E.pcsPower).toFixed(0)}<tspan font-size="11">kW</tspan></text>
-        <text x="0" y="8" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="8">${E.pcsPower>0?'DISCHARGE':'CHARGE'} | ${E.runningMode}</text>
-        <g transform="translate(-40,22)">${Array.from({length:6},(_,i)=>`<rect x="${i*14}" y="0" width="11" height="16" rx="2" fill="rgba(80,200,120,.1)" stroke="rgba(80,200,120,.3)" stroke-width=".5"/><text x="${i*14+5.5}" y="11" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="5">M${i+1}</text>`).join('')}</g>
-        <g transform="translate(-30,44)"><circle r="3" fill="${E.pcsPower!==0?'#50c878':'#333'}" ${E.pcsPower!==0?'filter="url(#twinGlow)"':''}/><circle cx="12" r="3" fill="#50c878" filter="url(#twinGlow)"/><circle cx="24" r="3" fill="#e8a838"/><circle cx="36" r="3" fill="#50c878" filter="url(#twinGlow)"/><text x="48" y="3" fill="rgba(255,255,255,.25)" font-size="6">IGBT DC RUN COM</text></g>
-      </g>
-      <g transform="translate(80,80)" onclick="mgTwinView('pcs')" style="cursor:pointer" filter="url(#twinGlow)">
-        <rect x="-45" y="-35" width="90" height="70" rx="5" fill="#0d1a2a" stroke="#4a90d9" stroke-width="1" opacity=".85"/>
-        <line x1="-30" y1="-15" x2="30" y2="-15" stroke="#4a90d9" stroke-width=".5" opacity=".3"/>
-        <text x="0" y="-18" text-anchor="middle" fill="#4a90d9" font-size="9" font-weight="bold">10kV GRID</text>
-        <text x="0" y="2" text-anchor="middle" fill="#4a90d9" font-size="16" font-weight="bold">${E.gridPower>0?'+':''}${E.gridPower.toFixed(0)}<tspan font-size="8">kW</tspan></text>
-        <text x="0" y="16" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="7">${E.gridMode==='grid_tied'?'PQ Grid-Tied':'V/f Off-Grid'}</text>
-        <text x="0" y="28" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="6">${E.gridFreq.toFixed(2)}Hz | ${E.gridVoltage.toFixed(0)}V</text>
-        <g transform="translate(-15,-28)"><circle r="2.5" fill="#50c878"/><circle cx="10" r="2.5" fill="#50c878"/><circle cx="20" r="2.5" fill="#50c878"/><text x="30" y="1" fill="rgba(255,255,255,.2)" font-size="5">ABC</text></g>
-      </g>
-      <g transform="translate(80,440)" onclick="mgTwinView('trans')" style="cursor:pointer" filter="url(#twinGlow)">
-        <rect x="-45" y="-35" width="90" height="70" rx="5" fill="#0d1a2a" stroke="#e8a838" stroke-width="1" opacity=".85"/>
-        <text x="0" y="-18" text-anchor="middle" fill="#e8a838" font-size="9" font-weight="bold">TRANSFORMER</text>
-        <circle cx="-18" cy="5" r="16" fill="none" stroke="#e8a838" stroke-width="1.5"/>
-        <text x="-18" y="8" text-anchor="middle" fill="#e8a838" font-size="8" font-weight="bold">10kV</text>
-        <line x1="-2" y1="5" x2="2" y2="5" stroke="#e8a838" stroke-width="2" marker-end="url(#fArrO)"/>
-        <circle cx="18" cy="5" r="16" fill="none" stroke="#e8a838" stroke-width="1.5"/>
-        <text x="18" y="8" text-anchor="middle" fill="#e8a838" font-size="8" font-weight="bold">0.4kV</text>
-        <text x="0" y="28" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="6">1600kVA | Dyn11</text>
-      </g>
-      <g transform="translate(880,80)" onclick="mgTwinView('batt')" style="cursor:pointer" filter="url(#twinGlow)">
-        <rect x="-55" y="-45" width="110" height="90" rx="5" fill="#0d1a2a" stroke="#4a90d9" stroke-width="1" opacity=".85"/>
-        <text x="0" y="-32" text-anchor="middle" fill="#4a90d9" font-size="9" font-weight="bold">BESS BATTERY</text>
-        <g transform="translate(-26,-22)">${Array.from({length:5},(_,i)=>{const layerSoc=Math.max(0,Math.min(100,socPct-i*20+20));const fillH=Math.round(layerSoc*0.36);return `<rect x="${i*11}" y="0" width="9" height="36" rx="1" fill="#1a2a3a" stroke="rgba(74,144,217,.3)" stroke-width=".5"/><rect x="${i*11}" y="${36-fillH}" width="9" height="${fillH}" fill="${socColor}88" rx="1"/><text x="${i*11+4.5}" y="20" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="4">#${i+1}</text>`}).join('')}</g>
-        <text x="0" y="22" text-anchor="middle" fill="${socColor}" font-size="14" font-weight="bold" filter="url(#twinGlow)">${E.soc.toFixed(0)}<tspan font-size="7">% SOC</tspan></text>
-        <text x="0" y="34" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="6">${(S.bessKwh/1000).toFixed(1)}MWh | LFP | SOH ${E.soh}%</text>
-      </g>
-      <g transform="translate(880,440)" onclick="mgTwinView('pv')" style="cursor:pointer" filter="url(#twinGlow)">
-        <rect x="-55" y="-45" width="110" height="90" rx="5" fill="#0d1a2a" stroke="#ffd700" stroke-width="1" opacity=".85"/>
-        <text x="0" y="-32" text-anchor="middle" fill="#ffd700" font-size="9" font-weight="bold">PV ARRAY</text>
-        <g transform="translate(-25,-20)">${Array.from({length:3},(_,r)=>Array.from({length:5},(_,c)=>`<rect x="${c*11}" y="${r*12}" width="9" height="9" rx="1" fill="${E.pvPower>10?'#1a3a6a':'rgba(255,215,0,.06)'}" stroke="${E.pvPower>10?'rgba(100,150,255,.3)':'rgba(255,215,0,.12)'}" stroke-width=".5"/>`).join('')).join('')}</g>
-        <text x="0" y="22" text-anchor="middle" fill="#ffd700" font-size="14" font-weight="bold" filter="url(#twinGlow)">${E.pvPower.toFixed(0)}<tspan font-size="7">kW</tspan></text>
-        <text x="0" y="34" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="6">/${S.pv}kWp | ${S.pv>0?(E.pvPower/S.pv*100).toFixed(0):0}%</text>
-      </g>
-      <g transform="translate(480,30)" onclick="mgTwinView('ems')" style="cursor:pointer" filter="url(#twinGlow)">
-        <rect x="-50" y="-18" width="100" height="36" rx="4" fill="#0d1a2a" stroke="#00f0ff" stroke-width="1" opacity=".8"/>
-        <text x="0" y="-4" text-anchor="middle" fill="#00f0ff" font-size="8" font-weight="bold">EMS CONTROLLER</text>
-        <text x="0" y="10" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="6">${E.activeStrategy} | ${E.runningMode}</text>
-      </g>
-      <g transform="translate(300,480)" onclick="mgTwinView('ev')" style="cursor:pointer" filter="url(#twinGlow)">
-        <rect x="-45" y="-18" width="90" height="36" rx="4" fill="#0d1a2a" stroke="#a070d0" stroke-width="1" opacity=".8"/>
-        <text x="0" y="-4" text-anchor="middle" fill="#a070d0" font-size="8" font-weight="bold">EV CHARGER</text>
-        <text x="0" y="10" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="6">${E.evPower.toFixed(0)}kW / ${S.evKw}kW</text>
-      </g>
-      <g transform="translate(660,480)">
-        <rect x="-45" y="-18" width="90" height="36" rx="4" fill="#0d1a2a" stroke="#a070d0" stroke-width="1" opacity=".8"/>
-        <text x="0" y="-4" text-anchor="middle" fill="#a070d0" font-size="8" font-weight="bold">LOAD</text>
-        <text x="0" y="10" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="6">${E.loadPower.toFixed(0)}kW | ${E.demandCurrent.toFixed(0)}kVA</text>
-      </g>
-      <g>
-        <path d="M125,80 Q300,120 410,220" stroke="#4a90d9" stroke-width="2.5" fill="none" class="twin-flow-line" marker-end="url(#fArrB)" filter="url(#twinGlow)"/>
-        <path d="M125,440 Q300,400 410,280" stroke="#e8a838" stroke-width="2" fill="none" class="twin-flow-line" marker-end="url(#fArrO)" filter="url(#twinGlow)"/>
-        <path d="M550,230 Q700,150 825,80" stroke="#4a90d9" stroke-width="2.5" fill="none" class="twin-flow-line" marker-end="url(#fArrB)" filter="url(#twinGlow)"/>
-        <path d="M550,290 Q700,370 825,440" stroke="#ffd700" stroke-width="2" fill="none" class="twin-flow-line" marker-end="url(#fArrY)" filter="url(#twinGlow)"/>
-        <path d="M480,48 L480,205" stroke="#00f0ff" stroke-width="1.5" fill="none" stroke-dasharray="4 3" opacity=".5"/>
-        <path d="M440,340 Q380,420 345,462" stroke="#a070d0" stroke-width="1.5" fill="none" class="twin-flow-line" marker-end="url(#fArrP)"/>
-        <path d="M520,340 Q580,420 615,462" stroke="#a070d0" stroke-width="1.5" fill="none" class="twin-flow-line" marker-end="url(#fArrP)"/>
-      </g>
-      <g font-size="7" fill="rgba(255,255,255,.2)">
-        <text x="260" y="140">DC cable</text><rect x="240" y="130" width="30" height="2" fill="#4a90d9" opacity=".4" rx="1"/>
-        <text x="680" y="140">AC cable</text><rect x="660" y="130" width="30" height="2" fill="#e8a838" opacity=".4" rx="1"/>
-        <text x="260" y="400">AC cable</text><rect x="240" y="390" width="30" height="2" fill="#e8a838" opacity=".4" rx="1"/>
-        <text x="680" y="400">PV cable</text><rect x="660" y="390" width="30" height="2" fill="#ffd700" opacity=".4" rx="1"/>
-      </g>
-    </svg>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
-    <div class="twin-card twin-rim" style="--twin-glow:rgba(74,144,217,.2);text-align:center" onclick="mgTwinView('pcs')">
-      <div class="twin-device-label" style="color:#4a90d9">GRID</div>
-      <div class="twin-big-num" style="color:#4a90d9;font-size:26px">${E.gridPower>0?'+':''}${E.gridPower.toFixed(0)}<span style="font-size:11px">kW</span></div>
-      <div style="font-size:9px;color:rgba(255,255,255,.3)">${E.gridMode==='grid_tied'?'并网PQ':'离网V/f'} | ${E.gridFreq.toFixed(2)}Hz</div>
-    </div>
-    <div class="twin-card twin-rim" style="--twin-glow:rgba(74,144,217,.2);text-align:center" onclick="mgTwinView('batt')">
-      <div class="twin-device-label" style="color:#4a90d9">BATTERY SOC</div>
-      <div class="twin-big-num twin-soc-ring" style="color:${socColor};font-size:26px">${E.soc.toFixed(0)}<span style="font-size:11px">%</span></div>
-      <div style="font-size:9px;color:rgba(255,255,255,.3)">${(S.bessKwh/1000).toFixed(1)}MWh | SOH ${E.soh}%</div>
-    </div>
-    <div class="twin-card twin-rim" style="--twin-glow:rgba(80,200,120,.2);text-align:center" onclick="mgTwinView('pcs')">
-      <div class="twin-device-label" style="color:#50c878">PCS POWER</div>
-      <div class="twin-big-num" style="color:#50c878;font-size:26px">${Math.abs(E.pcsPower).toFixed(0)}<span style="font-size:11px">kW</span></div>
-      <div style="font-size:9px;color:rgba(255,255,255,.3)">${E.pcsPower>0?'放电':'充电'} | ${E.runningMode}</div>
-    </div>
-    <div class="twin-card twin-rim" style="--twin-glow:rgba(255,215,0,.2);text-align:center" onclick="mgTwinView('pv')">
-      <div class="twin-device-label" style="color:#ffd700">PV OUTPUT</div>
-      <div class="twin-big-num" style="color:#ffd700;font-size:26px">${E.pvPower.toFixed(0)}<span style="font-size:11px">kW</span></div>
-      <div style="font-size:9px;color:rgba(255,255,255,.3)">/${S.pv}kWp | ${S.pv>0?(E.pvPower/S.pv*100).toFixed(0):0}%</div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-    <div class="twin-card twin-rim" style="--twin-glow:rgba(0,240,255,.15);padding:12px" onclick="mgTwinView('ems')">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="twin-live"></span><span style="color:#00f0ff;font-size:10px;font-weight:bold">EMS CONTROLLER</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-        <div style="padding:6px;background:rgba(0,240,255,.06);border-radius:4px;border:1px solid rgba(0,240,255,.15);text-align:center"><div style="font-size:7px;color:rgba(255,255,255,.25)">SCADA</div><div style="font-size:9px;color:#4a90d9;font-weight:bold">Node-RED</div></div>
-        <div style="padding:6px;background:rgba(80,200,120,.06);border-radius:4px;border:1px solid rgba(80,200,120,.15);text-align:center"><div style="font-size:7px;color:rgba(255,255,255,.25)">EMS</div><div style="font-size:9px;color:#50c878;font-weight:bold">FastAPI</div></div>
-        <div style="padding:6px;background:rgba(160,112,208,.06);border-radius:4px;border:1px solid rgba(160,112,208,.15);text-align:center"><div style="font-size:7px;color:rgba(255,255,255,.25)">DB</div><div style="font-size:9px;color:#a070d0;font-weight:bold">TDe+PG</div></div>
-      </div>
-      <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:6px">策略: ${E.activeStrategy} | ${E.runningMode} | MQTT+Modbus</div>
-    </div>
-    <div class="twin-card twin-rim" style="--twin-glow:rgba(160,112,208,.15);padding:12px" onclick="mgTwinView('ev')">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span style="color:#a070d0;font-size:10px;font-weight:bold">EV CHARGER + LOAD</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div><div style="font-size:8px;color:rgba(255,255,255,.25)">充电桩</div><div style="font-size:16px;color:#a070d0;font-weight:bold">${E.evPower.toFixed(0)}<span style="font-size:9px">kW</span></div><div style="font-size:8px;color:rgba(255,255,255,.2)">/${S.evKw}kW OCPP1.6J</div></div>
-        <div><div style="font-size:8px;color:rgba(255,255,255,.25)">负荷</div><div style="font-size:16px;color:#a070d0;font-weight:bold">${E.loadPower.toFixed(0)}<span style="font-size:9px">kW</span></div><div style="font-size:8px;color:rgba(255,255,255,.2)">需量${E.demandCurrent.toFixed(0)}kVA</div></div>
-      </div>
-    </div>
-  </div>`;
+  el.innerHTML=`
+    <div class="twin-stat"><div class="twin-stat-label">GRID</div><div class="twin-stat-val" style="color:#4a90d9">${E.gridPower>0?'+':''}${E.gridPower.toFixed(0)}<span style="font-size:10px">kW</span></div></div>
+    <div class="twin-stat"><div class="twin-stat-label">PCS</div><div class="twin-stat-val" style="color:#50c878">${Math.abs(E.pcsPower).toFixed(0)}<span style="font-size:10px">kW</span></div></div>
+    <div class="twin-stat"><div class="twin-stat-label">SOC</div><div class="twin-stat-val" style="color:${socColor}">${E.soc.toFixed(0)}<span style="font-size:10px">%</span></div></div>
+    <div class="twin-stat"><div class="twin-stat-label">PV</div><div class="twin-stat-val" style="color:#ffd700">${E.pvPower.toFixed(0)}<span style="font-size:10px">kW</span></div></div>
+    <div class="twin-stat"><div class="twin-stat-label">LOAD</div><div class="twin-stat-val" style="color:#a070d0">${E.loadPower.toFixed(0)}<span style="font-size:10px">kW</span></div></div>
+    <div class="twin-stat"><div class="twin-stat-label">EV</div><div class="twin-stat-val" style="color:#a070d0">${E.evPower.toFixed(0)}<span style="font-size:10px">kW</span></div></div>`;
 }
 
-function mgTwinDeviceV3(type,S,E){
-  const socColor=E.soc<20?'#e06070':E.soc<50?'#e8a838':'#50c878';
-  const devices={
-    pcs:{name:'PCS Hybrid Inverter',color:'#50c878',borderColor:'#00f0ff',specs:['额定功率: 500kW/630kVA','效率: >97.2% (RTE)','冷却: 强制风冷 IP54','通信: ModbusTCP:502','输入DC: 600-900V','输出AC: 380V 50Hz','模式: PQ/Vf/Droop/VSG','尺寸: 1200×800×2000mm','重量: 1200kg','品牌: 阳光/华为/科华']},
-    batt:{name:'BESS Battery Container',color:'#4a90d9',borderColor:'#4a90d9',specs:['标称容量: 1.4MWh','电芯: LFP 280Ah 3.2V','簇数: 4簇并联','额定电压: 672VDC','SOC范围: 10%-90%','SOH: '+E.soh+'%','温度: '+E.bmsTempMin+'-'+E.bmsTempMax+'℃','冷却: 液冷(乙二醇)','通信: CAN2.0B + Modbus','尺寸: 6058×2438×2591mm','品牌: 国轩GRID-5MWh']},
-    trans:{name:'Transformer 10kV/0.4kV',color:'#e8a838',borderColor:'#e8a838',specs:['容量: 1600kVA','变比: 10kV/0.4kV','接线: Dyn11','阻抗: Uk=6%','冷却: ONAN','绝缘: F级','重量: 3200kg','尺寸: 1800×1200×1800mm','效率: >98.5%','温升: <65K']},
-    pv:{name:'PV Array',color:'#ffd700',borderColor:'#ffd700',specs:['装机: '+S.pv+'kWp','组件: 550Wp N型TOPCon','数量: '+(S.pv/0.55).toFixed(0)+'块','逆变器: 100kW×5','MPPT: 2路/逆变器','效率: >98.5%','通信: ModbusTCP','支架: 固定倾角15°','方位: 正南','年发电: '+(S.pv*5*330/1000).toFixed(0)+'MWh']},
-    ev:{name:'EV Charger Station',color:'#a070d0',borderColor:'#a070d0',specs:['总功率: '+S.evKw+'kW','桩数: 6台 DC快充','单桩: 60kW 双枪','协议: OCPP1.6J','通信: WebSocket JSON','枪数: 12枪','效率: >95%','防护: IP54 户外','尺寸: 400×300×1500mm','计费: 扫码+APP+RFID']},
-    ems:{name:'EMS Controller Cabinet',color:'#00f0ff',borderColor:'#00f0ff',specs:['硬件: 工控机 i7/32G/512G','OS: Ubuntu 22.04 LTS','EMS: Python/FastAPI','SCADA: Node-RED','DB: TDengine+PostgreSQL','消息: EMQX MQTT v5','缓存: Redis 7','前端: Vue3+Vite+Pinia','通信: Modbus/CAN/OCPP','尺寸: 800×600×2000mm']}
-  };
-  const d=devices[type]||devices.pcs;
-  const specRows=d.specs.map((s,i)=>`<tr><td style="color:rgba(255,255,255,.2);padding:2px 8px;font-size:9px;font-family:monospace">${String(i+1).padStart(2,'0')}</td><td style="padding:2px 8px;color:rgba(255,255,255,.5);font-size:10px">${s}</td></tr>`).join('');
-  const cellFill=(i)=>{const threshold=i*12.5;return E.soc>threshold?socColor:'rgba(74,144,217,.12)'};
-  return `<div style="display:grid;grid-template-columns:3fr 2fr;gap:16px">
-    <div class="twin-card twin-rim" style="--twin-glow:${d.color}22;padding:20px;border-color:${d.borderColor}33">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="twin-live"></span><span style="color:#50c878;font-size:9px">LIVE</span><span style="color:${d.color};font-size:14px;font-weight:bold;letter-spacing:.5px">${d.name}</span></div>
-      <div style="width:100%;aspect-ratio:16/9;background:radial-gradient(ellipse at 50% 30%,#0f1a2e,#0a0f1d);border-radius:8px;border:1px solid ${d.borderColor}22;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:16px">
-        ${type==='pcs'?`<div style="text-align:center"><div style="font-size:52px;color:#50c878;font-weight:bold;text-shadow:0 0 30px rgba(80,200,120,.5)">${Math.abs(E.pcsPower).toFixed(0)}<span style="font-size:18px">kW</span></div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px">${E.pcsPower>0?'DISCHARGE':'CHARGE'} | ${E.runningMode} | RTE 97.2%</div><div style="display:flex;gap:6px;justify-content:center;margin-top:14px">${Array.from({length:6},(_,i)=>`<div style="width:36px;height:20px;border-radius:2px;background:rgba(80,200,120,.08);border:1px solid rgba(80,200,120,.25);display:flex;align-items:center;justify-content:center;font-size:7px;color:rgba(255,255,255,.25)">M${i+1}</div>`).join('')}</div><div style="display:flex;gap:5px;justify-content:center;margin-top:10px"><span class="twin-led ${E.pcsPower!==0?'twin-led-on':'twin-led-off'}"></span><span class="twin-led twin-led-on"></span><span class="twin-led twin-led-warn"></span><span class="twin-led twin-led-on"></span><span style="font-size:8px;color:rgba(255,255,255,.2);margin-left:3px">IGBT DC RUN COM</span></div></div>`:''}
-        ${type==='batt'?`<div style="text-align:center"><div style="display:flex;gap:5px;justify-content:center;margin-bottom:10px">${Array.from({length:8},(_,i)=>`<div class="twin-cell" style="width:24px;height:56px;background:${cellFill(i)};border:1px solid rgba(74,144,217,.25)"></div>`).join('')}</div><div style="font-size:52px;color:${socColor};font-weight:bold;text-shadow:0 0 30px ${socColor}">${E.soc.toFixed(0)}<span style="font-size:18px">% SOC</span></div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px">${(S.bessKwh/1000).toFixed(1)}MWh | LFP | SOH ${E.soh}%</div><div style="font-size:9px;color:rgba(255,255,255,.25);margin-top:3px">液冷 | ${E.bmsTempMin}-${E.bmsTempMax}℃ | CAN2.0B</div></div>`:''}
-        ${type==='trans'?`<div style="text-align:center"><div style="display:flex;align-items:center;justify-content:center;gap:20px;margin:16px 0"><div style="width:70px;height:70px;border-radius:50%;border:2px solid #e8a838;display:flex;align-items:center;justify-content:center;font-size:12px;color:#e8a838;font-weight:bold;box-shadow:0 0 20px rgba(232,168,56,.15)">10kV</div><div style="font-size:20px;color:#e8a838">→</div><div style="width:70px;height:70px;border-radius:50%;border:2px solid #e8a838;display:flex;align-items:center;justify-content:center;font-size:12px;color:#e8a838;font-weight:bold;box-shadow:0 0 20px rgba(232,168,56,.15)">0.4kV</div></div><div style="font-size:12px;color:rgba(255,255,255,.4)">1600kVA | Dyn11 | Uk=6%</div></div>`:''}
-        ${type==='pv'?`<div style="text-align:center"><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:10px">${Array.from({length:15},(_,i)=>`<div style="height:20px;border-radius:2px;background:${E.pvPower>10?'linear-gradient(135deg,#1a3a6a,#2a5a9a)':'rgba(255,215,0,.06)'};border:1px solid ${E.pvPower>10?'rgba(100,150,255,.25)':'rgba(255,215,0,.1)'};transform:perspective(100px) rotateX(10deg)"></div>`).join('')}</div><div style="font-size:52px;color:#ffd700;font-weight:bold;text-shadow:0 0 30px rgba(255,215,0,.5)">${E.pvPower.toFixed(0)}<span style="font-size:18px">kW</span></div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px">/${S.pv}kWp | MPPT | ${S.pv>0?(E.pvPower/S.pv*100).toFixed(0):0}%</div></div>`:''}
-        ${type==='ev'?`<div style="text-align:center"><div style="display:flex;gap:10px;justify-content:center;margin:12px 0">${Array.from({length:3},(_,i)=>`<div style="width:40px;height:64px;border-radius:6px;background:linear-gradient(180deg,rgba(160,112,208,.08),rgba(160,112,208,.02));border:1px solid rgba(160,112,208,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span class="twin-led ${i===0&&E.evPower>10?'twin-led-on':i===1?'twin-led-warn':'twin-led-off'}"></span><div style="width:10px;height:16px;border-radius:2px;background:rgba(160,112,208,.12);border:1px solid rgba(160,112,208,.15)"></div><span style="font-size:8px;color:rgba(255,255,255,.3)">${i+1}#</span></div>`).join('')}</div><div style="font-size:52px;color:#a070d0;font-weight:bold;text-shadow:0 0 30px rgba(160,112,208,.5)">${E.evPower.toFixed(0)}<span style="font-size:18px">kW</span></div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px">/${S.evKw}kW | OCPP1.6J</div></div>`:''}
-        ${type==='ems'?`<div style="text-align:center"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0"><div style="padding:12px;background:rgba(0,240,255,.06);border-radius:6px;border:1px solid rgba(0,240,255,.15)"><div style="font-size:8px;color:rgba(255,255,255,.25)">SCADA</div><div style="font-size:16px;color:#4a90d9;font-weight:bold">Node-RED</div></div><div style="padding:12px;background:rgba(80,200,120,.06);border-radius:6px;border:1px solid rgba(80,200,120,.15)"><div style="font-size:8px;color:rgba(255,255,255,.25)">EMS</div><div style="font-size:16px;color:#50c878;font-weight:bold">FastAPI</div></div></div><div style="font-size:11px;color:rgba(255,255,255,.4)">策略: ${E.activeStrategy} | ${E.runningMode}</div></div>`:''}
-      </div>
-    </div>
-    <div class="twin-card twin-rim" style="--twin-glow:${d.color}15;padding:16px;border-color:${d.borderColor}22">
-      <div style="font-size:12px;color:${d.color};font-weight:bold;margin-bottom:10px;letter-spacing:.5px">EQUIPMENT SPECS</div>
-      <table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid rgba(255,255,255,.04)"><th style="text-align:left;color:rgba(255,255,255,.15);padding:2px 8px;font-size:8px">#</th><th style="text-align:left;color:rgba(255,255,255,.15);padding:2px 8px;font-size:8px">PARAMETER</th></tr>${specRows}</table>
-      <div style="margin-top:14px;padding:10px;background:rgba(0,240,255,.03);border-radius:5px;border:1px solid rgba(0,240,255,.08)">
-        <div style="font-size:8px;color:rgba(255,255,255,.2);margin-bottom:4px;letter-spacing:.5px">DIGITAL TWIN TECH STACK</div>
-        <div style="font-size:8px;color:rgba(255,255,255,.15);line-height:1.7">Three.js r160+ PBR | GLSL Energy Flow<br>WebXR / Meta Quest / Vision Pro<br>glTF 2.0 / Blender 3.6+ 建模<br>MQTT.js / WebSocket / Modbus<br>LOD0(VR) / LOD1(Web) / LOD2(GIS)<br>Bloom + SSAO + ACES ToneMap</div>
-      </div>
-    </div>
-  </div>`;
-}
+function mgTwinView(view){mgTwinInit();if(view&&view!=='overview')mgTwinSelectDevice(view);else mgTwinSelectDevice(null);}
+function mgTwinStartFlow(){mgTwinFlowOn=true;const btn=document.getElementById('twinFlowBtn');if(btn)btn.textContent='■ 停止';}
+function mgTwinStopFlow(){mgTwinFlowOn=false;const btn=document.getElementById('twinFlowBtn');if(btn)btn.textContent='▶ 流动';if(mgTwin3D?.flowLines){mgTwin3D.flowLines.forEach(fl=>{fl.positions.fill(0);fl.particles.geometry.attributes.position.needsUpdate=true;});}}
 
-function mgTwinStartFlow(){
-  if(mgTwinFlowTimer)return;
-  mgTwinFlowTimer=setInterval(()=>{
-    mgTwinFlowPhase=(mgTwinFlowPhase+1)%80;
-    const svg=document.getElementById('mgTwinSvg');
-    if(!svg)return;
-    const particlesG=svg.getElementById('mgFlowParticles');
-    if(!particlesG)return;
-    const E=mgEnergyState;
-    const phase=mgTwinFlowPhase;
-    const paths=[
-      {pts:[[125,80],[300,120],[410,220]],active:Math.abs(E.gridPower)>10,color:'#4a90d9',dir:1},
-      {pts:[[125,440],[300,400],[410,280]],active:Math.abs(E.gridPower)>10,color:'#e8a838',dir:1},
-      {pts:[[550,230],[700,150],[825,80]],active:Math.abs(E.pcsPower)>10,color:E.pcsPower>0?'#50c878':'#4a90d9',dir:1},
-      {pts:[[550,290],[700,370],[825,440]],active:E.pvPower>10,color:'#ffd700',dir:1},
-      {pts:[[440,340],[380,420],[345,462]],active:E.evPower>10,color:'#a070d0',dir:1},
-      {pts:[[520,340],[580,420],[615,462]],active:E.loadPower>10,color:'#a070d0',dir:1}
-    ];
-    let html='';
-    paths.forEach((p,pi)=>{
-      if(!p.active)return;
-      for(let k=0;k<3;k++){
-        const t=((phase+pi*13+k*27)%80)/80;
-        const pt=mgTwinBezierPoint(p.pts,t);
-        const r=3-k*0.5;
-        const op=0.9-k*0.25;
-        html+=`<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${r}" fill="${p.color}" opacity="${op}" filter="url(#twinGlow)"/>`;
-      }
-    });
-    particlesG.innerHTML=html;
-  },50);
-}
-
-function mgTwinBezierPoint(pts,t){
-  if(pts.length===3){
-    const u=1-t;
-    return{x:u*u*pts[0][0]+2*u*t*pts[1][0]+t*t*pts[2][0],y:u*u*pts[0][1]+2*u*t*pts[1][1]+t*t*pts[2][1]};
-  }
-  return{x:pts[0][0]+(pts[pts.length-1][0]-pts[0][0])*t,y:pts[0][1]+(pts[pts.length-1][1]-pts[0][1])*t};
-}
-
-function mgTwinStopFlow(){
-  if(mgTwinFlowTimer){clearInterval(mgTwinFlowTimer);mgTwinFlowTimer=null;}
-  const particlesG=document.getElementById('mgFlowParticles');
-  if(particlesG)particlesG.innerHTML='';
-}
+setInterval(()=>{if(document.getElementById('page-mg-twin')?.style.display!=='none')mgTwinUpdateStats();},2000);
 
 /* ========== 协议调试Agent ========== */
 const MG_POINT_TABLES={
