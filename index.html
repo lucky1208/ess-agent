@@ -630,7 +630,7 @@ ACC AC一体柜专题
 <!-- Agent 5.5: 数字孪生 -->
 <div id="page-mg-twin" class="micro-content" style="display:none;padding:0;overflow:hidden">
 <style>
-.twin-outer{position:relative;width:100%;height:calc(100vh - 40px);min-height:480px;background:#0a0f1d;overflow:hidden}
+.twin-outer{position:relative;width:100%;height:600px;background:#0a0f1d;overflow:hidden}
 .twin-iframe{width:100%;height:100%;border:none;display:block}
 .twin-nodata{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(10,15,29,0.55);pointer-events:none}
 .twin-nodata button{pointer-events:auto}
@@ -6926,7 +6926,22 @@ let mgTwinSelected=null;
 function mgTwinInit(){
   const iframe=document.getElementById('twinIframe');
   const nd=document.getElementById('twinNoData');
+  const outer=document.getElementById('twinOuter');
   if(!iframe||!nd)return;
+  if(outer){
+    const subNav=document.getElementById('microgridNav');
+    const catTabs=document.querySelector('.category-tabs');
+    let topOffset=0;
+    const header=document.querySelector('.header');
+    if(header) topOffset+=header.offsetHeight;
+    if(catTabs) topOffset+=catTabs.offsetHeight;
+    if(subNav) topOffset+=subNav.offsetHeight;
+    outer.style.position='fixed';
+    outer.style.top=topOffset+'px';
+    outer.style.left='0';
+    outer.style.width='100vw';
+    outer.style.height='calc(100vh - '+topOffset+'px)';
+  }
   iframe.style.display='block';
   if(!LAST_MG_RESULT){
     nd.style.display='flex';
