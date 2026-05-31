@@ -1413,7 +1413,59 @@
         });
 
         // ============================================
-        // 14. INIT
+        // 14. POSTMESSAGE LISTENER (parent → iframe)
+        // ============================================
+        window.addEventListener('message', (e) => {
+            const msg = e.data;
+            if (!msg || !msg.type) return;
+            if (msg.type === 'ess-update' && msg.data) {
+                const d = msg.data;
+                if (d.soc !== undefined) {
+                    const socEl = document.querySelector('.metric-sub');
+                    if (socEl) {
+                        const mode = d.pcsPower >= 0 ? '充电中' : '放电中';
+                        socEl.textContent = mode + ' | SOC ' + Math.round(d.soc) + '%';
+                    }
+                }
+                if (d.loadPower !== undefined) {
+                    const el = document.getElementById('metricLoad');
+                    if (el) el.textContent = Math.abs(Math.round(d.loadPower)).toLocaleString();
+                }
+                if (d.pvPower !== undefined) {
+                    const el = document.getElementById('metricPV');
+                    if (el) el.textContent = Math.round(d.pvPower).toLocaleString();
+                }
+                if (d.pcsPower !== undefined) {
+                    const el = document.getElementById('metricBESS');
+                    if (el) el.textContent = Math.round(d.pcsPower).toLocaleString();
+                }
+                if (d.gridPower !== undefined) {
+                    const el = document.getElementById('metricPCC');
+                    if (el) el.textContent = Math.round(d.gridPower).toLocaleString();
+                }
+                if (d.sizing) {
+                    const s = d.sizing;
+                    scene.traverse((obj) => {
+                        if (obj.userData && obj.userData.type === 'bess') {
+                            obj.userData.power = s.bessMW ? Math.round(s.bessMW * 1000) : obj.userData.power;
+                            obj.userData.soc = d.soc || obj.userData.soc;
+                        }
+                        if (obj.userData && obj.userData.type === 'pcs') {
+                            obj.userData.power = s.bessMW ? Math.round(s.bessMW * 1000) : obj.userData.power;
+                        }
+                        if (obj.userData && obj.userData.type === 'pv') {
+                            obj.userData.power = s.pv || obj.userData.power;
+                        }
+                    });
+                }
+            }
+            if (msg.type === 'ess-cam-preset' && msg.preset) {
+                if (typeof flyToPreset === 'function') flyToPreset(msg.preset);
+            }
+        });
+
+        // ============================================
+        // 15. INIT
         // ============================================
         // Hide loading screen after init
         setTimeout(() => {

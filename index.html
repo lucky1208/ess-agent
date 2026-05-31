@@ -6912,7 +6912,7 @@ function mgTwinCamPreset(preset){
   mgTwinInit();
   try{
     const iframe=document.getElementById('twinIframe');
-    if(iframe&&iframe.contentWindow)iframe.contentWindow.postMessage({type:'ess-cam-preset',preset},' *');
+    if(iframe&&iframe.contentWindow)iframe.contentWindow.postMessage({type:'ess-cam-preset',preset},'*');
   }catch(e){}
 }
 function mgTwinToggleFlow(){mgTwinFlowOn=!mgTwinFlowOn;}
