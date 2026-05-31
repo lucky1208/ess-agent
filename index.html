@@ -3063,6 +3063,22 @@ async function callLLM(messages, useStream, providerOverride) {
         } catch (e) {}
       }
     }
+    if(!fullContent && fullReasoning){
+      const jsonInReasoning=fullReasoning.match(/\{[\s\S]*\}/);
+      if(jsonInReasoning){
+        try{JSON.parse(jsonInReasoning[0]);fullContent=jsonInReasoning[0];}catch(e){}
+      }
+      if(!fullContent){
+        const svgEnd=fullReasoning.lastIndexOf('</svg>');
+        if(svgEnd>0){
+          const beforeSvg=fullReasoning.lastIndexOf('{',svgEnd);
+          if(beforeSvg>0){
+            const candidate=fullReasoning.substring(beforeSvg);
+            try{JSON.parse(candidate);fullContent=candidate;}catch(e){}
+          }
+        }
+      }
+    }
     return {
       choices: [{
         message: {

@@ -33,7 +33,8 @@ export default async function handler(req, res) {
       url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
       key: process.env.BAILIAN_API_KEY,
       model: 'qwen3-235b-a22b',
-      max_tokens: 65536
+      max_tokens: 65536,
+      enable_thinking: true
     }
   };
 
@@ -52,6 +53,7 @@ export default async function handler(req, res) {
     };
     if (cfg.reasoning_effort) body.reasoning_effort = cfg.reasoning_effort;
     if (cfg.thinking) body.thinking = cfg.thinking;
+    if (cfg.enable_thinking) body.enable_thinking = true;
 
     const resp = await fetch(cfg.url, {
       method: 'POST',
@@ -71,15 +73,20 @@ export default async function handler(req, res) {
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
+      let lastWrite = Date.now();
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          res.write(decoder.decode(value, { stream: true }));
+          const chunk = decoder.decode(value, { stream: true });
+          res.write(chunk);
+          lastWrite = Date.now();
         }
       } catch (e) {
+        res.write(`data: {"error":"stream read error: ${e.message}"}\n\n`);
       }
       return res.end();
     }
