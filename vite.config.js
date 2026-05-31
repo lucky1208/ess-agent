@@ -24,6 +24,11 @@ export default defineConfig({
       svgFiles.forEach(f=>{
         copyFileSync(resolve(svgDir,f),resolve(__dirname,'dist',f));
       });
+      const htmlFiles=['ess_agent_3d_twin_viewer.html'];
+      htmlFiles.forEach(f=>{
+        const src=resolve(__dirname,f);
+        if(existsSync(src)) copyFileSync(src,resolve(__dirname,'dist',f));
+      });
     }
   }]
 })

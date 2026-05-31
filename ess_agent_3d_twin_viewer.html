@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESS Agent - 3D Twin Viewer (Microgrid Digital Twin)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0f1d;
+            overflow: hidden;
+            font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
+            color: #e0e6ed;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        canvas { display: block; }
+
+        /* HUD Overlay */
+        .hud-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            background: linear-gradient(180deg, rgba(10,15,29,0.95) 0%, rgba(10,15,29,0.6) 100%);
+            border-bottom: 1px solid rgba(0,240,255,0.15);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            pointer-events: auto;
+        }
+        .top-bar .logo {
+            font-size: 16px; font-weight: 700;
+            color: #00f0ff;
+            letter-spacing: 1px;
+            margin-right: 32px;
+        }
+        .top-bar .nav-tabs {
+            display: flex; gap: 4px;
+        }
+        .top-bar .nav-tab {
+            padding: 8px 16px;
+            font-size: 13px; color: #8b9bb4;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        .top-bar .nav-tab:hover { color: #00f0ff; background: rgba(0,240,255,0.08); }
+        .top-bar .nav-tab.active {
+            color: #00f0ff;
+            background: rgba(0,240,255,0.12);
+            border-color: rgba(0,240,255,0.3);
+        }
+
+        /* Status Tags */
+        .status-tags {
+            position: absolute;
+            top: 72px; left: 24px;
+            display: flex; gap: 8px;
+            pointer-events: auto;
+        }
+        .status-tag {
+            padding: 6px 12px;
+            font-size: 11px; font-weight: 600;
+            border-radius: 4px;
+            border: 1px solid;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .status-tag.live { color: #00ff88; border-color: rgba(0,255,136,0.4); background: rgba(0,255,136,0.1); }
+        .status-tag.pcs { color: #00f0ff; border-color: rgba(0,240,255,0.4); background: rgba(0,240,255,0.1); }
+        .status-tag.bess { color: #ffd700; border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.1); }
+        .status-tag.pv { color: #ff8c00; border-color: rgba(255,140,0,0.4); background: rgba(255,140,0,0.1); }
+
+        /* Bottom Dashboard */
+        .bottom-dashboard {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 120px;
+            background: linear-gradient(0deg, rgba(10,15,29,0.95) 0%, rgba(10,15,29,0.4) 100%);
+            border-top: 1px solid rgba(0,240,255,0.15);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 32px;
+            pointer-events: auto;
+        }
+        .metric-card {
+            display: flex; flex-direction: column;
+            min-width: 120px;
+        }
+        .metric-label {
+            font-size: 11px; color: #8b9bb4;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .metric-value {
+            font-size: 28px; font-weight: 700;
+            color: #00f0ff;
+            font-variant-numeric: tabular-nums;
+        }
+        .metric-unit {
+            font-size: 13px; color: #8b9bb4;
+            margin-left: 4px;
+        }
+        .metric-sub {
+            font-size: 11px; color: #00ff88;
+            margin-top: 2px;
+        }
+
+        /* Camera Presets */
+        .camera-presets {
+            position: absolute;
+            right: 24px; top: 50%;
+            transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 8px;
+            pointer-events: auto;
+        }
+        .preset-btn {
+            width: 40px; height: 40px;
+            border-radius: 8px;
+            background: rgba(10,15,29,0.8);
+            border: 1px solid rgba(0,240,255,0.2);
+            color: #00f0ff;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .preset-btn:hover {
+            background: rgba(0,240,255,0.15);
+            border-color: rgba(0,240,255,0.5);
+            transform: scale(1.05);
+        }
+
+        /* Device Info Panel */
+        .device-panel {
+            position: absolute;
+            right: 80px; top: 72px;
+            width: 320px;
+            background: rgba(10,15,29,0.92);
+            border: 1px solid rgba(0,240,255,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            pointer-events: auto;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(12px);
+        }
+        .device-panel.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .panel-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0,240,255,0.15);
+        }
+        .panel-icon {
+            width: 40px; height: 40px;
+            border-radius: 8px;
+            background: rgba(0,240,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .panel-title {
+            font-size: 15px; font-weight: 600;
+            color: #e0e6ed;
+        }
+        .panel-status {
+            font-size: 11px; color: #00ff88;
+            margin-top: 2px;
+        }
+        .panel-data-row {
+            display: flex; justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .panel-data-label {
+            font-size: 12px; color: #8b9bb4;
+        }
+        .panel-data-value {
+            font-size: 13px; font-weight: 600;
+            color: #e0e6ed;
+            font-variant-numeric: tabular-nums;
+        }
+        .panel-actions {
+            display: flex; gap: 8px;
+            margin-top: 16px;
+        }
+        .panel-btn {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(0,240,255,0.3);
+            background: rgba(0,240,255,0.08);
+            color: #00f0ff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .panel-btn:hover {
+            background: rgba(0,240,255,0.2);
+        }
+        .panel-btn.danger {
+            border-color: rgba(255,0,60,0.3);
+            background: rgba(255,0,60,0.08);
+            color: #ff003c;
+        }
+        .panel-btn.danger:hover {
+            background: rgba(255,0,60,0.2);
+        }
+
+        /* Loading */
+        .loading-screen {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: #0a0f1d;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.8s;
+        }
+        .loading-screen.hidden { opacity: 0; pointer-events: none; }
+        .loading-ring {
+            width: 60px; height: 60px;
+            border: 3px solid rgba(0,240,255,0.1);
+            border-top-color: #00f0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            margin-top: 16px;
+            font-size: 13px; color: #8b9bb4;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loading">
+        <div class="loading-ring"></div>
+        <div class="loading-text">INITIALIZING DIGITAL TWIN...</div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <div class="hud-overlay">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="logo">◉ ESS AGENT TWIN</div>
+            <div class="nav-tabs">
+                <div class="nav-tab">方案设计</div>
+                <div class="nav-tab">电气图纸</div>
+                <div class="nav-tab">协议调试</div>
+                <div class="nav-tab">能源管理</div>
+                <div class="nav-tab">一键部署</div>
+                <div class="nav-tab">电力交易</div>
+                <div class="nav-tab active">数字孪生</div>
+                <div class="nav-tab">微网百科</div>
+            </div>
+        </div>
+
+        <!-- Status Tags -->
+        <div class="status-tags">
+            <div class="status-tag live">● LIVE</div>
+            <div class="status-tag pcs">PCS</div>
+            <div class="status-tag bess">BESS</div>
+            <div class="status-tag pv">PV</div>
+        </div>
+
+        <!-- Camera Presets -->
+        <div class="camera-presets">
+            <div class="preset-btn" data-preset="bird" title="鸟瞰">⬥</div>
+            <div class="preset-btn" data-preset="bess" title="储能">🔋</div>
+            <div class="preset-btn" data-preset="pcs" title="PCS">⚡</div>
+            <div class="preset-btn" data-preset="pv" title="光伏">☀</div>
+            <div class="preset-btn" data-preset="grid" title="电网">🏭</div>
+        </div>
+
+        <!-- Device Info Panel -->
+        <div class="device-panel" id="devicePanel">
+            <div class="panel-header">
+                <div class="panel-icon" id="panelIcon">🔋</div>
+                <div>
+                    <div class="panel-title" id="panelTitle">国轩 5MWh 储能柜</div>
+                    <div class="panel-status" id="panelStatus">● 正常运行</div>
+                </div>
+            </div>
+            <div id="panelData"></div>
+            <div class="panel-actions">
+                <button class="panel-btn" onclick="toggleDevice()">启停控制</button>
+                <button class="panel-btn danger" onclick="simulateFault()">故障模拟</button>
+            </div>
+        </div>
+
+        <!-- Bottom Dashboard -->
+        <div class="bottom-dashboard">
+            <div class="metric-card">
+                <div class="metric-label">总负荷</div>
+                <div><span class="metric-value" id="metricLoad">1,250</span><span class="metric-unit">kW</span></div>
+                <div class="metric-sub">▲ 12% vs 昨日</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">光伏出力</div>
+                <div><span class="metric-value" id="metricPV">856</span><span class="metric-unit">kW</span></div>
+                <div class="metric-sub">辐照度 980 W/m²</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">储能功率</div>
+                <div><span class="metric-value" id="metricBESS">-500</span><span class="metric-unit">kW</span></div>
+                <div class="metric-sub">放电中 | SOC 65%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">PCC并网</div>
+                <div><span class="metric-value" id="metricPCC">894</span><span class="metric-unit">kW</span></div>
+                <div class="metric-sub">电压 10.02 kV</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">今日收益</div>
+                <div><span class="metric-value" id="metricRevenue">¥2,856</span></div>
+                <div class="metric-sub">削峰填谷 + 需量控制</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js & Dependencies -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+        // ============================================
+        // 1. SCENE SETUP
+        // ============================================
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0f1d);
+        scene.fog = new THREE.Fog(0x0a0f1d, 80, 250);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true, 
+            alpha: false,
+            powerPreference: 'high-performance'
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        container.appendChild(renderer.domElement);
+
+        // ============================================
+        // 2. ISOMETRIC CAMERA (30°俯视)
+        // ============================================
+        const aspect = window.innerWidth / window.innerHeight;
+        const d = 70;
+        const camera = new THREE.OrthographicCamera(
+            -d * aspect, d * aspect, d, -d, 1, 500
+        );
+        camera.position.set(40, 40, 40);
+        camera.lookAt(0, 0, 0);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minZoom = 0.3;
+        controls.maxZoom = 3;
+        controls.target.set(0, 5, 0);
+
+        // Camera Presets
+        const presets = {
+            bird: { pos: new THREE.Vector3(40, 40, 40), target: new THREE.Vector3(0, 5, 0) },
+            bess: { pos: new THREE.Vector3(-25, 12, 15), target: new THREE.Vector3(-25, 8, 0) },
+            pcs: { pos: new THREE.Vector3(0, 15, 20), target: new THREE.Vector3(0, 8, 0) },
+            pv: { pos: new THREE.Vector3(30, 12, -25), target: new THREE.Vector3(30, 5, -25) },
+            grid: { pos: new THREE.Vector3(-40, 15, 0), target: new THREE.Vector3(-30, 8, 0) }
+        };
+
+        function flyToPreset(name, duration = 1200) {
+            const preset = presets[name];
+            if (!preset) return;
+
+            const startPos = camera.position.clone();
+            const startTarget = controls.target.clone();
+            const startTime = performance.now();
+
+            function animate() {
+                const elapsed = performance.now() - startTime;
+                const t = Math.min(elapsed / duration, 1);
+                // Cubic ease-out
+                const ease = 1 - Math.pow(1 - t, 3);
+
+                camera.position.lerpVectors(startPos, preset.pos, ease);
+                controls.target.lerpVectors(startTarget, preset.target, ease);
+                controls.update();
+
+                if (t < 1) requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => flyToPreset(btn.dataset.preset));
+        });
+
+        // ============================================
+        // 3. LIGHTING SYSTEM (HDR-like with multiple lights)
+        // ============================================
+        // Ambient
+        const ambientLight = new THREE.AmbientLight(0x4a6fa5, 0.4);
+        scene.add(ambientLight);
+
+        // Hemisphere (sky/ground)
+        const hemiLight = new THREE.HemisphereLight(0x4a6fa5, 0x1a1a2e, 0.6);
+        scene.add(hemiLight);
+
+        // Main Directional (Sun)
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(50, 80, 30);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 200;
+        dirLight.shadow.camera.left = -60;
+        dirLight.shadow.camera.right = 60;
+        dirLight.shadow.camera.top = 60;
+        dirLight.shadow.camera.bottom = -60;
+        dirLight.shadow.bias = -0.001;
+        dirLight.shadow.normalBias = 0.02;
+        scene.add(dirLight);
+
+        // Fill Light
+        const fillLight = new THREE.DirectionalLight(0x88ccff, 0.3);
+        fillLight.position.set(-30, 40, -20);
+        scene.add(fillLight);
+
+        // Rim Light (cyan, for sci-fi feel)
+        const rimLight = new THREE.DirectionalLight(0x00f0ff, 0.3);
+        rimLight.position.set(0, 10, 40);
+        scene.add(rimLight);
+
+        // ============================================
+        // 4. GROUND & ENVIRONMENT
+        // ============================================
+        // Grid Floor
+        const gridHelper = new THREE.GridHelper(200, 100, 0x1e3a5f, 0x0f1f3a);
+        gridHelper.material.opacity = 0.3;
+        gridHelper.material.transparent = true;
+        scene.add(gridHelper);
+
+        // Concrete Floor
+        const floorGeo = new THREE.PlaneGeometry(200, 200);
+        const floorMat = new THREE.MeshStandardMaterial({
+            color: 0x1a1f2e,
+            roughness: 0.9,
+            metalness: 0.0,
+        });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -0.1;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // Reflection Plane (subtle)
+        const reflectGeo = new THREE.PlaneGeometry(200, 200);
+        const reflectMat = new THREE.MeshBasicMaterial({
+            color: 0x0a0f1d,
+            transparent: true,
+            opacity: 0.15,
+        });
+        const reflectPlane = new THREE.Mesh(reflectGeo, reflectMat);
+        reflectPlane.rotation.x = -Math.PI / 2;
+        reflectPlane.position.y = -0.05;
+        scene.add(reflectPlane);
+
+        // ============================================
+        // 5. PBR MATERIAL LIBRARY
+        // ============================================
+        const Materials = {
+            // Metal Enclosure (Energy Storage Cabinet / PCS)
+            metalEnclosure: new THREE.MeshStandardMaterial({
+                color: 0x7a8a9a,
+                roughness: 0.3,
+                metalness: 0.8,
+            }),
+            // Painted Surface (Inverter / Meter)
+            paintedSurface: new THREE.MeshStandardMaterial({
+                color: 0xf5f5f5,
+                roughness: 0.2,
+                metalness: 0.4,
+            }),
+            // Glass Panel (LCD Screen / Observation Window)
+            glass: new THREE.MeshStandardMaterial({
+                color: 0x111111,
+                roughness: 0.05,
+                metalness: 0.0,
+                transparent: true,
+                opacity: 0.3,
+            }),
+            // Copper Busbar
+            copper: new THREE.MeshStandardMaterial({
+                color: 0xb87333,
+                roughness: 0.25,
+                metalness: 0.9,
+            }),
+            // Warning Yellow
+            warning: new THREE.MeshStandardMaterial({
+                color: 0xffd200,
+                roughness: 0.6,
+                metalness: 0.0,
+                emissive: 0xffd200,
+                emissiveIntensity: 0.1,
+            }),
+            // Liquid Cooling Pipe (transparent with glow)
+            coolingPipe: new THREE.MeshStandardMaterial({
+                color: 0x1e90ff,
+                roughness: 0.1,
+                metalness: 0.1,
+                transparent: true,
+                opacity: 0.6,
+                emissive: 0x00f0ff,
+                emissiveIntensity: 0.3,
+            }),
+            // PV Panel (blue-purple reflective)
+            pvPanel: new THREE.MeshStandardMaterial({
+                color: 0x1a3a6e,
+                roughness: 0.15,
+                metalness: 0.3,
+            }),
+            // Diesel Generator (orange industrial)
+            diesel: new THREE.MeshStandardMaterial({
+                color: 0xff6b00,
+                roughness: 0.2,
+                metalness: 0.4,
+            }),
+            // Concrete
+            concrete: new THREE.MeshStandardMaterial({
+                color: 0x555555,
+                roughness: 0.9,
+                metalness: 0.0,
+            }),
+            // Glowing Status
+            statusGreen: new THREE.MeshStandardMaterial({
+                color: 0x00ff88,
+                emissive: 0x00ff88,
+                emissiveIntensity: 1.0,
+            }),
+            statusYellow: new THREE.MeshStandardMaterial({
+                color: 0xffd200,
+                emissive: 0xffd200,
+                emissiveIntensity: 1.0,
+            }),
+            statusRed: new THREE.MeshStandardMaterial({
+                color: 0xff003c,
+                emissive: 0xff003c,
+                emissiveIntensity: 1.0,
+            }),
+        };
+
+        // ============================================
+        // 6. ENERGY FLOW SHADER (UV Scroll + Particle)
+        // ============================================
+        const energyFlowVertexShader = `
+            varying vec2 vUv;
+            varying vec3 vPosition;
+
+            void main() {
+                vUv = uv;
+                vPosition = position;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const energyFlowFragmentShader = `
+            uniform float uTime;
+            uniform float uPower;
+            uniform vec3 uColor;
+            uniform vec3 uGlowColor;
+            uniform float uSpeed;
+
+            varying vec2 vUv;
+            varying vec3 vPosition;
+
+            void main() {
+                // UV scrolling speed proportional to power
+                float flowSpeed = 0.5 + uPower * 3.0;
+                float scrolledU = vUv.x + uTime * flowSpeed * uSpeed;
+
+                // Create flowing segments
+                float segment = fract(scrolledU * 8.0);
+                float segmentEdge = smoothstep(0.0, 0.1, segment) * smoothstep(1.0, 0.9, segment);
+
+                // Core glow
+                float core = smoothstep(0.5, 0.0, abs(vUv.y - 0.5));
+
+                // Pulse effect
+                float pulse = sin(uTime * (2.0 + uPower * 4.0)) * 0.15 + 0.85;
+
+                // Power affects intensity
+                float intensity = (0.3 + uPower * 1.2) * pulse;
+
+                // Combine
+                vec3 finalColor = mix(uColor, uGlowColor, segmentEdge);
+                float alpha = core * intensity * (0.4 + segmentEdge * 0.6);
+
+                gl_FragColor = vec4(finalColor * intensity, alpha);
+            }
+        `;
+
+        // Energy Flow Material Factory
+        function createEnergyFlowMaterial(color, glowColor, speed = 1.0) {
+            return new THREE.ShaderMaterial({
+                vertexShader: energyFlowVertexShader,
+                fragmentShader: energyFlowFragmentShader,
+                uniforms: {
+                    uTime: { value: 0 },
+                    uPower: { value: 0.8 },
+                    uColor: { value: new THREE.Color(color) },
+                    uGlowColor: { value: new THREE.Color(glowColor) },
+                    uSpeed: { value: speed },
+                },
+                transparent: true,
+                side: THREE.DoubleSide,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+            });
+        }
+
+        // Energy Flow Colors
+        const FlowColors = {
+            pv: { color: 0x8B7355, glow: 0xFFD700 },      // Photovoltaic: Gold
+            charge: { color: 0x4A90E2, glow: 0x00F0FF }, // Charging: Tech Blue
+            discharge: { color: 0x2E8B57, glow: 0x00FF88 }, // Discharging: Green
+            reverse: { color: 0x8B0000, glow: 0xFF003C },  // Reverse: Red Alert
+            comm: { color: 0x9370DB, glow: 0xDA70D6 },    // Communication: Purple
+        };
+
+        // ============================================
+        // 7. DEVICE BUILDERS (1:1 Realistic Models)
+        // ============================================
+        const devices = [];
+        const raycastTargets = [];
+
+        // 7.1 BESS Energy Storage Cabinet (国轩 5MWh)
+        function createBESS(x, z, name = "国轩 5MWh 储能柜") {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+            group.userData = { type: 'bess', name, power: -500, soc: 65 };
+
+            // Main Container (20ft standard proportions: 6m x 2.5m x 2.6m scaled)
+            const bodyGeo = new THREE.BoxGeometry(12, 6, 5);
+            const body = new THREE.Mesh(bodyGeo, Materials.metalEnclosure);
+            body.position.y = 3;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+
+            // Container details - corrugated texture simulation with ribs
+            for (let i = 0; i < 8; i++) {
+                const ribGeo = new THREE.BoxGeometry(12.1, 0.3, 0.1);
+                const rib = new THREE.Mesh(ribGeo, Materials.metalEnclosure);
+                rib.position.set(0, 1 + i * 0.7, 2.51);
+                group.add(rib);
+            }
+
+            // Doors (left and right)
+            const doorGeo = new THREE.BoxGeometry(5.5, 5, 0.2);
+            const leftDoor = new THREE.Mesh(doorGeo, Materials.metalEnclosure);
+            leftDoor.position.set(-3, 3, 2.6);
+            group.add(leftDoor);
+
+            const rightDoor = new THREE.Mesh(doorGeo, Materials.metalEnclosure);
+            rightDoor.position.set(3, 3, 2.6);
+            group.add(rightDoor);
+
+            // Door handles
+            const handleGeo = new THREE.BoxGeometry(0.3, 1.5, 0.3);
+            const leftHandle = new THREE.Mesh(handleGeo, Materials.copper);
+            leftHandle.position.set(-0.5, 3, 2.8);
+            group.add(leftHandle);
+
+            const rightHandle = new THREE.Mesh(handleGeo, Materials.copper);
+            rightHandle.position.set(6.5, 3, 2.8);
+            group.add(rightHandle);
+
+            // Brand Logo plate
+            const logoGeo = new THREE.PlaneGeometry(3, 0.8);
+            const logoMat = new THREE.MeshStandardMaterial({
+                color: 0x00a8e8,
+                emissive: 0x00a8e8,
+                emissiveIntensity: 0.3,
+                roughness: 0.4,
+            });
+            const logo = new THREE.Mesh(logoGeo, logoMat);
+            logo.position.set(0, 5, 2.65);
+            group.add(logo);
+
+            // SOC Ring Light (top)
+            const ringGeo = new THREE.TorusGeometry(3, 0.15, 8, 32);
+            const ringMat = new THREE.MeshStandardMaterial({
+                color: 0x00ff88,
+                emissive: 0x00ff88,
+                emissiveIntensity: 0.8,
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.set(0, 6.3, 0);
+            ring.rotation.x = Math.PI / 2;
+            group.add(ring);
+
+            // Status LEDs (4 corners)
+            const ledPositions = [[-5, 6, -2], [5, 6, -2], [-5, 6, 2], [5, 6, 2]];
+            ledPositions.forEach(pos => {
+                const ledGeo = new THREE.SphereGeometry(0.2, 8, 8);
+                const led = new THREE.Mesh(ledGeo, Materials.statusGreen);
+                led.position.set(...pos);
+                group.add(led);
+            });
+
+            // Cooling fans (top)
+            for (let i = 0; i < 3; i++) {
+                const fanGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.3, 16);
+                const fan = new THREE.Mesh(fanGeo, Materials.metalEnclosure);
+                fan.position.set(-3 + i * 3, 6.2, -1);
+                group.add(fan);
+
+                // Fan blades
+                const bladeGeo = new THREE.BoxGeometry(1.4, 0.05, 0.2);
+                const blade = new THREE.Mesh(bladeGeo, Materials.metalEnclosure);
+                blade.position.set(-3 + i * 3, 6.35, -1);
+                blade.userData = { isFan: true, speed: 0.05 };
+                group.add(blade);
+            }
+
+            // Liquid cooling pipes (side)
+            for (let i = 0; i < 4; i++) {
+                const pipeGeo = new THREE.CylinderGeometry(0.15, 0.15, 5, 8);
+                const pipe = new THREE.Mesh(pipeGeo, Materials.coolingPipe);
+                pipe.position.set(6.2, 2 + i * 1.2, 0);
+                group.add(pipe);
+            }
+
+            // Fire suppression nozzles (top)
+            for (let i = 0; i < 4; i++) {
+                const nozzleGeo = new THREE.ConeGeometry(0.1, 0.3, 8);
+                const nozzle = new THREE.Mesh(nozzleGeo, Materials.statusRed);
+                nozzle.position.set(-4 + i * 2.5, 6.2, 1.5);
+                nozzle.userData = { isNozzle: true };
+                group.add(nozzle);
+            }
+
+            // Nameplate
+            const nameGeo = new THREE.PlaneGeometry(4, 0.6);
+            const nameCanvas = document.createElement('canvas');
+            nameCanvas.width = 400; nameCanvas.height = 60;
+            const ctx = nameCanvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 400, 60);
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText('GOTION GRID 5MWh', 10, 40);
+            const nameTex = new THREE.CanvasTexture(nameCanvas);
+            const nameMat = new THREE.MeshBasicMaterial({ map: nameTex });
+            const nameplate = new THREE.Mesh(nameGeo, nameMat);
+            nameplate.position.set(0, 1, 2.65);
+            group.add(nameplate);
+
+            scene.add(group);
+            devices.push(group);
+            raycastTargets.push(body);
+            return group;
+        }
+
+        // 7.2 PCS Power Conversion System
+        function createPCS(x, z, name = "PCS 1.25MW") {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+            group.userData = { type: 'pcs', name, power: 0, mode: 'CHARGE' };
+
+            // Main Cabinet
+            const bodyGeo = new THREE.BoxGeometry(4, 8, 3);
+            const body = new THREE.Mesh(bodyGeo, Materials.paintedSurface);
+            body.position.y = 4;
+            body.castShadow = true;
+            group.add(body);
+
+            // LCD Screen
+            const screenGeo = new THREE.PlaneGeometry(2, 1.2);
+            const screenMat = new THREE.MeshStandardMaterial({
+                color: 0x000000,
+                emissive: 0x00f0ff,
+                emissiveIntensity: 0.5,
+                roughness: 0.1,
+            });
+            const screen = new THREE.Mesh(screenGeo, screenMat);
+            screen.position.set(0, 6, 1.51);
+            group.add(screen);
+
+            // Screen text (dynamic canvas)
+            const screenCanvas = document.createElement('canvas');
+            screenCanvas.width = 256; screenCanvas.height = 128;
+            const sCtx = screenCanvas.getContext('2d');
+            sCtx.fillStyle = '#000000';
+            sCtx.fillRect(0, 0, 256, 128);
+            sCtx.fillStyle = '#00f0ff';
+            sCtx.font = 'bold 36px monospace';
+            sCtx.fillText('0 kW', 20, 60);
+            sCtx.font = '18px monospace';
+            sCtx.fillText('CHARGE | PQ', 20, 100);
+            const screenTex = new THREE.CanvasTexture(screenCanvas);
+            screenMat.map = screenTex;
+
+            // AC Busbar (Yellow)
+            const acBusGeo = new THREE.BoxGeometry(0.3, 0.3, 2);
+            const acBus = new THREE.Mesh(acBusGeo, Materials.copper);
+            acBus.position.set(-1.5, 7, 0);
+            group.add(acBus);
+
+            // DC Busbar (Cyan)
+            const dcBusGeo = new THREE.BoxGeometry(0.3, 0.3, 2);
+            const dcBus = new THREE.Mesh(dcBusGeo, Materials.copper);
+            dcBus.position.set(1.5, 7, 0);
+            group.add(dcBus);
+
+            // Status indicators
+            const indicatorGeo = new THREE.SphereGeometry(0.15, 8, 8);
+            const indicators = [
+                { pos: [-1.5, 2, 1.6], color: 'green' },
+                { pos: [-0.5, 2, 1.6], color: 'green' },
+                { pos: [0.5, 2, 1.6], color: 'yellow' },
+                { pos: [1.5, 2, 1.6], color: 'green' },
+            ];
+            indicators.forEach(ind => {
+                const mat = ind.color === 'green' ? Materials.statusGreen : 
+                           ind.color === 'yellow' ? Materials.statusYellow : Materials.statusRed;
+                const mesh = new THREE.Mesh(indicatorGeo, mat);
+                mesh.position.set(...ind.pos);
+                group.add(mesh);
+            });
+
+            // Cooling fan (top)
+            const fanHousingGeo = new THREE.CylinderGeometry(1, 1, 0.5, 16);
+            const fanHousing = new THREE.Mesh(fanHousingGeo, Materials.metalEnclosure);
+            fanHousing.position.set(0, 8.3, 0);
+            group.add(fanHousing);
+
+            // Status border glow (subtle)
+            const borderGeo = new THREE.BoxGeometry(4.1, 8.1, 3.1);
+            const borderMat = new THREE.MeshBasicMaterial({
+                color: 0x00f0ff,
+                transparent: true,
+                opacity: 0.0,
+                side: THREE.BackSide,
+            });
+            const border = new THREE.Mesh(borderGeo, borderMat);
+            border.position.y = 4;
+            border.userData = { isBorder: true };
+            group.add(border);
+
+            scene.add(group);
+            devices.push(group);
+            raycastTargets.push(body);
+            return group;
+        }
+
+        // 7.3 PV Array
+        function createPVArray(x, z, rows = 3, cols = 4) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+            group.userData = { type: 'pv', name: '光伏阵列 1MW', power: 856 };
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    // Panel
+                    const panelGeo = new THREE.BoxGeometry(2, 0.05, 3.5);
+                    const panel = new THREE.Mesh(panelGeo, Materials.pvPanel);
+                    panel.position.set(c * 2.5, 2 + r * 0.5, r * 4);
+                    panel.rotation.x = -0.2; // Tilt angle
+                    panel.castShadow = true;
+                    group.add(panel);
+
+                    // Frame
+                    const frameGeo = new THREE.BoxGeometry(2.1, 0.08, 3.6);
+                    const frame = new THREE.Mesh(frameGeo, Materials.metalEnclosure);
+                    frame.position.set(c * 2.5, 1.95 + r * 0.5, r * 4);
+                    frame.rotation.x = -0.2;
+                    group.add(frame);
+
+                    // Support legs
+                    const legGeo = new THREE.CylinderGeometry(0.05, 0.05, 2, 8);
+                    const leg1 = new THREE.Mesh(legGeo, Materials.metalEnclosure);
+                    leg1.position.set(c * 2.5 - 0.8, 1, r * 4 - 1.5);
+                    group.add(leg1);
+
+                    const leg2 = new THREE.Mesh(legGeo, Materials.metalEnclosure);
+                    leg2.position.set(c * 2.5 + 0.8, 1, r * 4 - 1.5);
+                    group.add(leg2);
+                }
+            }
+
+            // Combiner Box
+            const combinerGeo = new THREE.BoxGeometry(1.5, 2, 1);
+            const combiner = new THREE.Mesh(combinerGeo, Materials.metalEnclosure);
+            combiner.position.set(cols * 2.5 / 2, 1, -2);
+            group.add(combiner);
+
+            // Inverter
+            const invGeo = new THREE.BoxGeometry(2, 3, 1.5);
+            const inv = new THREE.Mesh(invGeo, Materials.paintedSurface);
+            inv.position.set(cols * 2.5 / 2, 1.5, -4);
+            group.add(inv);
+
+            // Inverter status light
+            const invLedGeo = new THREE.SphereGeometry(0.15, 8, 8);
+            const invLed = new THREE.Mesh(invLedGeo, Materials.statusGreen);
+            invLed.position.set(cols * 2.5 / 2, 3, -3.2);
+            group.add(invLed);
+
+            scene.add(group);
+            devices.push(group);
+            return group;
+        }
+
+        // 7.4 Transformer
+        function createTransformer(x, z, name = "10kV 变压器") {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+            group.userData = { type: 'transformer', name, power: 1250 };
+
+            // Oil tank
+            const tankGeo = new THREE.CylinderGeometry(3, 3, 7, 24);
+            const tank = new THREE.Mesh(tankGeo, Materials.metalEnclosure);
+            tank.position.y = 3.5;
+            tank.castShadow = true;
+            group.add(tank);
+
+            // Cooling fins
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * Math.PI * 2;
+                const finGeo = new THREE.BoxGeometry(0.3, 5, 1.5);
+                const fin = new THREE.Mesh(finGeo, Materials.metalEnclosure);
+                fin.position.set(
+                    Math.cos(angle) * 3.2,
+                    3.5,
+                    Math.sin(angle) * 3.2
+                );
+                fin.rotation.y = -angle;
+                group.add(fin);
+            }
+
+            // Oil temperature gauge
+            const gaugeGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.2, 16);
+            const gauge = new THREE.Mesh(gaugeGeo, Materials.paintedSurface);
+            gauge.position.set(0, 7.2, 3);
+            group.add(gauge);
+
+            // Gauge needle
+            const needleGeo = new THREE.BoxGeometry(0.05, 0.8, 0.05);
+            const needle = new THREE.Mesh(needleGeo, Materials.statusRed);
+            needle.position.set(0, 7.3, 3);
+            needle.rotation.z = 0.3;
+            group.add(needle);
+
+            // Bushings (top)
+            const bushingGeo = new THREE.CylinderGeometry(0.2, 0.3, 2, 8);
+            for (let i = 0; i < 3; i++) {
+                const bushing = new THREE.Mesh(bushingGeo, Materials.copper);
+                bushing.position.set(-1 + i, 8, 0);
+                group.add(bushing);
+            }
+
+            // Hum visualization (sound waves)
+            const humGeo = new THREE.RingGeometry(3.5, 4, 32);
+            const humMat = new THREE.MeshBasicMaterial({
+                color: 0x00f0ff,
+                transparent: true,
+                opacity: 0.1,
+                side: THREE.DoubleSide,
+            });
+            const hum = new THREE.Mesh(humGeo, humMat);
+            hum.position.y = 3.5;
+            hum.rotation.x = Math.PI / 2;
+            hum.userData = { isHum: true };
+            group.add(hum);
+
+            scene.add(group);
+            devices.push(group);
+            raycastTargets.push(tank);
+            return group;
+        }
+
+        // 7.5 Grid / High Voltage Tower
+        function createGridConnection(x, z) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+            group.userData = { type: 'grid', name: '10kV 电网并网点', power: 894 };
+
+            // Tower base
+            const baseGeo = new THREE.BoxGeometry(4, 1, 4);
+            const base = new THREE.Mesh(baseGeo, Materials.concrete);
+            base.position.y = 0.5;
+            group.add(base);
+
+            // Tower structure (simplified lattice)
+            const towerGeo = new THREE.ConeGeometry(2, 15, 4);
+            const tower = new THREE.Mesh(towerGeo, Materials.metalEnclosure);
+            tower.position.y = 8;
+            group.add(tower);
+
+            // Insulators
+            for (let i = 0; i < 3; i++) {
+                const insGeo = new THREE.CylinderGeometry(0.15, 0.2, 1.5, 8);
+                const ins = new THREE.Mesh(insGeo, Materials.paintedSurface);
+                ins.position.set(-1 + i, 15.5, 0);
+                group.add(ins);
+            }
+
+            // Power lines (curved)
+            const curve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(-30, 15, 0),
+                new THREE.Vector3(-15, 12, 2),
+                new THREE.Vector3(0, 15, 0),
+            ]);
+            const lineGeo = new THREE.TubeGeometry(curve, 20, 0.1, 8, false);
+            const line = new THREE.Mesh(lineGeo, Materials.copper);
+            group.add(line);
+
+            scene.add(group);
+            devices.push(group);
+            return group;
+        }
+
+        // 7.6 EMS Controller Cabinet
+        function createEMS(x, z) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+            group.userData = { type: 'ems', name: 'EMS 控制器', mode: 'peak_shaving' };
+
+            const bodyGeo = new THREE.BoxGeometry(3, 6, 2);
+            const body = new THREE.Mesh(bodyGeo, Materials.paintedSurface);
+            body.position.y = 3;
+            body.castShadow = true;
+            group.add(body);
+
+            // Status display
+            const displayGeo = new THREE.PlaneGeometry(2, 1);
+            const displayMat = new THREE.MeshStandardMaterial({
+                color: 0x000000,
+                emissive: 0x00f0ff,
+                emissiveIntensity: 0.6,
+            });
+            const display = new THREE.Mesh(displayGeo, displayMat);
+            display.position.set(0, 5, 1.01);
+            group.add(display);
+
+            // LED indicators
+            const ledColors = [0x00ff88, 0x00f0ff, 0xffd200, 0xff003c];
+            ledColors.forEach((color, i) => {
+                const ledGeo = new THREE.SphereGeometry(0.12, 8, 8);
+                const ledMat = new THREE.MeshStandardMaterial({
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.8,
+                });
+                const led = new THREE.Mesh(ledGeo, ledMat);
+                led.position.set(-1 + i * 0.7, 2, 1.05);
+                group.add(led);
+            });
+
+            scene.add(group);
+            devices.push(group);
+            raycastTargets.push(body);
+            return group;
+        }
+
+        // ============================================
+        // 8. ENERGY FLOW CONNECTIONS
+        // ============================================
+        const flows = [];
+
+        function createFlow(start, end, colorType, power = 0.8) {
+            const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+            mid.y += 3; // Arc height
+
+            const curve = new THREE.CatmullRomCurve3([start, mid, end]);
+            const tubeGeo = new THREE.TubeGeometry(curve, 32, 0.15, 8, false);
+
+            const colors = FlowColors[colorType] || FlowColors.charge;
+            const mat = createEnergyFlowMaterial(colors.color, colors.glow);
+            mat.uniforms.uPower.value = power;
+
+            const tube = new THREE.Mesh(tubeGeo, mat);
+            tube.userData = { isFlow: true, power };
+            scene.add(tube);
+            flows.push(tube);
+            return tube;
+        }
+
+        // ============================================
+        // 9. BUILD THE SCENE
+        // ============================================
+        const bess = createBESS(-25, 0);
+        const pcs = createPCS(0, 0);
+        const pv = createPVArray(25, -20);
+        const transformer = createTransformer(-40, 0);
+        const grid = createGridConnection(-55, 0);
+        const ems = createEMS(0, 15);
+
+        // Energy Flows
+        // Grid → Transformer → PCS
+        createFlow(new THREE.Vector3(-55, 8, 0), new THREE.Vector3(-40, 7, 0), 'charge', 0.9);
+        createFlow(new THREE.Vector3(-40, 7, 0), new THREE.Vector3(-2, 8, 0), 'charge', 0.8);
+
+        // PV → PCS
+        createFlow(new THREE.Vector3(25, 3, -20), new THREE.Vector3(2, 8, 0), 'pv', 0.7);
+
+        // PCS → BESS (Charging)
+        createFlow(new THREE.Vector3(0, 8, 0), new THREE.Vector3(-25, 6, 0), 'charge', 0.6);
+
+        // BESS → PCS (Discharging - will toggle)
+        const dischargeFlow = createFlow(new THREE.Vector3(-25, 6, 0), new THREE.Vector3(0, 6, 0), 'discharge', 0.0);
+
+        // PCS → Transformer → Grid (when discharging/feeding)
+        createFlow(new THREE.Vector3(2, 6, 0), new THREE.Vector3(-40, 5, 0), 'discharge', 0.0);
+
+        // EMS → PCS (Communication)
+        createFlow(new THREE.Vector3(0, 6, 15), new THREE.Vector3(0, 8, 2), 'comm', 0.3);
+
+        // ============================================
+        // 10. POST-PROCESSING (Bloom + SSAO + Tone Mapping)
+        // ============================================
+        const composer = new EffectComposer(renderer);
+
+        // Render Pass
+        const renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+
+        // SSAO (Ambient Occlusion)
+        const ssaoPass = new SSAOPass(scene, camera, window.innerWidth, window.innerHeight);
+        ssaoPass.kernelRadius = 16;
+        ssaoPass.minDistance = 0.005;
+        ssaoPass.maxDistance = 0.1;
+        composer.addPass(ssaoPass);
+
+        // Bloom (Glow Effect)
+        const bloomPass = new UnrealBloomPass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight),
+            1.5,  // strength
+            0.4,  // radius
+            0.85  // threshold
+        );
+        composer.addPass(bloomPass);
+
+        // Output (Tone Mapping)
+        const outputPass = new OutputPass();
+        composer.addPass(outputPass);
+
+        // ============================================
+        // 11. INTERACTION SYSTEM
+        // ============================================
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredDevice = null;
+        let selectedDevice = null;
+
+        // Mouse Move (Hover)
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(raycastTargets);
+
+            if (intersects.length > 0) {
+                const obj = intersects[0].object;
+                const device = obj.parent;
+                if (device !== hoveredDevice) {
+                    // Reset previous
+                    if (hoveredDevice) setRimIntensity(hoveredDevice, 0);
+                    // Set new
+                    hoveredDevice = device;
+                    setRimIntensity(device, 0.5);
+                    document.body.style.cursor = 'pointer';
+                }
+            } else {
+                if (hoveredDevice) {
+                    setRimIntensity(hoveredDevice, 0);
+                    hoveredDevice = null;
+                    document.body.style.cursor = 'default';
+                }
+            }
+        });
+
+        // Click (Select)
+        window.addEventListener('click', (e) => {
+            if (hoveredDevice) {
+                selectDevice(hoveredDevice);
+            } else {
+                hideDevicePanel();
+            }
+        });
+
+        function setRimIntensity(device, intensity) {
+            device.traverse(child => {
+                if (child.userData.isBorder) {
+                    child.material.opacity = intensity * 0.3;
+                }
+            });
+        }
+
+        function selectDevice(device) {
+            selectedDevice = device;
+            const data = device.userData;
+            const panel = document.getElementById('devicePanel');
+
+            // Update panel content
+            document.getElementById('panelTitle').textContent = data.name;
+            document.getElementById('panelStatus').textContent = '● 正常运行';
+            document.getElementById('panelStatus').style.color = '#00ff88';
+
+            // Icon
+            const icons = { bess: '🔋', pcs: '⚡', pv: '☀', transformer: '🔌', grid: '🏭', ems: '🖥' };
+            document.getElementById('panelIcon').textContent = icons[data.type] || '◉';
+
+            // Data rows
+            let dataHtml = '';
+            if (data.type === 'bess') {
+                dataHtml = `
+                    <div class="panel-data-row"><span class="panel-data-label">电压</span><span class="panel-data-value">1331.2 V</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">电流</span><span class="panel-data-value">375.4 A</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">功率</span><span class="panel-data-value">${data.power} kW</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">SOC</span><span class="panel-data-value">${data.soc}%</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">温度</span><span class="panel-data-value">28.5 ℃</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">SOH</span><span class="panel-data-value">98.2%</span></div>
+                `;
+            } else if (data.type === 'pcs') {
+                dataHtml = `
+                    <div class="panel-data-row"><span class="panel-data-label">AC电压</span><span class="panel-data-value">400 V</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">AC电流</span><span class="panel-data-value">1802 A</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">DC电压</span><span class="panel-data-value">1331 V</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">DC电流</span><span class="panel-data-value">375 A</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">功率</span><span class="panel-data-value">${data.power} kW</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">模式</span><span class="panel-data-value">${data.mode}</span></div>
+                `;
+            } else if (data.type === 'pv') {
+                dataHtml = `
+                    <div class="panel-data-row"><span class="panel-data-label">发电功率</span><span class="panel-data-value">${data.power} kW</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">辐照度</span><span class="panel-data-value">980 W/m²</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">MPPT效率</span><span class="panel-data-value">99.2%</span></div>
+                    <div class="panel-data-row"><span class="panel-data-label">今日发电</span><span class="panel-data-value">3,420 kWh</span></div>
+                `;
+            }
+            document.getElementById('panelData').innerHTML = dataHtml;
+
+            panel.classList.add('active');
+
+            // Camera fly to device
+            const targetPos = device.position.clone().add(new THREE.Vector3(15, 12, 15));
+            flyToPosition(targetPos, device.position.clone().add(new THREE.Vector3(0, 5, 0)));
+        }
+
+        function hideDevicePanel() {
+            document.getElementById('devicePanel').classList.remove('active');
+            selectedDevice = null;
+        }
+
+        function flyToPosition(position, target, duration = 1000) {
+            const startPos = camera.position.clone();
+            const startTarget = controls.target.clone();
+            const startTime = performance.now();
+
+            function animate() {
+                const elapsed = performance.now() - startTime;
+                const t = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - t, 3);
+
+                camera.position.lerpVectors(startPos, position, ease);
+                controls.target.lerpVectors(startTarget, target, ease);
+                controls.update();
+
+                if (t < 1) requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // Global functions for panel buttons
+        window.toggleDevice = function() {
+            if (!selectedDevice) return;
+            const data = selectedDevice.userData;
+            data.power = data.power === 0 ? -500 : 0;
+            alert(`${data.name} 功率已切换至 ${data.power} kW`);
+        };
+
+        window.simulateFault = function() {
+            if (!selectedDevice) return;
+            const data = selectedDevice.userData;
+
+            // Visual feedback
+            selectedDevice.traverse(child => {
+                if (child.userData.isBorder) {
+                    child.material.color.setHex(0xff003c);
+                    child.material.opacity = 0.6;
+                }
+            });
+
+            // Status change
+            document.getElementById('panelStatus').textContent = '● 故障告警';
+            document.getElementById('panelStatus').style.color = '#ff003c';
+
+            alert(`已模拟 ${data.name} 故障：BMS过温保护触发`);
+
+            // Reset after 3s
+            setTimeout(() => {
+                selectedDevice.traverse(child => {
+                    if (child.userData.isBorder) {
+                        child.material.color.setHex(0x00f0ff);
+                        child.material.opacity = 0;
+                    }
+                });
+                document.getElementById('panelStatus').textContent = '● 正常运行';
+                document.getElementById('panelStatus').style.color = '#00ff88';
+            }, 3000);
+        };
+
+        // ============================================
+        // 12. ANIMATION LOOP
+        // ============================================
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            const delta = clock.getDelta();
+
+            // Update energy flow shaders
+            flows.forEach(flow => {
+                if (flow.material.uniforms) {
+                    flow.material.uniforms.uTime.value = time;
+                }
+            });
+
+            // Rotate fans
+            devices.forEach(device => {
+                device.traverse(child => {
+                    if (child.userData.isFan) {
+                        child.rotation.y += child.userData.speed;
+                    }
+                    if (child.userData.isHum) {
+                        const scale = 1 + Math.sin(time * 3) * 0.05;
+                        child.scale.set(scale, scale, 1);
+                        child.material.opacity = 0.05 + Math.sin(time * 2) * 0.03;
+                    }
+                    if (child.userData.isNozzle) {
+                        // Subtle pulse for fire nozzles
+                        child.material.emissiveIntensity = 0.2 + Math.sin(time * 4) * 0.1;
+                    }
+                });
+            });
+
+            // Pulse status LEDs
+            scene.traverse(obj => {
+                if (obj.material && obj.material.emissive) {
+                    const baseIntensity = obj.material.userData?.baseEmissive || 1.0;
+                    obj.material.emissiveIntensity = baseIntensity + Math.sin(time * 2) * 0.2;
+                }
+            });
+
+            controls.update();
+            composer.render();
+        }
+
+        // ============================================
+        // 13. RESIZE HANDLER
+        // ============================================
+        window.addEventListener('resize', () => {
+            const aspect = window.innerWidth / window.innerHeight;
+            camera.left = -d * aspect;
+            camera.right = d * aspect;
+            camera.top = d;
+            camera.bottom = -d;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ============================================
+        // 14. INIT
+        // ============================================
+        // Hide loading screen after init
+        setTimeout(() => {
+            document.getElementById('loading').classList.add('hidden');
+        }, 1500);
+
+        animate();
+    </script>
+</body>
+</html>
