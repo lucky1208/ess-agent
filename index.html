@@ -3023,7 +3023,8 @@ ${ESS_DIAGRAM_SKILL_V3}
 
 async function callLLM(messages, useStream, providerOverride) {
   const provider = providerOverride || document.getElementById('llmProvider').value;
-  if (useStream) {
+  const forceNonStream = (provider === 'bailian');
+  if (useStream && !forceNonStream) {
     const resp = await fetch('/api/ess-config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -5826,7 +5827,7 @@ ${ESS_DRAWING_RULES}
 ${ESS_DIAGRAM_SKILL_V3}`;
       const messages=[{role:'system',content:systemMsg},{role:'user',content:userPrompt}];
       const data=await callLLM(messages,true,provider);
-      mgAddLog(`流式响应完成, tokens: ${data.usage?.total_tokens||'?'}`,'ok');
+      mgAddLog(`响应完成, tokens: ${data.usage?.total_tokens||'?'}`,'ok');
       const content=data.choices?.[0]?.message?.content||'';
       const reasoning=data.choices?.[0]?.message?.reasoning_content||'';
       if(reasoning){
