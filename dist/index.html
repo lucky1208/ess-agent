@@ -6075,26 +6075,27 @@ function mgRenderAllDrawings(R,provider){
     d.style.cssText=`font-size:12px;padding:2px 0;color:${type==='step'?'#80b0e0':type==='ok'?'#50c878':type==='warn'?'#e8a838':'#C2C0B6'};word-break:break-all;`;
     d.textContent=msg;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;
   };
+  const isValidSvg=(s)=>s&&s.length>500&&s.includes('<svg')&&!s.includes('...');
   mgById('mgDrawingEmpty').style.display='none';
   mgById('mgDrawingContent').style.display='block';
   const isLLM=provider&&provider!=='local';
-  if(isLLM&&R.archDiagram){
+  if(isLLM&&isValidSvg(R.archDiagram)){
     dlog('['+provider.toUpperCase()+'] LLM已配套生成图纸+BOM+经济性','step');
     mgById('mgArchSvg').innerHTML=R.archDiagram;dlog('架构图 ✓','ok');
   }else{
-    dlog(isLLM?'LLM未返回架构图，fallback本地模板':'[本地SVG模板] 渲染图纸...','step');
+    dlog(isLLM?'LLM返回架构图无效(占位符/过短)，fallback本地模板':'[本地SVG模板] 渲染图纸...','step');
     mgDrawArchSvg(R);
   }
-  if(isLLM&&R.wiringDiagram){
+  if(isLLM&&isValidSvg(R.wiringDiagram)){
     mgById('mgWiringSvg').innerHTML=R.wiringDiagram;dlog('接线图 ✓','ok');
   }else{
-    if(isLLM)dlog('LLM未返回接线图，fallback本地','warn');
+    if(isLLM)dlog('LLM返回接线图无效，fallback本地','warn');
     mgDrawWiringSvg(R);
   }
-  if(isLLM&&R.commDiagram){
+  if(isLLM&&isValidSvg(R.commDiagram)){
     mgById('mgCommSvg').innerHTML=R.commDiagram;dlog('通信拓扑图 ✓','ok');
   }else{
-    if(isLLM)dlog('LLM未返回通信图，fallback本地','warn');
+    if(isLLM)dlog('LLM返回通信图无效，fallback本地','warn');
     mgDrawCommSvg(R);
   }
   if(isLLM&&R.bom&&Array.isArray(R.bom)){
