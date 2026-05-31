@@ -311,27 +311,27 @@
         <div class="bottom-dashboard">
             <div class="metric-card">
                 <div class="metric-label">总负荷</div>
-                <div><span class="metric-value" id="metricLoad">1,250</span><span class="metric-unit">kW</span></div>
-                <div class="metric-sub">▲ 12% vs 昨日</div>
+                <div><span class="metric-value" id="metricLoad">0</span><span class="metric-unit">kW</span></div>
+                <div class="metric-sub" id="metricLoadSub">待接入</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">光伏出力</div>
-                <div><span class="metric-value" id="metricPV">856</span><span class="metric-unit">kW</span></div>
-                <div class="metric-sub">辐照度 980 W/m²</div>
+                <div><span class="metric-value" id="metricPV">0</span><span class="metric-unit">kW</span></div>
+                <div class="metric-sub" id="metricPVSub">辐照度 0 W/m²</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">储能功率</div>
-                <div><span class="metric-value" id="metricBESS">-500</span><span class="metric-unit">kW</span></div>
-                <div class="metric-sub">放电中 | SOC 65%</div>
+                <div><span class="metric-value" id="metricBESS">0</span><span class="metric-unit">kW</span></div>
+                <div class="metric-sub" id="metricBESSSub">待机 | SOC 65%</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">PCC并网</div>
-                <div><span class="metric-value" id="metricPCC">894</span><span class="metric-unit">kW</span></div>
-                <div class="metric-sub">电压 10.02 kV</div>
+                <div><span class="metric-value" id="metricPCC">0</span><span class="metric-unit">kW</span></div>
+                <div class="metric-sub" id="metricPCCSub">电压 10.02 kV</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">今日收益</div>
-                <div><span class="metric-value" id="metricRevenue">¥2,856</span></div>
+                <div><span class="metric-value" id="metricRevenue">¥0</span></div>
                 <div class="metric-sub">削峰填谷 + 需量控制</div>
             </div>
         </div>
@@ -1421,19 +1421,23 @@
             if (msg.type === 'ess-update' && msg.data) {
                 const d = msg.data;
                 if (d.soc !== undefined) {
-                    const socEl = document.querySelector('.metric-sub');
-                    if (socEl) {
-                        const mode = d.pcsPower >= 0 ? '充电中' : '放电中';
-                        socEl.textContent = mode + ' | SOC ' + Math.round(d.soc) + '%';
+                    const subEl = document.getElementById('metricBESSSub');
+                    if (subEl) {
+                        const mode = d.pcsPower > 0 ? '充电中' : d.pcsPower < 0 ? '放电中' : '待机';
+                        subEl.textContent = mode + ' | SOC ' + Math.round(d.soc) + '%';
                     }
                 }
                 if (d.loadPower !== undefined) {
                     const el = document.getElementById('metricLoad');
                     if (el) el.textContent = Math.abs(Math.round(d.loadPower)).toLocaleString();
+                    const sub = document.getElementById('metricLoadSub');
+                    if (sub && d.loadPower > 0) sub.textContent = '▲ 运行中';
                 }
                 if (d.pvPower !== undefined) {
                     const el = document.getElementById('metricPV');
                     if (el) el.textContent = Math.round(d.pvPower).toLocaleString();
+                    const sub = document.getElementById('metricPVSub');
+                    if (sub && d.pvPower > 0) sub.textContent = '辐照度 ' + Math.round(d.pvPower / 500 * 1000) + ' W/m²';
                 }
                 if (d.pcsPower !== undefined) {
                     const el = document.getElementById('metricBESS');

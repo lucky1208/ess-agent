@@ -632,7 +632,8 @@ ACC AC一体柜专题
 <style>
 .twin-outer{position:relative;width:100%;height:calc(100vh - 80px);min-height:500px;background:#0a0f1d;overflow:hidden}
 .twin-iframe{width:100%;height:100%;border:none;display:block}
-.twin-nodata{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0a0f1d}
+.twin-nodata{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(10,15,29,0.55);pointer-events:none}
+.twin-nodata button{pointer-events:auto}
 </style>
 <div class="twin-outer" id="twinOuter">
 <iframe class="twin-iframe" id="twinIframe" src="ess_agent_3d_twin_viewer.html" style="display:none"></iframe>
@@ -6909,23 +6910,23 @@ function mgTwinInit(){
   const iframe=document.getElementById('twinIframe');
   const nd=document.getElementById('twinNoData');
   if(!iframe||!nd)return;
-  if(!LAST_MG_RESULT){
-    iframe.style.display='none';
-    nd.style.display='flex';
-    return;
-  }
-  nd.style.display='none';
   iframe.style.display='block';
-  if(!mgTwin3D){
-    mgTwin3D=true;
-    try{
-      const win=iframe.contentWindow;
-      if(win&&win.postMessage){
-        const E=mgEnergyState;
-        const S=LAST_MG_RESULT?.sizing||{};
-        win.postMessage({type:'ess-update',data:{soc:E.soc,pcsPower:E.pcsPower,pvPower:E.pvPower,gridPower:E.gridPower,loadPower:E.loadPower,evPower:E.evPower,sizing:S}},'*');
-      }
-    }catch(e){}
+  if(!LAST_MG_RESULT){
+    nd.style.display='flex';
+    nd.style.background='rgba(10,15,29,0.55)';
+  }else{
+    nd.style.display='none';
+    if(!mgTwin3D){
+      mgTwin3D=true;
+      try{
+        const win=iframe.contentWindow;
+        if(win&&win.postMessage){
+          const E=mgEnergyState;
+          const S=LAST_MG_RESULT?.sizing||{};
+          win.postMessage({type:'ess-update',data:{soc:E.soc,pcsPower:E.pcsPower,pvPower:E.pvPower,gridPower:E.gridPower,loadPower:E.loadPower,evPower:E.evPower,sizing:S}},'*');
+        }
+      }catch(e){}
+    }
   }
 }
 
