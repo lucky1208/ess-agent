@@ -649,32 +649,35 @@ ACC AC一体柜专题
 .twin-flow-line{stroke-dasharray:8 4;animation:twinFlowDash 1s linear infinite}
 @keyframes twinFlowDash{to{stroke-dashoffset:-12}}
 .twin-big-num{font-size:28px;font-weight:bold;line-height:1.1;text-shadow:0 0 20px currentColor}
-.twin-header{position:relative;z-index:10;padding:20px 24px 0}
+.twin-header{position:relative;z-index:10;padding:16px 24px 0}
 .twin-body{position:relative;z-index:10;padding:0 24px 24px}
+.twin-footer{position:relative;z-index:10;padding:8px 24px 12px;text-align:center}
 </style>
 <div class="twin-scene" id="twinScene">
 <div class="twin-grid"></div>
 <div class="twin-particles" id="twinParticles"></div>
 <div class="twin-fog"></div>
 <div class="twin-header">
-<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
 <div style="font-size:18px;font-weight:bold;color:#e0e0ff">数字孪生 &amp; 虚拟现实</div>
 <span class="twin-live"></span><span style="font-size:11px;color:#50c878">LIVE</span>
-<div style="font-size:11px;color:rgba(255,255,255,.3);margin-left:auto">基于 minimax_net_digital_twin_vr.md | Three.js / A-Frame WebXR</div>
-</div>
-<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-<button class="btn btn-primary" onclick="mgTwinView('overview')" style="font-size:11px;padding:5px 12px;background:linear-gradient(135deg,#185FA5,#0F6E56);border:none">全景总览</button>
-<button class="btn" onclick="mgTwinView('pcs')" style="font-size:11px;padding:5px 12px;background:rgba(80,200,120,.1);color:#50c878;border:1px solid rgba(80,200,120,.3)">PCS舱体</button>
-<button class="btn" onclick="mgTwinView('batt')" style="font-size:11px;padding:5px 12px;background:rgba(74,144,217,.1);color:#4a90d9;border:1px solid rgba(74,144,217,.3)">电池舱体</button>
-<button class="btn" onclick="mgTwinView('trans')" style="font-size:11px;padding:5px 12px;background:rgba(232,168,56,.1);color:#e8a838;border:1px solid rgba(232,168,56,.3)">变压器</button>
-<button class="btn" onclick="mgTwinView('pv')" style="font-size:11px;padding:5px 12px;background:rgba(232,168,56,.1);color:#e8a838;border:1px solid rgba(232,168,56,.3)">光伏阵列</button>
-<button class="btn" onclick="mgTwinView('ev')" style="font-size:11px;padding:5px 12px;background:rgba(160,112,208,.1);color:#a070d0;border:1px solid rgba(160,112,208,.3)">充电桩</button>
-<button class="btn" onclick="mgTwinView('ems')" style="font-size:11px;padding:5px 12px;background:rgba(128,176,224,.1);color:#80b0e0;border:1px solid rgba(128,176,224,.3)">EMS控制柜</button>
-<button class="btn" onclick="mgTwinStartFlow()" style="font-size:11px;padding:5px 12px;background:rgba(74,144,217,.15);color:#4a90d9;border:1px solid rgba(74,144,217,.3)">启动能量流动</button>
-<button class="btn" onclick="mgTwinStopFlow()" style="font-size:11px;padding:5px 12px;background:rgba(255,255,255,.05);color:#888;border:1px solid rgba(255,255,255,.1)">停止</button>
+<span style="margin:0 4px;color:rgba(255,255,255,.15)">|</span>
+<button class="btn btn-primary" onclick="mgTwinView('overview')" style="font-size:10px;padding:2px 8px;background:linear-gradient(135deg,#185FA5,#0F6E56);border:none">全景</button>
+<button class="btn" onclick="mgTwinView('pcs')" style="font-size:10px;padding:2px 8px;background:rgba(80,200,120,.1);color:#50c878;border:1px solid rgba(80,200,120,.3)">PCS</button>
+<button class="btn" onclick="mgTwinView('batt')" style="font-size:10px;padding:2px 8px;background:rgba(74,144,217,.1);color:#4a90d9;border:1px solid rgba(74,144,217,.3)">电池</button>
+<button class="btn" onclick="mgTwinView('trans')" style="font-size:10px;padding:2px 8px;background:rgba(232,168,56,.1);color:#e8a838;border:1px solid rgba(232,168,56,.3)">变压</button>
+<button class="btn" onclick="mgTwinView('pv')" style="font-size:10px;padding:2px 8px;background:rgba(232,168,56,.1);color:#e8a838;border:1px solid rgba(232,168,56,.3)">光伏</button>
+<button class="btn" onclick="mgTwinView('ev')" style="font-size:10px;padding:2px 8px;background:rgba(160,112,208,.1);color:#a070d0;border:1px solid rgba(160,112,208,.3)">充电桩</button>
+<button class="btn" onclick="mgTwinView('ems')" style="font-size:10px;padding:2px 8px;background:rgba(128,176,224,.1);color:#80b0e0;border:1px solid rgba(128,176,224,.3)">EMS</button>
+<span style="margin:0 4px;color:rgba(255,255,255,.15)">|</span>
+<button class="btn" onclick="mgTwinStartFlow()" style="font-size:10px;padding:2px 8px;background:rgba(74,144,217,.15);color:#4a90d9;border:1px solid rgba(74,144,217,.3)">▶ 流动</button>
+<button class="btn" onclick="mgTwinStopFlow()" style="font-size:10px;padding:2px 8px;background:rgba(255,255,255,.05);color:#888;border:1px solid rgba(255,255,255,.1)">■ 停止</button>
 </div>
 </div>
 <div class="twin-body" id="mgTwinContent"></div>
+<div class="twin-footer">
+<div style="font-size:10px;color:rgba(255,255,255,.2)">基于 minimax_net_digital_twin_vr.md | Three.js / A-Frame WebXR | 设计人: 卢继雄 | 规范: GB/T 42288</div>
+</div>
 </div>
 </div>
 

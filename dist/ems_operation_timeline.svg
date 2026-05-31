@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" font-family="system-ui,-apple-system,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/></linearGradient>
+    <marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#555"/></marker>
+    <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/></filter>
+  </defs>
+  <rect width="960" height="420" fill="url(#bg)" rx="8"/>
+  <text x="480" y="28" text-anchor="middle" fill="#e0e0ff" font-size="15" font-weight="bold">能源管理操作时序 — 协议调试完成 → 项目移交</text>
+  <!-- 时间轴 -->
+  <line x1="40" y1="60" x2="920" y2="60" stroke="#333" stroke-width="2"/>
+  <!-- 阶段节点 -->
+  <g>
+    <circle cx="80" cy="60" r="8" fill="#e06070"/><text x="80" y="82" text-anchor="middle" fill="#e06070" font-size="9" font-weight="bold">协议调试</text>
+    <line x1="88" y1="60" x2="168" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+    <circle cx="180" cy="60" r="8" fill="#e06070"/><text x="180" y="82" text-anchor="middle" fill="#e06070" font-size="9" font-weight="bold">系统启动</text>
+    <line x1="188" y1="60" x2="268" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+    <circle cx="280" cy="60" r="8" fill="#e06070"/><text x="280" y="82" text-anchor="middle" fill="#e06070" font-size="9" font-weight="bold">单元测试</text>
+    <line x1="288" y1="60" x2="368" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+    <circle cx="380" cy="60" r="8" fill="#e8a838"/><text x="380" y="82" text-anchor="middle" fill="#e8a838" font-size="9" font-weight="bold">策略配置</text>
+    <line x1="388" y1="60" x2="468" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+    <circle cx="480" cy="60" r="8" fill="#e8a838"/><text x="480" y="82" text-anchor="middle" fill="#e8a838" font-size="9" font-weight="bold">并离网验证</text>
+    <line x1="488" y1="60" x2="568" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+    <circle cx="580" cy="60" r="8" fill="#e8a838"/><text x="580" y="82" text-anchor="middle" fill="#e8a838" font-size="9" font-weight="bold">黑启动演练</text>
+    <line x1="588" y1="60" x2="668" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+    <circle cx="680" cy="60" r="8" fill="#50c878"/><text x="680" y="82" text-anchor="middle" fill="#50c878" font-size="9" font-weight="bold">运营试运行</text>
+    <line x1="688" y1="60" x2="768" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+    <circle cx="780" cy="60" r="8" fill="#50c878"/><text x="780" y="82" text-anchor="middle" fill="#50c878" font-size="9" font-weight="bold">FAT/SAT</text>
+    <line x1="788" y1="60" x2="868" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+    <circle cx="880" cy="60" r="8" fill="#4a90d9"/><text x="880" y="82" text-anchor="middle" fill="#4a90d9" font-size="9" font-weight="bold">项目移交</text>
+  </g>
+  <!-- 详细步骤 -->
+  <!-- 协议调试 -->
+  <g filter="url(#sh)">
+    <rect x="30" y="100" width="110" height="130" rx="4" fill="#1a1a2a" stroke="#e06070" stroke-width="1"/>
+    <text x="85" y="116" text-anchor="middle" fill="#e06070" font-size="9" font-weight="bold">协议调试</text>
+    <text x="40" y="132" fill="#888" font-size="8">1.PCS点表对点</text>
+    <text x="40" y="144" fill="#888" font-size="8">2.BMS CAN验证</text>
+    <text x="40" y="156" fill="#888" font-size="8">3.关口表读数</text>
+    <text x="40" y="168" fill="#888" font-size="8">4.光伏Modbus</text>
+    <text x="40" y="180" fill="#888" font-size="8">5.OCPP充电桩</text>
+    <text x="40" y="192" fill="#888" font-size="8">6.IEC104调度</text>
+    <text x="40" y="204" fill="#888" font-size="8">7.MQTT云平台</text>
+    <text x="40" y="220" fill="#e06070" font-size="8" font-weight="bold">前置: 全部通信OK</text>
+  </g>
+  <!-- 系统启动+单元测试 -->
+  <g filter="url(#sh)">
+    <rect x="155" y="100" width="130" height="130" rx="4" fill="#1a1a2a" stroke="#e06070" stroke-width="1"/>
+    <text x="220" y="116" text-anchor="middle" fill="#e06070" font-size="9" font-weight="bold">系统启动+单元测试</text>
+    <text x="165" y="132" fill="#888" font-size="8">1.QF01合闸(确认弹窗)</text>
+    <text x="165" y="144" fill="#888" font-size="8">2.PCS逐台启动</text>
+    <text x="165" y="156" fill="#888" font-size="8">3.手动充/放电指令</text>
+    <text x="165" y="168" fill="#888" font-size="8">4.BMS SOC/绝缘/温度</text>
+    <text x="165" y="180" fill="#888" font-size="8">5.关口表读数校验</text>
+    <text x="165" y="192" fill="#888" font-size="8">6.光伏远程启停</text>
+    <text x="165" y="204" fill="#888" font-size="8">7.ATS手/自动切换</text>
+    <text x="165" y="220" fill="#e06070" font-size="8" font-weight="bold">AI: 实测vs设计→判定</text>
+  </g>
+  <!-- 策略配置 -->
+  <g filter="url(#sh)">
+    <rect x="300" y="100" width="130" height="130" rx="4" fill="#1a1a2a" stroke="#e8a838" stroke-width="1"/>
+    <text x="365" y="116" text-anchor="middle" fill="#e8a838" font-size="9" font-weight="bold">策略配置+下发</text>
+    <text x="310" y="132" fill="#888" font-size="8">1.自然语言→YAML</text>
+    <text x="310" y="144" fill="#888" font-size="8">2.参数化界面配置</text>
+    <text x="310" y="156" fill="#888" font-size="8">3.日前MILP 96点</text>
+    <text x="310" y="168" fill="#888" font-size="8">4.防逆流三重保障</text>
+    <text x="310" y="180" fill="#888" font-size="8">5.需量控制预案</text>
+    <text x="310" y="192" fill="#888" font-size="8">6.SOC边界设定</text>
+    <text x="310" y="204" fill="#888" font-size="8">7.可视化确认→下发</text>
+    <text x="310" y="220" fill="#e8a838" font-size="8" font-weight="bold">AI: NL→YAML解析</text>
+  </g>
+  <!-- 并离网+黑启动 -->
+  <g filter="url(#sh)">
+    <rect x="445" y="100" width="130" height="130" rx="4" fill="#1a1a2a" stroke="#e8a838" stroke-width="1"/>
+    <text x="510" y="116" text-anchor="middle" fill="#e8a838" font-size="9" font-weight="bold">并离网+黑启动</text>
+    <text x="455" y="132" fill="#888" font-size="8">1.并→离切换<20ms</text>
+    <text x="455" y="144" fill="#888" font-size="8">2.离→并同期检查</text>
+    <text x="455" y="156" fill="#888" font-size="8">3.ΔV<5% Δf<0.2Hz Δφ<5°</text>
+    <text x="455" y="168" fill="#888" font-size="8">4.黑启动:断电确认</text>
+    <text x="455" y="180" fill="#888" font-size="8">5.→V/f建压380V/50Hz</text>
+    <text x="455" y="192" fill="#888" font-size="8">6.→接关键负荷</text>
+    <text x="455" y="204" fill="#888" font-size="8">7.→逐步接非关键负荷</text>
+    <text x="455" y="220" fill="#e8a838" font-size="8" font-weight="bold">AI: 条件判断→允许</text>
+  </g>
+  <!-- 运营试运行 -->
+  <g filter="url(#sh)">
+    <rect x="590" y="100" width="130" height="130" rx="4" fill="#1a1a2a" stroke="#50c878" stroke-width="1"/>
+    <text x="655" y="116" text-anchor="middle" fill="#50c878" font-size="9" font-weight="bold">运营试运行</text>
+    <text x="600" y="132" fill="#888" font-size="8">1.24h连续运行</text>
+    <text x="600" y="144" fill="#888" font-size="8">2.收益看板监控</text>
+    <text x="600" y="156" fill="#888" font-size="8">3.SOH健康跟踪</text>
+    <text x="600" y="168" fill="#888" font-size="8">4.告警分级处理</text>
+    <text x="600" y="180" fill="#888" font-size="8">5.AI故障诊断</text>
+    <text x="600" y="192" fill="#888" font-size="8">6.多PCS并机均衡</text>
+    <text x="600" y="204" fill="#888" font-size="8">7.需量预案验证</text>
+    <text x="600" y="220" fill="#50c878" font-size="8" font-weight="bold">AI: SOH预测+诊断</text>
+  </g>
+  <!-- FAT/SAT+移交 -->
+  <g filter="url(#sh)">
+    <rect x="735" y="100" width="190" height="130" rx="4" fill="#1a1a2a" stroke="#4a90d9" stroke-width="1"/>
+    <text x="830" y="116" text-anchor="middle" fill="#4a90d9" font-size="9" font-weight="bold">FAT/SAT+项目移交</text>
+    <text x="745" y="132" fill="#888" font-size="8">1.单元测试记录汇编</text>
+    <text x="745" y="144" fill="#888" font-size="8">2.保护验证记录汇编</text>
+    <text x="745" y="156" fill="#888" font-size="8">3.并离网测试记录</text>
+    <text x="745" y="168" fill="#888" font-size="8">4.FAT报告一键生成(Word)</text>
+    <text x="745" y="180" fill="#888" font-size="8">5.客户签字栏</text>
+    <text x="745" y="192" fill="#888" font-size="8">6.SAT试运行7天</text>
+    <text x="745" y="204" fill="#888" font-size="8">7.远程诊断包配置</text>
+    <text x="745" y="220" fill="#4a90d9" font-size="8" font-weight="bold">AI: 自动汇编+导出</text>
+  </g>
+  <!-- 底部: 关键约束 -->
+  <rect x="30" y="248" width="900" height="80" rx="6" fill="#111520" stroke="#333" stroke-width="1"/>
+  <text x="480" y="268" text-anchor="middle" fill="#80b0e0" font-size="11" font-weight="bold">关键约束 &amp; 安全保障</text>
+  <text x="60" y="286" fill="#e06070" font-size="9" font-weight="bold">安全停机:</text>
+  <text x="130" y="286" fill="#888" font-size="9">ESD序列: PCS停→QF01分→冷却延时30s, 任何阶段可触发</text>
+  <text x="60" y="302" fill="#e8a838" font-size="9" font-weight="bold">防误操作:</text>
+  <text x="130" y="302" fill="#888" font-size="9">断路器合/分二次确认弹窗 | 并离网切换确认 | 功率指令限幅校验</text>
+  <text x="60" y="318" fill="#50c878" font-size="9" font-weight="bold">操作留痕:</text>
+  <text x="130" y="318" fill="#888" font-size="9">所有控制操作记录操作人+时间+内容 | 角色权限: 管理员/操作员/只读</text>
+  <!-- 底部标注 -->
+  <text x="480" y="408" text-anchor="middle" fill="#555" font-size="9">设计人: 卢继雄 | 规范: GB/T 42288 GB/T 36558 | Open ESS Agent V8.0</text>
+</svg>
