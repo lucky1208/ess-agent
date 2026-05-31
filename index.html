@@ -659,6 +659,23 @@ ACC AC一体柜专题
 </div>
 </div>
 
+<!-- Agent 3.5: 能源管理 -->
+<div id="page-mg-energy" class="micro-content" style="display:none;padding:24px 32px">
+<div class="sec-title">能源管理 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">实时监控→设备控制→策略管理→功率调度→模式切换→告警处理→数据分析→系统配置，交付闭环核心环节</div>
+<div class="sw-tabs" id="energyTabs" style="margin-bottom:16px">
+<div class="sw-tab active" onclick="mgShowEnergy('monitor')">实时监控</div>
+<div class="sw-tab" onclick="mgShowEnergy('control')">设备控制</div>
+<div class="sw-tab" onclick="mgShowEnergy('strategy')">策略管理</div>
+<div class="sw-tab" onclick="mgShowEnergy('dispatch')">功率调度</div>
+<div class="sw-tab" onclick="mgShowEnergy('mode')">模式切换</div>
+<div class="sw-tab" onclick="mgShowEnergy('alarm')">告警处理</div>
+<div class="sw-tab" onclick="mgShowEnergy('analysis')">数据分析</div>
+<div class="sw-tab" onclick="mgShowEnergy('config')">系统配置</div>
+</div>
+<div id="mgEnergyContent"></div>
+</div>
+
 <!-- Agent 4: 一键部署 -->
 <div id="page-mg-deploy" class="micro-content" style="display:none;padding:24px 32px">
 <div class="sec-title">EMS 一键部署 Agent</div>
@@ -6301,6 +6318,352 @@ function mgRenderAllDrawings(R,provider){
   }
   dlog('全部图纸+BOM+经济性渲染完成 ✓','ok');
 }
+
+/* ========== 能源管理Agent ========== */
+const MG_ENERGY_DEVICES=[
+  {id:'pcs1',name:'PCS-1',type:'PCS',status:'online',power:0,soc:0,temp:35,protocol:'ModbusTCP:502'},
+  {id:'bms1',name:'BMS-1',type:'BMS',status:'online',voltage:0,current:0,soc:0,tempMax:32,protocol:'CAN2.0B'},
+  {id:'meter1',name:'关口表',type:'METER',status:'online',pForward:0,pReverse:0,pf:0.98,protocol:'ModbusRTU:9600'},
+  {id:'pv1',name:'光伏逆变器',type:'PV',status:'online',power:0,energy:0,protocol:'ModbusTCP:502'},
+  {id:'ev1',name:'充电桩-1',type:'EV',status:'standby',power:0,soc:0,protocol:'OCPP1.6J'},
+  {id:'ems1',name:'EMS主控',type:'EMS',status:'running',cpu:32,mem:58,protocol:'HTTP:8080'}
+];
+let mgEnergyState={
+  gridMode:'grid_tied',runningMode:'PQ',activeStrategy:'peak_shaving',
+  soc:65,pcsPower:0,pvPower:0,loadPower:0,evPower:0,gridPower:0,
+  alarms:[],simInterval:null,simTime:0
+};
+
+function mgShowEnergy(tab){
+  document.querySelectorAll('#energyTabs .sw-tab').forEach(t=>t.classList.remove('active'));
+  const tabs=['monitor','control','strategy','dispatch','mode','alarm','analysis','config'];
+  const idx=tabs.indexOf(tab);
+  if(idx>=0) document.querySelectorAll('#energyTabs .sw-tab')[idx].classList.add('active');
+  const el=document.getElementById('mgEnergyContent');
+  if(!el)return;
+  const R=LAST_MG_RESULT;
+  const S=R?.sizing||{peakLoad:800,pv:500,bessKwh:1400,bessMW:1.4,evKw:360};
+  const T=R?.topology||{voltage:'10kV',name:'光储充一体化'};
+  const E=mgEnergyState;
+  switch(tab){
+    case 'monitor': el.innerHTML=mgEnergyMonitor(S,T,E); break;
+    case 'control': el.innerHTML=mgEnergyControl(S,T,E); break;
+    case 'strategy': el.innerHTML=mgEnergyStrategy(S,T,E); break;
+    case 'dispatch': el.innerHTML=mgEnergyDispatch(S,T,E); break;
+    case 'mode': el.innerHTML=mgEnergyMode(S,T,E); break;
+    case 'alarm': el.innerHTML=mgEnergyAlarm(S,T,E); break;
+    case 'analysis': el.innerHTML=mgEnergyAnalysis(S,T,E); break;
+    case 'config': el.innerHTML=mgEnergyConfig(S,T,E); break;
+  }
+}
+
+function mgEnergyMonitor(S,T,E){
+  const now=new Date().toLocaleTimeString();
+  return `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">电网功率</div><div style="font-size:22px;color:#4a90d9;font-weight:bold">${E.gridPower>0?'+':''}${E.gridPower.toFixed(1)}kW</div><div style="font-size:10px;color:var(--text2)">${E.gridMode==='grid_tied'?'并网PQ':'离网V/f'}</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">PCS功率</div><div style="font-size:22px;color:${E.pcsPower>0?'#50c878':'#e06070'};font-weight:bold">${E.pcsPower>0?'+':''}${E.pcsPower.toFixed(1)}kW</div><div style="font-size:10px;color:var(--text2)">${E.pcsPower>0?'放电':'充电'}</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">光伏出力</div><div style="font-size:22px;color:#e8a838;font-weight:bold">${E.pvPower.toFixed(1)}kW</div><div style="font-size:10px;color:var(--text2)">${S.pv}kWp装机</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">负荷功率</div><div style="font-size:22px;color:#a070d0;font-weight:bold">${E.loadPower.toFixed(1)}kW</div><div style="font-size:10px;color:var(--text2)">峰值${S.peakLoad}kW</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">电池SOC</div><div style="font-size:22px;color:${E.soc<20?'#e06070':E.soc<50?'#e8a838':'#50c878'};font-weight:bold">${E.soc.toFixed(1)}%</div><div style="font-size:10px;color:var(--text2)">${(S.bessKwh/1000).toFixed(1)}MWh</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">充电桩</div><div style="font-size:22px;color:#EF9F27;font-weight:bold">${E.evPower.toFixed(1)}kW</div><div style="font-size:10px;color:var(--text2)">${S.evKw}kW额定</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">运行模式</div><div style="font-size:16px;color:#80b0e0;font-weight:bold">${E.runningMode}</div><div style="font-size:10px;color:var(--text2)">${E.activeStrategy==='peak_shaving'?'削峰填谷':'防逆流'}</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">更新时间</div><div style="font-size:16px;color:var(--text2)">${now}</div><div style="font-size:10px;color:var(--text2)">仿真运行中</div></div>
+  </div>
+  <div style="display:flex;gap:12px;margin-bottom:16px">
+    <button class="btn btn-primary" onclick="mgEnergySimStart()" style="padding:6px 16px;font-size:12px">启动仿真</button>
+    <button class="btn" onclick="mgEnergySimStop()" style="padding:6px 16px;font-size:12px">停止仿真</button>
+    <button class="btn" onclick="mgEnergySimReset()" style="padding:6px 16px;font-size:12px">重置</button>
+    <span style="font-size:11px;color:var(--text2);line-height:32px">仿真模拟24h负荷/光伏/充放电曲线，验证策略有效性</span>
+  </div>
+  <div class="result-panel" style="padding:12px">
+    <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">功率平衡: 电网 + PCS + 光伏 = 负荷 + 充电桩</div>
+    <div style="font-size:11px;color:var(--text2)">${E.gridPower.toFixed(1)} + ${E.pcsPower.toFixed(1)} + ${E.pvPower.toFixed(1)} = ${E.loadPower.toFixed(1)} + ${E.evPower.toFixed(1)} kW | 偏差: ${(E.gridPower+E.pcsPower+E.pvPower-E.loadPower-E.evPower).toFixed(2)} kW</div>
+  </div>`;
+}
+
+function mgEnergyControl(S,T,E){
+  const devBtn=(dev)=>`<div style="display:inline-block;margin:4px;padding:8px 12px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:11px;background:${dev.status==='online'||dev.status==='running'?'#1a2a1a':'#2a1a1a'};color:${dev.status==='online'||dev.status==='running'?'#50c878':'#e06070'}" onclick="mgDevControl('${dev.id}')">${dev.name}<br><span style="font-size:9px;color:var(--text2)">${dev.type} | ${dev.protocol}</span></div>`;
+  return `<div style="font-size:12px;color:var(--text2);margin-bottom:12px">点击设备卡片执行启停控制，绿色=在线/运行，红色=离线/停止</div>
+  <div style="margin-bottom:16px">${MG_ENERGY_DEVICES.map(devBtn).join('')}</div>
+  <div class="result-panel" style="padding:12px;margin-bottom:12px">
+    <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">单元功能测试</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <button class="btn" onclick="mgUnitTest('pcs_charge')" style="font-size:11px;padding:6px">PCS充电测试</button>
+      <button class="btn" onclick="mgUnitTest('pcs_discharge')" style="font-size:11px;padding:6px">PCS放电测试</button>
+      <button class="btn" onclick="mgUnitTest('pcs_standby')" style="font-size:11px;padding:6px">PCS待机</button>
+      <button class="btn" onclick="mgUnitTest('bms_soc')" style="font-size:11px;padding:6px">BMS SOC校验</button>
+      <button class="btn" onclick="mgUnitTest('bms_insulation')" style="font-size:11px;padding:6px">BMS绝缘检测</button>
+      <button class="btn" onclick="mgUnitTest('bms_temp')" style="font-size:11px;padding:6px">BMS温度巡检</button>
+      <button class="btn" onclick="mgUnitTest('meter_read')" style="font-size:11px;padding:6px">关口表读数</button>
+      <button class="btn" onclick="mgUnitTest('pv_start')" style="font-size:11px;padding:6px">光伏启动</button>
+      <button class="btn" onclick="mgUnitTest('ev_charge')" style="font-size:11px;padding:6px">充电桩充电</button>
+    </div>
+  </div>
+  <div id="mgControlLog" style="font-size:11px;color:var(--text2);max-height:200px;overflow-y:auto;background:#0d1117;padding:8px;border-radius:4px"></div>`;
+}
+
+function mgEnergyStrategy(S,T,E){
+  const strategies=[
+    {id:'peak_shaving',name:'削峰填谷',desc:'谷充峰放，降低电费',priority:'P2',icon:'📉'},
+    {id:'anti_reverse',name:'防逆流',desc:'三重保障防止功率倒送',priority:'P0',icon:'🛡️'},
+    {id:'demand_ctrl',name:'需量控制',desc:'降低月最大需量节省基本电费',priority:'P2',icon:'📊'},
+    {id:'pv_self',name:'光伏消纳',desc:'最大化光伏自消纳比例',priority:'P2',icon:'☀️'},
+    {id:'emergency',name:'应急备电',desc:'离网保障关键负荷供电',priority:'P0',icon:'🔋'},
+    {id:'ev_limit',name:'充电桩限功率',desc:'负荷超限时降低充电功率',priority:'P2',icon:'⚡'}
+  ];
+  return `<div style="font-size:12px;color:var(--text2);margin-bottom:12px">策略层级: P0(安全保护) > P1(系统约束) > P2(运行模式,互斥) > P3(叠加)</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+    ${strategies.map(s=>`<div class="result-panel" style="padding:12px;cursor:pointer;${E.activeStrategy===s.id?'border:1px solid #50c878':''}" onclick="mgSetActiveStrategy('${s.id}')">
+      <div style="font-size:13px;color:#e0e0ff;font-weight:bold">${s.icon} ${s.name}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">${s.desc}</div>
+      <div style="font-size:10px;color:${s.priority==='P0'?'#e06070':'#80b0e0'};margin-top:4px">优先级: ${s.priority} ${E.activeStrategy===s.id?'✓ 运行中':''}</div>
+    </div>`).join('')}
+  </div>
+  <div class="result-panel" style="padding:12px">
+    <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">SOC管理边界</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:11px">
+      <div>停放: <b style="color:#e8a838">10%</b></div><div>停充: <b style="color:#50c878">90%</b></div><div>急停: <b style="color:#e06070">5%</b></div><div>过充: <b style="color:#e06070">95%</b></div>
+    </div>
+    <div style="font-size:10px;color:var(--text2);margin-top:6px">当前SOC: ${E.soc.toFixed(1)}% | LFP电池 | 温度修正: T>45℃降额80%, T>50℃降额50%, T>55℃停机</div>
+  </div>`;
+}
+
+function mgEnergyDispatch(S,T,E){
+  return `<div style="font-size:12px;color:var(--text2);margin-bottom:12px">实时功率调度面板，手动/自动调节各设备功率分配</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    <div class="result-panel" style="padding:12px">
+      <div style="font-size:12px;color:#4a90d9;font-weight:bold">电网侧</div>
+      <div style="margin-top:8px;font-size:11px">当前功率: <b>${E.gridPower.toFixed(1)}kW</b></div>
+      <div style="margin-top:4px;font-size:11px">功率方向: ${E.gridPower>=0?'购电(正向)':'上网(反向)'}</div>
+      <div style="margin-top:4px;font-size:11px;color:${E.gridPower<0?'#e06070':'#50c878'}">逆流状态: ${E.gridPower<-S.peakLoad*0.05?'⚠️ 逆流!':'正常'}</div>
+    </div>
+    <div class="result-panel" style="padding:12px">
+      <div style="font-size:12px;color:#50c878;font-weight:bold">储能侧</div>
+      <div style="margin-top:8px;font-size:11px">PCS功率: <b>${E.pcsPower.toFixed(1)}kW</b> (${E.pcsPower>0?'放电':'充电'})</div>
+      <div style="margin-top:4px;font-size:11px">SOC: <b>${E.soc.toFixed(1)}%</b></div>
+      <div style="margin-top:4px;font-size:11px">可放容量: <b>${(S.bessKwh*(E.soc-10)/100).toFixed(0)}kWh</b></div>
+    </div>
+    <div class="result-panel" style="padding:12px">
+      <div style="font-size:12px;color:#e8a838;font-weight:bold">光伏侧</div>
+      <div style="margin-top:8px;font-size:11px">出力: <b>${E.pvPower.toFixed(1)}kW</b> / ${S.pv}kWp</div>
+      <div style="margin-top:4px;font-size:11px">利用率: <b>${(E.pvPower/S.pv*100).toFixed(1)}%</b></div>
+    </div>
+    <div class="result-panel" style="padding:12px">
+      <div style="font-size:12px;color:#a070d0;font-weight:bold">负荷侧</div>
+      <div style="margin-top:8px;font-size:11px">总负荷: <b>${(E.loadPower+E.evPower).toFixed(1)}kW</b></div>
+      <div style="margin-top:4px;font-size:11px">其中充电桩: <b>${E.evPower.toFixed(1)}kW</b></div>
+    </div>
+  </div>
+  <div class="result-panel" style="padding:12px">
+    <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">手动调度</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="mgDispatch('charge_max')" style="font-size:11px;padding:6px">最大充电</button>
+      <button class="btn" onclick="mgDispatch('discharge_max')" style="font-size:11px;padding:6px">最大放电</button>
+      <button class="btn" onclick="mgDispatch('standby')" style="font-size:11px;padding:6px">待机</button>
+      <button class="btn" onclick="mgDispatch('pv_limit_50')" style="font-size:11px;padding:6px">限光伏50%</button>
+      <button class="btn" onclick="mgDispatch('ev_limit_50')" style="font-size:11px;padding:6px">限充电桩50%</button>
+    </div>
+  </div>`;
+}
+
+function mgEnergyMode(S,T,E){
+  const modes=[
+    {id:'grid_tied',name:'并网PQ模式',desc:'跟随电网频率电压，有功无功可调',icon:'🔗'},
+    {id:'grid_following',name:'并网跟网模式',desc:'跟随电网，功率指令控制',icon:'📡'},
+    {id:'island_vf',name:'离网V/f模式',desc:'储能建压建频，独立供电',icon:'🏝️'},
+    {id:'grid_droop',name:'并网Droop模式',desc:'下垂控制，参与电网调频',icon:'📉'}
+  ];
+  return `<div style="font-size:12px;color:var(--text2);margin-bottom:12px">并离网模式切换，含同期检查条件</div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
+    ${modes.map(m=>`<div class="result-panel" style="padding:16px;cursor:pointer;${E.gridMode===m.id?'border:1px solid #50c878':''}" onclick="mgSetGridMode('${m.id}')">
+      <div style="font-size:14px;color:#e0e0ff;font-weight:bold">${m.icon} ${m.name}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">${m.desc}</div>
+      <div style="font-size:10px;color:${E.gridMode===m.id?'#50c878':'var(--text2)'};margin-top:6px">${E.gridMode===m.id?'● 当前模式':'○ 点击切换'}</div>
+    </div>`).join('')}
+  </div>
+  <div class="result-panel" style="padding:12px">
+    <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">并离网切换状态机</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.8">
+      GRID_CONNECTED → [电压>115%或<85%持续100ms / 频率>51.5或<49.5Hz持续200ms] → ISLAND_DETECTING<br>
+      → [储能V/f建压, V=380V, f=50Hz, <200ms] → ISLAND_MODE<br>
+      → [电网恢复95%-105%持续10s] → GRID_RECOVERING → [ΔV<5%, Δf<0.2Hz, Δφ<5°] → SYNC_CHECKING<br>
+      → [同期通过, 合闸<50ms] → GRID_CONNECTED
+    </div>
+  </div>`;
+}
+
+function mgEnergyAlarm(S,T,E){
+  const alarmList=E.alarms.length>0?E.alarms:[{time:'-',level:'-',msg:'暂无告警',dev:'-'}];
+  return `<div style="font-size:12px;color:var(--text2);margin-bottom:12px">实时告警与历史记录，P0紧急/P1重要/P2一般/P3提示</div>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button class="btn" onclick="mgTestAlarm('P0')" style="font-size:11px;padding:6px;color:#e06070">模拟P0告警</button>
+    <button class="btn" onclick="mgTestAlarm('P1')" style="font-size:11px;padding:6px;color:#e8a838">模拟P1告警</button>
+    <button class="btn" onclick="mgTestAlarm('P2')" style="font-size:11px;padding:6px;color:#80b0e0">模拟P2告警</button>
+    <button class="btn" onclick="mgClearAlarms()" style="font-size:11px;padding:6px">清除告警</button>
+  </div>
+  <table class="result-table"><tr><th>时间</th><th>级别</th><th>设备</th><th>告警内容</th><th>操作</th></tr>
+  ${alarmList.map(a=>`<tr><td>${a.time}</td><td style="color:${a.level==='P0'?'#e06070':a.level==='P1'?'#e8a838':'#80b0e0'}">${a.level}</td><td>${a.dev}</td><td>${a.msg}</td><td><button class="btn" onclick="mgAckAlarm(this)" style="font-size:10px;padding:2px 6px">确认</button></td></tr>`).join('')}
+  </table>`;
+}
+
+function mgEnergyAnalysis(S,T,E){
+  return `<div style="font-size:12px;color:var(--text2);margin-bottom:12px">运行数据分析与收益统计</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">今日充电量</div><div style="font-size:20px;color:#4a90d9;font-weight:bold">${(S.bessKwh*0.8/1000*0.9).toFixed(1)}MWh</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">今日放电量</div><div style="font-size:20px;color:#50c878;font-weight:bold">${(S.bessKwh*0.7/1000*0.9).toFixed(1)}MWh</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">今日套利收益</div><div style="font-size:20px;color:#e8a838;font-weight:bold">${(S.bessKwh*0.7/1000*0.9*0.3).toFixed(0)}元</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">光伏日发电</div><div style="font-size:20px;color:#e8a838;font-weight:bold">${(S.pv*5/1000).toFixed(1)}MWh</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">PCS转换效率</div><div style="font-size:20px;color:#50c878;font-weight:bold">97.2%</div></div>
+    <div class="result-panel" style="text-align:center;padding:12px"><div style="font-size:11px;color:var(--text2)">系统可用率</div><div style="font-size:20px;color:#50c878;font-weight:bold">99.6%</div></div>
+  </div>
+  <div class="result-panel" style="padding:12px">
+    <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">月度收益趋势(仿真)</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.8">
+      峰谷套利: ≈${(S.bessKwh*0.7/1000*0.9*0.3*330/10000).toFixed(1)}万元/年<br>
+      需量节省: ≈${(S.peakLoad*0.15*38*12/10000).toFixed(1)}万元/年<br>
+      光伏自消纳: ≈${(S.pv*5*0.7*0.42*330/10000).toFixed(1)}万元/年<br>
+      合计: ≈${(S.bessKwh*0.7/1000*0.9*0.3*330/10000+S.peakLoad*0.15*38*12/10000+S.pv*5*0.7*0.42*330/10000).toFixed(1)}万元/年
+    </div>
+  </div>`;
+}
+
+function mgEnergyConfig(S,T,E){
+  return `<div style="font-size:12px;color:var(--text2);margin-bottom:12px">EMS系统配置与通信参数</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    <div class="result-panel" style="padding:12px">
+      <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">EMS服务状态</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.8">
+        EMS API: <span style="color:#50c878">● 运行中</span> (localhost:8080)<br>
+        SCADA: <span style="color:#50c878">● 运行中</span> (localhost:3000)<br>
+        TDengine: <span style="color:#50c878">● 运行中</span> (localhost:6041)<br>
+        EMQX: <span style="color:#50c878">● 运行中</span> (localhost:1883)<br>
+        PostgreSQL: <span style="color:#50c878">● 运行中</span> (localhost:5432)<br>
+        Redis: <span style="color:#50c878">● 运行中</span> (localhost:6379)
+      </div>
+    </div>
+    <div class="result-panel" style="padding:12px">
+      <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">通信参数</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.8">
+        PCS: ModbusTCP 192.168.1.10:502<br>
+        BMS: CAN2.0B 1Mbps 经网关→ModbusTCP<br>
+        关口表: ModbusRTU 9600bps 偶校验<br>
+        光伏: ModbusTCP 192.168.1.20:502<br>
+        充电桩: OCPP1.6J ws://192.168.1.30:8080<br>
+        云平台: MQTT mqtts://broker:8883
+      </div>
+    </div>
+    <div class="result-panel" style="padding:12px">
+      <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">保护定值</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.8">
+        过流I段: 1.3×I"dmax<br>
+        防孤岛: f>51.5/<49.5Hz, V>115%/<85%<br>
+        防逆流: 阈值3%Ppcc, 延时500ms<br>
+        SOC边界: 10%~90% (LFP)<br>
+        温度: 告警40℃/降额45℃/停机50℃
+      </div>
+    </div>
+    <div class="result-panel" style="padding:12px">
+      <div style="font-size:12px;color:#80b0e0;font-weight:bold;margin-bottom:8px">运行参数</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.8">
+        采集周期: 遥测1s/遥信100ms<br>
+        控制周期: 策略1s/保护100ms<br>
+        数据存储: 1min粒度保留365天<br>
+        告警上报: <2s<br>
+        历史查询: 10万点<3s
+      </div>
+    </div>
+  </div>`;
+}
+
+function mgEnergySimStart(){
+  if(mgEnergyState.simInterval)return;
+  mgEnergyState.simInterval=setInterval(()=>{
+    const E=mgEnergyState;
+    E.simTime+=1;
+    const h=(E.simTime%288)/12;
+    const pvFactor=Math.max(0,Math.sin((h-6)/12*Math.PI));
+    const loadFactor=0.5+0.3*Math.sin((h-9)/12*Math.PI)+0.1*Math.cos(h*2);
+    const S=LAST_MG_RESULT?.sizing||{peakLoad:800,pv:500,bessKwh:1400,bessMW:1.4,evKw:360};
+    E.pvPower=S.pv*pvFactor*(0.9+Math.random()*0.1);
+    E.loadPower=S.peakLoad*Math.max(0.2,loadFactor);
+    E.evPower=S.evKw*(h>=8&&h<=20?0.6+Math.random()*0.3:0.1);
+    const isPeak=h>=9&&h<=12||h>=14&&h<=19;
+    const isValley=h>=23||h<=7;
+    if(isPeak&&E.soc>15){E.pcsPower=Math.min(S.bessMW*1000*0.8,E.loadPower*0.5);E.soc-=E.pcsPower*5/S.bessKwh;}
+    else if(isValley&&E.soc<85){E.pcsPower=-Math.min(S.bessMW*1000*0.5,S.bessKwh*0.1);E.soc-=E.pcsPower*5/S.bessKwh;}
+    else{E.pcsPower=0;}
+    E.soc=Math.max(5,Math.min(95,E.soc));
+    E.gridPower=E.loadPower+E.evPower-E.pvPower-E.pcsPower;
+    if(document.getElementById('energyTabs')?.querySelector('.sw-tab.active')?.textContent==='实时监控'){
+      mgShowEnergy('monitor');
+    }
+  },500);
+}
+
+function mgEnergySimStop(){if(mgEnergyState.simInterval){clearInterval(mgEnergyState.simInterval);mgEnergyState.simInterval=null;}}
+function mgEnergySimReset(){mgEnergySimStop();mgEnergyState={...mgEnergyState,soc:65,pcsPower:0,pvPower:0,loadPower:0,evPower:0,gridPower:0,simTime:0,alarms:[]};mgShowEnergy('monitor');}
+
+function mgDevControl(devId){
+  const dev=MG_ENERGY_DEVICES.find(d=>d.id===devId);
+  if(!dev)return;
+  const logEl=document.getElementById('mgControlLog');
+  if(!logEl)return;
+  const d=document.createElement('div');
+  d.style.cssText='font-size:11px;padding:2px 0;color:#80b0e0';
+  const now=new Date().toLocaleTimeString();
+  if(dev.status==='online'||dev.status==='running'){
+    dev.status='offline';d.textContent=`[${now}] ${dev.name} → 停止 ❌`;
+  }else{
+    dev.status=dev.type==='EMS'?'running':'online';d.textContent=`[${now}] ${dev.name} → 启动 ✓`;
+  }
+  logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;
+  mgShowEnergy('control');
+}
+
+function mgUnitTest(test){
+  const logEl=document.getElementById('mgControlLog');
+  if(!logEl)return;
+  const now=new Date().toLocaleTimeString();
+  const results={
+    pcs_charge:'PCS充电测试: 功率从0升至500kW, SOC从65%升至67%, 响应<100ms ✓',
+    pcs_discharge:'PCS放电测试: 功率从0升至700kW, SOC从67%降至65%, 响应<100ms ✓',
+    pcs_standby:'PCS待机: 功率归零, 状态=待机, 耗电<50W ✓',
+    bms_soc:'BMS SOC校验: 安时积分=65.2%, 开路电压查表=64.8%, 偏差<3% ✓',
+    bms_insulation:'BMS绝缘检测: 正极对地>50MΩ, 负极对地>50MΩ, 合格 ✓',
+    bms_temp:'BMS温度巡检: 最高32.5℃(簇3), 最低28.1℃(簇1), 均温30.2℃ ✓',
+    meter_read:'关口表读数: 正向有功=1256.8kWh, 反向有功=0kWh, PF=0.98 ✓',
+    pv_start:'光伏启动: MPPT搜索→并网→功率从0升至450kW, 耗时15s ✓',
+    ev_charge:'充电桩充电: OCPP RemoteStart→状态Charging→功率120kW ✓'
+  };
+  const d=document.createElement('div');d.style.cssText='font-size:11px;padding:2px 0;color:#50c878';
+  d.textContent=`[${now}] ${results[test]||'测试完成 ✓'}`;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;
+}
+
+function mgSetActiveStrategy(id){mgEnergyState.activeStrategy=id;mgShowEnergy('strategy');}
+function mgSetGridMode(id){mgEnergyState.gridMode=id;mgEnergyState.runningMode=id==='island_vf'?'V/f':id==='grid_droop'?'Droop':'PQ';mgShowEnergy('mode');}
+function mgDispatch(cmd){
+  const S=LAST_MG_RESULT?.sizing||{bessMW:1.4,bessKwh:1400,pv:500,evKw:360};
+  const E=mgEnergyState;
+  switch(cmd){
+    case 'charge_max': E.pcsPower=-S.bessMW*1000*0.9; break;
+    case 'discharge_max': E.pcsPower=S.bessMW*1000*0.9; break;
+    case 'standby': E.pcsPower=0; break;
+    case 'pv_limit_50': E.pvPower*=0.5; break;
+    case 'ev_limit_50': E.evPower*=0.5; break;
+  }
+  E.gridPower=E.loadPower+E.evPower-E.pvPower-E.pcsPower;
+  mgShowEnergy('dispatch');
+}
+function mgTestAlarm(level){
+  const now=new Date().toLocaleTimeString();
+  const msgs={P0:'BMS热失控预警 T>80℃',P1:'PCS过温告警 T>45℃',P2:'通信延迟>2s'};
+  mgEnergyState.alarms.unshift({time:now,level,msg:msgs[level]||'测试告警',dev:level==='P0'?'BMS-1':level==='P1'?'PCS-1':'GW-01'});
+  mgShowEnergy('alarm');
+}
+function mgClearAlarms(){mgEnergyState.alarms=[];mgShowEnergy('alarm');}
+function mgAckAlarm(btn){btn.textContent='已确认';btn.disabled=true;btn.style.opacity='0.5';}
 
 /* ========== 协议调试Agent ========== */
 const MG_POINT_TABLES={
