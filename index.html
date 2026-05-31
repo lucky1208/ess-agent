@@ -6879,186 +6879,278 @@ function mgTestAlarm(level){
 function mgClearAlarms(){mgEnergyState.alarms=[];mgShowEnergy('alarm');}
 function mgAckAlarm(btn){btn.textContent='已确认';btn.disabled=true;btn.style.opacity='0.5';mgOpLog('告警确认','');}
 
-/* ========== 数字孪生Agent ========== */
+/* ========== 数字孪生Agent (CSS 3D重写) ========== */
 let mgTwinFlowTimer=null;
 let mgTwinFlowPhase=0;
+const mgEnergyState={pcsPower:0,soc:75,soh:96,pvPower:0,evPower:0,loadPower:0,gridPower:0,gridMode:'grid_tied',runningMode:'PQ恒功率',activeStrategy:'削峰填谷',bmsTempMin:22,bmsTempMax:28,gridFreq:50.01,gridVoltage:388};
 
 function mgTwinView(view){
   const el=document.getElementById('mgTwinContent');
   if(!el)return;
   const E=mgEnergyState;
   const S=LAST_MG_RESULT?.sizing||{peakLoad:800,pv:500,bessKwh:1400,bessMW:1.4,evKw:360};
-  switch(view){
-    case 'overview': el.innerHTML=mgTwinOverview(S,E); break;
-    case 'pcs': el.innerHTML=mgTwinDevice('pcs',S,E); break;
-    case 'batt': el.innerHTML=mgTwinDevice('batt',S,E); break;
-    case 'trans': el.innerHTML=mgTwinDevice('trans',S,E); break;
-    case 'pv': el.innerHTML=mgTwinDevice('pv',S,E); break;
-    case 'ev': el.innerHTML=mgTwinDevice('ev',S,E); break;
-    case 'ems': el.innerHTML=mgTwinDevice('ems',S,E); break;
-  }
-}
-
-function mgTwinOverview(S,E){
-  return `<div style="position:relative;width:100%;aspect-ratio:16/9;min-height:500px;background:#0a0e14;border-radius:12px;border:1px solid var(--border);overflow:hidden" id="mgTwinCanvas">
-  <svg viewBox="0 0 960 540" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" id="mgTwinSvg">
-    <defs>
-      <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a90d9" stop-opacity="0"/><stop offset="0.5" stop-color="#4a90d9" stop-opacity="1"/><stop offset="1" stop-color="#4a90d9" stop-opacity="0"/></linearGradient>
-      <linearGradient id="flowGradGreen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#50c878" stop-opacity="0"/><stop offset="0.5" stop-color="#50c878" stop-opacity="1"/><stop offset="1" stop-color="#50c878" stop-opacity="0"/></linearGradient>
-      <linearGradient id="flowGradOrange" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e8a838" stop-opacity="0"/><stop offset="0.5" stop-color="#e8a838" stop-opacity="1"/><stop offset="1" stop-color="#e8a838" stop-opacity="0"/></linearGradient>
-      <linearGradient id="flowGradPurple" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a070d0" stop-opacity="0"/><stop offset="0.5" stop-color="#a070d0" stop-opacity="1"/><stop offset="1" stop-color="#a070d0" stop-opacity="0"/></linearGradient>
-      <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      <filter id="glowStrong"><feGaussianBlur stdDeviation="6" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    </defs>
-    <rect width="960" height="540" fill="#0a0e14"/>
-    <text x="480" y="28" text-anchor="middle" fill="#80b0e0" font-size="14" font-weight="bold">微电网数字孪生全景 — 实物设备 + 能量流动</text>
-    <text x="480" y="44" text-anchor="middle" fill="#555" font-size="10">设计人: 卢继雄 | 规范: GB/T 42288 | 基于 minimax_net_digital_twin_vr.md</text>
-    <!-- 电网侧 -->
-    <rect x="20" y="180" width="100" height="160" rx="8" fill="#111825" stroke="#4a90d9" stroke-width="1.5"/>
-    <text x="70" y="205" text-anchor="middle" fill="#4a90d9" font-size="11" font-weight="bold">10kV电网</text>
-    <line x1="55" y1="220" x2="85" y2="220" stroke="#4a90d9" stroke-width="2"/>
-    <line x1="55" y1="230" x2="85" y2="230" stroke="#e8a838" stroke-width="2"/>
-    <line x1="55" y1="240" x2="85" y2="240" stroke="#e06070" stroke-width="2"/>
-    <text x="70" y="260" text-anchor="middle" fill="#888" font-size="9">A B C三相</text>
-    <text x="70" y="280" text-anchor="middle" fill="#4a90d9" font-size="10">${E.gridPower.toFixed(0)}kW</text>
-    <text x="70" y="295" text-anchor="middle" fill="#888" font-size="8">${E.gridMode==='grid_tied'?'并网PQ':'离网V/f'}</text>
-    <circle cx="70" cy="320" r="8" fill="${E.gridMode==='grid_tied'?'#1a3a1a':'#3a1a1a'}" stroke="${E.gridMode==='grid_tied'?'#50c878':'#e06070'}" stroke-width="1.5"/>
-    <text x="70" y="324" text-anchor="middle" fill="${E.gridMode==='grid_tied'?'#50c878':'#e06070'}" font-size="8" font-weight="bold">${E.gridMode==='grid_tied'?'ON':'OFF'}</text>
-    <!-- 变压器 -->
-    <rect x="155" y="220" width="80" height="80" rx="8" fill="#111825" stroke="#e8a838" stroke-width="1.5"/>
-    <text x="195" y="245" text-anchor="middle" fill="#e8a838" font-size="10" font-weight="bold">变压器</text>
-    <circle cx="185" cy="270" r="12" fill="none" stroke="#e8a838" stroke-width="1.5"/>
-    <circle cx="205" cy="270" r="12" fill="none" stroke="#e8a838" stroke-width="1.5"/>
-    <text x="195" y="295" text-anchor="middle" fill="#888" font-size="8">10kV/0.4kV</text>
-    <!-- PCC关口 -->
-    <rect x="155" y="160" width="80" height="40" rx="4" fill="#111825" stroke="#50c878" stroke-width="1"/>
-    <text x="195" y="183" text-anchor="middle" fill="#50c878" font-size="9" font-weight="bold">PCC关口</text>
-    <!-- PCS舱体 -->
-    <rect x="280" y="140" width="130" height="200" rx="8" fill="#111825" stroke="#50c878" stroke-width="2"/>
-    <rect x="290" y="150" width="110" height="30" rx="4" fill="#1a2a1a"/>
-    <text x="345" y="170" text-anchor="middle" fill="#50c878" font-size="11" font-weight="bold">PCS 储能变流器</text>
-    <rect x="295" y="190" width="100" height="60" rx="4" fill="#0d1117" stroke="#333" stroke-width="1"/>
-    <text x="345" y="210" text-anchor="middle" fill="#888" font-size="9">功率模块 x6</text>
-    <text x="345" y="225" text-anchor="middle" fill="#50c878" font-size="12" font-weight="bold">${Math.abs(E.pcsPower).toFixed(0)}kW</text>
-    <text x="345" y="240" text-anchor="middle" fill="#888" font-size="8">${E.pcsPower>0?'放电':'充电'} | ${E.runningMode}</text>
-    <rect x="295" y="260" width="100" height="30" rx="4" fill="#0d1117" stroke="#333" stroke-width="1"/>
-    <text x="345" y="280" text-anchor="middle" fill="#888" font-size="8">散热风扇组</text>
-    <circle cx="310" cy="300" r="6" fill="${E.pcsPower!==0?'#50c878':'#333'}" filter="${E.pcsPower!==0?'url(#glow)':'none'}"/>
-    <circle cx="330" cy="300" r="6" fill="${E.pcsPower!==0?'#50c878':'#333'}" filter="${E.pcsPower!==0?'url(#glow)':'none'}"/>
-    <circle cx="350" cy="300" r="6" fill="#e8a838" filter="url(#glow)"/>
-    <circle cx="370" cy="300" r="6" fill="#50c878"/>
-    <text x="310" y="325" text-anchor="middle" fill="#555" font-size="7">IGBT</text>
-    <text x="330" y="325" text-anchor="middle" fill="#555" font-size="7">DC</text>
-    <text x="350" y="325" text-anchor="middle" fill="#555" font-size="7">RUN</text>
-    <text x="370" y="325" text-anchor="middle" fill="#555" font-size="7">COM</text>
-    <!-- 电池舱体 -->
-    <rect x="280" y="360" width="130" height="160" rx="8" fill="#111825" stroke="#4a90d9" stroke-width="2"/>
-    <rect x="290" y="370" width="110" height="25" rx="4" fill="#1a2a3a"/>
-    <text x="345" y="388" text-anchor="middle" fill="#4a90d9" font-size="11" font-weight="bold">BMS 电池舱体</text>
-    <rect x="295" y="400" width="100" height="50" rx="2" fill="#0d1117" stroke="#333" stroke-width="1"/>
-    ${Array.from({length:5},(_,i)=>`<rect x="${300+i*19}" y="405" width="16" height="38" rx="1" fill="${E.soc>20+i*15?'#1a3a5a':'#1a1a2a'}" stroke="#4a90d9" stroke-width="0.5"/>`).join('')}
-    <text x="345" y="465" text-anchor="middle" fill="#4a90d9" font-size="10">SOC: <tspan font-weight="bold" font-size="13" fill="${E.soc<20?'#e06070':E.soc<50?'#e8a838':'#50c878'}">${E.soc.toFixed(0)}%</tspan></text>
-    <text x="345" y="482" text-anchor="middle" fill="#888" font-size="8">${(S.bessKwh/1000).toFixed(1)}MWh | LFP | ${E.soh}%SOH</text>
-    <text x="345" y="500" text-anchor="middle" fill="#888" font-size="8">液冷管路 | T:${E.bmsTempMin}-${E.bmsTempMax}℃</text>
-    <!-- 光伏阵列 -->
-    <rect x="480" y="140" width="140" height="120" rx="8" fill="#111825" stroke="#e8a838" stroke-width="1.5"/>
-    <text x="550" y="165" text-anchor="middle" fill="#e8a838" font-size="11" font-weight="bold">光伏阵列</text>
-    ${Array.from({length:3},(_,r)=>Array.from({length:4},(_,c)=>`<rect x="${500+c*25}" y="${175+r*22}" width="20" height="16" rx="1" fill="${E.pvPower>10?'#2a3a1a':'#1a1a2a'}" stroke="#e8a838" stroke-width="0.5"/>`).join('')).join('')}
-    <text x="550" y="248" text-anchor="middle" fill="#e8a838" font-size="10" font-weight="bold">${E.pvPower.toFixed(0)}kW</text>
-    <text x="550" y="260" text-anchor="middle" fill="#888" font-size="8">/${S.pv}kWp | MPPT</text>
-    <!-- 充电桩 -->
-    <rect x="480" y="280" width="140" height="100" rx="8" fill="#111825" stroke="#a070d0" stroke-width="1.5"/>
-    <text x="550" y="305" text-anchor="middle" fill="#a070d0" font-size="11" font-weight="bold">充电桩</text>
-    <rect x="510" y="315" width="25" height="50" rx="4" fill="#1a1a2a" stroke="#a070d0" stroke-width="1"/>
-    <rect x="545" y="315" width="25" height="50" rx="4" fill="#1a1a2a" stroke="#a070d0" stroke-width="1"/>
-    <rect x="580" y="315" width="25" height="50" rx="4" fill="#1a1a2a" stroke="#a070d0" stroke-width="1"/>
-    <circle cx="522" cy="335" r="5" fill="${E.evPower>10?'#50c878':'#333'}"/>
-    <circle cx="557" cy="335" r="5" fill="#e8a838"/>
-    <circle cx="592" cy="335" r="5" fill="#333"/>
-    <text x="550" y="380" text-anchor="middle" fill="#a070d0" font-size="9">${E.evPower.toFixed(0)}kW / ${S.evKw}kW</text>
-    <!-- EMS控制柜 -->
-    <rect x="480" y="400" width="140" height="120" rx="8" fill="#111825" stroke="#80b0e0" stroke-width="1.5"/>
-    <text x="550" y="425" text-anchor="middle" fill="#80b0e0" font-size="11" font-weight="bold">EMS 控制柜</text>
-    <rect x="500" y="435" width="100" height="60" rx="4" fill="#0d1117" stroke="#333" stroke-width="1"/>
-    <rect x="510" y="445" width="35" height="20" rx="2" fill="#1a2a3a" stroke="#4a90d9" stroke-width="0.5"/>
-    <rect x="555" y="445" width="35" height="20" rx="2" fill="#1a2a1a" stroke="#50c878" stroke-width="0.5"/>
-    <text x="527" y="459" text-anchor="middle" fill="#4a90d9" font-size="7">SCADA</text>
-    <text x="572" y="459" text-anchor="middle" fill="#50c878" font-size="7">EMS</text>
-    <circle cx="520" cy="480" r="4" fill="#50c878" filter="url(#glow)"/>
-    <circle cx="540" cy="480" r="4" fill="#50c878" filter="url(#glow)"/>
-    <circle cx="560" cy="480" r="4" fill="#e8a838"/>
-    <circle cx="580" cy="480" r="4" fill="#50c878"/>
-    <text x="550" y="505" text-anchor="middle" fill="#888" font-size="8">策略: ${E.activeStrategy} | ${E.runningMode}</text>
-    <!-- 负荷 -->
-    <rect x="660" y="200" width="100" height="80" rx="8" fill="#111825" stroke="#a070d0" stroke-width="1.5"/>
-    <text x="710" y="225" text-anchor="middle" fill="#a070d0" font-size="11" font-weight="bold">负荷</text>
-    <text x="710" y="250" text-anchor="middle" fill="#a070d0" font-size="14" font-weight="bold">${E.loadPower.toFixed(0)}kW</text>
-    <text x="710" y="270" text-anchor="middle" fill="#888" font-size="8">峰值${S.peakLoad}kW</text>
-    <!-- 能量流动线 -->
-    <g id="mgFlowLines">
-      <line x1="120" y1="260" x2="155" y2="260" stroke="#4a90d9" stroke-width="2" stroke-dasharray="6,4" class="twin-flow-line" data-flow="grid"/>
-      <line x1="235" y1="260" x2="280" y2="240" stroke="#e8a838" stroke-width="2" stroke-dasharray="6,4" class="twin-flow-line" data-flow="trans-pcs"/>
-      <line x1="345" y1="340" x2="345" y2="360" stroke="#50c878" stroke-width="2" stroke-dasharray="6,4" class="twin-flow-line" data-flow="pcs-batt"/>
-      <line x1="410" y1="200" x2="480" y2="200" stroke="#e8a838" stroke-width="2" stroke-dasharray="6,4" class="twin-flow-line" data-flow="pcs-pv-bus"/>
-      <line x1="550" y1="260" x2="550" y2="280" stroke="#a070d0" stroke-width="2" stroke-dasharray="6,4" class="twin-flow-line" data-flow="pv-ev"/>
-      <line x1="620" y1="330" x2="660" y2="240" stroke="#a070d0" stroke-width="2" stroke-dasharray="6,4" class="twin-flow-line" data-flow="ev-load"/>
-      <line x1="620" y1="200" x2="660" y2="230" stroke="#a070d0" stroke-width="2" stroke-dasharray="6,4" class="twin-flow-line" data-flow="pv-load"/>
-    </g>
-    <!-- 流动粒子(动画由JS控制) -->
-    <g id="mgFlowParticles"></g>
-    <!-- 右侧信息面板 -->
-    <rect x="790" y="60" width="150" height="460" rx="8" fill="#111825" stroke="#333" stroke-width="1"/>
-    <text x="865" y="85" text-anchor="middle" fill="#80b0e0" font-size="11" font-weight="bold">实时数据面板</text>
-    <text x="810" y="110" fill="#4a90d9" font-size="9">电网: ${E.gridPower.toFixed(0)}kW</text>
-    <text x="810" y="128" fill="#50c878" font-size="9">PCS: ${E.pcsPower>0?'+':''}${E.pcsPower.toFixed(0)}kW</text>
-    <text x="810" y="146" fill="#e8a838" font-size="9">光伏: ${E.pvPower.toFixed(0)}kW</text>
-    <text x="810" y="164" fill="#a070d0" font-size="9">负荷: ${E.loadPower.toFixed(0)}kW</text>
-    <text x="810" y="182" fill="#a070d0" font-size="9">充电桩: ${E.evPower.toFixed(0)}kW</text>
-    <text x="810" y="205" fill="#80b0e0" font-size="9" font-weight="bold">SOC: ${E.soc.toFixed(1)}%</text>
-    <text x="810" y="223" fill="#888" font-size="9">SOH: ${E.soh}%</text>
-    <text x="810" y="241" fill="#888" font-size="9">频率: ${E.gridFreq.toFixed(2)}Hz</text>
-    <text x="810" y="259" fill="#888" font-size="9">电压: ${E.gridVoltage.toFixed(0)}V</text>
-    <text x="810" y="285" fill="#80b0e0" font-size="9" font-weight="bold">模式: ${E.runningMode}</text>
-    <text x="810" y="303" fill="#888" font-size="9">策略: ${E.activeStrategy}</text>
-    <text x="810" y="330" fill="#80b0e0" font-size="9" font-weight="bold">功率平衡:</text>
-    <text x="810" y="348" fill="#888" font-size="8">网+PCS+光=负+桩</text>
-    <text x="810" y="366" fill="#888" font-size="8">${E.gridPower.toFixed(0)}+${E.pcsPower.toFixed(0)}+${E.pvPower.toFixed(0)}=${E.loadPower.toFixed(0)}+${E.evPower.toFixed(0)}</text>
-    <text x="810" y="395" fill="#555" font-size="8">技术栈:</text>
-    <text x="810" y="410" fill="#555" font-size="7">Three.js / Babylon.js</text>
-    <text x="810" y="425" fill="#555" font-size="7">A-Frame WebXR</text>
-    <text x="810" y="440" fill="#555" font-size="7">MQTT WebSocket</text>
-    <text x="810" y="455" fill="#555" font-size="7">glTF 2.0 / GLB</text>
-    <text x="810" y="470" fill="#555" font-size="7">TDengine 时序</text>
-    <text x="810" y="500" fill="#555" font-size="7">LOD0(VR)/LOD1(Web)/LOD2(GIS)</text>
-  </svg>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px">
-    <div class="result-panel" style="text-align:center;padding:8px;cursor:pointer" onclick="mgTwinView('pcs')"><div style="font-size:10px;color:var(--text2)">PCS舱体</div><div style="font-size:16px;color:#50c878;font-weight:bold">${Math.abs(E.pcsPower).toFixed(0)}kW</div></div>
-    <div class="result-panel" style="text-align:center;padding:8px;cursor:pointer" onclick="mgTwinView('batt')"><div style="font-size:10px;color:var(--text2)">电池SOC</div><div style="font-size:16px;color:${E.soc<20?'#e06070':E.soc<50?'#e8a838':'#50c878'};font-weight:bold">${E.soc.toFixed(0)}%</div></div>
-    <div class="result-panel" style="text-align:center;padding:8px;cursor:pointer" onclick="mgTwinView('pv')"><div style="font-size:10px;color:var(--text2)">光伏出力</div><div style="font-size:16px;color:#e8a838;font-weight:bold">${E.pvPower.toFixed(0)}kW</div></div>
-    <div class="result-panel" style="text-align:center;padding:8px;cursor:pointer" onclick="mgTwinView('ev')"><div style="font-size:10px;color:var(--text2)">充电桩</div><div style="font-size:16px;color:#a070d0;font-weight:bold">${E.evPower.toFixed(0)}kW</div></div>
+  if(view==='overview'){el.innerHTML=mgTwin3DCanvas(S,E);mgTwinStartFlow();return;}
+  const devices={pcs:{name:'PCS 储能变流器',color:'#50c878',power:'500kW',icon:'⚡',desc:'三相全桥IGBT DC/AC双向变流器，支持PQ/Vf/Droop三模式',specs:['额定功率: 500kW/630kVA','DC电压: 600-900V','AC输出: 380V 50Hz','效率: >97.2%','冷却: 强制风冷','通信: Modbus TCP:502','防护: IP54','尺寸: 1200×800×2000mm']},
+    batt:{name:'BMS 电池舱体',color:'#4a90d9',power:'1.4MWh',icon:'🔋',desc:'LFP 280Ah电芯×4簇并联，液冷温控，CAN 2.0B通信',specs:['标称容量: 1.4MWh','电芯: LFP 3.2V 280Ah','簇数: 4簇并联','额定电压: 672VDC','SOC范围: 10%-90%','温度: '+E.bmsTempMin+'-'+E.bmsTempMax+'℃','冷却: 液冷机','尺寸: 6058×2438×2591mm']},
+    trans:{name:'干式变压器',color:'#e8a838',power:'1600kVA',icon:'🔽',desc:'10kV/0.4kV Dyn11，ONAN自冷，F级绝缘',specs:['容量: 1600kVA','变比: 10kV/0.4kV','接线组: Dyn11','阻抗: Uk=6%','冷却: ONAN','绝缘级: F级','重量: 3200kg','尺寸: 1800×1200×1800mm']},
+    pv:{name:'光伏阵列',color:'#e8a838',power:S.pv+'kWp',icon:'☀️',desc:'N型TOPCon 550Wp组件，组串式逆变器MPPT',specs:['装机: '+S.pv+'kWp','组件: 550Wp N型双面','逆变器: 100kW×5台','MPPT: 2路/逆变器','效率: >98.5%','倾角: 15°固定支架','方位: 正南180°']},
+    ev:{name:'直流充电桩',color:'#a070d0',power:S.evKw+'kW',icon:'🔌',desc:'60kW DC快充×6桩，OCPP 1.6J协议',specs:['总功率: '+S.evKw+'kW','桩数: 6台','单桩: 60kW DC快充','协议: OCPP 1.6J','通信: WebSocket','枪数: 12枪CS1/CS2','效率: >95%','防护: IP54']},
+    ems:{name:'EMS控制柜',color:'#80b0e0',power:'工控机',icon:'🖥️',desc:'i7/32G/512G工控机，Ubuntu 22.04 LTS',specs:['硬件: 工控机 i7/32G','OS: Ubuntu 22.04 LTS','EMS: Python FastAPI','SCADA: Node-RED','数据库: TDengine+PG','消息: EMQX MQTT','前端: Vue3+Vite','通信: Modbus/CAN/OCPP']}
+  };
+  const d=devices[view]||devices.pcs;
+  el.innerHTML=`<div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:16px">
+    <div style="position:relative;height:450px;background:linear-gradient(180deg,#0a0e17,#0d111d);border-radius:12px;border:1px solid ${d.color}30;overflow:hidden;display:flex;align-items:center;justify-content:center">
+      <div class="twin-3d-device" style="transform:perspective(800px) rotateX(5deg) rotateY(-10deg)">
+        <div style="width:280px;height:340px;background:linear-gradient(135deg,#1a1e2a,#141820);border:2px solid ${d.color}60;border-radius:16px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.5),inset 0 1px 0 ${d.color}20">
+          <div style="background:linear-gradient(135deg,${d.color}30,#1a1e2a);padding:16px;border-bottom:1px solid ${d.color}30;border-radius:14px 14px 0 0">
+            <div style="font-size:28px;text-align:center;margin-bottom:4px">${d.icon}</div>
+            <div style="text-align:center;font-size:15px;font-weight:700;color:${d.color}">${d.name}</div>
+          </div>
+          <div style="padding:16px;text-align:center">
+            <div style="font-size:28px;font-weight:900;color:${d.color};margin:8px 0">${d.power}</div>
+            <div style="font-size:11px;color:#808890;line-height:1.6">${d.desc}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:16px">
+              <div style="background:${d.color}10;border-radius:6px;padding:6px 8px;text-align:center"><div style="font-size:10px;color:${d.color}70">状态</div><div style="font-size:13px;color:${d.color};font-weight:700">运行中</div></div>
+              <div style="background:${d.color}10;border-radius:6px;padding:6px 8px;text-align:center"><div style="font-size:10px;color:${d.color}70">通信</div><div style="font-size:13px;color:${d.color};font-weight:700">在线</div></div>
+            </div>
+          </div>
+          <div style="position:absolute;top:6px;right:8px;display:flex;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${d.color};box-shadow:0 0 4px ${d.color}"> </span><span style="font-size:9px;color:${d.color}80">LIVE</span></div>
+        </div>
+      </div>
+      <div class="twin-particles" style="position:absolute;bottom:0;left:0;right:0;height:60px;overflow:hidden;pointer-events:none">
+        ${Array.from({length:20},()=>`<div class="twin-particle" style="left:${Math.random()*100}%;animation-duration:${2+Math.random()*3}s;animation-delay:${Math.random()*2}s;background:${d.color}"></div>`).join('')}
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:14px;font-weight:700;color:${d.color};margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="font-size:20px">📋</span>技术参数</div>
+      <table class="result-table" style="font-size:11px">${d.specs.map((s,i)=>`<tr><td style="color:var(--text2);width:24px">${i+1}</td><td>${s}</td></tr>`).join('')}</table>
+    </div>
   </div>`;
 }
 
-function mgTwinDevice(type,S,E){
-  const devices={
-    pcs:{name:'PCS 储能变流器',color:'#50c878',border:'#50c878',specs:['额定功率: 500kW/630kVA','效率: >97.2%','冷却: 强制风冷','通信: ModbusTCP:502','防护: IP54 户外','尺寸: 1200×800×2000mm','重量: 1200kg','输入DC: 600-900V','输出AC: 380V 50Hz','模式: PQ/Vf/Droop']},
-    batt:{name:'BMS 电池舱体',color:'#4a90d9',border:'#4a90d9',specs:['标称容量: 1.4MWh','电芯: LFP 280Ah','簇数: 4簇并联','额定电压: 672VDC','SOC范围: 10%-90%','SOH: '+E.soh+'%','温度: '+E.bmsTempMin+'-'+E.bmsTempMax+'℃','冷却: 液冷','通信: CAN2.0B','尺寸: 6058×2438×2591mm']},
-    trans:{name:'变压器',color:'#e8a838',border:'#e8a838',specs:['容量: 1600kVA','变比: 10kV/0.4kV','接线: Dyn11','阻抗: 6%','冷却: ONAN','绝缘: F级','重量: 3200kg','尺寸: 1800×1200×1800mm','效率: >98.5%','温升: <65K']},
-    pv:{name:'光伏阵列',color:'#e8a838',border:'#e8a838',specs:['装机: '+S.pv+'kWp','组件: 550Wp N型','数量: '+(S.pv/0.55).toFixed(0)+'块','逆变器: 100kW×5','MPPT: 2路/逆变器','效率: >98.5%','通信: ModbusTCP','支架: 固定倾角15°','方位: 正南','年发电: '+(S.pv*5*330/1000).toFixed(0)+'MWh']},
-    ev:{name:'充电桩',color:'#a070d0',border:'#a070d0',specs:['总功率: '+S.evKw+'kW','桩数: 6台','单桩: 60kW DC快充','协议: OCPP1.6J','通信: WebSocket','枪数: 12枪','效率: >95%','防护: IP54','尺寸: 400×300×1500mm','计费: 扫码+APP']},
-    ems:{name:'EMS 控制柜',color:'#80b0e0',border:'#80b0e0',specs:['硬件: 工控机 i7/32G/512G','OS: Ubuntu 22.04 LTS','EMS: Python/FastAPI','SCADA: Node-RED','数据库: TDengine+PostgreSQL','消息: EMQX MQTT','缓存: Redis','前端: Vue3+Vite','通信: Modbus/CAN/OCPP','尺寸: 800×600×2000mm']}
-  };
-  const d=devices[type]||devices.pcs;
-  const specRows=d.specs.map((s,i)=>`<tr><td style="color:var(--text2)">${i+1}</td><td>${s}</td></tr>`).join('');
-  return `<div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
-    <div class="result-panel" style="padding:20px">
-      <div style="font-size:16px;color:${d.color};font-weight:bold;margin-bottom:12px">${d.name} — 实物展示</div>
-      <div style="width:100%;aspect-ratio:4/3;background:#0a0e14;border-radius:8px;border:1px solid ${d.border};display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
-        <svg viewBox="0 0 400 300" width="100%" height="100%">
-          <rect width="400" height="300" fill="#0a0e14"/>
-          <rect x="50" y="30" width="300" height="240" rx="12" fill="#111825" stroke="${d.border}" stroke-width="2"/>
-          <text x="200" y="60" text-anchor="middle" fill="${d.color}" font-size="14" font-weight="bold">${d.name}</text>
+function mgTwin3DCanvas(S,E){
+  return `<style>
+    .twin-canvas{position:relative;width:100%;height:540px;background:radial-gradient(ellipse at center,#0f141e 0%,#080c14 100%);border-radius:16px;border:1px solid rgba(74,144,217,0.15);overflow:hidden}
+    .twin-grid{position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle,rgba(74,144,217,0.06) 1px,transparent 1px);background-size:30px 30px;pointer-events:none}
+    .twin-ground{position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(180deg,rgba(10,14,20,0) 0%,rgba(10,14,24,0.8) 50%,rgba(0,0,0,0.95) 100%);pointer-events:none}
+    .twin-equip{position:absolute;border-radius:12px;transition:all .4s;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+    .twin-equip:hover{transform:scale(1.08);z-index:10;box-shadow:0 16px 48px rgba(0,0,0,0.6)}
+    .twin-equip .icon{font-size:32px;margin-bottom:4px}
+    .twin-equip .label{font-size:11px;font-weight:700}
+    .twin-equip .val{font-size:15px;font-weight:900;margin-top:2px}
+    .twin-equip .sub{font-size:9px;opacity:0.6;margin-top:2px}
+    .flow-line{position:absolute;pointer-events:none;height:2px;transform-origin:left center;opacity:0.6}
+    .flow-line::after{content:'';position:absolute;right:-6px;top:-4px;width:0;height:0;border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+    .flow-particle{position:absolute;width:4px;height:4px;border-radius:50%;pointer-events:none;animation:flowMove linear infinite}
+    @keyframes flowMove{0%{transform:translateX(0)}100%{transform:translateX(var(--flow-length))}}
+    @keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+    @keyframes twinParticle{0%{transform:translateY(100%) scale(0);opacity:0}50%{opacity:1}100%{transform:translateY(-100%) scale(0);opacity:0}}
+    .twin-particle{position:absolute;bottom:0;width:3px;height:3px;border-radius:50%;animation:twinParticle ease-in infinite;pointer-events:none}
+    .twin-status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;animation:pulse 1.5s ease-in-out infinite}
+    .twin-vr-hint{position:absolute;bottom:12px;right:16px;font-size:10px;color:#666;text-align:right;line-height:1.5}
+  </style>
+  <div class="twin-canvas" id="twin3DCanvas">
+    <div class="twin-grid"></div>
+    <div class="twin-ground"></div>
+    
+    <!-- 10kV电网 -->
+    <div class="twin-equip" style="left:16px;top:40px;width:120px;height:130px;background:linear-gradient(135deg,rgba(74,144,217,0.12),rgba(74,144,217,0.04));border:1.5px solid rgba(74,144,217,0.4);box-shadow:0 8px 32px rgba(74,144,217,0.1)" onclick="mgTwinView('trans')">
+      <div class="icon">🔌</div><div class="label" style="color:#4a90d9">10kV电网</div>
+      <div class="val" style="color:#4a90d9">${E.gridPower.toFixed(0)}kW</div>
+      <div style="margin-top:6px;display:flex;gap:4px;align-items:center">
+        <span class="twin-status-dot" style="background:#50c878;box-shadow:0 0 6px #50c878"></span>
+        <div class="sub" style="color:#50c878">${E.gridMode==='grid_tied'?'并网PQ':'离网V/f'}</div>
+      </div>
+      <div style="margin-top:6px;display:flex;gap:3px"><span style="width:16px;height:2px;background:#4a90d9"> </span><span style="width:16px;height:2px;background:#e8a838"> </span><span style="width:16px;height:2px;background:#e06070"> </span></div>
+      <div class="sub" style="color:#808890;margin-top:2px">A B C 三相</div>
+    </div>
+
+    <!-- PCC关口 -->
+    <div class="twin-equip" style="left:140px;top:8px;width:100px;height:60px;background:linear-gradient(135deg,rgba(80,200,120,0.10),rgba(80,200,120,0.03));border:1.5px solid rgba(80,200,120,0.35);box-shadow:0 6px 20px rgba(80,200,120,0.08)" onclick="mgTwinView('ems')">
+      <div class="label" style="color:#50c878">PCC关口</div>
+      <div class="val" style="color:#50c878;font-size:18px">并网</div>
+    </div>
+
+    <!-- 变压器 -->
+    <div class="twin-equip" style="left:140px;top:76px;width:100px;height:94px;background:linear-gradient(135deg,rgba(232,168,56,0.12),rgba(232,168,56,0.04));border:1.5px solid rgba(232,168,56,0.4);box-shadow:0 8px 32px rgba(232,168,56,0.1)" onclick="mgTwinView('trans')">
+      <div class="icon">🔽</div><div class="label" style="color:#e8a838">变压器</div>
+      <div class="val" style="color:#e8a838">1600kVA</div>
+      <div class="sub" style="color:#808890">10kV/0.4kV</div>
+      <div class="sub" style="color:#808890">Dyn11 Uk=6%</div>
+    </div>
+
+    <!-- PCS舱体 -->
+    <div class="twin-equip" style="left:300px;top:30px;width:170px;height:250px;background:linear-gradient(135deg,rgba(80,200,120,0.1),rgba(80,200,120,0.05));border:2px solid rgba(80,200,120,0.5);box-shadow:0 12px 40px rgba(80,200,120,0.15)" onclick="mgTwinView('pcs')">
+      <div style="position:absolute;top:8px;right:10px;display:flex;align-items:center;gap:4px"><span class="twin-status-dot" style="background:#50c878;box-shadow:0 0 8px #50c878"></span><span style="font-size:9px;color:#50c878">LIVE</span></div>
+      <div class="icon" style="font-size:38px">⚡</div>
+      <div class="label" style="color:#50c878;font-size:14px">PCS 储能变流器</div>
+      <div class="val" style="color:#50c878;font-size:24px">${Math.abs(E.pcsPower).toFixed(0)}kW</div>
+      <div class="sub" style="color:#50c878">${E.pcsPower>0?'▶放电':'◀充电'} | ${E.runningMode}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px;width:80%">
+        <div style="background:rgba(80,200,120,0.08);border-radius:4px;padding:4px 6px;text-align:center"><div style="font-size:9px;color:#50c878">DC侧</div><div style="font-size:10px;color:#808890">652V</div></div>
+        <div style="background:rgba(80,200,120,0.08);border-radius:4px;padding:4px 6px;text-align:center"><div style="font-size:9px;color:#50c878">AC侧</div><div style="font-size:10px;color:#808890">388V</div></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <span style="width:10px;height:10px;border-radius:50%;background:#50c878;box-shadow:0 0 6px #50c878" title="IGBT正常"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:#50c878;box-shadow:0 0 6px #50c878" title="DC模块正常"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:#e8a838;box-shadow:0 0 6px #e8a838" title="关注"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:#50c878;box-shadow:0 0 6px #50c878" title="通信正常"></span>
+      </div>
+      <div class="sub" style="margin-top:6px">IGBT | DC | RUN | COM</div>
+    </div>
+
+    <!-- 电池舱体 -->
+    <div class="twin-equip" style="left:300px;top:295px;width:170px;height:230px;background:linear-gradient(135deg,rgba(74,144,217,0.10),rgba(74,144,217,0.04));border:2px solid rgba(74,144,217,0.5);box-shadow:0 12px 40px rgba(74,144,217,0.15)" onclick="mgTwinView('batt')">
+      <div style="position:absolute;top:8px;right:10px;display:flex;align-items:center;gap:4px"><span class="twin-status-dot" style="background:#4a90d9;box-shadow:0 0 8px #4a90d9"></span><span style="font-size:9px;color:#4a90d9">LIVE</span></div>
+      <div class="icon">🔋</div>
+      <div class="label" style="color:#4a90d9;font-size:14px">BMS 电池舱体</div>
+      <!-- 电池簇可视化 -->
+      <div style="display:flex;gap:2px;margin:4px 0">
+        ${Array.from({length:8},(_,i)=>`<div style="width:14px;height:28px;background:${E.soc>10+i*10?'linear-gradient(180deg,#3a6a9a,#1a3a5a)':'#1a1a2a'};border:0.5px solid #4a90d9;border-radius:2px;position:relative"><div style="position:absolute;bottom:1px;left:1px;right:1px;height:${Math.min(100,E.soc)}%;background:${E.soc<20?'#e06070':E.soc<50?'#e8a838':'#50c878'}70;border-radius:1px"></div></div>`).join('')}
+      </div>
+      <div class="val" style="color:${E.soc<20?'#e06070':E.soc<50?'#e8a838':'#50c878'};font-size:24px">SOC ${E.soc.toFixed(0)}%</div>
+      <div class="sub" style="color:#808890">${(S.bessKwh/1000).toFixed(1)}MWh | LFP | SOH ${E.soh}%</div>
+      <div class="sub" style="color:#808890">液冷 T:${E.bmsTempMin}-${E.bmsTempMax}℃</div>
+      <div class="sub" style="color:#808890">4簇并联 | 672VDC | CAN 2.0B</div>
+    </div>
+
+    <!-- 光伏阵列 -->
+    <div class="twin-equip" style="left:520px;top:30px;width:170px;height:160px;background:linear-gradient(135deg,rgba(232,168,56,0.12),rgba(232,168,56,0.04));border:1.5px solid rgba(232,168,56,0.4);box-shadow:0 8px 32px rgba(232,168,56,0.1)" onclick="mgTwinView('pv')">
+      <div class="icon" style="color:#e8a838">☀️</div>
+      <div class="label" style="color:#e8a838">光伏阵列</div>
+      <div class="val" style="color:#e8a838;font-size:20px">${E.pvPower.toFixed(0)}kW</div>
+      <div class="sub">/${S.pv}kWp | MPPT</div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:2px;margin-top:8px;width:80%">
+        ${Array.from({length:12},()=>`<div style="width:100%;aspect-ratio:1;background:${E.pvPower>10?'linear-gradient(135deg,rgba(232,168,56,0.4),rgba(232,168,56,0.1))':'#1a1a2a'};border:0.5px solid rgba(232,168,56,0.3);border-radius:1px"> </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- 充电桩 -->
+    <div class="twin-equip" style="left:520px;top:205px;width:170px;height:130px;background:linear-gradient(135deg,rgba(160,112,208,0.1),rgba(160,112,208,0.04));border:1.5px solid rgba(160,112,208,0.4);box-shadow:0 8px 32px rgba(160,112,208,0.1)" onclick="mgTwinView('ev')">
+      <div class="icon" style="color:#a070d0">🔌🔌🔌</div>
+      <div class="label" style="color:#a070d0">充电桩</div>
+      <div class="val" style="color:#a070d0;font-size:20px">${E.evPower.toFixed(0)}kW</div>
+      <div class="sub">/${S.evKw}kW | 6桩12枪</div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${E.evPower>10?'#50c878':'#333'}"> </span>
+        <span style="width:8px;height:8px;border-radius:50%;background:#e8a838"> </span>
+        <span style="width:8px;height:8px;border-radius:50%;background:#333"> </span>
+      </div>
+    </div>
+
+    <!-- EMS控制柜 -->
+    <div class="twin-equip" style="left:520px;top:350px;width:170px;height:170px;background:linear-gradient(135deg,rgba(128,176,224,0.1),rgba(128,176,224,0.04));border:1.5px solid rgba(128,176,224,0.4);box-shadow:0 8px 32px rgba(128,176,224,0.1)" onclick="mgTwinView('ems')">
+      <div class="icon">🖥️</div>
+      <div class="label" style="color:#80b0e0">EMS 控制柜</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px;width:80%">
+        <div style="background:rgba(74,144,217,0.08);border-radius:4px;padding:4px"><div style="font-size:10px;color:#4a90d9">SCADA</div><div style="font-size:9px;color:#808890">监控</div></div>
+        <div style="background:rgba(80,200,120,0.08);border-radius:4px;padding:4px"><div style="font-size:10px;color:#50c878">EMS</div><div style="font-size:9px;color:#808890">策略</div></div>
+      </div>
+      <div class="sub" style="margin-top:8px">策略: ${E.activeStrategy}</div>
+      <div class="sub">模式: ${E.runningMode}</div>
+      <div style="display:flex;gap:5px;margin-top:8px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#50c878;animation:pulse 1s infinite;box-shadow:0 0 4px #50c878"> </span>
+        <span style="width:6px;height:6px;border-radius:50%;background:#50c878;animation:pulse 1s infinite 0.3s;box-shadow:0 0 4px #50c878"> </span>
+        <span style="width:6px;height:6px;border-radius:50%;background:#e8a838;box-shadow:0 0 4px #e8a838"> </span>
+        <span style="width:6px;height:6px;border-radius:50%;background:#50c878;animation:pulse 1s infinite 0.6s;box-shadow:0 0 4px #50c878"> </span>
+      </div>
+    </div>
+
+    <!-- 负荷侧 -->
+    <div class="twin-equip" style="left:725px;top:120px;width:130px;height:120px;background:linear-gradient(135deg,rgba(160,112,208,0.1),rgba(160,112,208,0.05));border:1.5px solid rgba(160,112,208,0.4);box-shadow:0 8px 32px rgba(160,112,208,0.1)">
+      <div class="icon" style="color:#a070d0">💡</div>
+      <div class="label" style="color:#a070d0">负荷</div>
+      <div class="val" style="color:#a070d0;font-size:24px">${E.loadPower.toFixed(0)}kW</div>
+      <div class="sub">峰值${S.peakLoad}kW</div>
+      <div style="display:flex;justify-content:center;gap:4px;margin-top:4px">
+        <span style="font-size:9px;background:rgba(160,112,208,0.15);padding:2px 6px;border-radius:4px;color:#a070d0">关键</span>
+        <span style="font-size:9px;background:rgba(160,112,208,0.15);padding:2px 6px;border-radius:4px;color:#a070d0">可调</span>
+      </div>
+    </div>
+
+    <!-- 能量流动线 (绝对定位绘制) -->
+    <svg viewBox="0 0 900 550" width="100%" height="100%" style="position:absolute;top:0;left:0;pointer-events:none"><defs>
+      <marker id="arr-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 2L8 5L2 8" fill="#4a90d9"/></marker>
+      <marker id="arr-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 2L8 5L2 8" fill="#50c878"/></marker>
+      <marker id="arr-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 2L8 5L2 8" fill="#e8a838"/></marker></defs>
+      <line x1="136" y1="105" x2="190" y2="145" stroke="#4a90d9" stroke-width="2.5" marker-end="url(#arr-blue)" opacity="0.8"/>
+      <line x1="240" y1="145" x2="300" y2="155" stroke="#e8a838" stroke-width="2.5" marker-end="url(#arr-orange)" opacity="0.8"/>
+      <line x1="385" y1="280" x2="385" y2="295" stroke="#50c878" stroke-width="2.5" marker-end="url(#arr-green)" opacity="0.8" class="flow-line-svg"/>
+      <line x1="470" y1="115" x2="520" y2="115" stroke="#e8a838" stroke-width="2" marker-end="url(#arr-orange)" opacity="0.6" stroke-dasharray="6 3"/>
+      <line x1="605" y1="200" x2="720" y2="185" stroke="#a070d0" stroke-width="2" marker-end="url(#arr-orange)" opacity="0.6" stroke-dasharray="6 3"/>
+    </svg>
+
+    <!-- VR提示 -->
+    <div class="twin-vr-hint">
+      Three.js / Babylon.js 实时渲染<br>
+      MQTT WebSocket | glTF 2.0<br>
+      LOD0(VR) / LOD1(Web) / LOD2(GIS)
+    </div>
+
+    <!-- 流动粒子 -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:40px;overflow:hidden;pointer-events:none">
+      ${Array.from({length:30},()=>`<div class="twin-particle" style="left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*3}s;background:${['#50c878','#4a90d9','#e8a838','#a070d0'][Math.floor(Math.random()*4)]}"></div>`).join('')}
+    </div>
+  </div>
+  <!-- 底部面板 -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .3s" onclick="mgTwinView('pcs')" onmouseenter="this.style.borderColor='#50c878'" onmouseleave="this.style.borderColor='var(--border)'">
+      <div style="font-size:10px;color:var(--text2)">PCS变流器</div>
+      <div style="font-size:22px;color:#50c878;font-weight:900">${Math.abs(E.pcsPower).toFixed(0)}kW</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:2px">${E.pcsPower>0?'放电中':'充电中'}</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .3s" onclick="mgTwinView('batt')" onmouseenter="this.style.borderColor='#4a90d9'" onmouseleave="this.style.borderColor='var(--border)'">
+      <div style="font-size:10px;color:var(--text2)">电池SOC</div>
+      <div style="font-size:22px;color:${E.soc<20?'#e06070':E.soc<50?'#e8a838':'#50c878'};font-weight:900">${E.soc.toFixed(0)}%</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:2px">${(S.bessKwh/1000).toFixed(1)}MWh | SOH ${E.soh}%</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .3s" onclick="mgTwinView('pv')" onmouseenter="this.style.borderColor='#e8a838'" onmouseleave="this.style.borderColor='var(--border)'">
+      <div style="font-size:10px;color:var(--text2)">光伏出力</div>
+      <div style="font-size:22px;color:#e8a838;font-weight:900">${E.pvPower.toFixed(0)}kW</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:2px">/${S.pv}kWp | 日照中</div>
+    </div>
+  </div>`;
+}
+
+function mgTwinStartFlow(){
+  mgSimTwinData();
+  mgTwinFlowTimer=setInterval(()=>{
+    mgTwinFlowPhase=(mgTwinFlowPhase+1)%60;
+    mgSimTwinData();
+  },2000);
+}
+
+function mgTwinStopFlow(){
+  if(mgTwinFlowTimer){clearInterval(mgTwinFlowTimer);mgTwinFlowTimer=null;}
+}
+
+function mgSimTwinData(){
+  const E=mgEnergyState;
+  const phase=mgTwinFlowPhase;
+  if(phase<15) E.pcsPower=100+Math.sin(phase/5)*50+Math.random()*20;
+  else if(phase<30) E.pcsPower=-50-Math.sin(phase/5)*30-Math.random()*15;
+  else if(phase<45) E.pcsPower=0;
+  else E.pcsPower=80+Math.sin(phase/5)*40;
+
+  E.soc=70+Math.sin(phase/10)*15;
+  E.pvPower=phase>10&&phase<40?200+Math.sin(phase/4)*150:0;
+  E.evPower=phase>20&&phase<35?120+Math.random()*80:0;
+  E.loadPower=400+Math.sin(phase/8)*100+Math.random()*50;
+  E.gridPower=E.loadPower+E.evPower-E.pcsPower-E.pvPower;
+  E.gridFreq=50.01+(Math.random()-0.5)*0.03;
+  E.gridVoltage=388+(Math.random()-0.5)*5;
+  const el=document.getElementById('mgTwinContent');
+  if(el&&el.querySelector('.twin-canvas')){
+    const S=LAST_MG_RESULT?.sizing||{peakLoad:800,pv:500,bessKwh:1400,bessMW:1.4,evKw:360};
+    el.innerHTML=mgTwin3DCanvas(S,E);
+    mgTwinViewTimer=setTimeout(()=>{if(mgTwinFlowTimer)mgSimTwinData();},2200);
+  }
+}
+
+
+/*
+    旧数字孪生Agent (已替换)
+*/
           ${type==='pcs'?'<rect x="80" y="80" width="240" height="40" rx="4" fill="#0d1117" stroke="#333"/><text x="200" y="105" text-anchor="middle" fill="#50c878" font-size="18" font-weight="bold">'+Math.abs(E.pcsPower).toFixed(0)+'kW</text><rect x="80" y="130" width="240" height="30" rx="4" fill="#0d1117" stroke="#333"/><text x="200" y="150" text-anchor="middle" fill="#888" font-size="10">散热风扇 ●●●●●●</text><rect x="80" y="170" width="55" height="80" rx="4" fill="#1a2a1a" stroke="#50c878"/><text x="107" y="215" text-anchor="middle" fill="#50c878" font-size="9">模块1</text><rect x="145" y="170" width="55" height="80" rx="4" fill="#1a2a1a" stroke="#50c878"/><text x="172" y="215" text-anchor="middle" fill="#50c878" font-size="9">模块2</text><rect x="210" y="170" width="55" height="80" rx="4" fill="#1a2a1a" stroke="#50c878"/><text x="237" y="215" text-anchor="middle" fill="#50c878" font-size="9">模块3</text><rect x="275" y="170" width="55" height="80" rx="4" fill="#1a2a1a" stroke="#50c878"/><text x="302" y="215" text-anchor="middle" fill="#50c878" font-size="9">模块4</text>':''}
           ${type==='batt'?Array.from({length:4},(_,i)=>'<rect x="'+(80+i*65)+'" y="80" width="55" height="160" rx="4" fill="#1a2a3a" stroke="#4a90d9" stroke-width="1"/><text x="'+(107+i*65)+'" y="165" text-anchor="middle" fill="#4a90d9" font-size="9">簇'+(i+1)+'</text>').join('')+'<text x="200" y="260" text-anchor="middle" fill="#4a90d9" font-size="12">SOC: '+E.soc.toFixed(1)+'%</text>':''}
           ${type==='trans'?'<circle cx="170" cy="160" r="40" fill="none" stroke="#e8a838" stroke-width="2"/><circle cx="230" cy="160" r="40" fill="none" stroke="#e8a838" stroke-width="2"/><text x="200" y="230" text-anchor="middle" fill="#e8a838" font-size="12">10kV / 0.4kV</text>':''}
