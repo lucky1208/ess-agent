@@ -5836,8 +5836,17 @@ ${ESS_DIAGRAM_SKILL_V3}`;
           let openB=(fixed2.match(/{/g)||[]).length,closeB=(fixed2.match(/}/g)||[]).length;
           let openSq=(fixed2.match(/\[/g)||[]).length,closeSq=(fixed2.match(/]/g)||[]).length;
           if(openB>closeB||openSq>closeSq){
-            fixed2+='}'.repeat(Math.max(0,openB-closeB))+']'.repeat(Math.max(0,openSq-closeSq));
-            mgAddLog('补全: +'+(openB-closeB)+'} +'+(closeSq-openSq)+']','step');
+            const lastSvgClose=fixed2.lastIndexOf('</svg>');
+            const lastSvgCloseEsc=fixed2.lastIndexOf('<\\/svg>');
+            const svgEnd=Math.max(lastSvgClose,lastSvgCloseEsc);
+            if(svgEnd>fixed2.length*0.5){
+              fixed2=fixed2.substring(0,svgEnd+(lastSvgCloseEsc>lastSvgClose?7:6));
+              fixed2+='"';
+            }
+            const ob2=(fixed2.match(/{/g)||[]).length,cb2=(fixed2.match(/}/g)||[]).length;
+            const os2=(fixed2.match(/\[/g)||[]).length,cs2=(fixed2.match(/]/g)||[]).length;
+            fixed2+='}'.repeat(Math.max(0,ob2-cb2))+']'.repeat(Math.max(0,os2-cs2));
+            mgAddLog('补全: +'+(ob2-cb2)+'} +'+(os2-cs2)+']','step');
             try{result=JSON.parse(fixed2);ok=true;mgAddLog('补全后JSON解析成功 ✓','ok');}catch(e4){}
           }
         }
@@ -5853,6 +5862,19 @@ ${ESS_DIAGRAM_SKILL_V3}`;
               if(esc){esc=false;continue;}
               if(str[i]==='\\'){esc=true;continue;}
               if(str[i]==='"')return str.substring(start,i);
+            }
+            if(field.endsWith('Diagram')){
+              const tail=str.substring(start);
+              const svgClose=tail.indexOf('</svg>');
+              const svgCloseEsc=tail.indexOf('<\\/svg>');
+              let endIdx=-1;
+              if(svgClose>0&&svgCloseEsc>0) endIdx=Math.min(svgClose,svgCloseEsc);
+              else if(svgClose>0) endIdx=svgClose;
+              else if(svgCloseEsc>0) endIdx=svgCloseEsc;
+              if(endIdx>0){
+                const raw=tail.substring(0,endIdx+(str[start+endIdx]==='\\'?7:6));
+                return raw;
+              }
             }
             return null;
           };

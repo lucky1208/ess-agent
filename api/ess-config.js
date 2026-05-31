@@ -17,6 +17,7 @@ export default async function handler(req, res) {
       url: 'https://api.deepseek.com/v1/chat/completions',
       key: process.env.DEEPSEEK_API_KEY,
       model: 'deepseek-v4-pro',
+      max_tokens: 65536,
       reasoning_effort: 'high',
       thinking: { type: 'enabled' }
     },
@@ -31,7 +32,8 @@ export default async function handler(req, res) {
     bailian: {
       url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
       key: process.env.BAILIAN_API_KEY,
-      model: 'qwen3-235b-a22b'
+      model: 'qwen3-235b-a22b',
+      max_tokens: 65536
     }
   };
 
