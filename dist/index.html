@@ -7125,7 +7125,7 @@ function mgTwinInit(){
       const pMat=new T.PointsMaterial({color,size:thickness*8,transparent:true,opacity:0.8,blending:T.AdditiveBlending,depthWrite:false});
       const particles=new T.Points(pGeo,pMat);
       d.scene.add(particles);
-      return{curve,particles,positions,particleCount,speed:0.3+offset:Math.random()};
+      return{curve,particles,positions,particleCount,speed:0.3+Math.random(),offset:Math.random()};
     }
     const flowLines=[];
     flowLines.push(createFlowLine(new T.Vector3(-18,5,-5),new T.Vector3(-10,3,0),0x4a90d9,0.15));
