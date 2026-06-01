@@ -6056,11 +6056,18 @@ function mgDrawArchSvg(R){
   line(cx,174,cx,195,'#4a90d9','gaB');
   s+=`<line x1="${cx-260}" y1="195" x2="${cx+260}" y2="195" stroke="url(#gbus)" stroke-width="7" stroke-linecap="round"/><text x="${cx}" y="189" text-anchor="middle" fill="#80b0e0" font-size="11">${T.voltage} 母线</text>`;
   line(cx-180,195,cx-180,232,'#4a90d9','gaO');
-  box(cx-180,235,160,52,'#1a1530','#e8a838','主变压器',T.transformer||'');
-  line(cx-180,287,cx-180,320,'#a070d0','gaR',2);
-  box(cx-180,320,160,48,'#1a1530','#a070d0','AC 400V负荷',`${S.peakLoad||0}kW 关键${(T.criticalLoad&&S.peakLoad?(T.criticalLoad/S.peakLoad*100).toFixed(0):35)}%`);
-  line(cx+60,195,cx+60,232,'#50c878','gaG');
-  if(S.pv>0) box(cx+60,235,150,46,'#1a2a1a','#50c878','光伏系统',S.pv+'kWp');
+  box(cx-180,235,160,52,'#1a1530','#e8a838','主变压器',T.transformer||'10/0.4kV');
+  line(cx-180,287,cx-180,310,'#4a90d9','gaB');
+  s+=`<line x1="${cx-280}" y1="310" x2="${cx-80}" y2="310" stroke="url(#gbus)" stroke-width="5" stroke-linecap="round"/><text x="${cx-180}" y="304" text-anchor="middle" fill="#80b0e0" font-size="10">0.4kV 母线</text>`;
+  line(cx-250,310,cx-250,340,'#a070d0','gaR',2);
+  box(cx-250,342,120,44,'#1a1530','#a070d0','关键负荷',`${S.peakLoad||0}kW`);
+  line(cx-110,310,cx-110,340,'#a070d0','gaR',2);
+  box(cx-110,342,120,44,'#1a1530','#a070d0','一般负荷','');
+  if(S.pv>0){
+    box(cx+60,235,150,46,'#1a2a1a','#50c878','光伏系统',S.pv+'kWp');
+    line(cx+60,235,cx+60,210,'#50c878','gaG');
+    s+=`<line x1="${cx+60}" y1="210" x2="${cx+60}" y2="195" stroke="#50c878" stroke-width="2" marker-end="url(#gaG)"/>`;
+  }
   line(cx+220,195,cx+220,232,'#e06070','gaR');
   box(cx+220,235,150,46,'#2a1520','#e06070','PCS储能变流器',(S.bessMW||0)+'MW');
   line(cx+220,281,cx+220,310,'#534AB7','gaG');
@@ -6095,8 +6102,12 @@ function mgDrawWiringSvg(R){
   s+=`<rect x="${cx-192}" y="200" width="24" height="24" rx="2" fill="#2a3050" stroke="#e8a838" stroke-width="1.5"/><text x="${cx-180}" y="218" text-anchor="middle" class="ls" style="fill:#e0c060">QF2</text>`;
   s+=`<line x1="${cx-180}" y1="224" x2="${cx-180}" y2="250" class="bw" marker-end="url(#waO)"/>`;
   s+=`<circle cx="${cx-180}" cy="272" r="22" fill="#2a3050" stroke="#e8a838" stroke-width="2"/><circle cx="${cx-180}" cy="272" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/><text x="${cx-180}" y="275" text-anchor="middle" class="ls" style="fill:#e8a838">Δ/Y</text><text x="${cx-140}" y="260" class="ls" style="fill:#c09030">主变压器</text>`;
-  s+=`<line x1="${cx-180}" y1="294" x2="${cx-180}" y2="330" class="bw" style="stroke:#a070d0"/>`;
-  s+=`<rect x="${cx-250}" y="330" width="140" height="50" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/><text x="${cx-180}" y="353" text-anchor="middle" class="ls" style="fill:#c090e0;font-size:10">0.4kV交流负荷</text><text x="${cx-180}" y="370" text-anchor="middle" class="ls" style="fill:#8060a0;font-size:8">${S.peakLoad||0}kW</text>`;
+  s+=`<line x1="${cx-180}" y1="294" x2="${cx-180}" y2="320" class="bw" style="stroke:#4a90d9"/>`;
+  s+=`<line x1="${cx-280}" y1="320" x2="${cx-80}" y2="320" stroke="url(#wbus)" stroke-width="4" stroke-linecap="round"/><text x="${cx-180}" y="314" text-anchor="middle" class="ls" style="fill:#80b0e0">0.4kV 母线</text>`;
+  s+=`<line x1="${cx-250}" y1="320" x2="${cx-250}" y2="350" class="bw" style="stroke:#a070d0" marker-end="url(#waO)"/>`;
+  s+=`<rect x="${cx-310}" y="350" width="120" height="40" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/><text x="${cx-250}" y="373" text-anchor="middle" class="ls" style="fill:#c090e0;font-size:10">关键负荷</text><text x="${cx-250}" y="385" text-anchor="middle" class="ls" style="fill:#8060a0;font-size:8">${S.peakLoad||0}kW</text>`;
+  s+=`<line x1="${cx-110}" y1="320" x2="${cx-110}" y2="350" class="bw" style="stroke:#a070d0" marker-end="url(#waO)"/>`;
+  s+=`<rect x="${cx-170}" y="350" width="120" height="40" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/><text x="${cx-110}" y="373" text-anchor="middle" class="ls" style="fill:#c090e0;font-size:10">一般负荷</text>`;
   let by=200;
   s+=`<line x1="${cx}" y1="160" x2="${cx}" y2="${by}" class="bw" style="stroke:#50c878" marker-end="url(#waG)"/>`;
   s+=`<rect x="${cx-80}" y="${by}" width="160" height="44" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="2"/><text x="${cx}" y="${by+20}" text-anchor="middle" style="fill:#80e080;font-size:11">储能${T.voltage}并网柜</text><text x="${cx}" y="${by+36}" text-anchor="middle" class="ls" style="fill:#60a060">断路器+继保+防孤岛</text>`;
