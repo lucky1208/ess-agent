@@ -71,7 +71,7 @@ select.form-input{appearance:auto}
 .badge-purple{background:rgba(83,74,183,.2);color:var(--purple)}
 .badge-orange{background:rgba(239,159,39,.2);color:var(--orange)}
 .badge-red{background:rgba(224,96,112,.15);color:var(--red)}
-.detail-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.detail-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 .detail-modal.show{display:flex;align-items:center;justify-content:center}
 .detail-content{background:var(--bg2);border:1px solid var(--border);border-radius:12px;width:90%;max-width:800px;max-height:85vh;overflow-y:auto;padding:24px;position:relative}
 .detail-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
@@ -4575,15 +4575,15 @@ const DEVICE_SPECS={
 
 function showDetail(productId){
   const p=PRODUCTS.find(x=>x.id===productId);
-  if(!p)return;
+  if(!p){console.warn('showDetail: product not found',productId);return;}
   const modal=document.getElementById('detailModal');
+  if(!modal){console.error('showDetail: detailModal not found');return;}
   const img=document.getElementById('detailImg');
   const name=document.getElementById('detailName');
   const model=document.getElementById('detailModel');
   const specs=document.getElementById('detailSpecs');
-  img.src=p.img?`images/products/${p.img}`:'';
-  img.style.display=p.img?'block':'none';
-  img.onerror=function(){this.style.display='none'};
+  if(!name||!model||!specs){console.error('showDetail: modal elements missing');return;}
+  if(img){img.src=p.img?`images/products/${p.img}`:'';img.style.display=p.img?'block':'none';img.onerror=function(){this.style.display='none'};}
   name.textContent=p.name;
   model.textContent=p.model;
   const specText=DEVICE_SPECS[productId]||`型号: ${p.model}\n\n基本参数:\n  标称能量: ${p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh'}\n  额定功率: ${p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW'}\n  标称电压: ${p.volt}V\n  电芯: ${p.cell}\n  尺寸: ${p.size}\n  重量: ${p.weight}\n  温控: ${p.cool}\n  防护: ${p.ip}\n  消防: ${p.fire}\n  工作温度: ${p.temp}\n  ${p.pcs?'PCS+升压变一体化':'需另配PCS+升压变'}\n  ${p.maxP?'最大'+p.maxP+'台并联':''}`;
