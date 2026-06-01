@@ -7005,7 +7005,8 @@ function mgTwinInit(){
         if(win&&win.postMessage){
           const E=mgEnergyState;
           const S=LAST_MG_RESULT?.sizing||{};
-          win.postMessage({type:'ess-update',data:{soc:E.soc,pcsPower:E.pcsPower,pvPower:E.pvPower,gridPower:E.gridPower,loadPower:E.loadPower,evPower:E.evPower,sizing:S}},'*');
+          const B=LAST_MG_RESULT?.bom||[];
+          win.postMessage({type:'ess-update',data:{soc:E.soc,pcsPower:E.pcsPower,pvPower:E.pvPower,gridPower:E.gridPower,loadPower:E.loadPower,evPower:E.evPower,sizing:S,bom:B}},'*');
         }
       }catch(e){}
     }
@@ -7033,7 +7034,8 @@ setInterval(()=>{
     const iframe=document.getElementById('twinIframe');
     if(iframe&&iframe.contentWindow&&LAST_MG_RESULT){
       const E=mgEnergyState;
-      iframe.contentWindow.postMessage({type:'ess-update',data:{soc:E.soc,pcsPower:E.pcsPower,pvPower:E.pvPower,gridPower:E.gridPower,loadPower:E.loadPower,evPower:E.evPower}},'*');
+      const B=LAST_MG_RESULT?.bom||[];
+      iframe.contentWindow.postMessage({type:'ess-update',data:{soc:E.soc,pcsPower:E.pcsPower,pvPower:E.pvPower,gridPower:E.gridPower,loadPower:E.loadPower,evPower:E.evPower,bom:B}},'*');
     }
   }catch(e){}
 },2000);

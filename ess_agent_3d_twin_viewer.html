@@ -1244,6 +1244,9 @@
 
             // Data rows
             let dataHtml = '';
+            if (data.bomModel) {
+                dataHtml += `<div class="panel-data-row"><span class="panel-data-label">型号</span><span class="panel-data-value" style="font-size:10px">${data.bomModel}</span></div>`;
+            }
             if (data.type === 'bess') {
                 dataHtml = `
                     <div class="panel-data-row"><span class="panel-data-label">电压</span><span class="panel-data-value">1331.2 V</span></div>
@@ -1452,6 +1455,43 @@
                             obj.userData.power = s.pv || obj.userData.power;
                         }
                     });
+                }
+                if (d.bom && Array.isArray(d.bom)) {
+                    const bomMap = {};
+                    d.bom.forEach(b => { bomMap[b.item] = b; });
+                    scene.traverse((obj) => {
+                        if (!obj.userData || !obj.userData.type) return;
+                        const t = obj.userData.type;
+                        if (t === 'bess') {
+                            const b = bomMap['储能电池系统BESS'];
+                            if (b) { obj.userData.name = b.item + ' ' + (b.model||''); obj.userData.bomModel = b.model; }
+                        }
+                        if (t === 'pcs') {
+                            const b = bomMap['PCS储能变流器'];
+                            if (b) { obj.userData.name = b.item + ' ' + (b.model||''); obj.userData.bomModel = b.model; }
+                        }
+                        if (t === 'pv') {
+                            const b = bomMap['光伏逆变器'];
+                            if (b) { obj.userData.name = '光伏系统 ' + (b.model||''); obj.userData.bomModel = b.model; }
+                        }
+                        if (t === 'transformer') {
+                            const b = bomMap['PCC并网开关柜'];
+                            if (b) { obj.userData.name = b.item + ' ' + (b.model||''); obj.userData.bomModel = b.model; }
+                        }
+                        if (t === 'ems') {
+                            const b = bomMap['微网EMS系统'];
+                            if (b) { obj.userData.name = b.item + ' ' + (b.model||''); obj.userData.bomModel = b.model; }
+                        }
+                    });
+                    const statusTags = document.querySelectorAll('.status-tag');
+                    if (statusTags.length >= 4) {
+                        const bBess = bomMap['储能电池系统BESS'];
+                        const bPcs = bomMap['PCS储能变流器'];
+                        const bPv = bomMap['光伏逆变器'];
+                        if (bBess) statusTags[1].textContent = 'BESS ' + (bBess.model||'').substring(0,15);
+                        if (bPcs) statusTags[2].textContent = 'PCS ' + (bPcs.model||'').substring(0,15);
+                        if (bPv) statusTags[3].textContent = 'PV ' + (bPv.model||'').substring(0,15);
+                    }
                 }
             }
             if (msg.type === 'ess-cam-preset' && msg.preset) {
