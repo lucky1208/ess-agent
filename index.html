@@ -236,7 +236,7 @@ select.form-input{appearance:auto}
 
 <!-- TAB: 方案设计/方案结果 -->
 <div id="page-config" class="tab-content">
-<div class="success-msg" id="successMsg">解决方案已生成！请查看推荐设备和系统图纸。</div>
+
 
 <div style="background:linear-gradient(135deg,#185FA5,#0F6E56);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
 <div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px" data-i18n="sidebar_ai_title">AI智能体自动配置</div>
@@ -313,6 +313,8 @@ select.form-input{appearance:auto}
 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
 <span data-i18n="generate_btn">生成解决方案</span>
 </button>
+
+<div class="success-msg" id="successMsg">解决方案已生成！请查看推荐设备和系统图纸。</div>
 
 <div id="rankingSection" style="display:none;margin-top:12px;background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">
   <div class="sec-title" style="font-size:13px;margin-bottom:8px">
@@ -2266,7 +2268,7 @@ const PRODUCTS=[
 const CASES=[
   {title:'黑龙江大庆管业 5MWh',desc:'2×1250kVA变压器，月用电35万kWh，10kV侧接入，峰谷套利年省55万+',tags:['10kV','5MWh','工商业'],color:'var(--blue)',img:'transformer.png',detailId:'daqing'},
   {title:'美国Fremont光储充 1.4MWh',desc:'1.4MWh储能+1MW光伏+1.6MW直流快充，自给自足',tags:['光储充','1.4MWh','海外'],color:'var(--orange)',img:'page11_img2.png',detailId:'fremont'},
-  {title:'上海邑东 2.5MWh储能站',desc:'集装箱储能充电桩一体化，2.5MWh配套充电场站',tags:['2.5MWh','充换电'],color:'var(--purple)',img:'page1_img0.png',detailId:'yidong'},
+  {title:'上海邑东 2.5MWh储能站',desc:'集装箱储能充电桩一体化，2.5MWh配套充电场站',tags:['2.5MWh','充换电'],color:'var(--purple)',img:'yidong_charging_station.png',detailId:'yidong'},
   {title:'西部钻探油田钻井平台 5MWh',desc:'国轩高科×西部钻探×沃德石油，国内首创大型油改电项目，5MWh储能仓替代柴油发电',tags:['油改电','5MWh','钻井'],color:'var(--brown)',img:'dll_s15_4.jpg',detailId:'xibuzt'},
 ];
 
@@ -5090,7 +5092,7 @@ function renderCases(){
   const el=document.getElementById('caseGrid');
   el.innerHTML=CASES.map((c,i)=>`<div class="case-card fade-in" style="animation-delay:${i*0.1}s;cursor:pointer" data-detail="${c.detailId||''}" data-title="${c.title}">
     <div class="case-img" style="background:linear-gradient(135deg,${c.color}33,${c.color}11)">
-      ${c.img?`<img src="images/products/${c.img}" alt="${c.title}" onerror="this.parentElement.innerHTML='<span style=color:var(--text2)>⚡</span>'">`:'<span style="color:var(--text2)">⚡</span>'}
+      ${c.img?`<img src="images/cases/${c.img}" alt="${c.title}" onerror="this.src='images/products/${c.img}';this.onerror=function(){this.parentElement.innerHTML='<span style=color:var(--text2)>⚡</span>'}">`:'<span style="color:var(--text2)">⚡</span>'}
     </div>
     <div class="case-body"><div class="case-title">${c.title}${c.detailId?' ↗':''}</div><div class="case-desc">${c.desc}</div>
     <div class="case-tags">${c.tags.map(t=>`<span class="case-tag" style="background:${c.color}22;color:${c.color}">${t}</span>`).join('')}</div>
