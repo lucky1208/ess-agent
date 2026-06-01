@@ -6230,29 +6230,26 @@ function mgRenderAllDrawings(R,provider){
   if(isLLM&&isStructJSON(R.archDiagram)){
     dlog('['+provider.toUpperCase()+'] LLM返回结构化JSON，前端渲染架构图','step');
     renderDiagramFromJSON('mgArchSvg',R.archDiagram,'微网系统架构图 (AI生成)');dlog('架构图 ✓','ok');
-  }else if(isLLM&&isValidSvg(R.archDiagram)){
-    dlog('['+provider.toUpperCase()+'] LLM返回SVG架构图','step');
-    mgById('mgArchSvg').innerHTML=R.archDiagram;dlog('架构图 ✓','ok');
   }else{
-    dlog(isLLM?'LLM返回架构图无效，fallback本地模板':'[本地SVG模板] 渲染图纸...','step');
+    if(isLLM&&isValidSvg(R.archDiagram))dlog('LLM返回SVG架构图(质量差)，fallback本地模板','warn');
+    else if(isLLM)dlog('LLM返回架构图无效，fallback本地模板','step');
+    else dlog('[本地SVG模板] 渲染图纸...','step');
     mgDrawArchSvg(R);
   }
   if(isLLM&&isWiringJSON(R.wiringDiagram)){
     dlog('LLM返回结构化JSON，前端渲染接线图','step');
     renderDiagramFromJSON('mgWiringSvg',R.wiringDiagram,'电气一次接线图 (AI生成)');dlog('接线图 ✓','ok');
-  }else if(isLLM&&isValidSvg(R.wiringDiagram)){
-    mgById('mgWiringSvg').innerHTML=R.wiringDiagram;dlog('接线图 ✓','ok');
   }else{
-    if(isLLM)dlog('LLM返回接线图无效，fallback本地','warn');
+    if(isLLM&&isValidSvg(R.wiringDiagram))dlog('LLM返回SVG接线图(质量差)，fallback本地模板','warn');
+    else if(isLLM)dlog('LLM返回接线图无效，fallback本地','warn');
     mgDrawWiringSvg(R);
   }
   if(isLLM&&isCommJSON(R.commDiagram)){
     dlog('LLM返回结构化JSON，前端渲染通信图','step');
     mgRenderCommFromJSON(R.commDiagram);dlog('通信拓扑图 ✓','ok');
-  }else if(isLLM&&isValidSvg(R.commDiagram)){
-    mgById('mgCommSvg').innerHTML=R.commDiagram;dlog('通信拓扑图 ✓','ok');
   }else{
-    if(isLLM)dlog('LLM返回通信图无效，fallback本地','warn');
+    if(isLLM&&isValidSvg(R.commDiagram))dlog('LLM返回SVG通信图(质量差)，fallback本地模板','warn');
+    else if(isLLM)dlog('LLM返回通信图无效，fallback本地','warn');
     mgDrawCommSvg(R);
   }
   if(isLLM&&R.bom&&Array.isArray(R.bom)){
