@@ -1137,10 +1137,10 @@ ACC AC一体柜专题
 <script>
 (function(){
   function _showDetail(productId){
-    var PRODUCTS=window.PRODUCTS;
-    var DEVICE_SPECS=window.DEVICE_SPECS;
-    if(!PRODUCTS){console.error('_showDetail: PRODUCTS not ready');return;}
-    var p=PRODUCTS.find(function(x){return x.id===productId});
+    var prods=typeof PRODUCTS!=='undefined'?PRODUCTS:(window.PRODUCTS||null);
+    var dspecs=typeof DEVICE_SPECS!=='undefined'?DEVICE_SPECS:(window.DEVICE_SPECS||null);
+    if(!prods){console.error('_showDetail: PRODUCTS not ready');return;}
+    var p=prods.find(function(x){return x.id===productId});
     if(!p){console.warn('_showDetail: product not found',productId);return;}
     var modal=document.getElementById('detailModal');
     if(!modal){console.error('_showDetail: detailModal not found');return;}
@@ -1152,7 +1152,7 @@ ACC AC一体柜专题
     if(img){img.src=p.img?'images/products/'+p.img:'';img.style.display=p.img?'block':'none';img.onerror=function(){this.style.display='none'};}
     name.textContent=p.name;
     model.textContent=p.model;
-    var specText=DEVICE_SPECS&&DEVICE_SPECS[productId]?DEVICE_SPECS[productId]:('型号: '+p.model+'\n\n基本参数:\n  标称能量: '+(p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh')+'\n  额定功率: '+(p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW')+'\n  标称电压: '+p.volt+'V\n  电芯: '+p.cell+'\n  尺寸: '+p.size+'\n  重量: '+p.weight+'\n  温控: '+p.cool+'\n  防护: '+p.ip+'\n  消防: '+p.fire+'\n  工作温度: '+p.temp);
+    var specText=dspecs&&dspecs[productId]?dspecs[productId]:('型号: '+p.model+'\n\n基本参数:\n  标称能量: '+(p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh')+'\n  额定功率: '+(p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW')+'\n  标称电压: '+p.volt+'V\n  电芯: '+p.cell+'\n  尺寸: '+p.size+'\n  重量: '+p.weight+'\n  温控: '+p.cool+'\n  防护: '+p.ip+'\n  消防: '+p.fire+'\n  工作温度: '+p.temp);
     specs.textContent=specText;
     modal.classList.add('show');
     console.log('_showDetail: modal shown for',productId);
