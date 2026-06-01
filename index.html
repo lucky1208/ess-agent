@@ -1136,77 +1136,31 @@ ACC AC一体柜专题
 
 <script>
 (function(){
-  function _openModal(){
-    var modal=document.getElementById('detailModal');
-    if(!modal)return;
-    modal.style.cssText='display:flex;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center';
-  }
-  function _closeModal(){
-    var modal=document.getElementById('detailModal');
-    if(modal)modal.style.cssText='display:none';
-  }
-  function _showDetail(productId){
-    var prods=typeof PRODUCTS!=='undefined'?PRODUCTS:(window.PRODUCTS||null);
-    var dspecs=typeof DEVICE_SPECS!=='undefined'?DEVICE_SPECS:(window.DEVICE_SPECS||null);
-    if(!prods){console.error('_showDetail: PRODUCTS not ready');return;}
-    var p=prods.find(function(x){return x.id===productId});
-    if(!p){console.warn('_showDetail: product not found',productId);return;}
-    var modal=document.getElementById('detailModal');
-    if(!modal){console.error('_showDetail: detailModal not found');return;}
-    var img=document.getElementById('detailImg');
-    var name=document.getElementById('detailName');
-    var model=document.getElementById('detailModel');
-    var specs=document.getElementById('detailSpecs');
-    if(!name||!model||!specs){console.error('_showDetail: modal elements missing');return;}
-    if(img){img.src=p.img?'images/products/'+p.img:'';img.style.display=p.img?'block':'none';img.onerror=function(){this.style.display='none'};}
-    name.textContent=p.name;
-    model.textContent=p.model;
-    var specText=dspecs&&dspecs[productId]?dspecs[productId]:('型号: '+p.model+'\n\n基本参数:\n  标称能量: '+(p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh')+'\n  额定功率: '+(p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW')+'\n  标称电压: '+p.volt+'V\n  电芯: '+p.cell+'\n  尺寸: '+p.size+'\n  重量: '+p.weight+'\n  温控: '+p.cool+'\n  防护: '+p.ip+'\n  消防: '+p.fire+'\n  工作温度: '+p.temp);
-    specs.textContent=specText;
-    _openModal();
-    console.log('_showDetail: modal shown for',productId);
-  }
-  function _showDocDetail(detailKey,title){
-    var dspecs=typeof DEVICE_SPECS!=='undefined'?DEVICE_SPECS:(window.DEVICE_SPECS||null);
-    var ACC_DETAIL=typeof ACC_DETAIL!=='undefined'?ACC_DETAIL:(window.ACC_DETAIL||null);
-    var LL760_DETAIL=typeof LL760_DETAIL!=='undefined'?LL760_DETAIL:(window.LL760_DETAIL||null);
-    var detailMap={ACC_DETAIL:ACC_DETAIL,LL760_DETAIL:LL760_DETAIL};
-    var text=detailMap[detailKey];
-    if(!text){console.warn('_showDocDetail: no detail for',detailKey);return;}
-    var modal=document.getElementById('detailModal');
-    if(!modal){console.error('_showDocDetail: detailModal not found');return;}
-    var img=document.getElementById('detailImg');
-    var name=document.getElementById('detailName');
-    var model=document.getElementById('detailModel');
-    var specs=document.getElementById('detailSpecs');
-    if(!name||!model||!specs){console.error('_showDocDetail: modal elements missing');return;}
-    if(img)img.style.display='none';
-    name.textContent=title;
-    model.textContent=detailKey==='ACC_DETAIL'?'安装指导手册':'技术规格书';
-    specs.textContent=text;
-    _openModal();
-    console.log('_showDocDetail: modal shown for',detailKey);
-  }
-  window._openModal=_openModal;
-  window._closeModal=_closeModal;
-  window.showDetail=window.showDetail||_showDetail;
-  window.showDocDetail=window.showDocDetail||_showDocDetail;
-  window.closeDetail=window.closeDetail||_closeModal;
-  document.addEventListener('click',function(e){
-    var card=e.target.closest('.device-card');
-    if(card){
-      var onclickAttr=card.getAttribute('onclick');
-      if(onclickAttr){
-        var m1=onclickAttr.match(/showDetail\(['"]([^'"]+)['"]\)/);
-        if(m1){e.stopPropagation();e.preventDefault();_showDetail(m1[1]);return;}
-        var m2=onclickAttr.match(/showDocDetail\(['"]([^'"]+)['"]\s*,\s*['"]([^'"]+)['"]\)/);
-        if(m2){e.stopPropagation();e.preventDefault();_showDocDetail(m2[1],m2[2]);return;}
+  var modal=document.getElementById('detailModal');
+  if(!modal){console.error('detailModal not found');return;}
+  document.body.appendChild(modal);
+  modal.style.cssText='display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;z-index:99999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center';
+  var observer=new MutationObserver(function(mutations){
+    mutations.forEach(function(m){
+      if(m.attributeName==='class'){
+        var cls=modal.className;
+        if(cls.indexOf('show')!==-1){
+          modal.style.display='flex';
+          console.log('detail-modal: forced display=flex via MutationObserver');
+        }else{
+          modal.style.display='none';
+        }
       }
-    }
-    if(e.target.closest('.detail-close')){_closeModal();return;}
-    if(e.target.id==='detailModal'){_closeModal();return;}
-  },true);
-  console.log('detail-modal event delegation v2 ready');
+    });
+  });
+  observer.observe(modal,{attributes:true,attributeFilter:['class']});
+  modal.addEventListener('click',function(e){
+    if(e.target===modal){modal.classList.remove('show');modal.style.display='none';}
+  });
+  modal.querySelector('.detail-close').addEventListener('click',function(){
+    modal.classList.remove('show');modal.style.display='none';
+  });
+  console.log('detail-modal MutationObserver v3 ready');
 })();
 </script>
 
@@ -4670,7 +4624,9 @@ function showDetail(productId){
 }
 
 function closeDetail(){
-  document.getElementById('detailModal').classList.remove('show');
+  const m=document.getElementById('detailModal');
+  m.classList.remove('show');
+  m.style.display='none';
 }
 
 function showDocDetail(detailKey,title){
