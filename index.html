@@ -1135,6 +1135,51 @@ ACC AC一体柜专题
 </div>
 
 <script>
+(function(){
+  function _showDetail(productId){
+    var PRODUCTS=window.PRODUCTS;
+    var DEVICE_SPECS=window.DEVICE_SPECS;
+    if(!PRODUCTS){console.error('_showDetail: PRODUCTS not ready');return;}
+    var p=PRODUCTS.find(function(x){return x.id===productId});
+    if(!p){console.warn('_showDetail: product not found',productId);return;}
+    var modal=document.getElementById('detailModal');
+    if(!modal){console.error('_showDetail: detailModal not found');return;}
+    var img=document.getElementById('detailImg');
+    var name=document.getElementById('detailName');
+    var model=document.getElementById('detailModel');
+    var specs=document.getElementById('detailSpecs');
+    if(!name||!model||!specs){console.error('_showDetail: modal elements missing');return;}
+    if(img){img.src=p.img?'images/products/'+p.img:'';img.style.display=p.img?'block':'none';img.onerror=function(){this.style.display='none'};}
+    name.textContent=p.name;
+    model.textContent=p.model;
+    var specText=DEVICE_SPECS&&DEVICE_SPECS[productId]?DEVICE_SPECS[productId]:('型号: '+p.model+'\n\n基本参数:\n  标称能量: '+(p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh')+'\n  额定功率: '+(p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW')+'\n  标称电压: '+p.volt+'V\n  电芯: '+p.cell+'\n  尺寸: '+p.size+'\n  重量: '+p.weight+'\n  温控: '+p.cool+'\n  防护: '+p.ip+'\n  消防: '+p.fire+'\n  工作温度: '+p.temp);
+    specs.textContent=specText;
+    modal.classList.add('show');
+    console.log('_showDetail: modal shown for',productId);
+  }
+  function _closeDetail(){
+    var modal=document.getElementById('detailModal');
+    if(modal)modal.classList.remove('show');
+  }
+  window.showDetail=window.showDetail||_showDetail;
+  window.closeDetail=window.closeDetail||_closeDetail;
+  document.addEventListener('click',function(e){
+    var card=e.target.closest('.device-card');
+    if(card){
+      var onclickAttr=card.getAttribute('onclick');
+      if(onclickAttr&&onclickAttr.indexOf('showDetail')!==-1){
+        var m=onclickAttr.match(/showDetail\(['"]([^'"]+)['"]\)/);
+        if(m){e.stopPropagation();_showDetail(m[1]);return;}
+      }
+    }
+    if(e.target.closest('.detail-close')){_closeDetail();return;}
+    if(e.target.id==='detailModal'){_closeDetail();return;}
+  },true);
+  console.log('detail-modal event delegation ready');
+})();
+</script>
+
+<script>
 function loadMermaid(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';s.onload=function(){mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#185FA5',primaryTextColor:'#FAFAF5',primaryBorderColor:'#3a3e45',lineColor:'#C2C0B6',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px'},layout:'dagre',flowchart:{htmlLabels:false,curve:'basis'},sequence:{actorMargin:50,messageMargin:40}});};document.head.appendChild(s);}
 loadMermaid();
 
