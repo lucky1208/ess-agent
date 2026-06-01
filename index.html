@@ -6027,15 +6027,20 @@ function mgRenderDrawings(){
 
 function mgDrawArchSvg(R){
   const T=R.topology||{},S=R.sizing||{};
-  const W=1100,H=650,cx=550;
+  const W=1100,H=680,cx=550;
+  const isLV=T.voltage&&T.voltage.includes&&T.voltage.includes('480');
+  const busV=T.voltage||'10kV';
+  const lvBus=isLV?'480V AC':'0.4kV';
   let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">
 <defs>
-<linearGradient id="gbus" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="#185FA5"/><stop offset="50%" stop-color="#4a90d9"/><stop offset="100%" stop-color="#185FA5"/></linearGradient>
+<linearGradient id="gbus" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="#185FA5"/><stop offset="50" stop-color="#4a90d9"/><stop offset="100%" stop-color="#185FA5"/></linearGradient>
+<linearGradient id="glvbus" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="#0F6E56"/><stop offset="50%" stop-color="#50c878"/><stop offset="100%" stop-color="#0F6E56"/></linearGradient>
 <filter id="gsh"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.15"/></filter>
 <marker id="gaB" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#4a90d9"/></marker>
 <marker id="gaG" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#50c878"/></marker>
 <marker id="gaO" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e8a838"/></marker>
 <marker id="gaR" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e06070"/></marker>
+<marker id="gaP" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#AFA9EC"/></marker>
 </defs>
 <pattern id="dot" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="0.5" fill="#1a1f2e"/></pattern>
 <rect width="${W}" height="${H}" fill="url(#dot)"/>
@@ -6050,33 +6055,42 @@ function mgDrawArchSvg(R){
   const line=(x1,y1,x2,y2,color,marker,sw)=>{
     s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw||2}" marker-end="url(#${marker})"/>`;
   };
-  box(cx,62,220,44,'url(#gGrid)','#85B7EB','电网 '+T.voltage,'市电电源');
+  const busY=195,lvBusY=320;
+  box(cx,62,220,44,'url(#gGrid)','#85B7EB','电网 '+busV,'市电电源');
   line(cx,106,cx,130,'#4a90d9','gaB');
   box(cx,130,280,44,'#2a3050','#4a90d9','PCC 并网开关柜','断路器QF01 + 双向关口表0.2S');
-  line(cx,174,cx,195,'#4a90d9','gaB');
-  s+=`<line x1="${cx-260}" y1="195" x2="${cx+260}" y2="195" stroke="url(#gbus)" stroke-width="7" stroke-linecap="round"/><text x="${cx}" y="189" text-anchor="middle" fill="#80b0e0" font-size="11">${T.voltage} 母线</text>`;
-  line(cx-180,195,cx-180,232,'#4a90d9','gaO');
-  box(cx-180,235,160,52,'#1a1530','#e8a838','主变压器',T.transformer||'10/0.4kV');
-  line(cx-180,287,cx-180,310,'#4a90d9','gaB');
-  s+=`<line x1="${cx-280}" y1="310" x2="${cx-80}" y2="310" stroke="url(#gbus)" stroke-width="5" stroke-linecap="round"/><text x="${cx-180}" y="304" text-anchor="middle" fill="#80b0e0" font-size="10">0.4kV 母线</text>`;
-  line(cx-250,310,cx-250,340,'#a070d0','gaR',2);
-  box(cx-250,342,120,44,'#1a1530','#a070d0','关键负荷',`${S.peakLoad||0}kW`);
-  line(cx-110,310,cx-110,340,'#a070d0','gaR',2);
-  box(cx-110,342,120,44,'#1a1530','#a070d0','一般负荷','');
-  if(S.pv>0){
-    box(cx+60,235,150,46,'#1a2a1a','#50c878','光伏系统',S.pv+'kWp');
-    line(cx+60,235,cx+60,210,'#50c878','gaG');
-    s+=`<line x1="${cx+60}" y1="210" x2="${cx+60}" y2="195" stroke="#50c878" stroke-width="2" marker-end="url(#gaG)"/>`;
+  line(cx,174,cx,busY,'#4a90d9','gaB');
+  s+=`<line x1="${cx-300}" y1="${busY}" x2="${cx+300}" y2="${busY}" stroke="url(#gbus)" stroke-width="7" stroke-linecap="round"/><text x="${cx}" y="${busY-6}" text-anchor="middle" fill="#80b0e0" font-size="11">${busV} 母线</text>`;
+  if(!isLV){
+    line(cx-220,busY,cx-220,busY+30,'#4a90d9','gaO');
+    box(cx-220,busY+33,160,52,'#1a1530','#e8a838','主变压器',T.transformer||'10/0.4kV');
+    line(cx-220,busY+85,cx-220,lvBusY-10,'#4a90d9','gaB');
   }
-  line(cx+220,195,cx+220,232,'#e06070','gaR');
-  box(cx+220,235,150,46,'#2a1520','#e06070','PCS储能变流器',(S.bessMW||0)+'MW');
-  line(cx+220,281,cx+220,310,'#534AB7','gaG');
-  box(cx+220,313,210,56,'#181830','#AFA9EC','BESS储能系统',(S.bessKwh?(S.bessKwh/1000).toFixed(1):'')+'MWh LFP BMS三级');
-  if(S.dieselKw>0){line(cx-60,195,cx-60,232,'#e8a838','gaO');box(cx-60,235,130,46,'#2a2020','#e06070','柴发',S.dieselKw+'kW');}
-  if(S.evKw>0){line(cx+400,195,cx+400,232,'#EF9F27','gaO');box(cx+400,235,140,46,'#2a2020','#EF9F27','充电桩群',S.evKw+'kW');}
-  box(cx-380,290,150,110,'none','#854F0B','EMS控制域','SCADA+调度优化\nPQ/VF/Droop控制\n并离网切换管理');
-  s+=`<line x1="${cx-305}" y1="300" x2="${cx-200}" y2="270" stroke="#854F0B" stroke-width="1" stroke-dasharray="4,3"/>`;
-  s+=`<text x="${cx}" y="${H-16}" text-anchor="middle" fill="#606080" font-size="9">设计人:卢继雄 | GB/T 36558-2023</text></svg>`;
+  s+=`<line x1="${cx-320}" y1="${lvBusY}" x2="${cx-120}" y2="${lvBusY}" stroke="url(#glvbus)" stroke-width="5" stroke-linecap="round"/><text x="${cx-220}" y="${lvBusY-6}" text-anchor="middle" fill="#80e080" font-size="10">${lvBus} 母线</text>`;
+  line(cx-290,lvBusY,cx-290,lvBusY+30,'#a070d0','gaR',2);
+  box(cx-290,lvBusY+33,120,44,'#1a1530','#a070d0','关键负荷',`${S.peakLoad||0}kW`);
+  line(cx-150,lvBusY,cx-150,lvBusY+30,'#a070d0','gaR',2);
+  box(cx-150,lvBusY+33,120,44,'#1a1530','#a070d0','一般负荷','');
+  if(S.pv>0){
+    box(cx-60,busY+33,150,46,'#1a2a1a','#50c878','光伏系统',S.pv+'kWp');
+    s+=`<line x1="${cx-60}" y1="${busY+33}" x2="${cx-60}" y2="${busY+10}" stroke="#50c878" stroke-width="2" marker-end="url(#gaG)"/>`;
+  }
+  line(cx+100,busY,cx+100,busY+30,'#e06070','gaR');
+  box(cx+100,busY+33,160,46,'#2a1520','#e06070','PCS储能变流器',(S.bessMW||0)+'MW AC↔DC');
+  line(cx+100,busY+79,cx+100,busY+105,'#AFA9EC','gaP');
+  box(cx+100,busY+108,210,56,'#181830','#AFA9EC','BESS储能系统',(S.bessKwh?(S.bessKwh/1000).toFixed(1):'')+'MWh LFP BMS三级');
+  if(S.evKw>0){
+    line(cx+300,busY,cx+300,busY+30,'#EF9F27','gaO');
+    box(cx+300,busY+33,140,46,'#2a2020','#EF9F27','充电桩群',S.evKw+'kW');
+  }
+  if(S.dieselKw>0){
+    line(cx+440,busY,cx+440,busY+30,'#e8a838','gaO');
+    box(cx+440,busY+33,130,46,'#2a2020','#e06070','柴发',S.dieselKw+'kW');
+  }
+  box(cx-420,lvBusY+60,150,110,'none','#854F0B','EMS控制域','SCADA+调度优化\nPQ/VF/Droop控制\n并离网切换管理');
+  s+=`<line x1="${cx-345}" y1="${lvBusY+80}" x2="${cx-280}" y2="${lvBusY+50}" stroke="#854F0B" stroke-width="1" stroke-dasharray="4,3"/>`;
+  s+=`<line x1="${cx-345}" y1="${lvBusY+100}" x2="${cx+30}" y2="${busY+55}" stroke="#854F0B" stroke-width="1" stroke-dasharray="4,3"/>`;
+  s+=`<text x="${cx}" y="${H-16}" text-anchor="middle" fill="#606080" font-size="9">设计人:卢继雄 | GB/T 36558-2023 | 箭头方向=电能流向</text></svg>`;
   mgById('mgArchSvg').innerHTML=s;
 }
 
