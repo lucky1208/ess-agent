@@ -3677,8 +3677,11 @@ const DIAGRAM_ICONS = {
   load: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gLoad)" stroke="#B4B2A9" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#D3D1C7" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}`,
   pv: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="rgba(232,168,56,0.15)" stroke="#e8a838" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#fac775" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#e8a838" font-size="12">${sub}</text>`:''}`,
   ev: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="rgba(80,200,120,0.15)" stroke="#50c878" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#50c878" font-size="12">${sub}</text>`:''}`,
-  dcBus: (x,y,label) => `<rect x="${x-90}" y="${y-4}" width="180" height="8" rx="2" fill="#0F6E56" opacity="0.85" filter="url(#sh)"/><text x="${x}" y="${y+20}" text-anchor="middle" fill="#9fe1cb" font-size="12" font-weight="500">${label}</text>`
+  dcBus: (x,y,label) => `<rect x="${x-90}" y="${y-4}" width="180" height="8" rx="2" fill="#0F6E56" opacity="0.85" filter="url(#sh)"/><text x="${x}" y="${y+20}" text-anchor="middle" fill="#9fe1cb" font-size="12" font-weight="500">${label}</text>`,
+  cabinet: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gSwitch)" stroke="#F0997B" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#F5C4B3" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="12">${sub}</text>`:''}`,
+  protection: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#ffc0c0" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#e06070" font-size="12">${sub}</text>`:''}`
 };
+const TYPE_ALIAS={grid:'source',bus:'busbar',inverter:'pcs',bess:'battery',ems:'controller',solar:'pv',charger:'ev'};
 
 function getArrowForLink(l){
   if(l.dashed) return 'aY';
@@ -3734,7 +3737,8 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
   svg += `<text x="${svgW/2}" y="46" text-anchor="middle" fill="#8888cc" font-size="11">${diagramData.bus||''} | 设计人：卢继雄 | GB/T 36558-2023</text>`;
   if (diagramData.nodes) {
     diagramData.nodes.forEach(n => {
-      const iconFn = DIAGRAM_ICONS[n.type] || DIAGRAM_ICONS.source;
+      const resolvedType = TYPE_ALIAS[n.type] || n.type;
+      const iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.source;
       svg += iconFn(n.x, n.y + 60, n.label, n.sub);
     });
   }
@@ -3791,7 +3795,7 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
   if (diagramData.components) {
     diagramData.components.forEach((c, i) => {
       const y = 80 + i * 65;
-      const iconFn = DIAGRAM_ICONS[c.type] || DIAGRAM_ICONS.source;
+      const iconFn = DIAGRAM_ICONS[TYPE_ALIAS[c.type]||c.type] || DIAGRAM_ICONS.source;
       svg += iconFn(250, y, c.label, c.sub || '');
       if (i > 0) svg += `<line x1="250" y1="${y - 30}" x2="250" y2="${y - 25}" stroke="#4a90d9" stroke-width="2" marker-end="url(#aB)"/>`;
     });
