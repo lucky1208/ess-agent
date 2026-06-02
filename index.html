@@ -303,6 +303,7 @@ select.form-input{appearance:auto}
       <option value="deepseek" data-i18n="llm_deepseek">DeepSeek V4</option>
       <option value="glm" data-i18n="llm_glm">GLM-5.1 (智谱)</option>
       <option value="bailian" data-i18n="llm_bailian">Qwen3.7-Max (阿里百炼)</option>
+      <option value="minimax">MiniMax-M3</option>
     </select>
   </div>
 </div>
@@ -443,7 +444,7 @@ ACC AC一体柜专题
 <div class="form-row" style="margin-top:4px">
 <div class="form-group"><label class="form-label" data-i18n="mg_price_peak">峰段电价($/kWh)</label><input type="number" class="form-input" id="mgPricePeak" value="0.42" step="0.01"></div>
 <div class="form-group"><label class="form-label" data-i18n="mg_price_valley">谷段电价($/kWh)</label><input type="number" class="form-input" id="mgPriceValley" value="0.12" step="0.01"></div>
-<div class="form-group"><label class="form-label" data-i18n="mg_llm_provider">AI模型</label><select class="form-input" id="mgLlmProvider"><option value="local" data-i18n="mg_llm_local_rule">本地规则引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option><option value="bailian">Qwen3.7-Max (阿里百炼)</option></select></div>
+<div class="form-group"><label class="form-label" data-i18n="mg_llm_provider">AI模型</label><select class="form-input" id="mgLlmProvider"><option value="local" data-i18n="mg_llm_local_rule">本地规则引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option><option value="bailian">Qwen3.7-Max (阿里百炼)</option><option value="minimax">MiniMax-M3</option></select></div>
 </div>
 </div>
 </div>
@@ -2182,7 +2183,7 @@ generate_btn:'生成解决方案',
 device_library_title:'储能设备产品库',
 diagram_arch:'系统架构图',diagram_wiring:'电气一次接线图',diagram_topo:'系统拓扑图',diagram_bom:'物料清单(BOM)',diagram_ref:'参考设计图（大庆管业5MWh项目）',
 download_svg:'下载 SVG',export_csv:'导出 CSV',export_excel:'导出 Excel',cases_title:'应用案例',
-llm_provider:'AI模型',llm_local:'本地小模型',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen3.7-Max (阿里百炼)',
+llm_provider:'AI模型',llm_local:'本地小模型',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen3.7-Max (阿里百炼)',llm_minimax:'MiniMax-M3',
 ranking_title:'推荐配置排序',ranking_formula:'评分 = 覆盖率×0.4 + 利用率×0.3 + 1/回收期×0.3',
 cat_ess_agent:'储能方案智能体',cat_microgrid_agent:'微网交付智能体',
 subtab_mg_design:'方案设计',subtab_mg_drawings:'电气图纸',subtab_mg_protocol:'协议调试',subtab_mg_energy:'能源管理',subtab_mg_deploy:'一键部署',subtab_mg_trading:'电力交易',subtab_mg_twin:'数字孪生',subtab_mg_wiki:'微网百科',
@@ -2237,7 +2238,7 @@ generate_btn:'Generate Solution',
 device_library_title:'ESS Device Product Library',
 diagram_arch:'System Architecture',diagram_wiring:'Electrical Single-line Diagram',diagram_topo:'System Topology Diagram',diagram_bom:'Bill of Materials (BOM)',diagram_ref:'Reference Design (Daqing 5MWh Project)',
 download_svg:'Download SVG',export_csv:'Export CSV',export_excel:'Export Excel',cases_title:'Use Cases',
-llm_provider:'AI Model',llm_local:'Local Mini Model',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen3.7-Max (Alibaba)',
+llm_provider:'AI Model',llm_local:'Local Mini Model',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen3.7-Max (Alibaba)',llm_minimax:'MiniMax-M3',
 ranking_title:'Recommended Configuration Ranking',ranking_formula:'Score = Coverage×0.4 + Utilization×0.3 + 1/Payback×0.3',
 cat_ess_agent:'ESS Solution Agent',cat_microgrid_agent:'Microgrid Delivery Agent',
 subtab_mg_design:'Solution Design',subtab_mg_drawings:'Electrical Drawings',subtab_mg_protocol:'Protocol & Debug',subtab_mg_energy:'Energy Management',subtab_mg_deploy:'One-Click Deploy',subtab_mg_trading:'Power Trading',subtab_mg_twin:'Digital Twin',subtab_mg_wiki:'Microgrid Wiki',
@@ -2292,7 +2293,7 @@ generate_btn:'توليد الحل',
 device_library_title:'مكتبة منتجات معدات التخزين',
 diagram_arch:'هيكل النظام',diagram_wiring:'مخطط التوصيل الكهربائي أحادي الخط',diagram_topo:'مخطط طوبولوجيا النظام',diagram_bom:'قائمة المواد (BOM)',diagram_ref:'تصميم مرجعي (مشروع داتشينغ 5MWh)',
 download_svg:'تحميل SVG',export_csv:'تصدير CSV',export_excel:'تصدير Excel',cases_title:'حالات الاستخدام',
-llm_provider:'نموذج AI',llm_local:'نموذج محلي صغير',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1',llm_bailian:'Qwen3.7-Max',
+llm_provider:'نموذج AI',llm_local:'نموذج محلي صغير',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1',llm_bailian:'Qwen3.7-Max',llm_minimax:'MiniMax-M3',
 ranking_title:'ترتيب التكوين الموصى به',ranking_formula:'النتيجة = التغطية×0.4 + الاستخدام×0.3 + 1/فترة الاسترداد×0.3',
 cat_ess_agent:'وكيل حلول التخزين',cat_microgrid_agent:'وكيل تسليم الشبكة المصغرة',
 subtab_mg_design:'تصميم الحل',subtab_mg_drawings:'الرسوم الكهربائية',subtab_mg_protocol:'البروتوكول والتصحيح',subtab_mg_energy:'إدارة الطاقة',subtab_mg_deploy:'نشر بنقرة واحدة',subtab_mg_trading:'تداول الطاقة',subtab_mg_twin:'التوأم الرقمي',subtab_mg_wiki:'موسوعة الشبكة المصغرة',

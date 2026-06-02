@@ -35,6 +35,12 @@ export default async function handler(req, res) {
       model: 'qwen3-235b-a22b',
       max_tokens: 16384,
       enable_thinking: true
+    },
+    minimax: {
+      url: 'https://api.minimax.chat/v1/text/chatcompletion_v2',
+      key: process.env.MINIMAX_API_KEY,
+      model: 'MiniMax-M3',
+      max_tokens: 65536
     }
   };
 
