@@ -198,7 +198,7 @@ select.form-input{appearance:auto}
 <header class="header">
 <h1 data-i18n="header_title">Open ESS Agent — 开源储能系统解决方案AI智能体</h1>
 <p data-i18n="header_spec">设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905</p>
-<div style="position:absolute;top:20px;right:32px;display:flex;gap:6px">
+<div id="langSwitch" style="position:absolute;top:20px;right:32px;display:flex;gap:6px;z-index:100">
   <button class="lang-btn active" onclick="switchLang('zh')">中</button>
   <button class="lang-btn" onclick="switchLang('en')">EN</button>
   <button class="lang-btn" onclick="switchLang('ar')">عربي</button>
@@ -343,20 +343,20 @@ select.form-input{appearance:auto}
 <div class="acc-section">
 <h3>
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M6 7V4"/><path d="M10 7V4"/><path d="M14 7V4"/><path d="M18 7V4"/></svg>
-ACC AC一体柜专题
+<span data-i18n="acc_section_title"></span>ACC AC一体柜专题</span>
 </h3>
 <div class="device-grid" style="margin-bottom:0">
 <div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('ACC_DETAIL','ACC-480-P750 AC一体柜')">
 <div class="dev-img-wrap"><img src="images/products/X-522_X261_product.jpeg" alt="ACC-480" onerror="this.style.display='none'"></div>
-<div class="dev-header"><div><div class="dev-name">ACC-480-P750 AC一体机</div><div class="dev-model">ACC-480-P750-UL</div></div><span class="dev-badge badge-orange">480kWh</span></div>
-<div class="dev-specs"><span class="spec-item">750kW内置PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈10t</span></div>
-<div class="dev-features"><span class="feature-tag">PCS+升压变+开关柜一体</span><span class="feature-tag">即插即用</span><span class="feature-tag">最大4并→1.92MWh</span></div>
+<div class="dev-header"><div><div class="dev-name" data-i18n="acc_480_name">ACC-480-P750 AC一体机</div><div class="dev-model">ACC-480-P750-UL</div></div><span class="dev-badge badge-orange">480kWh</span></div>
+<div class="dev-specs"><span class="spec-item">750kW PCS</span><span class="spec-item" data-i18n="cat_container_ess">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈10t</span></div>
+<div class="dev-features"><span class="feature-tag">PCS+Step-up Integrated</span><span class="feature-tag">Plug & Play</span><span class="feature-tag">Max 4→1.92MWh</span></div>
 </div>
 <div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('LL760_DETAIL','760kWh液冷储能柜')">
 <div class="dev-img-wrap"><img src="images/products/GRID-5M_product.jpeg" alt="760LL" onerror="this.style.display='none'"></div>
-<div class="dev-header"><div><div class="dev-name">760kWh液冷储能柜</div><div class="dev-model">光储充一体化标准柜</div></div><span class="dev-badge badge-green">760kWh</span></div>
-<div class="dev-specs"><span class="spec-item">380kW PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈38t</span></div>
-<div class="dev-features"><span class="feature-tag">光储充一体化</span><span class="feature-tag">7000次循环</span><span class="feature-tag">最大8并→6.08MWh</span></div>
+<div class="dev-header"><div><div class="dev-name" data-i18n="ll760_name">760kWh液冷储能柜</div><div class="dev-model">PV+ESS+EV Integrated</div></div><span class="dev-badge badge-green">760kWh</span></div>
+<div class="dev-specs"><span class="spec-item">380kW PCS</span><span class="spec-item">Liquid Cooling</span><span class="spec-item">IP55</span><span class="spec-item">≈38t</span></div>
+<div class="dev-features"><span class="feature-tag">PV+ESS+EV Integrated</span><span class="feature-tag">7000 Cycles</span><span class="feature-tag">Max 8→6.08MWh</span></div>
 </div>
 </div>
 </div>
@@ -2184,6 +2184,9 @@ device_library_title:'储能设备产品库',
 diagram_arch:'系统架构图',diagram_wiring:'电气一次接线图',diagram_topo:'系统拓扑图',diagram_bom:'物料清单(BOM)',diagram_ref:'参考设计图（大庆管业5MWh项目）',
 download_svg:'下载 SVG',export_csv:'导出 CSV',export_excel:'导出 Excel',cases_title:'应用案例',
 llm_provider:'AI模型',llm_local:'本地小模型',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen3.7-Max (阿里百炼)',llm_minimax:'MiniMax-M3',
+pcs_integrated:'PCS一体',max_parallel:'最大{N}并',filter_all:'全部',
+cat_container_ess:'集装箱储能',cat_qianyuan:'乾元载道',cat_battery_pack:'电池包/簇',cat_portable:'户用/便携',cat_yijianeng_mobile:'易加能-移动充',cat_yijianeng_fixed:'易加能-固定储充',cat_dianlala_mobile:'电拉拉-移动储充换',cat_dianlala_battery:'电拉拉-电池/底托',cat_gendome_portable:'Gendome-便携',cat_gendome_home:'Gendome-户用',
+acc_section_title:'ACC AC一体柜专题',acc_480_name:'ACC-480-P750 AC一体机',ll760_name:'760kWh液冷储能柜',
 ranking_title:'推荐配置排序',ranking_formula:'评分 = 覆盖率×0.4 + 利用率×0.3 + 1/回收期×0.3',
 cat_ess_agent:'储能方案智能体',cat_microgrid_agent:'微网交付智能体',
 subtab_mg_design:'方案设计',subtab_mg_drawings:'电气图纸',subtab_mg_protocol:'协议调试',subtab_mg_energy:'能源管理',subtab_mg_deploy:'一键部署',subtab_mg_trading:'电力交易',subtab_mg_twin:'数字孪生',subtab_mg_wiki:'微网百科',
@@ -2239,6 +2242,9 @@ device_library_title:'ESS Device Product Library',
 diagram_arch:'System Architecture',diagram_wiring:'Electrical Single-line Diagram',diagram_topo:'System Topology Diagram',diagram_bom:'Bill of Materials (BOM)',diagram_ref:'Reference Design (Daqing 5MWh Project)',
 download_svg:'Download SVG',export_csv:'Export CSV',export_excel:'Export Excel',cases_title:'Use Cases',
 llm_provider:'AI Model',llm_local:'Local Mini Model',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen3.7-Max (Alibaba)',llm_minimax:'MiniMax-M3',
+pcs_integrated:'PCS Integrated',max_parallel:'Max {N} Parallel',filter_all:'All',
+cat_container_ess:'Container ESS',cat_qianyuan:'QianYuan ZaiDao',cat_battery_pack:'Battery Pack/Cluster',cat_portable:'Residential/Portable',cat_yijianeng_mobile:'YiJiaNeng-Mobile',cat_yijianeng_fixed:'YiJiaNeng-Fixed Storage',cat_dianlala_mobile:'DianLaLa-Mobile',cat_dianlala_battery:'DianLaLa-Battery/Tray',cat_gendome_portable:'Gendome-Portable',cat_gendome_home:'Gendome-Residential',
+acc_section_title:'ACC AC Integrated Cabinet',acc_480_name:'ACC-480-P750 AC All-in-One',ll760_name:'760kWh Liquid Cooling ESS Cabinet',
 ranking_title:'Recommended Configuration Ranking',ranking_formula:'Score = Coverage×0.4 + Utilization×0.3 + 1/Payback×0.3',
 cat_ess_agent:'ESS Solution Agent',cat_microgrid_agent:'Microgrid Delivery Agent',
 subtab_mg_design:'Solution Design',subtab_mg_drawings:'Electrical Drawings',subtab_mg_protocol:'Protocol & Debug',subtab_mg_energy:'Energy Management',subtab_mg_deploy:'One-Click Deploy',subtab_mg_trading:'Power Trading',subtab_mg_twin:'Digital Twin',subtab_mg_wiki:'Microgrid Wiki',
@@ -2294,6 +2300,9 @@ device_library_title:'مكتبة منتجات معدات التخزين',
 diagram_arch:'هيكل النظام',diagram_wiring:'مخطط التوصيل الكهربائي أحادي الخط',diagram_topo:'مخطط طوبولوجيا النظام',diagram_bom:'قائمة المواد (BOM)',diagram_ref:'تصميم مرجعي (مشروع داتشينغ 5MWh)',
 download_svg:'تحميل SVG',export_csv:'تصدير CSV',export_excel:'تصدير Excel',cases_title:'حالات الاستخدام',
 llm_provider:'نموذج AI',llm_local:'نموذج محلي صغير',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1',llm_bailian:'Qwen3.7-Max',llm_minimax:'MiniMax-M3',
+pcs_integrated:'PCS مدمج',max_parallel:'حد أقصى {N} توازي',filter_all:'الكل',
+cat_container_ess:'تخزين حاوي',cat_qianyuan:'QianYuan ZaiDao',cat_battery_pack:'حزمة بطارية/عنقود',cat_portable:'سكني/محمول',cat_yijianeng_mobile:'YiJiaNeng-محمول',cat_yijianeng_fixed:'YiJiaNeng-تخزين ثابت',cat_dianlala_mobile:'DianLaLa-محمول',cat_dianlala_battery:'DianLaLa-بطارية/صينية',cat_gendome_portable:'Gendome-محمول',cat_gendome_home:'Gendome-سكني',
+acc_section_title:'خزانة ACC AC المتكاملة',acc_480_name:'ACC-480-P750 AC متكامل',ll760_name:'خزانة تخزين 760kWh بتبريد سائل',
 ranking_title:'ترتيب التكوين الموصى به',ranking_formula:'النتيجة = التغطية×0.4 + الاستخدام×0.3 + 1/فترة الاسترداد×0.3',
 cat_ess_agent:'وكيل حلول التخزين',cat_microgrid_agent:'وكيل تسليم الشبكة المصغرة',
 subtab_mg_design:'تصميم الحل',subtab_mg_drawings:'الرسوم الكهربائية',subtab_mg_protocol:'البروتوكول والتصحيح',subtab_mg_energy:'إدارة الطاقة',subtab_mg_deploy:'نشر بنقرة واحدة',subtab_mg_trading:'تداول الطاقة',subtab_mg_twin:'التوأم الرقمي',subtab_mg_wiki:'موسوعة الشبكة المصغرة',
@@ -2333,6 +2342,11 @@ function switchLang(lang){
   const dict=I18N[lang];if(!dict)return;
   document.documentElement.lang=lang==='ar'?'ar':'zh-CN';
   document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  const langSwitch=document.getElementById('langSwitch');
+  if(langSwitch){
+    if(lang==='ar'){langSwitch.style.right='auto';langSwitch.style.left='32px';}
+    else{langSwitch.style.left='auto';langSwitch.style.right='32px';}
+  }
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const key=el.getAttribute('data-i18n');
     if(dict[key]!==undefined)el.textContent=dict[key];
@@ -3501,9 +3515,21 @@ async function parseNaturalInput(){
   setTimeout(()=>tip.remove(),4000);
 }
 
+const CAT_I18N_MAP={'集装箱储能':'cat_container_ess','乾元载道':'cat_qianyuan','电池包/簇':'cat_battery_pack','户用/便携':'cat_portable','易加能-移动充':'cat_yijianeng_mobile','易加能-固定储充':'cat_yijianeng_fixed','电拉拉-移动储充换':'cat_dianlala_mobile','电拉拉-电池/底托':'cat_dianlala_battery','Gendome-便携':'cat_gendome_portable','Gendome-户用':'cat_gendome_home'};
+const FEATURE_I18N={'PACK级消防':'PACK Fire Safety','20MWh超大容量':'20MWh Ultra Capacity','风液一体温控':'Air-Liquid Hybrid Cooling','588Ah大电芯':'588Ah Large Cell','液冷温控':'Liquid Cooling','PACK级消防':'PACK Fire Safety','330Ah电芯':'330Ah Cell','3.1MW高功率':'3.1MW High Power','5MWh标准柜':'5MWh Standard Cabinet','1280V平台':'1280V Platform','PCS+升压一体':'PCS+Step-up Integrated','即插即用':'Plug & Play','最大6并':'Max 6 Parallel','分期投资':'Phased Investment','高能量密度':'High Energy Density','最大4并':'Max 4 Parallel','PCS内置':'Built-in PCS','风冷+液冷':'Air+Liquid Cooling','最大6并':'Max 6 Parallel','50Hz版':'50Hz Version','全液冷':'Full Liquid Cooling','轻量3.5t':'Lightweight 3.5t','IP67高防护':'IP67 High Protection','588Ah大电芯':'588Ah Large Cell','户用储能':'Residential ESS','自然冷却':'Natural Cooling','IP65':'IP65','便携式':'Portable','风冷':'Air Cooling','无人驾驶':'Autonomous','100kW快充':'100kW Fast Charge','209kWh储能':'209kWh ESS','自动寻车避障':'Auto Obstacle Avoidance','移动充电':'Mobile Charging','60kW输出':'60kW Output','V2L放电':'V2L Discharge','扫码即充':'Scan to Charge','轻量化':'Lightweight','60kW快充':'60kW Fast Charge','适配商用车':'Commercial Vehicle','免基建':'No Infrastructure','固定储充':'Fixed Storage+Charge','120kW快充':'120kW Fast Charge','V2G 30kW':'V2G 30kW','交直流双补电':'AC/DC Dual Supply','1000V直流平台':'1000V DC Platform','320kW双枪':'320kW Dual Gun','液冷温控':'Liquid Cooling','360kW峰值':'360kW Peak','522kWh储能':'522kWh ESS','5枪输出':'5-Gun Output','并网/离网双模式':'Grid/Off-grid Dual Mode','120kW输出':'120kW Output','PF≥0.99':'PF≥0.99','THDi≤3%':'THDi≤3%','绿电搬运':'Green Power Transport','移动充放电':'Mobile Charge/Discharge','移动换电':'Mobile Battery Swap','846-1800kWh':'846-1800kWh','八工位':'8-Station','2256-4800kWh':'2256-4800kWh','1250kW输出':'1250kW Output','移动充换一体':'Mobile Charge+Swap','动储一体':'Integrated Mobile Storage','可充可换':'Charge & Swap','IP68':'IP68','液冷液热':'Liquid Cooling+Heating','大容量600kWh':'600kWh Large Capacity','5层电池':'5-Layer Battery','液冷+电加热':'Liquid+Electric Heating','电动移动':'Electric Mobile','承载282-600kWh':'282-600kWh Capacity','DC-DC 200-1000V':'DC-DC 200-1000V','无需叉车':'No Forklift Needed','充放一体':'Charge/Discharge Integrated','750kW':'750kW','双向PCS':'Bidirectional PCS','离网无缝切换':'Seamless Off-grid Switch','DC-DC变换':'DC-DC Conversion','750kW':'750kW','1500Vdc输入':'1500Vdc Input','高效':'High Efficiency','超便携':'Ultra Portable','15000mAh':'15000mAh','USB-C PD65W':'USB-C PD65W','多口输出':'Multi-port Output'};
+function tCat(cat){const lang=localStorage.getItem('lang')||'zh';if(lang==='zh')return cat;const key=CAT_I18N_MAP[cat];if(!key)return cat;const dict=I18N[lang];return dict&&dict[key]?dict[key]:cat;}
+function tFeature(f){const lang=localStorage.getItem('lang')||'zh';if(lang==='zh')return f;if(lang==='ar')return FEATURE_I18N_AR[f]||FEATURE_I18N[f]||f;return FEATURE_I18N[f]||f;}
+const FEATURE_I18N_AR={'PACK级消防':'حماية حريق PACK','液冷温控':'تبريد سائل','PCS+升压一体':'PCS+محول صعد مدمج','即插即用':'توصيل واستخدام','户用储能':'تخزين سكني','便携式':'محمول','移动充电':'شحن محمول','固定储充':'تخزين+شحن ثابت','绿电搬运':'نقل طاقة خضراء','充放一体':'شحن/تفريغ مدمج','超便携':'فائق المحمولية'};
+function tCool(cool){const map={'风液一体':'Air-Liquid Hybrid','液冷':'Liquid Cooling','风冷':'Air Cooling','自然冷却':'Natural Cooling','自然散热/液冷':'Natural/Liquid','自然散热/选配液冷':'Natural/Liquid Opt.','全液冷':'Full Liquid','液冷液热':'Liquid Cool+Heat','液冷+电加热':'Liquid+Elec Heat','风冷+液冷':'Air+Liquid'};const lang=localStorage.getItem('lang')||'zh';if(lang==='zh')return cool;return map[cool]||cool;}
+function tFire(fire){const map={'PACK浸没+气体+水':'PACK Immersion+Gas+Water','气溶胶+泄爆':'Aerosol+Vent','PACK气溶胶+舱气溶胶':'PACK Aerosol+Cabin Aerosol','七氟丙烷/气溶胶':'Heptafluoropropane/Aerosol','-':'-'};const lang=localStorage.getItem('lang')||'zh';if(lang==='zh')return fire;return map[fire]||fire;}
+
 function devCardHTML(p,isSelected){
+  const lang=localStorage.getItem('lang')||'zh';
+  const dict=I18N[lang]||{};
   const capStr=p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh';
   const badgeCls=p.cat==='集装箱储能'?'badge-green':p.cat==='乾元载道'?'badge-blue':p.cat==='户用/便携'?'badge-purple':'badge-orange';
+  const pcsLabel=dict.pcs_integrated||'PCS一体';
+  const maxPLabel=(dict.max_parallel||'最大{N}并').replace('{N}',p.maxP);
   return`<div class="device-card${isSelected?' selected':''}" onclick="showDetail('${p.id}')">
     ${p.img?`<div class="dev-img-wrap"><img src="images/products/${p.img}" alt="${p.name}" onerror="this.style.display='none'"></div>`:''}
     <div class="dev-header"><div><div class="dev-name">${p.name}</div><div class="dev-model">${p.model}</div></div><span class="dev-badge ${badgeCls}">${capStr}</span></div>
@@ -3511,12 +3537,12 @@ function devCardHTML(p,isSelected){
       <span class="spec-item">${p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW'}</span>
       <span class="spec-item">${p.volt}V</span>
       <span class="spec-item">${p.cell}</span>
-      <span class="spec-item">${p.cool}</span>
+      <span class="spec-item">${tCool(p.cool)}</span>
       <span class="spec-item">${p.ip}</span>
-      ${p.pcs?'<span class="spec-item">PCS一体</span>':''}
-      ${p.maxP?`<span class="spec-item">最大${p.maxP}并</span>`:''}
+      ${p.pcs?`<span class="spec-item">${pcsLabel}</span>`:''}
+      ${p.maxP?`<span class="spec-item">${maxPLabel}</span>`:''}
     </div>
-    <div class="dev-features">${(p.features||[]).slice(0,3).map(f=>`<span class="feature-tag">${f}</span>`).join('')}</div>
+    <div class="dev-features">${(p.features||[]).slice(0,3).map(f=>`<span class="feature-tag">${tFeature(f)}</span>`).join('')}</div>
   </div>`;
 }
 
@@ -4163,10 +4189,16 @@ function renderTopoDiagramFromJSON(d) { renderDiagramFromJSON('wiring2Svg', d, '
 
 function renderDeviceLibrary(filter){
   currentFilter=filter;
-  const allLabel=I18N[localStorage.getItem('lang')||'zh']?.filter_all||'全部';
-  const cats=[allLabel,...new Set(PRODUCTS.map(p=>p.cat))];
+  const lang=localStorage.getItem('lang')||'zh';
+  const dict=I18N[lang]||{};
+  const allLabel=dict.filter_all||'全部';
+  const cats=['全部',...new Set(PRODUCTS.map(p=>p.cat))];
   const fb=document.getElementById('equipFilter');
-  fb.innerHTML=cats.map(c=>`<button class="filter-btn${c===filter?' active':''}" onclick="renderDeviceLibrary('${c===allLabel?allLabel:c}')">${c}</button>`).join('');
+  fb.innerHTML=cats.map(c=>{
+    const display=c==='全部'?allLabel:tCat(c);
+    const filterVal=c==='全部'?allLabel:c;
+    return`<button class="filter-btn${c===filter||display===filter?' active':''}" onclick="renderDeviceLibrary('${filterVal}')">${display}</button>`;
+  }).join('');
   const items=filter===allLabel||filter==='全部'?PRODUCTS:PRODUCTS.filter(p=>p.cat===filter);
   document.getElementById('deviceLibrary').innerHTML=items.map(p=>devCardHTML(p,false)).join('');
 }
