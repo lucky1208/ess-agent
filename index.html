@@ -3238,7 +3238,7 @@ ${ESS_DIAGRAM_SKILL_V3}
 
 async function callLLM(messages, useStream, providerOverride) {
   const provider = providerOverride || document.getElementById('llmProvider').value;
-  const forceNonStream = (provider === 'bailian' || provider === 'minimax');
+  const forceNonStream = (provider === 'bailian');
   if (useStream && !forceNonStream) {
     const resp = await fetch('/api/ess-config', {
       method: 'POST',
@@ -3282,7 +3282,15 @@ async function callLLM(messages, useStream, providerOverride) {
     if(!fullContent && fullReasoning){
       const jsonInReasoning=fullReasoning.match(/\{[\s\S]*\}/);
       if(jsonInReasoning){
-        try{JSON.parse(jsonInReasoning[0]);fullContent=jsonInReasoning[0];}catch(e){}
+        try{JSON.parse(jsonInReasoning[0]);fullContent=jsonInReasoning[0];}catch(e){
+          const jsonBlocks=fullReasoning.match(/```json\s*([\s\S]*?)```/g);
+          if(jsonBlocks){
+            for(const block of jsonBlocks){
+              const cleaned=block.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+              try{JSON.parse(cleaned);fullContent=cleaned;break;}catch(e2){}
+            }
+          }
+        }
       }
       if(!fullContent){
         const svgEnd=fullReasoning.lastIndexOf('</svg>');
@@ -3294,7 +3302,24 @@ async function callLLM(messages, useStream, providerOverride) {
           }
         }
       }
+      if(!fullContent && fullReasoning.length>100){
+        const lastBrace=fullReasoning.lastIndexOf('}');
+        if(lastBrace>0){
+          let start=0;
+          let depth=0;
+          for(let i=lastBrace;i>=0;i--){
+            if(fullReasoning[i]==='}') depth++;
+            else if(fullReasoning[i]==='{') depth--;
+            if(depth===0 && fullReasoning[i]==='{'){start=i;break;}
+          }
+          if(start>0){
+            const candidate=fullReasoning.substring(start,lastBrace+1);
+            try{JSON.parse(candidate);fullContent=candidate;}catch(e){}
+          }
+        }
+      }
     }
+
     return {
       choices: [{
         message: {
@@ -6057,7 +6082,7 @@ async function mgGenerateSolution(){
       const skillCount=MG_SKILLS_SUMMARY.split('\n').filter(l=>l.trim()&&l.startsWith('-')).length;
       const ruleCount=ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()).length;
       mgAddLog('Skill: '+skillCount+'条 + DRAWING_RULES: '+ruleCount+'行 + SKILL_V3 已注入','step');
-      mgAddLog(`调用${provider.toUpperCase()} API${(provider==='bailian'||provider==='minimax')?' (强制非流式)':' (SSE流式)'}...`,'step');
+      mgAddLog(`调用${provider.toUpperCase()} API${provider==='bailian'?' (强制非流式)':''}...`,'step');
       const systemMsg=`你是微网系统解决方案AI智能体。根据用户参数一次性输出完整JSON，包含方案+配套图纸+BOM+经济性。
 
 必须输出的JSON字段：
@@ -6098,14 +6123,29 @@ ${ESS_DIAGRAM_SKILL_V3}`;
       try{result=JSON.parse(jsonStr);ok=true;mgAddLog('JSON解析成功 ✓','ok');}
       catch(e2){
         mgAddLog('JSON.parse失败: '+e2.message,'warn');
-        mgAddLog('尝试修复1: 转义SVG内双引号...','step');
+        mgAddLog('尝试修复1: 清理JSON语法问题(尾随逗号/注释/特殊字符)...','step');
         try{
-          let fixed=jsonStr.replace(/"archDiagram"\s*:\s*"/g,'"archDiagram":"').replace(/"wiringDiagram"\s*:\s*"/g,'"wiringDiagram":"').replace(/"commDiagram"\s*:\s*"/g,'"commDiagram":"');
-          result=JSON.parse(fixed);ok=true;mgAddLog('修复1成功 ✓','ok');
+          let fixed=jsonStr
+            .replace(/,\s*([}\]])/g,'$1')
+            .replace(/\/\/[^\n]*/g,'')
+            .replace(/\/\*[\s\S]*?\*\//g,'')
+            .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'')
+            .replace(/\\(?!["\\\/bfnrtu])/g,'\\\\');
+          result=JSON.parse(fixed);ok=true;jsonStr=fixed;mgAddLog('修复1成功 ✓','ok');
         }catch(e3){}
         if(!ok){
-          mgAddLog('修复1失败, 尝试修复2: 补全截断...','step');
-          let fixed2=jsonStr;
+          mgAddLog('修复1失败, 尝试修复2: 转义SVG内双引号...','step');
+          try{
+            let fixed=jsonStr.replace(/"archDiagram"\s*:\s*"/g,'"archDiagram":"').replace(/"wiringDiagram"\s*:\s*"/g,'"wiringDiagram":"').replace(/"commDiagram"\s*:\s*"/g,'"commDiagram":"');
+            result=JSON.parse(fixed);ok=true;mgAddLog('修复2成功 ✓','ok');
+          }catch(e3b){}
+        }
+        if(!ok){
+          mgAddLog('修复2失败, 尝试修复3: 补全截断...','step');
+          let fixed2=jsonStr
+            .replace(/,\s*([}\]])/g,'$1')
+            .replace(/\/\/[^\n]*/g,'')
+            .replace(/\/\*[\s\S]*?\*\//g,'');
           let openB=(fixed2.match(/{/g)||[]).length,closeB=(fixed2.match(/}/g)||[]).length;
           let openSq=(fixed2.match(/\[/g)||[]).length,closeSq=(fixed2.match(/]/g)||[]).length;
           if(openB>closeB||openSq>closeSq){
@@ -6124,7 +6164,7 @@ ${ESS_DIAGRAM_SKILL_V3}`;
           }
         }
         if(!ok){
-          mgAddLog('修复2失败, 尝试修复3: 逐字段提取...','step');
+          mgAddLog('修复3失败, 尝试修复4: 逐字段提取...','step');
           const extractField=(str,field)=>{
             const re=new RegExp('"'+field+'"\\s*:\\s*"');
             const m=str.match(re);
@@ -6152,38 +6192,51 @@ ${ESS_DIAGRAM_SKILL_V3}`;
             return null;
           };
           try{
-            const topoMatch=jsonStr.match(/"topology"\s*:\s*\{[\s\S]*?\}/);
-            const sizingMatch=jsonStr.match(/"sizing"\s*:\s*\{[\s\S]*?\}/);
-            const econMatch=jsonStr.match(/"economics"\s*:\s*\{[\s\S]*?\}/);
-            const stratMatch=jsonStr.match(/"strategy"\s*:\s*\{[\s\S]*?\}/);
-            const protMatch=jsonStr.match(/"protection"\s*:\s*\[[\s\S]*?\]/);
-            const riskMatch=jsonStr.match(/"risks"\s*:\s*\[[\s\S]*?\]/);
-            const bomMatch=jsonStr.match(/"bom"\s*:\s*\[[\s\S]*?\]/);
-            const econDMatch=jsonStr.match(/"economicsDetail"\s*:\s*\{[\s\S]*?\}/);
+            const extractObj=(str,field)=>{
+              const re=new RegExp('"'+field+'"\\s*:\\s*\\{');
+              const m=str.match(re);
+              if(!m)return null;
+              const start=str.indexOf(m[0])+m[0].lastIndexOf('{');
+              let depth=0;
+              for(let i=start;i<str.length;i++){
+                if(str[i]==='{')depth++;
+                else if(str[i]==='}'){depth--;if(depth===0)return str.substring(start,i+1);}
+              }
+              return null;
+            };
+            const extractArr=(str,field)=>{
+              const re=new RegExp('"'+field+'"\\s*:\\s*\\[');
+              const m=str.match(re);
+              if(!m)return null;
+              const start=str.indexOf(m[0])+m[0].lastIndexOf('[');
+              let depth=0;
+              for(let i=start;i<str.length;i++){
+                if(str[i]==='[')depth++;
+                else if(str[i]===']'){depth--;if(depth===0)return str.substring(start,i+1);}
+              }
+              return null;
+            };
             let partial={};
-            if(topoMatch)try{partial.topology=JSON.parse('{'+topoMatch[0].slice(topoMatch[0].indexOf('{')));}catch(e){}
-            if(sizingMatch)try{partial.sizing=JSON.parse('{'+sizingMatch[0].slice(sizingMatch[0].indexOf('{')));}catch(e){}
-            if(econMatch)try{partial.economics=JSON.parse('{'+econMatch[0].slice(econMatch[0].indexOf('{')));}catch(e){}
-            if(stratMatch)try{partial.strategy=JSON.parse('{'+stratMatch[0].slice(stratMatch[0].indexOf('{')));}catch(e){}
-            if(protMatch)try{partial.protection=JSON.parse('['+protMatch[0].slice(protMatch[0].indexOf('[')));}catch(e){}
-            if(riskMatch)try{partial.risks=JSON.parse('['+riskMatch[0].slice(riskMatch[0].indexOf('[')));}catch(e){}
-            if(bomMatch)try{partial.bom=JSON.parse('['+bomMatch[0].slice(bomMatch[0].indexOf('[')));}catch(e){}
-            if(econDMatch)try{partial.economicsDetail=JSON.parse('{'+econDMatch[0].slice(econDMatch[0].indexOf('{')));}catch(e){}
-            const archSvg=extractField(jsonStr,'archDiagram');
-            const wireSvg=extractField(jsonStr,'wiringDiagram');
-            const commSvg=extractField(jsonStr,'commDiagram');
-            if(archSvg)partial.archDiagram=archSvg.replace(/\\n/g,'\n').replace(/\\"/g,'"');
-            if(wireSvg)partial.wiringDiagram=wireSvg.replace(/\\n/g,'\n').replace(/\\"/g,'"');
-            if(commSvg)partial.commDiagram=commSvg.replace(/\\n/g,'\n').replace(/\\"/g,'"');
+            const topoStr=extractObj(jsonStr,'topology');if(topoStr)try{partial.topology=JSON.parse(topoStr);}catch(e){}
+            const sizingStr=extractObj(jsonStr,'sizing');if(sizingStr)try{partial.sizing=JSON.parse(sizingStr);}catch(e){}
+            const econStr=extractObj(jsonStr,'economics');if(econStr)try{partial.economics=JSON.parse(econStr);}catch(e){}
+            const stratStr=extractObj(jsonStr,'strategy');if(stratStr)try{partial.strategy=JSON.parse(stratStr);}catch(e){}
+            const protStr=extractArr(jsonStr,'protection');if(protStr)try{partial.protection=JSON.parse(protStr);}catch(e){}
+            const riskStr=extractArr(jsonStr,'risks');if(riskStr)try{partial.risks=JSON.parse(riskStr);}catch(e){}
+            const bomStr=extractArr(jsonStr,'bom');if(bomStr)try{partial.bom=JSON.parse(bomStr);}catch(e){}
+            const econDStr=extractObj(jsonStr,'economicsDetail');if(econDStr)try{partial.economicsDetail=JSON.parse(econDStr);}catch(e){}
+            const archStr=extractObj(jsonStr,'archDiagram');if(archStr)try{partial.archDiagram=JSON.parse(archStr);}catch(e){}
+            const wireStr=extractObj(jsonStr,'wiringDiagram');if(wireStr)try{partial.wiringDiagram=JSON.parse(wireStr);}catch(e){}
+            const commStr=extractObj(jsonStr,'commDiagram');if(commStr)try{partial.commDiagram=JSON.parse(commStr);}catch(e){}
             if(Object.keys(partial).length>=3){result=partial;ok=true;mgAddLog('逐字段提取成功, 得到'+Object.keys(partial).length+'个字段 ✓','ok');}
           }catch(e5){mgAddLog('逐字段提取失败: '+e5.message,'warn');}
         }
         if(!ok){
-          mgAddLog('修复3失败, 尝试修复4: 正则提取最外层JSON...','step');
+          mgAddLog('修复4失败, 尝试修复5: 正则提取最外层JSON...','step');
           const m=jsonStr.match(/\{[\s\S]*\}/);
           if(m){try{result=JSON.parse(m[0]);ok=true;mgAddLog('正则提取JSON解析成功 ✓','ok');}catch(e6){}}
         }
-        if(!ok)throw new Error('JSON解析失败(4级修复均失败)');
+        if(!ok)throw new Error('JSON解析失败(5级修复均失败)');
       }
     }catch(e){mgAddLog('LLM调用失败: '+e.message,'warn');mgAddLog('Fallback到本地规则引擎...','warn');result=mgLocalEngine(P);}
   }
