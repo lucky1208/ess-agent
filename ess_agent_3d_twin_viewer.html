@@ -360,6 +360,7 @@
             alpha: false,
             powerPreference: 'high-performance'
         });
+
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
@@ -1165,9 +1166,9 @@
         composer.addPass(renderPass);
 
         const ssaoPass = new SSAOPass(scene, camera, window.innerWidth, window.innerHeight);
-        ssaoPass.kernelRadius = 16;
-        ssaoPass.minDistance = 0.005;
-        ssaoPass.maxDistance = 0.1;
+        ssaoPass.kernelRadius = 8;
+        ssaoPass.minDistance = 0.01;
+        ssaoPass.maxDistance = 0.05;
         composer.addPass(ssaoPass);
 
         const bloomPass = new UnrealBloomPass(
@@ -1341,6 +1342,13 @@
         // 13. ANIMATION LOOP
         // ============================================
         const clock = new THREE.Clock();
+
+        const origConsoleWarn = console.warn;
+        const glWarnRegex = /GL_INVALID_FRAMEBUFFER_OPERATION|THREE\.WebGLProgram|THREE\.WebGLTextures/;
+        console.warn = function(...args) {
+            if (args.length > 0 && typeof args[0] === 'string' && glWarnRegex.test(args[0])) return;
+            origConsoleWarn.apply(console, args);
+        };
 
         function animate() {
             requestAnimationFrame(animate);
