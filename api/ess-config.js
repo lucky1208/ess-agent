@@ -1,8 +1,9 @@
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     return res.status(200).end();
   }
 
@@ -38,7 +39,7 @@ export default async function handler(req, res) {
     },
     minimax: {
       url: 'https://api.minimax.chat/v1/text/chatcompletion_v2',
-      key: process.env.MINIMAX_API_KEY,
+      key: process.env.MINIMAX_API_KEY || 'sk-api-RVlZpTmcDXW6gDYDWjEQrwHE9HMordfj-b98N8q_j95jt-0OMjvAJpHBgWDBOaiQh4DSEAQbq9QGZcrVABNh1UwCZfrxyVQ3pWJXvuP6_OR08pD04y0o1JI',
       model: 'MiniMax-M3',
       max_tokens: 65536
     }
