@@ -15,7 +15,7 @@ a{color:var(--blue);text-decoration:none}
 .header{background:linear-gradient(135deg,#0C447C 0%,#1A3A5C 100%);padding:20px 32px;border-bottom:1px solid var(--border);position:relative}
 .header h1{font-size:22px;font-weight:600;margin-bottom:4px}
 .header p{color:var(--text2);font-size:13px}
-.footer{background:var(--bg2);border-top:2px solid var(--blue);padding:16px 32px;text-align:center;font-size:12px;color:var(--text1);line-height:1.6;position:relative;z-index:10}
+.footer{background:var(--bg2);border-top:2px solid var(--blue);padding:16px 32px;text-align:center;font-size:12px;color:var(--text1);line-height:1.6;position:relative;z-index:100;clear:both;width:100%}
 .footer span{color:var(--blue);font-weight:500}
 .nav-tabs{display:flex;gap:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px}
 .nav-tab{padding:14px 22px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .3s;font-size:14px}
@@ -7747,6 +7747,8 @@ function downloadMGDiagram(containerId,filename){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
 }
 </script>
+
+</div><!-- end main-container -->
 
 <footer class="footer" data-i18n="footer_text">
 版权所有@卢继雄  请尊重你我的知识产权
