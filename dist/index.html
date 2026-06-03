@@ -355,7 +355,7 @@ select.form-input{appearance:auto}
 <div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('LL760_DETAIL','760kWh液冷储能柜')">
 <div class="dev-img-wrap"><img src="images/products/GRID-5M_product.jpeg" alt="760LL" onerror="this.style.display='none'"></div>
 <div class="dev-header"><div><div class="dev-name" data-i18n="ll760_name">760kWh液冷储能柜</div><div class="dev-model">PV+ESS+EV Integrated</div></div><span class="dev-badge badge-green">760kWh</span></div>
-<div class="dev-specs"><span class="spec-item">380kW PCS</span><span class="spec-item">Liquid Cooling</span><span class="spec-item">IP55</span><span class="spec-item">≈38t</span></div>
+<div class="dev-specs"><span class="spec-item">380kW 0.5P</span><span class="spec-item">Liquid Cooling</span><span class="spec-item">IP55</span><span class="spec-item">≈8t</span></div>
 <div class="dev-features"><span class="feature-tag">PV+ESS+EV Integrated</span><span class="feature-tag">7000 Cycles</span><span class="feature-tag">Max 8→6.08MWh</span></div>
 </div>
 </div>
@@ -2443,6 +2443,7 @@ const PRODUCTS=[
   {id:'GRID-7M-330',name:'GOTION GRID 7MWh (330Ah)',cat:'集装箱储能',model:'ESD1331-05P6261',cap:6262,power:3131,volt:1331.2,cell:'LFP-330Ah',size:'6.1m×2.4m×2.9m',weight:'≤50t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-7M_product.jpeg',features:['330Ah电芯','3.1MW高功率','液冷温控']},
   {id:'GRID-5M-314',name:'GOTION GRID 5MWh (314Ah)',cat:'集装箱储能',model:'ESD1331-05P5015',cap:5016,power:2508,volt:1331.2,cell:'LFP-314Ah',size:'6.1m×2.4m×2.9m',weight:'≈44t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-5M_product.jpeg',features:['5MWh标准柜','液冷温控','PACK级消防']},
   {id:'GRID-5M-330',name:'GOTION GRID 5MWh (330Ah)',cat:'集装箱储能',model:'ESD1280-05P5068',cap:5069,power:2534,volt:1280,cell:'LFP-330Ah',size:'6.1m×2.4m×2.9m',weight:'≈44t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-5M_product.jpeg',features:['330Ah电芯','1280V平台','液冷温控']},
+  {id:'EDGE676',name:'GOTION EDGE 760kWh 工商业液冷柜',cat:'集装箱储能',model:'EDGE676-760',cap:760,power:380,volt:1267.2,cell:'LFP-300Ah',size:'1.4m×2.4m×2.5m',weight:'≈8t',cool:'智能液冷',fire:'气溶胶+水消防+PACK级灭火',ip:'IP55',temp:'-20~50°C',pcs:false,maxP:8,img:'GRID-7M_product.jpeg',features:['760kWh工商业','7000次循环','智能液冷温差5±2℃','最大8并→6.01MWh','IP55户外柜']},
   {id:'X-836',name:'乾元载道 X-836',cat:'乾元载道',model:'X-836',cap:836,power:418,volt:1331.2,cell:'LFP-314Ah',size:'1.4m×2.4m×2.4m',weight:'8t',cool:'液冷',fire:'气溶胶+泄爆',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:6,img:'X-836_X950_product.jpeg',features:['PCS+升压一体','即插即用','最大6并','分期投资']},
   {id:'X-950',name:'乾元载道 X-950',cat:'乾元载道',model:'X-950',cap:948,power:474,volt:1152,cell:'LFP-91.5Ah×3',size:'2.1m×2.3m×2.7m',weight:'9.5t',cool:'液冷',fire:'气溶胶+泄爆',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:4,img:'X-836_X950_product.jpeg',features:['PCS+升压一体','高能量密度','最大4并']},
   {id:'X-522',name:'乾元载道 X-522',cat:'乾元载道',model:'X-522',cap:522,power:250,volt:832,cell:'LFP-314Ah',size:'2.4m×1.4m×2.4m',weight:'8t',cool:'风冷+液冷',fire:'PACK气溶胶+舱气溶胶',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:6,img:'X-522_X261_product.jpeg',features:['PCS内置','风冷+液冷','最大6并','50Hz版']},
@@ -3238,7 +3239,7 @@ ${ESS_DIAGRAM_SKILL_V3}
 
 async function callLLM(messages, useStream, providerOverride) {
   const provider = providerOverride || document.getElementById('llmProvider').value;
-  const forceNonStream = (provider === 'bailian');
+  const forceNonStream = false;
   if (useStream && !forceNonStream) {
     const resp = await fetch('/api/ess-config', {
       method: 'POST',
@@ -6082,7 +6083,7 @@ async function mgGenerateSolution(){
       const skillCount=MG_SKILLS_SUMMARY.split('\n').filter(l=>l.trim()&&l.startsWith('-')).length;
       const ruleCount=ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()).length;
       mgAddLog('Skill: '+skillCount+'条 + DRAWING_RULES: '+ruleCount+'行 + SKILL_V3 已注入','step');
-      mgAddLog(`调用${provider.toUpperCase()} API${provider==='bailian'?' (强制非流式)':''}...`,'step');
+      mgAddLog(`调用${provider.toUpperCase()} API...`,'step');
       const systemMsg=`你是微网系统解决方案AI智能体。根据用户参数一次性输出完整JSON，包含方案+配套图纸+BOM+经济性。
 
 必须输出的JSON字段：
