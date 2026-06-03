@@ -100,8 +100,24 @@ export default async function handler(req, res) {
     const data = await resp.json();
     if (data.choices && data.choices[0] && data.choices[0].message) {
       const msg = data.choices[0].message;
-      if (msg.reasoning_content && !msg.content) {
-        msg.content = msg.reasoning_content;
+      if (!msg.content && msg.reasoning_content) {
+        const rc = msg.reasoning_content;
+        const jsonMatch = rc.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try { JSON.parse(jsonMatch[0]); msg.content = jsonMatch[0]; } catch(e) {}
+        }
+        if (!msg.content) {
+          const jsonBlocks = rc.match(/```json\s*([\s\S]*?)```/g);
+          if (jsonBlocks) {
+            for (const block of jsonBlocks) {
+              const cleaned = block.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+              try { JSON.parse(cleaned); msg.content = cleaned; break; } catch(e2) {}
+            }
+          }
+        }
+        if (!msg.content) {
+          msg.content = rc;
+        }
       }
       if (msg.content) {
         let c = msg.content.replace(/```json\n?/g, '').replace(/```/g, '').trim();

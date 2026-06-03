@@ -3239,7 +3239,7 @@ ${ESS_DIAGRAM_SKILL_V3}
 
 async function callLLM(messages, useStream, providerOverride) {
   const provider = providerOverride || document.getElementById('llmProvider').value;
-  const forceNonStream = false;
+  const forceNonStream = (provider === 'minimax');
   if (useStream && !forceNonStream) {
     const resp = await fetch('/api/ess-config', {
       method: 'POST',
@@ -3340,7 +3340,32 @@ async function callLLM(messages, useStream, providerOverride) {
     const err = await resp.json().catch(() => ({ error: 'Network error' }));
     throw new Error(err.error || 'LLM API call failed');
   }
-  return await resp.json();
+  const data = await resp.json();
+  if (provider === 'minimax') {
+    const msg = data.choices?.[0]?.message;
+    if (msg) {
+      const rc = msg.reasoning_content || '';
+      if (rc && typeof updateStreamLog === 'function') {
+        updateStreamLog(rc, 'reasoning');
+      }
+      if (!msg.content && rc) {
+        const jsonMatch = rc.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try { JSON.parse(jsonMatch[0]); msg.content = jsonMatch[0]; } catch(e) {}
+        }
+        if (!msg.content) {
+          const jsonBlocks = rc.match(/```json\s*([\s\S]*?)```/g);
+          if (jsonBlocks) {
+            for (const block of jsonBlocks) {
+              const cleaned = block.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+              try { JSON.parse(cleaned); msg.content = cleaned; break; } catch(e2) {}
+            }
+          }
+        }
+      }
+    }
+  }
+  return data;
 }
 
 let _streamLogReasoningEl = null;
@@ -6083,7 +6108,7 @@ async function mgGenerateSolution(){
       const skillCount=MG_SKILLS_SUMMARY.split('\n').filter(l=>l.trim()&&l.startsWith('-')).length;
       const ruleCount=ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()).length;
       mgAddLog('Skill: '+skillCount+'条 + DRAWING_RULES: '+ruleCount+'行 + SKILL_V3 已注入','step');
-      mgAddLog(`调用${provider.toUpperCase()} API...`,'step');
+      mgAddLog(`调用${provider.toUpperCase()} API${provider==='minimax'?' (非流式,思考时间较长请耐心等待)':''}...`,'step');
       const systemMsg=`你是微网系统解决方案AI智能体。根据用户参数一次性输出完整JSON，包含方案+配套图纸+BOM+经济性。
 
 必须输出的JSON字段：
