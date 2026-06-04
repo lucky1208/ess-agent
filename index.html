@@ -3248,8 +3248,10 @@ async function callLLM(messages, useStream, providerOverride) {
       body: JSON.stringify({ provider, messages, stream: true })
     });
     if (!resp.ok) {
-      const err = await resp.json().catch(() => ({ error: 'Network error' }));
-      throw new Error(err.error || 'LLM API call failed');
+      const errText = await resp.text();
+      let errMsg = 'Network error';
+      try { const errJson = JSON.parse(errText); errMsg = errJson.error || errMsg; } catch(e) { errMsg = errText.substring(0, 200) || errMsg; }
+      throw new Error(errMsg);
     }
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();
@@ -3338,8 +3340,10 @@ async function callLLM(messages, useStream, providerOverride) {
     body: JSON.stringify({ provider, messages, stream: false })
   });
   if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: 'Network error' }));
-    throw new Error(err.error || 'LLM API call failed');
+    const errText = await resp.text();
+    let errMsg = 'Network error';
+    try { const errJson = JSON.parse(errText); errMsg = errJson.error || errMsg; } catch(e) { errMsg = errText.substring(0, 200) || errMsg; }
+    throw new Error(errMsg);
   }
   const data = await resp.json();
   if (provider === 'minimax') {
@@ -3469,7 +3473,7 @@ async function generateSolution() {
     addLog('─── 输入结束 ───', 'step');
     addLog('画图规则: ' + ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).length + '条已注入system prompt', 'step');
     addLog('Skill v3规则: ' + ESS_DIAGRAM_SKILL_V3.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).length + '条已注入system prompt', 'step');
-    addLog(`调用${provider.toUpperCase()} API (SSE流式)...`, 'step');
+    addLog(`调用${provider.toUpperCase()} API${provider==='minimax'?' (非流式,思考时间较长请耐心等待)':' (SSE流式)'}...`, 'step');
     _streamLogReasoningEl = null;
     _streamLogContentEl = null;
     const messages = [

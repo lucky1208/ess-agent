@@ -89,7 +89,8 @@ async function handleAnthropicProvider(req, res, cfg, messages, stream) {
       'x-api-key': cfg.key,
       'anthropic-version': '2023-06-01'
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(280000)
   });
 
   if (!resp.ok) {
@@ -183,7 +184,8 @@ async function handleOpenAIProvider(req, res, cfg, messages, stream) {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${cfg.key}`
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(280000)
   });
 
   if (!resp.ok) {
