@@ -6160,6 +6160,30 @@ ${ESS_DIAGRAM_SKILL_V3}`;
       mgAddLog('解析LLM输出JSON(含方案+图纸+BOM+经济性)...','step');
       let jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
       jsonStr=jsonStr.replace(/[\x00-\x1f]/g,c=>c==='\n'||c==='\r'||c==='\t'?' ':'' );
+      // 预处理: M3 经常在 JSON 后面追加解释文字, 用栈平衡找 JSON 真正结束位置
+      const findBalancedJson=(s)=>{
+        const start=s.indexOf('{');
+        if(start<0)return null;
+        let depth=0,esc=false,inStr=false,quote='';
+        for(let i=start;i<s.length;i++){
+          const c=s[i];
+          if(esc){esc=false;continue;}
+          if(c==='\\'){esc=true;continue;}
+          if(inStr){
+            if(c===quote)inStr=false;
+            continue;
+          }
+          if(c==='"'||c==="'"){inStr=true;quote=c;continue;}
+          if(c==='{')depth++;
+          else if(c==='}'){depth--;if(depth===0)return s.substring(start,i+1);}
+        }
+        return null;
+      };
+      const balancedJson=findBalancedJson(jsonStr);
+      if(balancedJson&&balancedJson.length<jsonStr.length){
+        mgAddLog('截断JSON后多余内容: '+(jsonStr.length-balancedJson.length)+'字符 (M3 经常在JSON后追加解释文字)','step');
+        jsonStr=balancedJson;
+      }
       mgAddLog('JSON长度: '+jsonStr.length+'字符 (控制字符已清理)','step');
       let ok=false;
       try{result=JSON.parse(jsonStr);ok=true;mgAddLog('JSON解析成功 ✓','ok');}
