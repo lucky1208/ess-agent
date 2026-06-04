@@ -5,3 +5,5 @@ node_modules/
 .mavis/
 check_i18n.py
 _check.js
+
+.git_commit_msg.txt
