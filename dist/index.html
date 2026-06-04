@@ -8102,7 +8102,7 @@ window.mgRenderSkillCards=function(){
     const grid=document.getElementById('mgSkillCardsGrid');
     if(!grid||!window.MG_SKILLS)return;
     grid.innerHTML=window.MG_SKILLS.map(s=>{
-      return '<div class="mg-skill-card" data-skill-key="'+s.key+'" style="border-left:3px solid '+s.color+'">'
+      return '<div class="mg-skill-card" data-skill-key="'+s.key+'" data-bound="0" style="border-left:3px solid '+s.color+';cursor:pointer">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
           +'<b style="color:'+s.color+'">'+s.title+'</b>'
           +'<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:'+s.color+'22;color:'+s.color+'">'+s.tag+'</span>'
@@ -8111,14 +8111,30 @@ window.mgRenderSkillCards=function(){
         +'<div class="skill-hint">▸ 点击查看 技术核心 / 解决问题 / 商用价值</div>'
       +'</div>';
     }).join('');
+    // 关键修复: 每张卡片直接 addEventListener, 不用事件委托 — 不依赖渲染时机/全局监听是否就绪
+    grid.querySelectorAll('.mg-skill-card').forEach(function(card){
+      if(card.getAttribute('data-bound')==='1')return;
+      card.setAttribute('data-bound','1');
+      const key=card.getAttribute('data-skill-key');
+      card.addEventListener('click',function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(typeof window.mgShowSkillDetail==='function'){
+          window.mgShowSkillDetail(key);
+        }else{
+          console.error('mgShowSkillDetail not defined yet');
+        }
+      });
+    });
   }catch(err){console.error('mgRenderSkillCards error:',err);}
 };
 
-// 全局事件委托 (挂在 document.body, 永远存在, 任何时机渲染的卡片都生效)
+// 备份: 仍然保留 document.body 上的事件委托 (新插入的卡片未走 mgRenderSkillCards 也能用)
 if(!window._skillClickDelegated){
   window._skillClickDelegated=true;
   document.body.addEventListener('click',function(e){
-    const card=e.target.closest('.mg-skill-card[data-skill-key]');
+    if(e.target.closest && e.target.closest('.mg-skill-card'))return; // 已由卡片自身处理
+    const card=e.target.closest&&e.target.closest('.mg-skill-card[data-skill-key]');
     if(card&&window.mgShowSkillDetail){
       e.preventDefault();
       e.stopPropagation();
