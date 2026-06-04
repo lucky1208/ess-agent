@@ -6120,7 +6120,7 @@ async function mgGenerateSolution(){
 - 思考要简洁（≤1500字），分析完关键约束后**立即输出JSON**，不要长篇推理或重复计算
 - 不要在思考阶段列举BOM的所有型号规格, 只列关键类别即可, 详细型号在JSON里输出
 - 不要反复校验坐标重叠, 按规则一次定位, 有疑问在JSON里调整
-- 必须输出**一个且仅一个**完整的JSON对象，**不要输出```json代码块包裹**, 直接以 { 开头
+- 必须输出**一个且仅一个**完整的JSON对象，不要用 markdown 三反引号 code block 包裹，直接以 { 开头
 - 所有图纸字段(archDiagram/wiringDiagram/commDiagram)必须是结构化JSON对象, 不要输出SVG字符串
 
 根据用户参数一次性输出完整JSON，包含方案+配套图纸+BOM+经济性。

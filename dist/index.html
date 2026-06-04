@@ -6114,7 +6114,16 @@ async function mgGenerateSolution(){
       const ruleCount=ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()).length;
       mgAddLog('Skill: '+skillCount+'条 + DRAWING_RULES: '+ruleCount+'行 + SKILL_V3 已注入','step');
       mgAddLog(`调用${provider.toUpperCase()} API (SSE流式,思考过程实时显示)...`,'step');
-      const systemMsg=`你是微网系统解决方案AI智能体。根据用户参数一次性输出完整JSON，包含方案+配套图纸+BOM+经济性。
+      const systemMsg=`你是微网系统解决方案AI智能体。
+
+【核心指令 - 务必遵守】
+- 思考要简洁（≤1500字），分析完关键约束后**立即输出JSON**，不要长篇推理或重复计算
+- 不要在思考阶段列举BOM的所有型号规格, 只列关键类别即可, 详细型号在JSON里输出
+- 不要反复校验坐标重叠, 按规则一次定位, 有疑问在JSON里调整
+- 必须输出**一个且仅一个**完整的JSON对象，不要用 markdown 三反引号 code block 包裹，直接以 { 开头
+- 所有图纸字段(archDiagram/wiringDiagram/commDiagram)必须是结构化JSON对象, 不要输出SVG字符串
+
+根据用户参数一次性输出完整JSON，包含方案+配套图纸+BOM+经济性。
 
 必须输出的JSON字段：
 1. topology: {type,name,acBus,dcBus,voltage,pcc,transformer,opMode,hasSTS,criticalLoad}
@@ -6138,9 +6147,11 @@ ${ESS_DRAWING_RULES}
 ${ESS_DIAGRAM_SKILL_V3}`;
       const messages=[{role:'system',content:systemMsg},{role:'user',content:userPrompt}];
       const data=await callLLM(messages,true,provider);
-      mgAddLog(`响应完成, tokens: ${data.usage?.total_tokens||'?'}`,'ok');
       const content=data.choices?.[0]?.message?.content||'';
       const reasoning=data.choices?.[0]?.message?.reasoning_content||'';
+      const finishReason=data.choices?.[0]?.finish_reason||'?';
+      mgAddLog(`响应完成, tokens: ${data.usage?.total_tokens||data.usage?.output_tokens||'?'}, finish_reason: ${finishReason}`,'ok');
+      mgAddLog(`内容统计: content=${content.length}字符, reasoning=${reasoning.length}字符`,'step');
       if(reasoning){
         mgAddLog('─── AI思考过程 ───','step');
         reasoning.split('\n').forEach(line=>{if(line.trim())mgAddLog(line,'');});
