@@ -8111,16 +8111,21 @@ window.mgRenderSkillCards=function(){
         +'<div class="skill-hint">▸ 点击查看 技术核心 / 解决问题 / 商用价值</div>'
       +'</div>';
     }).join('');
-    // 事件委托 (主绑定, 取代不可靠的 inline onclick)
-    if(!grid.dataset.delegated){
-      grid.dataset.delegated='1';
-      grid.addEventListener('click',function(e){
-        const card=e.target.closest('.mg-skill-card[data-skill-key]');
-        if(card)window.mgShowSkillDetail(card.dataset.skillKey);
-      });
-    }
   }catch(err){console.error('mgRenderSkillCards error:',err);}
 };
+
+// 全局事件委托 (挂在 document.body, 永远存在, 任何时机渲染的卡片都生效)
+if(!window._skillClickDelegated){
+  window._skillClickDelegated=true;
+  document.body.addEventListener('click',function(e){
+    const card=e.target.closest('.mg-skill-card[data-skill-key]');
+    if(card&&window.mgShowSkillDetail){
+      e.preventDefault();
+      e.stopPropagation();
+      window.mgShowSkillDetail(card.dataset.skillKey);
+    }
+  });
+}
 
 window.mgShowSkillDetail=function(key){
   try{
