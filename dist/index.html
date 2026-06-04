@@ -6160,29 +6160,111 @@ ${ESS_DIAGRAM_SKILL_V3}`;
       mgAddLog('解析LLM输出JSON(含方案+图纸+BOM+经济性)...','step');
       let jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
       jsonStr=jsonStr.replace(/[\x00-\x1f]/g,c=>c==='\n'||c==='\r'||c==='\t'?' ':'' );
-      // 预处理: M3 经常在 JSON 后面追加解释文字, 用栈平衡找 JSON 真正结束位置
-      const findBalancedJson=(s)=>{
-        const start=s.indexOf('{');
-        if(start<0)return null;
-        let depth=0,esc=false,inStr=false,quote='';
-        for(let i=start;i<s.length;i++){
-          const c=s[i];
-          if(esc){esc=false;continue;}
-          if(c==='\\'){esc=true;continue;}
-          if(inStr){
-            if(c===quote)inStr=false;
-            continue;
+      // 预处理: M3 输出常把 JSON 拆成多段或中间多写 `}`, 用「多对象提取 + 智能重组」:
+      //   (a) JSON 末尾追加中文解释 → 提取第一个 balanced JSON
+      //   (b) JSON 中间多写 `}` 提前关闭外层 → 提取多个独立对象
+      //   (c) JSON 拆成多段 → 同样提取多个对象
+      // 然后按字段签名识别: bus/nodes/links → archDiagram, voltage/components/connections → wiringDiagram,
+      // item/qty/price 多条 → bom[], annualRevenue/payback/irr/note → economicsDetail
+      const extractAllJsonObjects=(s)=>{
+        const objects=[];
+        let i=0;
+        while(i<s.length){
+          const start=s.indexOf('{',i);
+          if(start<0)break;
+          let depth=0,esc=false,inStr=false,quote='';
+          let endIdx=-1;
+          for(let j=start;j<s.length;j++){
+            const c=s[j];
+            if(esc){esc=false;continue;}
+            if(c==='\\'){esc=true;continue;}
+            if(inStr){if(c===quote)inStr=false;continue;}
+            if(c==='"'||c==="'"){inStr=true;quote=c;continue;}
+            if(c==='{')depth++;
+            else if(c==='}'){depth--;if(depth===0){endIdx=j;break;}}
           }
-          if(c==='"'||c==="'"){inStr=true;quote=c;continue;}
-          if(c==='{')depth++;
-          else if(c==='}'){depth--;if(depth===0)return s.substring(start,i+1);}
+          if(endIdx<0)break;
+          const objStr=s.substring(start,endIdx+1);
+          try{const o=JSON.parse(objStr);if(o&&typeof o==='object'&&!Array.isArray(o))objects.push(o);}catch(e){}
+          i=endIdx+1;
         }
-        return null;
+        return objects;
       };
-      const balancedJson=findBalancedJson(jsonStr);
-      if(balancedJson&&balancedJson.length<jsonStr.length){
-        mgAddLog('截断JSON后多余内容: '+(jsonStr.length-balancedJson.length)+'字符 (M3 经常在JSON后追加解释文字)','step');
-        jsonStr=balancedJson;
+      const reassembleSplit=(objs)=>{
+        if(objs.length<=1)return objs[0]||null;
+        // 按字段签名分类, 第一个对象作为 base (通常含 topology/sizing/economics/strategy/protection/risks)
+        const base=objs[0];
+        const consumed=objs.map((o,i)=>i===0?true:false);
+        // archDiagram: 含 bus + (nodes 或 links) 的对象
+        for(let i=1;i<objs.length;i++){
+          if(consumed[i])continue;
+          const o=objs[i];
+          if(o.bus!==undefined&&(o.nodes||o.links)){
+            if(!base.archDiagram)base.archDiagram={};
+            if(o.bus!==undefined)base.archDiagram.bus=o.bus;
+            if(o.nodes!==undefined)base.archDiagram.nodes=o.nodes;
+            if(o.links!==undefined)base.archDiagram.links=o.links;
+            consumed[i]=true;
+          }
+        }
+        // wiringDiagram: 含 voltage + (components 或 connections) 的对象
+        for(let i=1;i<objs.length;i++){
+          if(consumed[i])continue;
+          const o=objs[i];
+          if(o.voltage!==undefined&&(o.components||o.connections)){
+            if(!base.wiringDiagram)base.wiringDiagram={};
+            if(o.voltage!==undefined)base.wiringDiagram.voltage=o.voltage;
+            if(o.components!==undefined)base.wiringDiagram.components=o.components;
+            if(o.connections!==undefined)base.wiringDiagram.connections=o.connections;
+            if(o.protection!==undefined)base.wiringDiagram.protection=o.protection;
+            consumed[i]=true;
+          }
+        }
+        // commDiagram: 含 layers 字段的对象
+        for(let i=1;i<objs.length;i++){
+          if(consumed[i])continue;
+          if(objs[i].layers!==undefined){base.commDiagram={layers:objs[i].layers};consumed[i]=true;}
+        }
+        // bom: 含 item + qty 的对象 (可能有多个, 累积成数组)
+        const bomItems=[];
+        for(let i=1;i<objs.length;i++){
+          if(consumed[i])continue;
+          if(objs[i].item!==undefined&&objs[i].qty!==undefined){bomItems.push(objs[i]);consumed[i]=true;}
+        }
+        if(bomItems.length>0)base.bom=bomItems;
+        // economicsDetail: 含 annualRevenue + payback/irr 的对象
+        for(let i=1;i<objs.length;i++){
+          if(consumed[i])continue;
+          const o=objs[i];
+          if(o.annualRevenue!==undefined&&(o.payback!==undefined||o.irr!==undefined)){
+            if(!base.economicsDetail)base.economicsDetail={};
+            for(const k of Object.keys(o))base.economicsDetail[k]=o[k];
+            consumed[i]=true;
+          }
+        }
+        // 剩余未识别的字段, 直接 merge 到 base
+        for(let i=1;i<objs.length;i++){
+          if(consumed[i])continue;
+          for(const k of Object.keys(objs[i])){
+            if(!base.hasOwnProperty(k))base[k]=objs[i][k];
+          }
+        }
+        return base;
+      };
+      const allObjects=extractAllJsonObjects(jsonStr);
+      if(allObjects.length>1){
+        const reassembled=reassembleSplit(allObjects);
+        const reassembledStr=JSON.stringify(reassembled);
+        if(reassembledStr.length<jsonStr.length){
+          mgAddLog('M3输出拆成'+allObjects.length+'段, 已按字段签名重组 (archDiagram/wiringDiagram/bom/economicsDetail) → '+reassembledStr.length+'字符','step');
+          jsonStr=reassembledStr;
+        }
+      }else if(allObjects.length===1&&allObjects[0]&&jsonStr.length>JSON.stringify(allObjects[0]).length+10){
+        const firstObjStr=JSON.stringify(allObjects[0]);
+        if(firstObjStr.length<jsonStr.length){
+          mgAddLog('截断JSON后多余内容: '+(jsonStr.length-firstObjStr.length)+'字符 (M3经常在JSON后追加解释文字)','step');
+          jsonStr=firstObjStr;
+        }
       }
       mgAddLog('JSON长度: '+jsonStr.length+'字符 (控制字符已清理)','step');
       let ok=false;
