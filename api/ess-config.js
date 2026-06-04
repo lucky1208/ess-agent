@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       enable_thinking: true
     },
     minimax: {
-      url: 'https://api.anthropic.com/v1/messages',
+      url: 'https://api.minimax.chat/anthropic/v1/messages',
       key: process.env.MINIMAX_API_KEY || 'sk-api-RVlZpTmcDXW6gDYDWjEQrwHE9HMordfj-b98N8q_j95jt-0OMjvAJpHBgWDBOaiQh4DSEAQbq9QGZcrVABNh1UwCZfrxyVQ3pWJXvuP6_OR08pD04y0o1JI',
       model: 'MiniMax-M3',
       max_tokens: 65536,
