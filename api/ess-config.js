@@ -50,8 +50,8 @@ export default async function handler(req, res) {
       key: process.env.MINIMAX_API_KEY || 'sk-api-RVlZpTmcDXW6gDYDWjEQrwHE9HMordfj-b98N8q_j95jt-0OMjvAJpHBgWDBOaiQh4DSEAQbq9QGZcrVABNh1UwCZfrxyVQ3pWJXvuP6_OR08pD04y0o1JI',
       model: 'MiniMax-M3',
       // ✅ Anthropic 协议：max_tokens 必需，thinking 可选
-      max_tokens: 16384,
-      thinking: { type: 'enabled', budget_tokens: 8192 },
+      max_tokens: 65536,
+      thinking: { type: 'enabled', budget_tokens: 32768 },
       // ✅ 用 anthropic-version 头标识协议版本
       anthropic_version: '2023-06-01',
       // 标记走 Anthropic 协议，handler 分发用
