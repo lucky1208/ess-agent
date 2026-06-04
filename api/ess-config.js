@@ -38,11 +38,13 @@ export default async function handler(req, res) {
       enable_thinking: true
     },
     minimax: {
-      url: 'https://platform.minimaxi.com/v1/responses',
+      url: 'https://api.minimaxi.com/v1/chat/completions',
       key: process.env.MINIMAX_API_KEY || 'sk-api-RVlZpTmcDXW6gDYDWjEQrwHE9HMordfj-b98N8q_j95jt-0OMjvAJpHBgWDBOaiQh4DSEAQbq9QGZcrVABNh1UwCZfrxyVQ3pWJXvuP6_OR08pD04y0o1JI',
       model: 'MiniMax-M3',
-      max_tokens: 65536,
-      apiType: 'minimax_responses'
+      max_completion_tokens: 131072,
+      thinking: { type: 'adaptive' },
+      reasoning_split: true,
+      temperature: 1.0
     }
   };
 
@@ -52,142 +54,27 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (cfg.apiType === 'minimax_responses') {
-      return await handleMiniMaxResponses(req, res, cfg, messages);
-    }
+
     return await handleOpenAIProvider(req, res, cfg, messages, stream);
   } catch (e) {
     return res.status(500).json({ error: `Proxy error: ${e.message}` });
   }
 }
 
-async function handleMiniMaxResponses(req, res, cfg, messages) {
-  let systemPrompt = '';
-  const conversationParts = [];
-  for (const msg of messages) {
-    if (msg.role === 'system') {
-      systemPrompt += (systemPrompt ? '\n' : '') + msg.content;
-    } else if (msg.role === 'user') {
-      conversationParts.push(msg.content);
-    } else if (msg.role === 'assistant') {
-      conversationParts.push(msg.content);
-    }
-  }
-
-  let inputText = '';
-  if (systemPrompt) {
-    inputText = systemPrompt + '\n\n';
-  }
-  inputText += conversationParts.join('\n');
-
-  const body = {
-    model: cfg.model,
-    input: inputText
-  };
-
-  const resp = await fetch(cfg.url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${cfg.key}`
-    },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(280000)
-  });
-
-  if (!resp.ok) {
-    const errText = await resp.text();
-    return res.status(resp.status).json({ error: `MiniMax API error (${resp.status}): ${errText.substring(0, 500)}` });
-  }
-
-  const data = await resp.json();
-
-  let reasoningText = '';
-  let contentText = '';
-
-  if (data.output && Array.isArray(data.output)) {
-    for (const block of data.output) {
-      if (block.type === 'reasoning' && block.content && Array.isArray(block.content)) {
-        for (const c of block.content) {
-          if (c.type === 'reasoning_text') {
-            reasoningText += c.text || '';
-          }
-        }
-      } else if (block.type === 'message' && block.content && Array.isArray(block.content)) {
-        for (const c of block.content) {
-          if (c.type === 'output_text') {
-            contentText += c.text || '';
-          }
-        }
-      }
-    }
-  }
-
-  if (!contentText && reasoningText) {
-    const jsonMatch = reasoningText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      try { JSON.parse(jsonMatch[0]); contentText = jsonMatch[0]; } catch(e) {}
-    }
-    if (!contentText) {
-      const jsonBlocks = reasoningText.match(/```json\s*([\s\S]*?)```/g);
-      if (jsonBlocks) {
-        for (const block of jsonBlocks) {
-          const cleaned = block.replace(/```json\n?/g,'').replace(/```/g,'').trim();
-          try { JSON.parse(cleaned); contentText = cleaned; break; } catch(e2) {}
-        }
-      }
-    }
-  }
-
-  if (contentText) {
-    let c = contentText.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-    if (!c.startsWith('{')) {
-      const jsonMatch = c.match(/\{[\s\S]*\}/);
-      if (jsonMatch) c = jsonMatch[0];
-    }
-    try {
-      JSON.parse(c);
-      contentText = c;
-    } catch (e) {
-      const allJsons = [];
-      const re = /\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}/g;
-      let m;
-      while ((m = re.exec(c)) !== null) {
-        try { allJsons.push({json: JSON.parse(m[0]), len: m[0].length}); } catch(e2) {}
-      }
-      if (allJsons.length > 0) {
-        allJsons.sort((a,b) => b.len - a.len);
-        contentText = JSON.stringify(allJsons[0].json);
-      }
-    }
-  }
-
-  const openaiFormat = {
-    choices: [{
-      message: {
-        content: contentText,
-        reasoning_content: reasoningText
-      }
-    }],
-    usage: {
-      total_tokens: data.usage?.total_tokens || 0
-    }
-  };
-
-  return res.status(200).json(openaiFormat);
-}
 
 async function handleOpenAIProvider(req, res, cfg, messages, stream) {
   const body = {
     model: cfg.model,
     messages,
     temperature: cfg.temperature !== undefined ? cfg.temperature : 0.3,
-    max_tokens: cfg.max_tokens || 16384,
     stream: !!stream
   };
+  if (cfg.max_completion_tokens) body.max_completion_tokens = cfg.max_completion_tokens;
+  else body.max_tokens = cfg.max_tokens || 16384;
   if (cfg.reasoning_effort) body.reasoning_effort = cfg.reasoning_effort;
   if (cfg.thinking) body.thinking = cfg.thinking;
   if (cfg.enable_thinking) body.enable_thinking = true;
+  if (cfg.reasoning_split) body.reasoning_split = true;
 
   const resp = await fetch(cfg.url, {
     method: 'POST',
