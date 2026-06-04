@@ -50,12 +50,12 @@ export default async function handler(req, res) {
       key: process.env.MINIMAX_API_KEY || 'sk-api-RVlZpTmcDXW6gDYDWjEQrwHE9HMordfj-b98N8q_j95jt-0OMjvAJpHBgWDBOaiQh4DSEAQbq9QGZcrVABNh1UwCZfrxyVQ3pWJXvuP6_OR08pD04y0o1JI',
       model: 'MiniMax-M3',
       // ✅ Anthropic 协议：max_tokens 必需，thinking 可选
-      // ⚠️ budget_tokens 必须小于 max_tokens - 1024（Anthropic 硬约束：response 需要至少 1024 token）
-      // 之前 32768 budget + 复杂 system prompt → M3 在 thinking 阶段把 32K 全用光
-      // 还没切到 text 输出就被截断，content 为空，5级 JSON 修复全失败
-      // 现在 16384 budget → text 还有 65536-16384 = 49152 token 空间，足够复杂 JSON
+      // ❌ 禁用 thinking！实测 budget_tokens 16384 / 32768 / 8192 都无法阻止 M3 过度思考
+      //    M3 在复杂 system prompt (~320K字符) 下会反复迭代拓扑/BOM/坐标,把 thinking
+      //    吃光后还没切到 text 输出,content 为空,5级 JSON 修复全失败
+      // ✅ 关闭 thinking 让 M3 直接出 JSON,牺牲思考过程显示换取功能可用
       max_tokens: 65536,
-      thinking: { type: 'enabled', budget_tokens: 16384 },
+      thinking: { type: 'disabled' },
       // ✅ 用 anthropic-version 头标识协议版本
       anthropic_version: '2023-06-01',
       // 标记走 Anthropic 协议，handler 分发用
