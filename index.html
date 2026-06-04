@@ -3240,7 +3240,7 @@ ${ESS_DIAGRAM_SKILL_V3}
 
 async function callLLM(messages, useStream, providerOverride) {
   const provider = providerOverride || document.getElementById('llmProvider').value;
-  const forceNonStream = (provider === 'minimax');
+  const forceNonStream = false;
   if (useStream && !forceNonStream) {
     const resp = await fetch('/api/ess-config', {
       method: 'POST',
@@ -3473,7 +3473,7 @@ async function generateSolution() {
     addLog('─── 输入结束 ───', 'step');
     addLog('画图规则: ' + ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).length + '条已注入system prompt', 'step');
     addLog('Skill v3规则: ' + ESS_DIAGRAM_SKILL_V3.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).length + '条已注入system prompt', 'step');
-    addLog(`调用${provider.toUpperCase()} API${provider==='minimax'?' (非流式,思考时间较长请耐心等待)':' (SSE流式)'}...`, 'step');
+    addLog(`调用${provider.toUpperCase()} API (SSE流式,思考过程实时显示)...`, 'step');
     _streamLogReasoningEl = null;
     _streamLogContentEl = null;
     const messages = [
@@ -6113,7 +6113,7 @@ async function mgGenerateSolution(){
       const skillCount=MG_SKILLS_SUMMARY.split('\n').filter(l=>l.trim()&&l.startsWith('-')).length;
       const ruleCount=ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()).length;
       mgAddLog('Skill: '+skillCount+'条 + DRAWING_RULES: '+ruleCount+'行 + SKILL_V3 已注入','step');
-      mgAddLog(`调用${provider.toUpperCase()} API${provider==='minimax'?' (非流式,思考时间较长请耐心等待)':''}...`,'step');
+      mgAddLog(`调用${provider.toUpperCase()} API (SSE流式,思考过程实时显示)...`,'step');
       const systemMsg=`你是微网系统解决方案AI智能体。根据用户参数一次性输出完整JSON，包含方案+配套图纸+BOM+经济性。
 
 必须输出的JSON字段：
