@@ -38,11 +38,11 @@ export default async function handler(req, res) {
       enable_thinking: true
     },
     minimax: {
-      url: 'https://api.minimax.chat/anthropic/v1/messages',
+      url: 'https://platform.minimaxi.com/v1/responses',
       key: process.env.MINIMAX_API_KEY || 'sk-api-RVlZpTmcDXW6gDYDWjEQrwHE9HMordfj-b98N8q_j95jt-0OMjvAJpHBgWDBOaiQh4DSEAQbq9QGZcrVABNh1UwCZfrxyVQ3pWJXvuP6_OR08pD04y0o1JI',
       model: 'MiniMax-M3',
       max_tokens: 65536,
-      apiType: 'anthropic'
+      apiType: 'minimax_responses'
     }
   };
 
@@ -52,8 +52,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (cfg.apiType === 'anthropic') {
-      return await handleAnthropicProvider(req, res, cfg, messages, stream);
+    if (cfg.apiType === 'minimax_responses') {
+      return await handleMiniMaxResponses(req, res, cfg, messages);
     }
     return await handleOpenAIProvider(req, res, cfg, messages, stream);
   } catch (e) {
@@ -61,33 +61,35 @@ export default async function handler(req, res) {
   }
 }
 
-async function handleAnthropicProvider(req, res, cfg, messages, stream) {
+async function handleMiniMaxResponses(req, res, cfg, messages) {
   let systemPrompt = '';
-  const anthropicMessages = [];
+  const conversationParts = [];
   for (const msg of messages) {
     if (msg.role === 'system') {
       systemPrompt += (systemPrompt ? '\n' : '') + msg.content;
-    } else {
-      anthropicMessages.push({
-        role: msg.role,
-        content: msg.content
-      });
+    } else if (msg.role === 'user') {
+      conversationParts.push(msg.content);
+    } else if (msg.role === 'assistant') {
+      conversationParts.push(msg.content);
     }
   }
 
+  let inputText = '';
+  if (systemPrompt) {
+    inputText = systemPrompt + '\n\n';
+  }
+  inputText += conversationParts.join('\n');
+
   const body = {
     model: cfg.model,
-    max_tokens: cfg.max_tokens || 65536,
-    messages: anthropicMessages
+    input: inputText
   };
-  if (systemPrompt) body.system = systemPrompt;
 
   const resp = await fetch(cfg.url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': cfg.key,
-      'anthropic-version': '2023-06-01'
+      'Authorization': `Bearer ${cfg.key}`
     },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(280000)
@@ -95,19 +97,28 @@ async function handleAnthropicProvider(req, res, cfg, messages, stream) {
 
   if (!resp.ok) {
     const errText = await resp.text();
-    return res.status(resp.status).json({ error: `MiniMax API error: ${errText}` });
+    return res.status(resp.status).json({ error: `MiniMax API error (${resp.status}): ${errText.substring(0, 500)}` });
   }
 
   const data = await resp.json();
 
   let reasoningText = '';
   let contentText = '';
-  if (data.content && Array.isArray(data.content)) {
-    for (const block of data.content) {
-      if (block.type === 'thinking') {
-        reasoningText += block.thinking || '';
-      } else if (block.type === 'text') {
-        contentText += block.text || '';
+
+  if (data.output && Array.isArray(data.output)) {
+    for (const block of data.output) {
+      if (block.type === 'reasoning' && block.content && Array.isArray(block.content)) {
+        for (const c of block.content) {
+          if (c.type === 'reasoning_text') {
+            reasoningText += c.text || '';
+          }
+        }
+      } else if (block.type === 'message' && block.content && Array.isArray(block.content)) {
+        for (const c of block.content) {
+          if (c.type === 'output_text') {
+            contentText += c.text || '';
+          }
+        }
       }
     }
   }
@@ -159,7 +170,7 @@ async function handleAnthropicProvider(req, res, cfg, messages, stream) {
       }
     }],
     usage: {
-      total_tokens: data.usage?.input_tokens + data.usage?.output_tokens || 0
+      total_tokens: data.usage?.total_tokens || 0
     }
   };
 
