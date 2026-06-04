@@ -9,14 +9,15 @@
 <style>
 :root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg1);color:var(--text1);line-height:1.6;min-height:100vh;padding-bottom:56px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg1);color:var(--text1);line-height:1.6;min-height:100vh;padding-bottom:72px}
 a{color:var(--blue);text-decoration:none}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:#3a3e45;border-radius:3px}
 .header{background:linear-gradient(135deg,#0C447C 0%,#1A3A5C 100%);padding:20px 32px;border-bottom:1px solid var(--border);position:relative}
 .header h1{font-size:22px;font-weight:600;margin-bottom:4px}
 .header p{color:var(--text2);font-size:13px}
-.footer{background:linear-gradient(90deg,#0C447C,#185FA5,#1A3A5C);border-top:4px solid #4A9EE8;padding:16px 32px;text-align:center;font-size:15px;color:#fff;font-weight:600;line-height:1.4;position:fixed;bottom:0;left:0;right:0;z-index:2147483647;width:100%;box-shadow:0 -4px 20px rgba(0,0,0,.7);pointer-events:auto;letter-spacing:1px}
+.footer{background:linear-gradient(90deg,#0C447C,#185FA5,#1A3A5C);border-top:4px solid #4A9EE8;padding:16px 32px;text-align:center;font-size:15px;color:#fff;font-weight:700;line-height:1.5;position:fixed;bottom:0;left:0;right:0;z-index:2147483647;width:100%;box-shadow:0 -6px 28px rgba(0,0,0,.9),0 -2px 8px rgba(24,95,165,.6);pointer-events:auto;letter-spacing:1.5px;display:block!important;visibility:visible!important;opacity:1!important;transform:none!important}
 .footer span{color:#7EC8F8;font-weight:700}
+/* 确保footer不被任何元素遮挡 */
 body>*:not(.footer){max-z-index:2147483646}
 .nav-tabs{display:flex;gap:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px}
 .nav-tab{padding:14px 22px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .3s;font-size:14px}
@@ -2408,6 +2409,7 @@ function switchLang(lang){
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const key=el.getAttribute('data-i18n');
     if(dict[key]!==undefined){
+      /* footer保留HTML结构，其他元素用textContent */
       if(el.id==='copyright-footer'){el.innerHTML=dict[key];}
       else{el.textContent=dict[key];}
     }
@@ -7757,13 +7759,15 @@ function downloadMGDiagram(containerId,filename){
 <footer class="footer" data-i18n="footer_text" id="copyright-footer">
   © 版权所有 @ <strong style="color:#FFD700;letter-spacing:2px">卢继雄</strong>&nbsp;&nbsp;|&nbsp;&nbsp;请尊重你我的知识产权
 </footer>
+
 <script>
+/* 版权保护：防止footer被任何动态内容遮挡 */
 (function protectFooter(){
   function ensureFooter(){
     var f=document.getElementById('copyright-footer');
     if(!f)return;
-    f.style.cssText='background:linear-gradient(90deg,#0C447C,#185FA5,#1A3A5C)!important;border-top:4px solid #4A9EE8!important;padding:16px 32px!important;text-align:center!important;font-size:15px!important;color:#fff!important;font-weight:600!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;z-index:2147483647!important;width:100%!important;box-shadow:0 -4px 20px rgba(0,0,0,.7)!important;pointer-events:auto!important;letter-spacing:1px!important;display:block!important;visibility:visible!important;opacity:1!important';
-    document.body.appendChild(f);
+    f.style.cssText='background:linear-gradient(90deg,#0C447C,#185FA5,#1A3A5C)!important;border-top:4px solid #4A9EE8!important;padding:16px 32px!important;text-align:center!important;font-size:15px!important;color:#fff!important;font-weight:700!important;line-height:1.5!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;z-index:2147483647!important;width:100%!important;box-shadow:0 -6px 28px rgba(0,0,0,.9)!important;pointer-events:auto!important;letter-spacing:1.5px!important;display:block!important;visibility:visible!important;opacity:1!important;transform:none!important';
+    document.body.appendChild(f); /* 确保footer始终是body最后一个子元素 */
   }
   document.addEventListener('DOMContentLoaded',ensureFooter);
   window.addEventListener('load',ensureFooter);
