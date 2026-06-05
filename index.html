@@ -673,7 +673,7 @@ select.form-input{appearance:auto}
 <div class="sec-title" style="margin-bottom:0" data-i18n="mg_wiki_title">核心技术</div>
 <div style="font-size:11px;color:var(--text2)" data-i18n="mg_wiki_desc">5年项目实战沉淀的16项微网核心技术 | 点击卡片查看技术核心、关键解决问题与商用价值</div>
 </div>
-<div style="padding:16px;background:linear-gradient(135deg,rgba(24,95,165,.08),rgba(15,110,86,.08));border:1px solid var(--border);border-radius:8px;margin-bottom:16px">
+<div id="mgSkillCardsSection" style="padding:16px;background:linear-gradient(135deg,rgba(24,95,165,.08),rgba(15,110,86,.08));border:1px solid var(--border);border-radius:8px;margin-bottom:16px">
 <div style="font-size:14px;font-weight:bold;color:var(--text1);margin-bottom:4px" data-i18n="mg_wiki_skill_title">5年项目实战训练出的16项核心技术 Skill</div>
 <div style="font-size:11px;color:var(--text2);margin-bottom:12px" data-i18n="mg_wiki_skill_author">设计人：卢继雄 | 10项工程流Skill + 6项微网深度技术Skill | 每项均经多个微网项目验证迭代</div>
 <div id="mgSkillCardsGrid" class="mg-grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px"></div>
@@ -2556,8 +2556,9 @@ function mgShowWiki(id){
   if(idx>=0) document.querySelectorAll('#page-mg-wiki .sw-tab')[idx].classList.add('active');
   document.querySelectorAll('.micro-content').forEach(t=>{t.style.display='none';});
   document.getElementById('page-mg-wiki').style.display='block';
-  // 强制渲染 16 个 Skill 卡片 (双保险: DOMContentLoaded 已渲染, 这里再渲染一次)
   if(typeof window.mgRenderSkillCards==='function')window.mgRenderSkillCards();
+  var skillSection=document.getElementById('mgSkillCardsSection');
+  if(skillSection){skillSection.style.display='block';skillSection.style.pointerEvents='auto';}
   const subEl=document.getElementById('page-mg-'+id);
   if(subEl){
     subEl.style.display='block';
@@ -8130,6 +8131,17 @@ window.mgRenderSkillCards=function(){
       });
     });
     console.log('[mgR] DONE in', (performance.now()-_t0).toFixed(1), 'ms, bound cards:', grid.querySelectorAll('[data-bound="1"]').length);
+    // 额外：给页面上所有mg-skill-card（含子页面静态卡片）绑定点击
+    document.querySelectorAll('.mg-skill-card').forEach(function(c){
+      if(c.getAttribute('data-all-bound')==='1')return;
+      c.setAttribute('data-all-bound','1');
+      c.style.cursor='pointer';
+      c.addEventListener('click',function(ev){
+        var k=c.getAttribute('data-skill-key');
+        if(!k){var b=c.querySelector('b');if(b&&window.MG_SKILLS){var t=b.textContent.trim();var f=window.MG_SKILLS.find(function(s){return s.title===t;});if(f)k=f.key;}}
+        if(k&&typeof window.mgShowSkillDetail==='function'){ev.preventDefault();ev.stopPropagation();window.mgShowSkillDetail(k);}
+      });
+    });
   }catch(err){console.error('[mgR] ERROR:',err);}
 };
 
