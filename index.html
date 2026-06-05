@@ -8099,16 +8099,13 @@ window.MG_SKILLS = [
 ];
 
 window.mgRenderSkillCards=function(){
-  var _t0=performance.now();
-  console.log('[mgR] called at', _t0.toFixed(1), 'ms, grid?', !!document.getElementById('mgSkillCardsGrid'), 'skills?', !!window.MG_SKILLS, 'visible?', document.getElementById('page-mg-wiki')&&getComputedStyle(document.getElementById('page-mg-wiki')).display);
   try{
     const grid=document.getElementById('mgSkillCardsGrid');
-    if(!grid||!window.MG_SKILLS){console.log('[mgR] early return, no grid/skills');return;}
+    if(!grid||!window.MG_SKILLS)return;
     grid.innerHTML=window.MG_SKILLS.map(s=>{
-      // 终极方案: 内联 onclick + addEventListener 双保险
       return '<div class="mg-skill-card" data-skill-key="'+s.key+'" data-bound="0" '
         +'onclick="window.mgShowSkillDetail&&window.mgShowSkillDetail(\''+s.key+'\')" '
-        +'style="border-left:3px solid '+s.color+';cursor:pointer">'
+        +'style="border-left:3px solid '+s.color+';cursor:pointer;pointer-events:auto;position:relative;z-index:1">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
           +'<b style="color:'+s.color+'">'+s.title+'</b>'
           +'<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:'+s.color+'22;color:'+s.color+'">'+s.tag+'</span>'
@@ -8117,50 +8114,69 @@ window.mgRenderSkillCards=function(){
         +'<div class="skill-hint">▸ 点击查看 技术核心 / 解决问题 / 商用价值</div>'
       +'</div>';
     }).join('');
-    console.log('[mgR] innerHTML set, 16 cards in DOM:', grid.querySelectorAll('.mg-skill-card').length);
-    // 兜底: addEventListener (内联 onclick 万一被 strip 也能用)
+    // 强制所有祖先元素 pointer-events:auto (防止某个 CSS 把事件吞了)
+    const sec=document.getElementById('mgSkillCardsSection');
+    if(sec){sec.style.pointerEvents='auto';}
+    grid.style.pointerEvents='auto';
     grid.querySelectorAll('.mg-skill-card').forEach(function(card){
+      card.style.pointerEvents='auto';
       if(card.getAttribute('data-bound')==='1')return;
       card.setAttribute('data-bound','1');
       const key=card.getAttribute('data-skill-key');
       card.addEventListener('click',function(e){
-        console.log('[mgR] card click via addEventListener, key=',key);
         e.preventDefault();
         e.stopPropagation();
         if(typeof window.mgShowSkillDetail==='function')window.mgShowSkillDetail(key);
       });
     });
-    console.log('[mgR] DONE in', (performance.now()-_t0).toFixed(1), 'ms, bound cards:', grid.querySelectorAll('[data-bound="1"]').length);
-    // 额外：给页面上所有mg-skill-card（含子页面静态卡片）绑定点击
-    document.querySelectorAll('.mg-skill-card').forEach(function(c){
-      if(c.getAttribute('data-all-bound')==='1')return;
-      c.setAttribute('data-all-bound','1');
-      c.style.cursor='pointer';
-      c.addEventListener('click',function(ev){
-        var k=c.getAttribute('data-skill-key');
-        if(!k){var b=c.querySelector('b');if(b&&window.MG_SKILLS){var t=b.textContent.trim();var f=window.MG_SKILLS.find(function(s){return s.title===t;});if(f)k=f.key;}}
-        if(k&&typeof window.mgShowSkillDetail==='function'){ev.preventDefault();ev.stopPropagation();window.mgShowSkillDetail(k);}
-      });
-    });
-  }catch(err){console.error('[mgR] ERROR:',err);}
+  }catch(err){console.error('mgRenderSkillCards error:',err);}
 };
 
-// 兜底2: document.body 事件委托 (无 onclick、无 addEventListener 时还能用)
+// 终极兜底: document 捕获阶段 监听 click (优先级最高, 任何 stopPropagation 都拦不住)
+if(!window._skillCaptureBound){
+  window._skillCaptureBound=true;
+  document.addEventListener('click',function(e){
+    const card=e.target&&e.target.closest&&e.target.closest('.mg-skill-card[data-skill-key]');
+    if(card&&typeof window.mgShowSkillDetail==='function'){
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation&&e.stopImmediatePropagation();
+      window.mgShowSkillDetail(card.dataset.skillKey);
+    }
+  },true);  // true = 捕获阶段, 最高优先级
+}
+
+// 兜底2: document.body 冒泡阶段 (再不行就用这个)
 if(!window._skillClickDelegated){
   window._skillClickDelegated=true;
   document.body.addEventListener('click',function(e){
-    const card=e.target.closest&&e.target.closest('.mg-skill-card');
-    if(card&&window.mgShowSkillDetail&&window.MG_SKILLS){
+    const card=e.target.closest&&e.target.closest('.mg-skill-card[data-skill-key]');
+    if(card&&window.mgShowSkillDetail){
       e.preventDefault();
       e.stopPropagation();
-      var key=card.dataset.skillKey;
-      if(!key){
-        var titleEl=card.querySelector('b');
-        if(titleEl){
-          var title=titleEl.textContent.trim();
-          var found=window.MG_SKILLS.find(function(s){return s.title===title;});
-          if(found) key=found.key;
-        }
+      window.mgShowSkillDetail(card.dataset.skillKey);
+    }
+  });
+}
+
+// 定期修复: 每 500ms 检查卡片是否还在 DOM, 丢失就重新绑
+setInterval(function(){
+  const grid=document.getElementById('mgSkillCardsGrid');
+  if(!grid||!window.MG_SKILLS)return;
+  const cards=grid.querySelectorAll('.mg-skill-card');
+  if(cards.length!==16)return;  // 没渲染完不折腾
+  cards.forEach(function(card){
+    if(card.getAttribute('data-bound')==='1')return;
+    card.setAttribute('data-bound','1');
+    card.style.pointerEvents='auto';
+    const key=card.getAttribute('data-skill-key');
+    card.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(typeof window.mgShowSkillDetail==='function')window.mgShowSkillDetail(key);
+    });
+  });
+},500);
       }
       if(key) window.mgShowSkillDetail(key);
     }
