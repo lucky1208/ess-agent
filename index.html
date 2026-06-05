@@ -8137,11 +8137,20 @@ window.mgRenderSkillCards=function(){
 if(!window._skillClickDelegated){
   window._skillClickDelegated=true;
   document.body.addEventListener('click',function(e){
-    const card=e.target.closest&&e.target.closest('.mg-skill-card[data-skill-key]');
-    if(card&&window.mgShowSkillDetail){
+    const card=e.target.closest&&e.target.closest('.mg-skill-card');
+    if(card&&window.mgShowSkillDetail&&window.MG_SKILLS){
       e.preventDefault();
       e.stopPropagation();
-      window.mgShowSkillDetail(card.dataset.skillKey);
+      var key=card.dataset.skillKey;
+      if(!key){
+        var titleEl=card.querySelector('b');
+        if(titleEl){
+          var title=titleEl.textContent.trim();
+          var found=window.MG_SKILLS.find(function(s){return s.title===title;});
+          if(found) key=found.key;
+        }
+      }
+      if(key) window.mgShowSkillDetail(key);
     }
   });
 }
