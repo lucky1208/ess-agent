@@ -8098,9 +8098,11 @@ window.MG_SKILLS = [
 ];
 
 window.mgRenderSkillCards=function(){
+  var _t0=performance.now();
+  console.log('[mgR] called at', _t0.toFixed(1), 'ms, grid?', !!document.getElementById('mgSkillCardsGrid'), 'skills?', !!window.MG_SKILLS, 'visible?', document.getElementById('page-mg-wiki')&&getComputedStyle(document.getElementById('page-mg-wiki')).display);
   try{
     const grid=document.getElementById('mgSkillCardsGrid');
-    if(!grid||!window.MG_SKILLS)return;
+    if(!grid||!window.MG_SKILLS){console.log('[mgR] early return, no grid/skills');return;}
     grid.innerHTML=window.MG_SKILLS.map(s=>{
       // 终极方案: 内联 onclick + addEventListener 双保险
       return '<div class="mg-skill-card" data-skill-key="'+s.key+'" data-bound="0" '
@@ -8114,18 +8116,21 @@ window.mgRenderSkillCards=function(){
         +'<div class="skill-hint">▸ 点击查看 技术核心 / 解决问题 / 商用价值</div>'
       +'</div>';
     }).join('');
+    console.log('[mgR] innerHTML set, 16 cards in DOM:', grid.querySelectorAll('.mg-skill-card').length);
     // 兜底: addEventListener (内联 onclick 万一被 strip 也能用)
     grid.querySelectorAll('.mg-skill-card').forEach(function(card){
       if(card.getAttribute('data-bound')==='1')return;
       card.setAttribute('data-bound','1');
       const key=card.getAttribute('data-skill-key');
       card.addEventListener('click',function(e){
+        console.log('[mgR] card click via addEventListener, key=',key);
         e.preventDefault();
         e.stopPropagation();
         if(typeof window.mgShowSkillDetail==='function')window.mgShowSkillDetail(key);
       });
     });
-  }catch(err){console.error('mgRenderSkillCards error:',err);}
+    console.log('[mgR] DONE in', (performance.now()-_t0).toFixed(1), 'ms, bound cards:', grid.querySelectorAll('[data-bound="1"]').length);
+  }catch(err){console.error('[mgR] ERROR:',err);}
 };
 
 // 兜底2: document.body 事件委托 (无 onclick、无 addEventListener 时还能用)
