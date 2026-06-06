@@ -4439,14 +4439,17 @@ function renderWiringDiagramFromJSON(d) {
   s+=`<text x="${bX}" y="${bY+23}" text-anchor="middle" style="fill:white;font-size:12;font-weight:bold">PCS</text>`;
   s+=`<text x="${bX}" y="${bY+41}" text-anchor="middle" class="ls" style="fill:#ffc0c0;font-size:10">${pcsLabel}</text>`;
   s+=`<text x="${bX}" y="${bY+55}" text-anchor="middle" class="ls" style="fill:#c06070;font-size:9">AC↔DC ≥97%</text>`;
+  const pcsBottom = bY + 65;
   bY += 65;
 
-  // 直流安全注释
-  s+=`<rect x="${bX+100}" y="${bY-55}" width="120" height="45" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
-  s+=`<text x="${bX+160}" y="${bY-37}" text-anchor="middle" style="fill:#a0a0ff;font-size:9;font-weight:bold">直流安全</text>`;
-  s+=`<text x="${bX+160}" y="${bY-23}" text-anchor="middle" class="ls" style="fill:#8080c0">绝缘监测</text>`;
-  s+=`<text x="${bX+160}" y="${bY-12}" text-anchor="middle" class="ls" style="fill:#8080c0">接触器+BMS联动</text>`;
-  s+=`<line x1="${bX+100}" y1="${bY-30}" x2="${bX+90}" y2="${bY-30}" class="wc"/>`;
+  // 直流安全注释(画在PCS右侧,不与DC cable冲突)
+  const safetyX = bX + 100;
+  const safetyY = pcsBottom - 55;
+  s+=`<rect x="${safetyX}" y="${safetyY}" width="120" height="45" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+  s+=`<text x="${safetyX+60}" y="${safetyY+18}" text-anchor="middle" style="fill:#a0a0ff;font-size:9;font-weight:bold">直流安全</text>`;
+  s+=`<text x="${safetyX+60}" y="${safetyY+32}" text-anchor="middle" class="ls" style="fill:#8080c0">绝缘监测</text>`;
+  s+=`<text x="${safetyX+60}" y="${safetyY+43}" text-anchor="middle" class="ls" style="fill:#8080c0">接触器+BMS联动</text>`;
+  s+=`<line x1="${safetyX}" y1="${safetyY+22}" x2="${bX+90}" y2="${safetyY+22}" class="wc"/>`;
 
   // DC cable
   s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+30}" class="wd" marker-end="url(#awG)"/>`;
@@ -4478,19 +4481,20 @@ function renderWiringDiagramFromJSON(d) {
   s+=`<line x1="${bX+120}" y1="${bY+45}" x2="${bX+130}" y2="${bY+45}" class="wc"/>`;
 
   // === EMS Controller ===
-  s+=`<rect x="850" y="165" width="160" height="180" rx="8" fill="#151530" stroke="#6060a0" stroke-width="1.5"/>`;
-  s+=`<text x="930" y="190" text-anchor="middle" style="fill:#a0a0ff;font-size:11;font-weight:bold">EMS能量管理</text>`;
-  s+=`<line x1="865" y1="200" x2="995" y2="200" stroke="#3a3a5e" stroke-width="1"/>`;
-  s+=`<text x="930" y="220" text-anchor="middle" class="ls" style="fill:#8080c0">● 峰谷自动调度</text>`;
-  s+=`<text x="930" y="240" text-anchor="middle" class="ls" style="fill:#8080c0">● PCC功率实时监测</text>`;
-  s+=`<text x="930" y="260" text-anchor="middle" class="ls" style="fill:#8080c0">● 防逆流双闭环</text>`;
-  s+=`<text x="930" y="280" text-anchor="middle" class="ls" style="fill:#8080c0">  软件限功率+硬件兜底</text>`;
-  s+=`<text x="930" y="300" text-anchor="middle" class="ls" style="fill:#8080c0">● SOC保护管理</text>`;
-  s+=`<text x="930" y="320" text-anchor="middle" class="ls" style="fill:#8080c0">● 防孤岛保护联锁</text>`;
-  s+=`<text x="930" y="340" text-anchor="middle" class="ls" style="fill:#8080c0">● 远程监控+告警</text>`;
+  const emsY = Math.max(bY + 20, 165);
+  s+=`<rect x="850" y="${emsY}" width="160" height="180" rx="8" fill="#151530" stroke="#6060a0" stroke-width="1.5"/>`;
+  s+=`<text x="930" y="${emsY+25}" text-anchor="middle" style="fill:#a0a0ff;font-size:11;font-weight:bold">EMS能量管理</text>`;
+  s+=`<line x1="865" y1="${emsY+35}" x2="995" y2="${emsY+35}" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="930" y="${emsY+55}" text-anchor="middle" class="ls" style="fill:#8080c0">● 峰谷自动调度</text>`;
+  s+=`<text x="930" y="${emsY+75}" text-anchor="middle" class="ls" style="fill:#8080c0">● PCC功率实时监测</text>`;
+  s+=`<text x="930" y="${emsY+95}" text-anchor="middle" class="ls" style="fill:#8080c0">● 防逆流双闭环</text>`;
+  s+=`<text x="930" y="${emsY+115}" text-anchor="middle" class="ls" style="fill:#8080c0">  软件限功率+硬件兜底</text>`;
+  s+=`<text x="930" y="${emsY+135}" text-anchor="middle" class="ls" style="fill:#8080c0">● SOC保护管理</text>`;
+  s+=`<text x="930" y="${emsY+155}" text-anchor="middle" class="ls" style="fill:#8080c0">● 防孤岛保护联锁</text>`;
+  s+=`<text x="930" y="${emsY+175}" text-anchor="middle" class="ls" style="fill:#8080c0">● 远程监控+告警</text>`;
   // EMS connections
-  s+=`<line x1="850" y1="230" x2="${bX+70}" y2="185" class="wc"/>`;
-  s+=`<line x1="850" y1="270" x2="${bX+90}" y2="280" class="wc"/>`;
+  s+=`<line x1="850" y1="${emsY+65}" x2="${bX+70}" y2="${emsY-15}" class="wc"/>`;
+  s+=`<line x1="850" y1="${emsY+105}" x2="${bX+90}" y2="${emsY+25}" class="wc"/>`;
 
   // === Cable Schedule ===
   s+=`<rect x="60" y="430" width="380" height="${conns.length*20+80}" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
