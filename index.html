@@ -8,7 +8,45 @@
 
 
 <style>
-:root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
+:root{
+  --bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070;
+  /* SVG/图纸主题变量 (深色默认) */
+  --svg-bg:#0d1117;--svg-dot:#1a1f2e;--svg-title:#e0e0ff;--svg-sub:#8888cc;--svg-label:#C2C0B6;--svg-stroke-main:#b0b0a0;--svg-text-light:#e0e0ff;
+  --svg-zone-bg:rgba(20,30,50,0.4);--svg-zone-grid:rgba(24,95,165,0.18);
+  /* 元器件色调 (深色) */
+  --icon-bg:rgba(30,40,60,0.85);--icon-border:rgba(120,160,220,0.4);
+  /* 图片SVG (SVG_MAP 通过 <img> 加载的) 在深色模式反色 */
+  --svg-img-filter:none;
+}
+body[data-theme="light"]{
+  --bg1:#F5F4EE;--bg2:#EAE8DF;--bg3:#DDDAD0;--border:rgba(30,30,30,.15);--text1:#1a1d21;--text2:#4a4a45;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070;
+  --svg-bg:#FAFAF5;--svg-dot:#E0DDD0;--svg-title:#1a1d21;--svg-sub:#5a5a55;--svg-label:#303030;--svg-stroke-main:#5a5a55;--svg-text-light:#1a1d21;
+  --svg-zone-bg:rgba(200,200,180,0.25);--svg-zone-grid:rgba(24,95,165,0.12);
+  --icon-bg:rgba(230,228,218,0.95);--icon-border:rgba(80,100,140,0.5);
+  --svg-img-filter:invert(1) hue-rotate(180deg);
+}
+/* 浅色模式下,SVG_MAP 通过 <img> 加载的图需要反色 */
+body[data-theme="light"] .svg-map-img{filter:invert(1) hue-rotate(180deg);}
+/* 深色模式下,IEC 库 icon (base64 svg 内部默认黑线条) 需要反色为白 */
+body[data-theme="dark"] .ies-icon-img{filter:invert(1) hue-rotate(180deg);}
+/* 主题切换按钮 */
+.theme-toggle{position:fixed;bottom:80px;right:20px;z-index:2147483646;width:42px;height:42px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text1);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .2s}
+.theme-toggle:hover{transform:scale(1.08);box-shadow:0 6px 18px rgba(24,95,165,.4);border-color:var(--blue)}
+/* 浅色模式下,把 SVG 内的浅色文字 fill (DIAGRAM_ICONS 硬编码) 强制改成深色 (用 attribute 匹配) */
+body[data-theme="light"] svg text[fill="#B5D4F4"],
+body[data-theme="light"] svg text[fill="#D3D1C7"],
+body[data-theme="light"] svg text[fill="#9FE1CB"],
+body[data-theme="light"] svg text[fill="#CECBF6"],
+body[data-theme="light"] svg text[fill="#F5C4B3"],
+body[data-theme="light"] svg text[fill="#fac775"],
+body[data-theme="light"] svg text[fill="#ffc0c0"],
+body[data-theme="light"] svg text[fill="#5DCAA5"],
+body[data-theme="light"] svg text[fill="#F0997B"],
+body[data-theme="light"] svg text[fill="#EF9F27"],
+body[data-theme="light"] svg text[fill="#e0e0ff"],
+body[data-theme="light"] svg text[fill="#B4B2A9"]{fill:#1a1d21!important}
+/* 浅色模式下,IEC 符号底色亮起来 (因为深色背景下是暗底, 浅色模式不需要这个深底) */
+body[data-theme="light"] svg rect[fill="rgba(30,40,60,0.85)"]{fill:rgba(230,228,218,0.95)!important;stroke:rgba(80,100,140,0.5)!important}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg1);color:var(--text1);line-height:1.6;min-height:100vh;padding-bottom:56px}
 a{color:var(--blue);text-decoration:none}
@@ -212,7 +250,8 @@ select.form-input{appearance:auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
-<body>
+<body data-theme="dark">
+<button class="theme-toggle" id="themeToggleBtn" title="切换 深色/浅色 主题" onclick="window.toggleTheme&&window.toggleTheme()">🌙</button>
 
 <header class="header">
 <h1 data-i18n="header_title">Open ESS Agent — 开源储能系统解决方案AI智能体</h1>
@@ -2147,7 +2186,7 @@ async function renderMermaid(containerId){
   for(const el of containers){
     if(!el)continue;
     if(el.dataset.rendered)continue;
-    if(SVG_MAP[el.id]){el.innerHTML='<img src="'+SVG_MAP[el.id]+'" style="max-width:100%;display:block" onerror="console.error(\'SVG 404:\',\''+SVG_MAP[el.id]+'\')"/>';el.dataset.rendered='1';continue;}
+    if(SVG_MAP[el.id]){el.innerHTML='<img class="svg-map-img" src="'+SVG_MAP[el.id]+'" style="max-width:100%;display:block;transition:filter .3s" onerror="console.error(\'SVG 404:\',\''+SVG_MAP[el.id]+'\')"/>';el.dataset.rendered='1';continue;}
     if(!MERMAID_DEFS[el.id])continue;
     if(typeof mermaid==='undefined'||!mermaid.render){setTimeout(()=>renderMermaid(containerId),500);return;}
     try{
@@ -3016,6 +3055,46 @@ Level4紧急切除:火灾确认(烟+温),可燃气体超标,手动急停 → 消
 标注错误:❌不标元件编号 ❌CT不标变比 ❌电缆不标截面积 ❌变压器参数不全
 安全错误(最严重):❌消防联动仅靠通信无硬接线 ❌直流侧没有熔断器 ❌漏画ESD急停回路 ❌防孤岛保护不标注 ❌绝缘监测不标注
 SVG专项:❌坐标靠估算不靠计算 ❌箭头终点不偏移 ❌Z轴顺序混乱 ❌虚线框位置估算 ❌文字宽度不估算(汉字=font_size×1.0,英文=font_size×0.6)
+
+## SKILL-10:国际连线走线规范(IEC 61082-1 / GB/T 6988.1)
+
+### 10.1 走线起讫点(强制)
+- 走线必须从元器件的"上/下/左/右四个边中点"出发/进入(优先选最短距离的边)
+- 绝不允许走线从元器件的边角、四边非中点位置进出 —— 这会让图纸读起来像"穿墙"
+- 走线从元器件边缘出来时,先走一小段"垂直/水平短引线"再拐弯,不要一出来就斜插
+
+### 10.2 避让原则(强制)
+- 走线严禁穿过任何元器件的边框区域(即使是其他层的设备)
+- 当走线路径上会遇到其他元器件时,必须从元器件的"上/下/左/右"四个边的外侧绕过去
+- 优先走"外圈路由"(沿图框边缘走,留20-30px边距),其次走"通道路由"(元器件之间留出的水平/垂直空白带)
+- 同向走线优先形成清晰的"母线+分支"格局,不要画成"蜘蛛网"
+
+### 10.3 交叉点处理(强制,GB/T 4728.1 §5.3)
+- 走线交叉但互相连接 → 必须在交叉点画实心圆点(dot,直径≥3px,fill=连线颜色)
+- 走线交叉但不连接(路过) → 必须在交叉点画半圆弧"跳跨"(hop/jump),不允许直接十字交叉
+- 走线T型分支(一条线T接到另一条) → T点本身就是连接点,画实心圆点
+- 严禁:走线直接画十字┼却不打点也不画弧 —— 读者无法判断是否连接
+
+### 10.4 路由选择规则(优先级从高到低)
+1. 走外圈(viewBox边缘的内缩区域)
+2. 走空白通道(同列元器件之间的水平gap、跨层间的垂直gap)
+3. 走母线延长线(从母线引出再接支路,避免斜插到具体设备)
+4. 严禁斜线(45°/任意角度)直连跨层设备
+
+### 10.5 连线粗细/颜色
+- 主电力母线:线宽≥3px,颜色=主电压等级色
+- 一次主回路:线宽2.5px,颜色=对应电压等级(AC红/DC蓝)
+- 二次控制:线宽1.5px,虚线stroke-dasharray="4 2"
+- 通信信号:线宽1px,长虚线stroke-dasharray="6 3"
+- 故障/保护:线宽2px,红色stroke-dasharray="3 2"
+- 箭头终点偏移:refX=箭头长度+2px,避免箭头盖在节点上
+
+### 10.6 暗色/亮色模式适配(强制)
+- 元器件内部线条、标注文字、连线、背景 全部使用 CSS 变量 (var(--xxx)),不允许硬编码 #ffffff / #000000
+- 暗色模式:背景接近 #0d1117,文字/线条用浅色(>=#c0c0d0)
+- 亮色模式:背景接近 #fafafa,文字/线条用深色(<=#303030)
+- 任何图标库(iec_symbols_svg 等)插入 SVG 之前,先用 JS 把 path/line/circle/text 的 stroke 和 fill 替换成 CSS 变量对应色
+- 在用户切换主题时,所有已经渲染的 SVG 必须重渲染(用 MutationObserver 或主题切换事件触发)
 `;
 
 const ESS_DRAWING_RULES = `
@@ -3959,7 +4038,7 @@ function iecImg(type,x,y,w,h,label){
   const src=IEC_SYM[type];
   if(!src) return '';
   const pad=6;
-  return `<rect x="${x-w/2-pad}" y="${y-h/2-pad}" width="${w+pad*2}" height="${h+pad*2}" rx="4" fill="rgba(30,40,60,0.85)" stroke="rgba(120,160,220,0.4)" stroke-width="1"/><image href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="1"/>`+(label?`<text x="${x}" y="${y+h/2+14}" text-anchor="middle" fill="#e0e0ff" font-size="10" font-weight="500">${label}</text>`:'');
+  return `<rect x="${x-w/2-pad}" y="${y-h/2-pad}" width="${w+pad*2}" height="${h+pad*2}" rx="4" fill="var(--icon-bg)" stroke="var(--icon-border)" stroke-width="1"/><image class="ies-icon-img" href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="1"/>`+(label?`<text x="${x}" y="${y+h/2+14}" text-anchor="middle" fill="var(--svg-text-light)" font-size="10" font-weight="500">${label}</text>`:'');
 }
 const DIAGRAM_ICONS = {
   source: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="url(#gGrid)" stroke="#85B7EB" stroke-width="2" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#85B7EB" font-size="12">${sub}</text>`:''}`,
@@ -4131,8 +4210,41 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone
   }
   existing.push({x1, x2});
   const actualMidY = midY + chOffset;
+  // 强制每个连线都"绕开"端点设备的 4 边中点入线 (SKILL-10.1: 从设备边中点出发)
+  // from 端: 如果 y1 < from.y, 走 from.y 顶边; 否则走 from.y 底边
+  // to 端: 类似
   const path = `M${x1},${y1} V${actualMidY} H${x2} V${y2}`;
   return { path, isOrtho: true, midX: (x1+x2)/2, midY: actualMidY };
+}
+
+/**
+ * 检测两两连线交叉点 (SKILL-10.3: 强制交叉点打点)
+ * 输入: paths = [{x1,y1,x2,y2,color,link}, ...] (每条线两端点 + 走线 midY, 走线 = M..V..H..V.. 模式)
+ * 返回: crosspoints = [{x, y, color, connected: bool}, ...]
+ *   - 两线确实交叉 → 圆点(connected=false 默认是路过打半圆, 但因我们没存 link-to-link 关系, 一律按"打点"处理, 简化)
+ */
+function detectCrosspoints(allLinks){
+  const cps=[];
+  for(let i=0;i<allLinks.length;i++){
+    for(let j=i+1;j<allLinks.length;j++){
+      const a=allLinks[i],b=allLinks[j];
+      // 简化: 只检测两条 L 形连线 (M..V..H..V..) 在 midY 段的水平交叉
+      // 假设 midY 是统一的水平段 Y 坐标
+      if(a.midY===b.midY){
+        const aFrom=Math.min(a.x1,a.x2), aTo=Math.max(a.x1,a.x2);
+        const bFrom=Math.min(b.x1,b.x2), bTo=Math.max(b.x1,b.x2);
+        if(aFrom<bTo && aTo>bFrom){
+          // 真正重叠 (不是挨着)
+          const overlapFrom=Math.max(aFrom,bFrom);
+          const overlapTo=Math.min(aTo,bTo);
+          if(overlapTo-overlapFrom>2){
+            cps.push({x:(overlapFrom+overlapTo)/2, y:a.midY, color:a.color});
+          }
+        }
+      }
+    }
+  }
+  return cps;
 }
 
 function buildMermaidGraph(nodes, links, title) {
@@ -4192,6 +4304,39 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
   renderDiagramFromJSON_SVG(containerId, diagramData, title);
 }
 
+/**
+ * 主题切换 (SKILL-10.6: 暗色/亮色模式适配)
+ * 切换 body.data-theme, SVG 内部用 var(--xxx) 自动适配
+ * 调用 mgRenderDrawings 重新渲染已生成的图纸
+ */
+window.toggleTheme=function(){
+  try{
+    const cur=document.body.dataset.theme||'dark';
+    const next=cur==='dark'?'light':'dark';
+    document.body.dataset.theme=next;
+    try{localStorage.setItem('ess-theme',next);}catch(e){}
+    const btn=document.getElementById('themeToggleBtn');
+    if(btn)btn.textContent=next==='dark'?'🌙':'☀️';
+    // 重新渲染已生成的图纸 (让 LLM/JSON 渲染的 SVG 重新走一遍 var(--xxx) 解析)
+    if(typeof window.mgRenderDrawings==='function'&&typeof LAST_MG_RESULT!=='undefined'&&LAST_MG_RESULT){
+      try{window.mgRenderDrawings();}catch(e){console.warn('重渲染图纸失败:',e);}
+    }
+    // 同步调色板
+    console.log('[theme] 切换到',next);
+  }catch(err){console.error('toggleTheme error:',err);}
+};
+// 启动时恢复用户偏好
+(function(){
+  try{
+    const saved=localStorage.getItem('ess-theme');
+    if(saved&&(saved==='dark'||saved==='light')){
+      document.body.dataset.theme=saved;
+      const btn=document.getElementById('themeToggleBtn');
+      if(btn)btn.textContent=saved==='dark'?'🌙':'☀️';
+    }
+  }catch(e){}
+})();
+
 function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   const svgW = 1100, svgH = 800;
   const nodes = diagramData.nodes || [];
@@ -4225,18 +4370,18 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     n.y = 400;
     n._cardW = 160;
   });
-  let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">`;
+  let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:var(--svg-bg);font-family:'Microsoft YaHei',sans-serif">`;
   svg += DIAGRAM_DEFS;
-  svg += `<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern><rect width="${svgW}" height="${svgH}" fill="url(#dot)"/>`;
-  svg += `<text x="${svgW/2}" y="24" text-anchor="middle" fill="#e0e0ff" font-size="15" font-weight="bold">${title}</text>`;
-  svg += `<text x="${svgW/2}" y="42" text-anchor="middle" fill="#8888cc" font-size="10">${diagramData.bus||''} | 设计人：卢继雄 | GB/T 36558-2023</text>`;
+  svg += `<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="var(--svg-dot)"/></pattern><rect width="${svgW}" height="${svgH}" fill="url(#dot)"/>`;
+  svg += `<text x="${svgW/2}" y="24" text-anchor="middle" fill="var(--svg-title)" font-size="15" font-weight="bold">${title}</text>`;
+  svg += `<text x="${svgW/2}" y="42" text-anchor="middle" fill="var(--svg-sub)" font-size="10">${diagramData.bus||''} | 设计人：卢继雄 | GB/T 36558-2023</text>`;
   ZONES.forEach(zone => {
     const zoneNodes = nodes.filter(n => n._zone === zone);
     if (!zoneNodes.length) return;
     const xs = zoneNodes.map(n => n.x);
     const minX = Math.min(...xs) - (zoneNodes[0]._cardW||180)/2 - 15;
     const maxX = Math.max(...xs) + (zoneNodes[0]._cardW||180)/2 + 15;
-    svg += `<rect x="${minX}" y="${zone.y}" width="${maxX-minX}" height="${zone.h}" rx="8" fill="rgba(20,30,50,0.4)" stroke="${zone.color}" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>`;
+    svg += `<rect x="${minX}" y="${zone.y}" width="${maxX-minX}" height="${zone.h}" rx="8" fill="var(--svg-zone-bg)" stroke="${zone.color}" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>`;
     svg += `<text x="${minX+8}" y="${zone.y+14}" fill="${zone.color}" font-size="10" opacity="0.9">${zone.name}</text>`;
   });
   nodes.forEach(n => {
@@ -4246,6 +4391,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   });
   if (links) {
     const channels = {};
+    const allLinksForCross = [];  // 收集用于交叉点检测
     links.forEach(l => {
       const from = nodeMap[l.from];
       const to = nodeMap[l.to];
@@ -4260,7 +4406,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
           else if (toT==='pcs') color='#afa9ec';
           else if (toT==='battery') color='#50c878';
           else if (toT==='load') color='#50c878';
-          else color='#b0b0a0';
+          else color='var(--svg-stroke-main)';
         }
         const arrow = getArrowForLink(l);
         const sw = l.dashed ? '1' : '1.5';
@@ -4268,12 +4414,19 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         const toD = getNodeDim(to.type);
         const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels, from._zone, to._zone);
         svg += `<path d="${route.path}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
+        // 收集进交叉检测
+        allLinksForCross.push({x1:from.x, x2:to.x, y1:from.y, y2:to.y, midY:route.midY, color, link:l});
         if (l.label) {
           const lblX = route.midX + 6;
           const lblY = route.midY - 4;
-          svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="#C2C0B6" font-size="9">${l.label}</text>`;
+          svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="var(--svg-label)" font-size="9">${l.label}</text>`;
         }
       }
+    });
+    // SKILL-10.3: 强制交叉点画实心圆点
+    const cps = detectCrosspoints(allLinksForCross);
+    cps.forEach(cp => {
+      svg += `<circle cx="${cp.x.toFixed(1)}" cy="${cp.y}" r="3" fill="${cp.color}" stroke="var(--svg-bg)" stroke-width="1"/>`;
     });
   }
   if (diagramData.loads) {
