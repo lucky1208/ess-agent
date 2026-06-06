@@ -3957,7 +3957,8 @@ const IEC_SYM={
 function iecImg(type,x,y,w,h,label){
   const src=IEC_SYM[type];
   if(!src) return '';
-  return `<image href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="0.95"/>`+(label?`<text x="${x}" y="${y+h/2+12}" text-anchor="middle" fill="#e0e0ff" font-size="10">${label}</text>`:'');
+  const pad=4;
+  return `<rect x="${x-w/2-pad}" y="${y-h/2-pad}" width="${w+pad*2}" height="${h+pad*2}" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/><image href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="0.95"/>`+(label?`<text x="${x}" y="${y+h/2+12}" text-anchor="middle" fill="#e0e0ff" font-size="10">${label}</text>`:'');
 }
 const DIAGRAM_ICONS = {
   source: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="url(#gGrid)" stroke="#85B7EB" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#85B7EB" font-size="12">${sub}</text>`:''}`,
@@ -6824,7 +6825,7 @@ function mgRenderAllDrawings(R,provider){
   };
   const isValidSvg=(s)=>typeof s==='string'&&s.length>500&&s.includes('<svg')&&!s.includes('...');
   const isStructJSON=(d)=>d&&typeof d==='object'&&d.nodes;
-  const isWiringJSON=(d)=>d&&typeof d==='object'&&(d.components||d.nodes);
+  const isWiringJSON=(d)=>d&&typeof d==='object'&&(d.components||d.nodes||d.voltage||d.protection);
   const isCommJSON=(d)=>d&&typeof d==='object'&&d.layers;
   mgById('mgDrawingEmpty').style.display='none';
   mgById('mgDrawingContent').style.display='block';
@@ -6842,8 +6843,10 @@ function mgRenderAllDrawings(R,provider){
     dlog('LLM返回结构化JSON，前端渲染接线图','step');
     if(R.wiringDiagram.components&&R.wiringDiagram.components.length>0){
       renderWiringDiagramFromJSON(R.wiringDiagram);dlog('接线图(专用渲染器+IEC符号) ✓','ok');
-    }else{
+    }else if(R.wiringDiagram.nodes&&R.wiringDiagram.nodes.length>0){
       renderDiagramFromJSON('mgWiringSvg',R.wiringDiagram,'电气一次接线图 (AI生成)');dlog('接线图(通用渲染器) ✓','ok');
+    }else{
+      renderWiringDiagramFromJSON(R.wiringDiagram);dlog('接线图(专用渲染器-默认) ✓','ok');
     }
   }else{
     if(isLLM&&isValidSvg(R.wiringDiagram))dlog('LLM返回SVG接线图(质量差)，fallback本地模板','warn');
