@@ -3913,14 +3913,14 @@ function renderLLMResult(R) {
 }
 
 const DIAGRAM_DEFS=`<defs>
-<linearGradient id="gGrid" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#185FA5"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient>
-<linearGradient id="gTrans" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#633806"/><stop offset="100%" style="stop-color:#4A2804"/></linearGradient>
-<linearGradient id="gESS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#085041"/><stop offset="100%" style="stop-color:#063828"/></linearGradient>
-<linearGradient id="gPCS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#3C3489"/><stop offset="100%" style="stop-color:#2A2466"/></linearGradient>
-<linearGradient id="gLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#444441"/><stop offset="100%" style="stop-color:#333330"/></linearGradient>
-<linearGradient id="gBus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#085041"/><stop offset="50%" style="stop-color:#0F6E56"/><stop offset="100%" style="stop-color:#085041"/></linearGradient>
-<linearGradient id="gCtrl" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#854F0B"/><stop offset="100%" style="stop-color:#6A3D08"/></linearGradient>
-<linearGradient id="gSwitch" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#712B13"/><stop offset="100%" style="stop-color:#5A2210"/></linearGradient>
+<linearGradient id="gGrid" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#2A7CC8"/><stop offset="100%" style="stop-color:#1A5FA0"/></linearGradient>
+<linearGradient id="gTrans" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#8A5010"/><stop offset="100%" style="stop-color:#6A3C08"/></linearGradient>
+<linearGradient id="gESS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#10705A"/><stop offset="100%" style="stop-color:#0A5040"/></linearGradient>
+<linearGradient id="gPCS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#5048B0"/><stop offset="100%" style="stop-color:#3A3490"/></linearGradient>
+<linearGradient id="gLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#5A5A56"/><stop offset="100%" style="stop-color:#484844"/></linearGradient>
+<linearGradient id="gBus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#10705A"/><stop offset="50%" style="stop-color:#1A9070"/><stop offset="100%" style="stop-color:#10705A"/></linearGradient>
+<linearGradient id="gCtrl" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#A06810"/><stop offset="100%" style="stop-color:#80500C"/></linearGradient>
+<linearGradient id="gSwitch" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#904018"/><stop offset="100%" style="stop-color:#703014"/></linearGradient>
 <filter id="sh"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.2"/></filter>
 <marker id="aB" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#185FA5" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
 <marker id="aO" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#EF9F27" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
@@ -3961,20 +3961,20 @@ function iecImg(type,x,y,w,h,label){
   return `<rect x="${x-w/2-pad}" y="${y-h/2-pad}" width="${w+pad*2}" height="${h+pad*2}" rx="4" fill="rgba(30,40,60,0.85)" stroke="rgba(120,160,220,0.4)" stroke-width="1"/><image href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="1"/>`+(label?`<text x="${x}" y="${y+h/2+14}" text-anchor="middle" fill="#e0e0ff" font-size="10" font-weight="500">${label}</text>`:'');
 }
 const DIAGRAM_ICONS = {
-  source: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="url(#gGrid)" stroke="#85B7EB" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#85B7EB" font-size="12">${sub}</text>`:''}`,
+  source: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="url(#gGrid)" stroke="#85B7EB" stroke-width="2" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#85B7EB" font-size="12">${sub}</text>`:''}`,
   meter: (x,y,label,sub) => `${iecImg('meter',x,y,36,36,'')}${sub?`<text x="${x}" y="${y+26}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}<text x="${x}" y="${y-24}" text-anchor="middle" fill="#D3D1C7" font-size="13" font-weight="500">${label}</text>`,
   busbar: (x,y,label) => `<rect x="${x-170}" y="${y-4}" width="340" height="8" rx="2" fill="#185FA5" opacity="0.85" filter="url(#sh)"/><text x="${x}" y="${y+20}" text-anchor="middle" fill="#9FE1CB" font-size="12" font-weight="500">${label}</text>`,
   transformer: (x,y,label,sub) => `${iecImg('transformer',x,y,44,50,label)}${sub?`<text x="${x}" y="${y+38}" text-anchor="middle" dominant-baseline="central" fill="#EF9F27" font-size="11">${sub}</text>`:''}`,
-  pcs: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gPCS)" stroke="#AFA9EC" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#CECBF6" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#AFA9EC" font-size="12">${sub}</text>`:''}`,
+  pcs: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gPCS)" stroke="#AFA9EC" stroke-width="2" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#CECBF6" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#AFA9EC" font-size="12">${sub}</text>`:''}`,
   battery: (x,y,label,sub) => `${iecImg('battery',x,y,50,36,'')}${sub?`<text x="${x}" y="${y+26}" text-anchor="middle" dominant-baseline="central" fill="#5DCAA5" font-size="11">${sub}</text>`:''}<text x="${x}" y="${y-24}" text-anchor="middle" fill="#9FE1CB" font-size="13" font-weight="500">${label}</text>`,
-  controller: (x,y,label,sub) => `<rect x="${x-65}" y="${y-60}" width="130" height="120" rx="8" fill="none" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="4 3"/><text x="${x}" y="${y-40}" text-anchor="middle" fill="#FAF9F5" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y-20}" text-anchor="middle" fill="#854F0B" font-size="12">${sub}</text>`:''}`,
+  controller: (x,y,label,sub) => `<rect x="${x-65}" y="${y-60}" width="130" height="120" rx="8" fill="none" stroke="#854F0B" stroke-width="2" stroke-dasharray="4 3"/><text x="${x}" y="${y-40}" text-anchor="middle" fill="#FAF9F5" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y-20}" text-anchor="middle" fill="#854F0B" font-size="12">${sub}</text>`:''}`,
   breaker: (x,y,label) => `${iecImg('breaker',x,y,28,36,'')}${label?`<text x="${x}" y="${y+24}" text-anchor="middle" fill="#B5D4F4" font-size="11">${label}</text>`:''}`,
   switch: (x,y,label,sub) => `${iecImg('disconnector',x,y,28,36,'')}${sub?`<text x="${x}" y="${y+26}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="11">${sub}</text>`:''}<text x="${x}" y="${y-24}" text-anchor="middle" fill="#F5C4B3" font-size="13" font-weight="500">${label}</text>`,
-  load: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gLoad)" stroke="#B4B2A9" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#D3D1C7" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}`,
-  pv: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="rgba(232,168,56,0.15)" stroke="#e8a838" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#fac775" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#e8a838" font-size="12">${sub}</text>`:''}`,
-  ev: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="rgba(80,200,120,0.15)" stroke="#50c878" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#50c878" font-size="12">${sub}</text>`:''}`,
+  load: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gLoad)" stroke="#B4B2A9" stroke-width="2" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#D3D1C7" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}`,
+  pv: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="rgba(232,168,56,0.15)" stroke="#e8a838" stroke-width="2" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#fac775" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#e8a838" font-size="12">${sub}</text>`:''}`,
+  ev: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="rgba(80,200,120,0.15)" stroke="#50c878" stroke-width="2" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#50c878" font-size="12">${sub}</text>`:''}`,
   dcBus: (x,y,label) => `<rect x="${x-90}" y="${y-4}" width="180" height="8" rx="2" fill="#0F6E56" opacity="0.85" filter="url(#sh)"/><text x="${x}" y="${y+20}" text-anchor="middle" fill="#9fe1cb" font-size="12" font-weight="500">${label}</text>`,
-  cabinet: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gSwitch)" stroke="#F0997B" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#F5C4B3" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="12">${sub}</text>`:''}`,
+  cabinet: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gSwitch)" stroke="#F0997B" stroke-width="2" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#F5C4B3" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="12">${sub}</text>`:''}`,
   protection: (x,y,label,sub) => `${iecImg('fuse',x,y,24,30,'')}${sub?`<text x="${x}" y="${y+24}" text-anchor="middle" dominant-baseline="central" fill="#e06070" font-size="11">${sub}</text>`:''}<text x="${x}" y="${y-22}" text-anchor="middle" fill="#ffc0c0" font-size="13" font-weight="500">${label}</text>`,
   fuse: (x,y,label) => `${iecImg('fuse',x,y,24,30,'')}${label?`<text x="${x}" y="${y+22}" text-anchor="middle" fill="#e06070" font-size="11">${label}</text>`:''}`,
   ct: (x,y,label) => `${iecImg('ct',x,y,30,40,'')}${label?`<text x="${x}" y="${y+28}" text-anchor="middle" fill="#e8a838" font-size="10">${label}</text>`:''}`,
@@ -4101,16 +4101,12 @@ function dagLayout(nodes, links, svgW, svgH) {
 
 function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
   const isCtrl = from.type === 'controller' || to.type === 'controller';
-  const y1 = from.y + 60 + (isCtrl ? 0 : fromH/2);
-  const y2 = to.y + 60 - (isCtrl ? 0 : toH/2 - 8);
+  const y1 = from.y + (isCtrl ? 0 : fromH/2);
+  const y2 = to.y - (isCtrl ? 0 : toH/2);
   let x1 = from.x, x2 = to.x;
   if (isCtrl) {
-    if (from.x < to.x) { x1 = from.x + fromW/2; x2 = to.x - toW/2 - 8; }
-    else { x1 = from.x - fromW/2; x2 = to.x + toW/2 + 8; }
-    return { path: `M${x1},${y1} L${x2},${y2}`, isOrtho: false, midX: (x1+x2)/2, midY: (y1+y2)/2 };
-  }
-  if (Math.abs(from.x - to.x) < 30) {
-    return { path: `M${x1},${y1} L${x2},${y2}`, isOrtho: false, midX: (x1+x2)/2, midY: (y1+y2)/2 };
+    if (from.x < to.x) { x1 = from.x + fromW/2; x2 = to.x - toW/2; }
+    else { x1 = from.x - fromW/2; x2 = to.x + toW/2; }
   }
   const dy = y2 - y1;
   const dx = x2 - x1;
@@ -4120,7 +4116,7 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
   } else {
     midY = Math.round((y1 + y2) / 2);
   }
-  const chKey = `${Math.min(from.x,to.x)}-${Math.max(from.x,to.x)}-${midY}`;
+  const chKey = `${Math.min(x1,x2)}-${Math.max(x1,x2)}-${midY}`;
   let chOffset = 0;
   if (!channels[midY]) channels[midY] = [];
   const existing = channels[midY];
@@ -4129,7 +4125,7 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
     const eTo = Math.max(e.x1, e.x2);
     const nFrom = Math.min(x1, x2);
     const nTo = Math.max(x1, x2);
-    if (nFrom < eTo && nTo > eFrom) chOffset += 6;
+    if (nFrom < eTo && nTo > eFrom) chOffset += 8;
   }
   existing.push({x1, x2});
   const actualMidY = midY + chOffset;
@@ -4138,17 +4134,17 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
 }
 
 function renderDiagramFromJSON(containerId, diagramData, title) {
-  const svgW = 1100, svgH = 700;
+  const svgW = 1100, svgH = 800;
   const nodes = diagramData.nodes || [];
   const links = diagramData.links || [];
   const ZONE_COLORS = {source:'#185FA5',meter:'#185FA5',busbar:'#185FA5',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#534AB7',battery:'#0F6E56',controller:'#854F0B',load:'#0F6E56',pv:'#e8a838',ev:'#0F6E56'};
   const ZONE_BG = {source:'rgba(24,95,165,0.15)',meter:'rgba(24,95,165,0.1)',busbar:'rgba(24,95,165,0.1)',breaker:'rgba(232,168,56,0.1)',switch:'rgba(232,168,56,0.1)',transformer:'rgba(232,168,56,0.12)',pcs:'rgba(83,74,183,0.15)',battery:'rgba(15,110,86,0.15)',controller:'rgba(133,79,11,0.1)',load:'rgba(15,110,86,0.1)',pv:'rgba(232,168,56,0.1)',ev:'rgba(15,110,86,0.1)'};
   const ZONES = [
-    {name:'电源侧',types:['source','meter'],y:55,h:90,color:'#185FA5'},
-    {name:'配电母线',types:['busbar'],y:155,h:50,color:'#185FA5'},
-    {name:'开关/变压',types:['breaker','switch','transformer'],y:215,h:120,color:'#e8a838'},
-    {name:'变流/储能',types:['pcs','battery','pv','ev'],y:345,h:120,color:'#534AB7'},
-    {name:'负荷/控制',types:['load','controller'],y:475,h:120,color:'#0F6E56'}
+    {name:'电源侧',types:['source','meter'],y:55,h:100,color:'#185FA5'},
+    {name:'配电母线',types:['busbar'],y:165,h:55,color:'#185FA5'},
+    {name:'开关/变压',types:['breaker','switch','transformer'],y:230,h:130,color:'#e8a838'},
+    {name:'变流/储能',types:['pcs','battery','pv','ev'],y:370,h:130,color:'#534AB7'},
+    {name:'负荷/控制',types:['load','controller'],y:510,h:130,color:'#0F6E56'}
   ];
   const nodeMap = {};
   nodes.forEach(n => { nodeMap[n.id] = n; });
@@ -4156,11 +4152,11 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
     const zoneNodes = nodes.filter(n => zone.types.includes(TYPE_ALIAS[n.type]||n.type));
     const count = zoneNodes.length;
     if (!count) return;
-    const cardW = Math.min(200, (svgW - 80) / count - 20);
-    const totalW = count * cardW + (count - 1) * 20;
+    const cardW = Math.min(200, (svgW - 80) / count - 30);
+    const totalW = count * cardW + (count - 1) * 30;
     const startX = (svgW - totalW) / 2;
     zoneNodes.forEach((n, i) => {
-      n.x = Math.round(startX + i * (cardW + 20) + cardW / 2);
+      n.x = Math.round(startX + i * (cardW + 30) + cardW / 2);
       n.y = zone.y + zone.h / 2;
       n._zone = zone;
       n._cardW = cardW;
@@ -4182,8 +4178,8 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
     const xs = zoneNodes.map(n => n.x);
     const minX = Math.min(...xs) - zoneNodes[0]._cardW/2 - 15;
     const maxX = Math.max(...xs) + zoneNodes[0]._cardW/2 + 15;
-    svg += `<rect x="${minX}" y="${zone.y}" width="${maxX-minX}" height="${zone.h}" rx="8" fill="rgba(20,30,50,0.4)" stroke="${zone.color}" stroke-width="0.8" stroke-dasharray="4,2" opacity="0.6"/>`;
-    svg += `<text x="${minX+8}" y="${zone.y+14}" fill="${zone.color}" font-size="9" opacity="0.7">${zone.name}</text>`;
+    svg += `<rect x="${minX}" y="${zone.y}" width="${maxX-minX}" height="${zone.h}" rx="8" fill="rgba(20,30,50,0.4)" stroke="${zone.color}" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>`;
+    svg += `<text x="${minX+8}" y="${zone.y+14}" fill="${zone.color}" font-size="10" opacity="0.8">${zone.name}</text>`;
   });
   nodes.forEach(n => {
     const resolvedType = TYPE_ALIAS[n.type] || n.type;
@@ -4233,10 +4229,10 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
     });
   }
   if (diagramData.protection) {
-    svg += `<rect x="700" y="580" width="380" height="${20 + diagramData.protection.length * 20}" rx="6" fill="none" stroke="#534AB7" stroke-width="1" stroke-dasharray="4,2"/>`;
-    svg += `<text x="890" y="596" text-anchor="middle" fill="#534AB7" font-size="10" font-weight="bold">保护配置</text>`;
+    svg += `<rect x="700" y="660" width="380" height="${20 + diagramData.protection.length * 20}" rx="6" fill="none" stroke="#534AB7" stroke-width="1" stroke-dasharray="4,2"/>`;
+    svg += `<text x="890" y="676" text-anchor="middle" fill="#534AB7" font-size="10" font-weight="bold">保护配置</text>`;
     diagramData.protection.forEach((p, i) => {
-      svg += `<text x="715" y="${615 + i * 20}" fill="#AFA9EC" font-size="9">\u25CF ${p}</text>`;
+      svg += `<text x="715" y="${695 + i * 20}" fill="#AFA9EC" font-size="9">\u25CF ${p}</text>`;
     });
   }
   svg += '</svg>';
