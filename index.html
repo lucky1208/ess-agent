@@ -4004,39 +4004,89 @@ function getArrowForLink(l){
   return 'aX';
 }
 
-function autoLayoutNodes(nodes, svgW, svgH) {
+const NODE_DIM = {
+  source:{w:220,h:44}, meter:{w:60,h:60}, busbar:{w:340,h:8},
+  transformer:{w:44,h:50}, breaker:{w:28,h:36}, switch:{w:28,h:36},
+  pcs:{w:180,h:44}, battery:{w:50,h:36}, controller:{w:130,h:120},
+  load:{w:180,h:44}, pv:{w:180,h:44}, ev:{w:180,h:44}, dcBus:{w:180,h:8},
+  fuse:{w:24,h:30}, ct:{w:30,h:40}, pt:{w:30,h:40}, relay:{w:30,h:30},
+  contactor:{w:30,h:30}, earth:{w:20,h:20}, surge:{w:24,h:30},
+  diode:{w:24,h:20}, resistor:{w:36,h:18}, capacitor:{w:24,h:20},
+  inductor:{w:36,h:18}, motor:{w:30,h:30}, lamp:{w:20,h:20},
+  terminal:{w:16,h:16}, contact:{w:24,h:20}, protection:{w:24,h:30}, cabinet:{w:180,h:44}
+};
+function getNodeDim(type){
+  const t = TYPE_ALIAS[type]||type;
+  return NODE_DIM[t]||{w:180,h:44};
+}
+
+const LAYER_ORDER = ['source','meter','busbar','breaker','switch','transformer','pcs','battery','controller','load','pv','ev','dcBus','fuse','ct','pt','relay','contactor','earth','surge','diode','resistor','capacitor','inductor','motor','lamp','terminal','contact','protection','cabinet'];
+const LAYER_Y_MAP = {source:80,meter:155,busbar:230,breaker:260,switch:260,transformer:330,pcs:330,battery:410,controller:330,load:450,pv:330,ev:410,dcBus:370};
+
+function getLayerIndex(type, layerOrder) {
+  const idx = layerOrder.indexOf(type);
+  return idx >= 0 ? idx : layerOrder.length - 1;
+}
+
+function dagLayout(nodes, links, svgW, svgH) {
   if (!nodes || !nodes.length) return nodes;
-  const LAYER_ORDER = ['source','meter','busbar','breaker','switch','transformer','pcs','battery','controller','load'];
-  const LAYER_Y = [80, 155, 230, 260, 260, 330, 330, 330, 330, 450];
+  const GRID = 80;
   const byLayer = {};
-  nodes.forEach(n => { const ly = getLayerIndex(n.type, LAYER_ORDER); byLayer[ly] = byLayer[ly] || []; byLayer[ly].push(n); });
+  nodes.forEach(n => {
+    const ly = getLayerIndex(n.type, LAYER_ORDER);
+    byLayer[ly] = byLayer[ly] || [];
+    byLayer[ly].push(n);
+  });
   const layerKeys = Object.keys(byLayer).map(Number).sort((a,b)=>a-b);
+  const parentMap = {};
+  (links||[]).forEach(l => {
+    if (!parentMap[l.to]) parentMap[l.to] = [];
+    parentMap[l.to].push(l.from);
+  });
+  const nodeMap = {};
+  nodes.forEach(n => nodeMap[n.id] = n);
   layerKeys.forEach((ly, lki) => {
     const layer = byLayer[ly];
-    const yBase = LAYER_Y[ly] || 400;
+    const yBase = LAYER_Y_MAP[LAYER_ORDER[ly]] || (80 + ly * 70);
     layer.forEach(n => { n.y = yBase; });
+    layer.sort((a, b) => {
+      const aParents = (parentMap[a.id]||[]).map(pid => nodeMap[pid]?.x || 0);
+      const bParents = (parentMap[b.id]||[]).map(pid => nodeMap[pid]?.x || 0);
+      const aAvg = aParents.length ? aParents.reduce((s,v)=>s+v,0)/aParents.length : (a.x||0);
+      const bAvg = bParents.length ? bParents.reduce((s,v)=>s+v,0)/bParents.length : (b.x||0);
+      return aAvg - bAvg;
+    });
     const count = layer.length;
     const hasX = layer.every(n => typeof n.x === 'number' && n.x > 0);
     if (hasX) {
       const xOverlap = layer.some((a, i) => layer.some((b, j) => i !== j && Math.abs(a.x - b.x) < 140));
-      if (xOverlap) {
-        const neighborXs = [];
-        if (lki > 0) { const prev = byLayer[layerKeys[lki-1]]; if(prev) prev.forEach(p => neighborXs.push(p.x)); }
-        if (lki < layerKeys.length-1) { const next = byLayer[layerKeys[lki+1]]; if(next) next.forEach(p => neighborXs.push(p.x)); }
-        if (neighborXs.length > 0 && count <= neighborXs.length) {
-          neighborXs.sort((a,b)=>a-b);
-          const picked = [];
-          for (let i = 0; i < count; i++) {
-            const targetI = Math.round(i * (neighborXs.length - 1) / Math.max(count - 1, 1));
-            picked.push(neighborXs[targetI]);
-          }
-          layer.sort((a, b) => (a.x || 0) - (b.x || 0));
-          layer.forEach((n, i) => { n.x = Math.round(picked[i]); });
-        } else {
-          const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
-          const startX = svgW / 2 - (count - 1) * spacing / 2;
-          layer.sort((a, b) => (a.x || 0) - (b.x || 0));
-          layer.forEach((n, i) => { n.x = Math.round(startX + i * spacing); });
+      if (!xOverlap) return;
+    }
+    const neighborXs = [];
+    if (lki > 0) { const prev = byLayer[layerKeys[lki-1]]; if(prev) prev.forEach(p => neighborXs.push(p.x)); }
+    if (lki < layerKeys.length-1) { const next = byLayer[layerKeys[lki+1]]; if(next) next.forEach(p => neighborXs.push(p.x)); }
+    if (neighborXs.length > 0 && count <= neighborXs.length * 2) {
+      neighborXs.sort((a,b)=>a-b);
+      const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
+      const startX = svgW / 2 - (count - 1) * spacing / 2;
+      layer.forEach((n, i) => {
+        const baseX = Math.round(startX + i * spacing);
+        let bestParentX = baseX;
+        const parents = parentMap[n.id]||[];
+        if (parents.length === 1) {
+          const px = nodeMap[parents[0]]?.x;
+          if (px) bestParentX = px;
+        } else if (parents.length > 1) {
+          const pxs = parents.map(pid=>nodeMap[pid]?.x).filter(x=>x);
+          if (pxs.length) bestParentX = pxs.reduce((s,v)=>s+v,0)/pxs.length;
+        }
+        n.x = Math.round(baseX * 0.4 + bestParentX * 0.6);
+        n.x = Math.round(n.x / GRID) * GRID;
+        n.x = Math.max(100, Math.min(svgW - 100, n.x));
+      });
+      for (let i = 1; i < layer.length; i++) {
+        if (layer[i].x - layer[i-1].x < 140) {
+          layer[i].x = layer[i-1].x + 140;
         }
       }
     } else {
@@ -4047,14 +4097,48 @@ function autoLayoutNodes(nodes, svgW, svgH) {
   });
   return nodes;
 }
-function getLayerIndex(type, layerOrder) {
-  const idx = layerOrder.indexOf(type);
-  return idx >= 0 ? idx : layerOrder.length - 1;
+
+function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
+  const isCtrl = from.type === 'controller' || to.type === 'controller';
+  const y1 = from.y + 60 + (isCtrl ? 0 : fromH/2);
+  const y2 = to.y + 60 - (isCtrl ? 0 : toH/2 - 8);
+  let x1 = from.x, x2 = to.x;
+  if (isCtrl) {
+    if (from.x < to.x) { x1 = from.x + fromW/2; x2 = to.x - toW/2 - 8; }
+    else { x1 = from.x - fromW/2; x2 = to.x + toW/2 + 8; }
+    return { path: `M${x1},${y1} L${x2},${y2}`, isOrtho: false, midX: (x1+x2)/2, midY: (y1+y2)/2 };
+  }
+  if (Math.abs(from.x - to.x) < 30) {
+    return { path: `M${x1},${y1} L${x2},${y2}`, isOrtho: false, midX: (x1+x2)/2, midY: (y1+y2)/2 };
+  }
+  const dy = y2 - y1;
+  const dx = x2 - x1;
+  let midY;
+  if (Math.abs(dy) > 80) {
+    midY = Math.round(y1 + dy * 0.5);
+  } else {
+    midY = Math.round((y1 + y2) / 2);
+  }
+  const chKey = `${Math.min(from.x,to.x)}-${Math.max(from.x,to.x)}-${midY}`;
+  let chOffset = 0;
+  if (!channels[midY]) channels[midY] = [];
+  const existing = channels[midY];
+  for (const e of existing) {
+    const eFrom = Math.min(e.x1, e.x2);
+    const eTo = Math.max(e.x1, e.x2);
+    const nFrom = Math.min(x1, x2);
+    const nTo = Math.max(x1, x2);
+    if (nFrom < eTo && nTo > eFrom) chOffset += 6;
+  }
+  existing.push({x1, x2});
+  const actualMidY = midY + chOffset;
+  const path = `M${x1},${y1} V${actualMidY} H${x2} V${y2}`;
+  return { path, isOrtho: true, midX: (x1+x2)/2, midY: actualMidY };
 }
 
 function renderDiagramFromJSON(containerId, diagramData, title) {
   const svgW = 1100, svgH = 700;
-  if (diagramData.nodes) autoLayoutNodes(diagramData.nodes, svgW, svgH);
+  if (diagramData.nodes) dagLayout(diagramData.nodes, diagramData.links, svgW, svgH);
   let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">`;
   svg += DIAGRAM_DEFS;
   svg += `<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern><rect width="${svgW}" height="${svgH}" fill="url(#dot)"/>`;
@@ -4068,6 +4152,7 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
     });
   }
   if (diagramData.links) {
+    const channels = {};
     diagramData.links.forEach(l => {
       const from = diagramData.nodes?.find(n => n.id === l.from);
       const to = diagramData.nodes?.find(n => n.id === l.to);
@@ -4086,34 +4171,14 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
         }
         const arrow = getArrowForLink(l);
         const sw = l.dashed ? '1' : '1.5';
-        let x1=from.x, y1, x2=to.x, y2;
-        const fromH = from.type==='busbar'?8:(from.type==='controller'?120:44);
-        const toH = to.type==='busbar'?8:(to.type==='controller'?120:44);
-        const fromW = from.type==='source'||from.type==='meter'?220:(from.type==='busbar'?340:(from.type==='battery'?280:180));
-        const toW = to.type==='source'||to.type==='meter'?220:(to.type==='busbar'?340:(to.type==='battery'?280:180));
-        if (Math.abs(from.x - to.x) < 30 && from.type !== 'controller' && to.type !== 'controller') {
-          y1 = from.y + 60 + fromH/2;
-          y2 = to.y + 60 - toH/2 - 8;
-          svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
-        } else {
-          y1 = from.y + 60 + fromH/2;
-          y2 = to.y + 60 - toH/2 - 8;
-          if (from.type === 'controller' || to.type === 'controller') {
-            y1 = from.y + 60;
-            y2 = to.y + 60;
-            if (from.x < to.x) { x1 = from.x + fromW/2; x2 = to.x - toW/2 - 8; }
-            else { x1 = from.x - fromW/2; x2 = to.x + toW/2 + 8; }
-            svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
-          } else {
-            const midY = Math.round((y1 + y2) / 2);
-            svg += `<path d="M${from.x},${y1} L${from.x},${midY} L${to.x},${midY} L${to.x},${y2}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
-          }
-        }
+        const fromD = getNodeDim(from.type);
+        const toD = getNodeDim(to.type);
+        const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels);
+        svg += `<path d="${route.path}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
         if (l.label) {
-          const isOrtho = Math.abs(from.x - to.x) >= 30 && from.type !== 'controller' && to.type !== 'controller';
-          const lblX = (from.x + to.x) / 2 + 6;
-          const lblY = isOrtho ? (from.y + to.y) / 2 + 58 - Math.abs(from.x - to.x) * 0.05 : (from.y + to.y) / 2 + 58;
-          const lblRot = isOrtho ? 0 : Math.atan2(to.y-from.y,to.x-from.x)*180/Math.PI;
+          const lblX = route.midX + 6;
+          const lblY = route.isOrtho ? route.midY - 4 : route.midY;
+          const lblRot = route.isOrtho ? 0 : Math.atan2(to.y-from.y,to.x-from.x)*180/Math.PI;
           svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="#C2C0B6" font-size="9" transform="rotate(${lblRot},${lblX},${lblY})">${l.label}</text>`;
         }
       }
