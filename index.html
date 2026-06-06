@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/elkjs@0.9.3/lib/elk.bundled.js"></script>
+
 
 <style>
 :root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
@@ -1171,7 +1171,7 @@ select.form-input{appearance:auto}
 </script>
 
 <script>
-function loadMermaid(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';s.onload=function(){mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#185FA5',primaryTextColor:'#FAFAF5',primaryBorderColor:'#3a3e45',lineColor:'#C2C0B6',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px'},layout:'dagre',flowchart:{htmlLabels:false,curve:'basis'},sequence:{actorMargin:50,messageMargin:40}});};document.head.appendChild(s);}
+function loadMermaid(){if(typeof mermaid!=='undefined'){mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#2a7cc8',primaryTextColor:'#FAFAF5',primaryBorderColor:'#4a9ee8',lineColor:'#b0b0a0',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px',nodeBorder:'#4a9ee8',clusterBkg:'#1a2040',clusterBorder:'#4a90d9',edgeLabelBackground:'#0d1117'},layout:'dagre',flowchart:{htmlLabels:true,curve:'basis',padding:20,nodeSpacing:50,rankSpacing:60},sequence:{actorMargin:50,messageMargin:40}});}}
 loadMermaid();
 
 const SVG_MAP={'mm-1':'microgrid_arch_topology_1.svg','mm-2':'microgrid_arch_acdc_2.svg','mm-3':'microgrid_arch_4types_3.svg','mm-4':'microgrid_mode_switch_4.svg','mm-5':'microgrid_protection_5.svg','mm-6':'microgrid_comms_network_6.svg','mm-7':'ems_arch_4layers_mm7.svg','mm-8':'ems_comms_protocols_mm8.svg','mm-9':'ems_eblock_internal_mm9.svg','mm-10':'ems_dispatch_layers_mm10.svg','mm-11':'ems_network_topology_mm11.svg'};
@@ -4134,188 +4134,168 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
   return { path, isOrtho: true, midX: (x1+x2)/2, midY: actualMidY };
 }
 
-async function elkLayout(nodes, links) {
-  const TYPE_LAYER = {source:0,meter:0,busbar:1,breaker:2,switch:2,transformer:2,pcs:3,battery:3,pv:3,ev:3,controller:4,load:4,dcBus:3,fuse:2,ct:0,pt:0,relay:2,contactor:2,earth:4,surge:2,protection:2,cabinet:2};
-  const elk = new ELK();
-  const elkGraph = {
-    id: 'root',
-    layoutOptions: {
-      'elk.algorithm': 'layered',
-      'elk.direction': 'DOWN',
-      'elk.layered.spacing.nodeNodeBetweenLayers': '80',
-      'elk.spacing.nodeNode': '40',
-      'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
-      'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
-      'elk.edgeRouting': 'ORTHOGONAL',
-      'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
-      'elk.layered.cycleBreaking.strategy': 'GREEDY',
-      'elk.hierarchyHandling': 'INCLUDE_CHILDREN'
-    },
-    children: nodes.map(n => {
-      const t = TYPE_ALIAS[n.type] || n.type;
-      const dim = NODE_DIM[t] || {w:180,h:44};
-      const layer = TYPE_LAYER[t] !== undefined ? TYPE_LAYER[t] : 2;
-      return {
-        id: n.id,
-        width: dim.w + 20,
-        height: dim.h + 30,
-        properties: { 'elk.position': `(0,${layer * 120})` },
-        layoutOptions: { 'elk.partitioning.partition': String(layer) }
-      };
-    }),
-    edges: links.map((l, i) => ({
-      id: `e${i}`,
-      sources: [l.from],
-      targets: [l.to]
-    }))
+function buildMermaidGraph(nodes, links, title) {
+  const TYPE_STYLE = {
+    source:'grid',meter:'grid',busbar:'bus',breaker:'sw',switch:'sw',transformer:'sw',
+    pcs:'ess',battery:'ess',pv:'ess',ev:'ess',controller:'ctrl',load:'load',dcBus:'bus',
+    fuse:'sw',ct:'grid',pt:'grid',relay:'sw',contactor:'sw',cabinet:'sw',protection:'sw'
   };
+  let md = `graph TD\n`;
+  md += `classDef grid fill:#1a478a,stroke:#4a9ee8,stroke-width:2px,color:#e0e0ff\n`;
+  md += `classDef bus fill:#185fa5,stroke:#4a90d9,stroke-width:3px,color:#9fe1cb\n`;
+  md += `classDef sw fill:#633806,stroke:#e8a838,stroke-width:2px,color:#fac775\n`;
+  md += `classDef ess fill:#3c3489,stroke:#afa9ec,stroke-width:2px,color:#cecbf6\n`;
+  md += `classDef ctrl fill:#854f0b,stroke:#d4a030,stroke-width:2px,color:#faf9f5,stroke-dasharray: 5 3\n`;
+  md += `classDef load fill:#2d5a3d,stroke:#50c878,stroke-width:2px,color:#9fe1cb\n`;
+  nodes.forEach(n => {
+    const t = TYPE_ALIAS[n.type] || n.type;
+    const style = TYPE_STYLE[t] || 'load';
+    const label = (n.label||n.id).replace(/[<>"/\\|{}]/g,' ');
+    const sub = n.sub ? `<br/>${n.sub.replace(/[<>"/\\|{}]/g,' ')}` : '';
+    md += `  ${n.id}["${label}${sub}"]:::${style}\n`;
+  });
+  links.forEach(l => {
+    const arrow = l.dashed ? '-.->' : '-->';
+    const label = l.label ? `|${l.label.replace(/[<>"/\\|{}]/g,' ')}|` : '';
+    md += `  ${l.from} ${arrow}${label} ${l.to}\n`;
+  });
+  return md;
+}
+
+function renderDiagramWithMermaid(containerId, diagramData, title) {
+  const nodes = diagramData.nodes || [];
+  const links = diagramData.links || [];
+  if (nodes.length === 0) {
+    document.getElementById(containerId).innerHTML = `<div style="padding:40px;color:#8888cc;text-align:center">${title} — 暂无数据</div>`;
+    return;
+  }
+  const mermaidDef = buildMermaidGraph(nodes, links, title);
+  const renderId = containerId + '_mermaid';
+  const container = document.getElementById(containerId);
+  container.innerHTML = `<div class="mermaid" id="${renderId}">${mermaidDef}</div>`;
   try {
-    const result = await elk.layout(elkGraph);
-    const posMap = {};
-    result.children.forEach(c => { posMap[c.id] = { x: c.x, y: c.y }; });
-    return posMap;
+    if (typeof mermaid !== 'undefined') {
+      mermaid.init(undefined, document.getElementById(renderId));
+    }
   } catch(e) {
-    console.warn('ELK layout failed, fallback to zone layout:', e);
-    return null;
+    console.warn('Mermaid render failed, fallback to SVG:', e);
+    renderDiagramFromJSON_SVG(containerId, diagramData, title);
   }
 }
 
 function renderDiagramFromJSON(containerId, diagramData, title) {
+  const nodes = diagramData.nodes || [];
+  const links = diagramData.links || [];
+  if (nodes.length > 0 && typeof mermaid !== 'undefined') {
+    renderDiagramWithMermaid(containerId, diagramData, title);
+  } else {
+    renderDiagramFromJSON_SVG(containerId, diagramData, title);
+  }
+}
+
+function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   const svgW = 1100, svgH = 800;
   const nodes = diagramData.nodes || [];
   const links = diagramData.links || [];
-  const ZONE_COLORS = {source:'#185FA5',meter:'#185FA5',busbar:'#185FA5',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#534AB7',battery:'#0F6E56',controller:'#854F0B',load:'#0F6E56',pv:'#e8a838',ev:'#0F6E56'};
+  const ZONE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',busbar:'#4a90d9',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#afa9ec',battery:'#50c878',controller:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878'};
   const ZONES = [
-    {name:'电源侧',types:['source','meter'],y:55,h:100,color:'#185FA5'},
-    {name:'配电母线',types:['busbar'],y:165,h:55,color:'#185FA5'},
+    {name:'电源侧',types:['source','meter'],y:55,h:100,color:'#4a9ee8'},
+    {name:'配电母线',types:['busbar'],y:165,h:55,color:'#4a90d9'},
     {name:'开关/变压',types:['breaker','switch','transformer'],y:230,h:130,color:'#e8a838'},
-    {name:'变流/储能',types:['pcs','battery','pv','ev'],y:370,h:130,color:'#534AB7'},
-    {name:'负荷/控制',types:['load','controller'],y:510,h:130,color:'#0F6E56'}
+    {name:'变流/储能',types:['pcs','battery','pv','ev'],y:370,h:130,color:'#afa9ec'},
+    {name:'负荷/控制',types:['load','controller'],y:510,h:130,color:'#50c878'}
   ];
   const nodeMap = {};
   nodes.forEach(n => { nodeMap[n.id] = n; });
-
-  function applyZoneLayout() {
-    ZONES.forEach(zone => {
-      const zoneNodes = nodes.filter(n => zone.types.includes(TYPE_ALIAS[n.type]||n.type));
-      const count = zoneNodes.length;
-      if (!count) return;
-      const cardW = Math.min(200, (svgW - 80) / count - 30);
-      const totalW = count * cardW + (count - 1) * 30;
-      const startX = (svgW - totalW) / 2;
-      zoneNodes.forEach((n, i) => {
-        n.x = Math.round(startX + i * (cardW + 30) + cardW / 2);
-        n.y = zone.y + zone.h / 2;
-        n._zone = zone;
-        n._cardW = cardW;
-      });
+  ZONES.forEach(zone => {
+    const zoneNodes = nodes.filter(n => zone.types.includes(TYPE_ALIAS[n.type]||n.type));
+    const count = zoneNodes.length;
+    if (!count) return;
+    const cardW = Math.min(200, (svgW - 80) / count - 30);
+    const totalW = count * cardW + (count - 1) * 30;
+    const startX = (svgW - totalW) / 2;
+    zoneNodes.forEach((n, i) => {
+      n.x = Math.round(startX + i * (cardW + 30) + cardW / 2);
+      n.y = zone.y + zone.h / 2;
+      n._zone = zone;
+      n._cardW = cardW;
     });
-    nodes.filter(n => !n._zone).forEach((n, i) => {
-      n.x = 100 + i * 200;
-      n.y = 400;
-      n._cardW = 160;
-    });
-  }
-
-  function renderSvg() {
-    let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">`;
-    svg += DIAGRAM_DEFS;
-    svg += `<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern><rect width="${svgW}" height="${svgH}" fill="url(#dot)"/>`;
-    svg += `<text x="${svgW/2}" y="24" text-anchor="middle" fill="#e0e0ff" font-size="15" font-weight="bold">${title}</text>`;
-    svg += `<text x="${svgW/2}" y="42" text-anchor="middle" fill="#8888cc" font-size="10">${diagramData.bus||''} | 设计人：卢继雄 | GB/T 36558-2023</text>`;
-    ZONES.forEach(zone => {
-      const zoneNodes = nodes.filter(n => n._zone === zone);
-      if (!zoneNodes.length) return;
-      const xs = zoneNodes.map(n => n.x);
-      const minX = Math.min(...xs) - (zoneNodes[0]._cardW||180)/2 - 15;
-      const maxX = Math.max(...xs) + (zoneNodes[0]._cardW||180)/2 + 15;
-      svg += `<rect x="${minX}" y="${zone.y}" width="${maxX-minX}" height="${zone.h}" rx="8" fill="rgba(20,30,50,0.4)" stroke="${zone.color}" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>`;
-      svg += `<text x="${minX+8}" y="${zone.y+14}" fill="${zone.color}" font-size="10" opacity="0.8">${zone.name}</text>`;
-    });
-    nodes.forEach(n => {
-      const resolvedType = TYPE_ALIAS[n.type] || n.type;
-      const iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.source;
-      svg += iconFn(n.x, n.y, n.label, n.sub);
-    });
-    if (links) {
-      const channels = {};
-      links.forEach(l => {
-        const from = nodeMap[l.from];
-        const to = nodeMap[l.to];
-        if (from && to) {
-          l._toType = to.type;
-          const dash = l.dashed ? ' stroke-dasharray="4,3"' : '';
-          let color;
-          if (l.dashed) { color = '#854F0B'; }
-          else {
-            const toT = to.type;
-            if (toT==='transformer'||toT==='switch') color='#185FA5';
-            else if (toT==='pcs') color='#534AB7';
-            else if (toT==='battery') color='#0F6E56';
-            else if (toT==='load') color='#0F6E56';
-            else color='#9C9A92';
-          }
-          const arrow = getArrowForLink(l);
-          const sw = l.dashed ? '1' : '1.5';
-          const fromD = getNodeDim(from.type);
-          const toD = getNodeDim(to.type);
-          const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels);
-          svg += `<path d="${route.path}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
-          if (l.label) {
-            const lblX = route.midX + 6;
-            const lblY = route.midY - 4;
-            svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="#C2C0B6" font-size="9">${l.label}</text>`;
-          }
+  });
+  nodes.filter(n => !n._zone).forEach((n, i) => {
+    n.x = 100 + i * 200;
+    n.y = 400;
+    n._cardW = 160;
+  });
+  let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">`;
+  svg += DIAGRAM_DEFS;
+  svg += `<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern><rect width="${svgW}" height="${svgH}" fill="url(#dot)"/>`;
+  svg += `<text x="${svgW/2}" y="24" text-anchor="middle" fill="#e0e0ff" font-size="15" font-weight="bold">${title}</text>`;
+  svg += `<text x="${svgW/2}" y="42" text-anchor="middle" fill="#8888cc" font-size="10">${diagramData.bus||''} | 设计人：卢继雄 | GB/T 36558-2023</text>`;
+  ZONES.forEach(zone => {
+    const zoneNodes = nodes.filter(n => n._zone === zone);
+    if (!zoneNodes.length) return;
+    const xs = zoneNodes.map(n => n.x);
+    const minX = Math.min(...xs) - (zoneNodes[0]._cardW||180)/2 - 15;
+    const maxX = Math.max(...xs) + (zoneNodes[0]._cardW||180)/2 + 15;
+    svg += `<rect x="${minX}" y="${zone.y}" width="${maxX-minX}" height="${zone.h}" rx="8" fill="rgba(20,30,50,0.4)" stroke="${zone.color}" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>`;
+    svg += `<text x="${minX+8}" y="${zone.y+14}" fill="${zone.color}" font-size="10" opacity="0.9">${zone.name}</text>`;
+  });
+  nodes.forEach(n => {
+    const resolvedType = TYPE_ALIAS[n.type] || n.type;
+    const iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.source;
+    svg += iconFn(n.x, n.y, n.label, n.sub);
+  });
+  if (links) {
+    const channels = {};
+    links.forEach(l => {
+      const from = nodeMap[l.from];
+      const to = nodeMap[l.to];
+      if (from && to) {
+        l._toType = to.type;
+        const dash = l.dashed ? ' stroke-dasharray="4,3"' : '';
+        let color;
+        if (l.dashed) { color = '#d4a030'; }
+        else {
+          const toT = to.type;
+          if (toT==='transformer'||toT==='switch') color='#4a9ee8';
+          else if (toT==='pcs') color='#afa9ec';
+          else if (toT==='battery') color='#50c878';
+          else if (toT==='load') color='#50c878';
+          else color='#b0b0a0';
         }
-      });
-    }
-    if (diagramData.loads) {
-      diagramData.loads.forEach((ld, i) => {
-        const parent = nodeMap[ld.parent];
-        if (parent) {
-          const lx = parent.x, ly = parent.y + 100 + i * 60;
-          svg += DIAGRAM_ICONS.load(lx, ly, ld.label, ld.sub || '');
-          svg += `<path d="M${parent.x},${parent.y+30} V${ly-30} H${lx} V${ly-22}" fill="none" stroke="#a070d0" stroke-width="2" marker-end="url(#aP)"/>`;
+        const arrow = getArrowForLink(l);
+        const sw = l.dashed ? '1' : '1.5';
+        const fromD = getNodeDim(from.type);
+        const toD = getNodeDim(to.type);
+        const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels);
+        svg += `<path d="${route.path}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
+        if (l.label) {
+          const lblX = route.midX + 6;
+          const lblY = route.midY - 4;
+          svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="#C2C0B6" font-size="9">${l.label}</text>`;
         }
-      });
-    }
-    if (diagramData.protection) {
-      svg += `<rect x="700" y="660" width="380" height="${20 + diagramData.protection.length * 20}" rx="6" fill="none" stroke="#534AB7" stroke-width="1" stroke-dasharray="4,2"/>`;
-      svg += `<text x="890" y="676" text-anchor="middle" fill="#534AB7" font-size="10" font-weight="bold">保护配置</text>`;
-      diagramData.protection.forEach((p, i) => {
-        svg += `<text x="715" y="${695 + i * 20}" fill="#AFA9EC" font-size="9">\u25CF ${p}</text>`;
-      });
-    }
-    svg += '</svg>';
-    document.getElementById(containerId).innerHTML = svg;
-  }
-
-  if (nodes.length > 0 && links.length > 0 && typeof ELK !== 'undefined') {
-    elkLayout(nodes, links).then(posMap => {
-      if (posMap) {
-        nodes.forEach(n => {
-          const pos = posMap[n.id];
-          if (pos) {
-            n.x = pos.x + (NODE_DIM[TYPE_ALIAS[n.type]||n.type]||{w:180}).w/2 + 10;
-            n.y = pos.y + (NODE_DIM[TYPE_ALIAS[n.type]||n.type]||{h:44}).h/2 + 15;
-            const t = TYPE_ALIAS[n.type]||n.type;
-            for (const zone of ZONES) {
-              if (zone.types.includes(t)) { n._zone = zone; n._cardW = NODE_DIM[t]?.w||180; break; }
-            }
-          }
-        });
-        const maxX = Math.max(...nodes.map(n=>n.x+200));
-        const maxY = Math.max(...nodes.map(n=>n.y+80));
-        renderSvg();
-      } else {
-        applyZoneLayout();
-        renderSvg();
       }
     });
-  } else {
-    applyZoneLayout();
-    renderSvg();
   }
+  if (diagramData.loads) {
+    diagramData.loads.forEach((ld, i) => {
+      const parent = nodeMap[ld.parent];
+      if (parent) {
+        const lx = parent.x, ly = parent.y + 100 + i * 60;
+        svg += DIAGRAM_ICONS.load(lx, ly, ld.label, ld.sub || '');
+        svg += `<path d="M${parent.x},${parent.y+30} V${ly-30} H${lx} V${ly-22}" fill="none" stroke="#b070d0" stroke-width="2" marker-end="url(#aP)"/>`;
+      }
+    });
+  }
+  if (diagramData.protection) {
+    svg += `<rect x="700" y="660" width="380" height="${20 + diagramData.protection.length * 20}" rx="6" fill="none" stroke="#afa9ec" stroke-width="1.5" stroke-dasharray="4,2"/>`;
+    svg += `<text x="890" y="676" text-anchor="middle" fill="#afa9ec" font-size="10" font-weight="bold">保护配置</text>`;
+    diagramData.protection.forEach((p, i) => {
+      svg += `<text x="715" y="${695 + i * 20}" fill="#cecbf6" font-size="9">\u25CF ${p}</text>`;
+    });
+  }
+  svg += '</svg>';
+  document.getElementById(containerId).innerHTML = svg;
 }
 
 function renderArchDiagramFromJSON(d) { renderDiagramFromJSON('archSvg', d, '系统架构图 (AI生成)'); }
