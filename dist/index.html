@@ -3957,8 +3957,8 @@ const IEC_SYM={
 function iecImg(type,x,y,w,h,label){
   const src=IEC_SYM[type];
   if(!src) return '';
-  const pad=4;
-  return `<rect x="${x-w/2-pad}" y="${y-h/2-pad}" width="${w+pad*2}" height="${h+pad*2}" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/><image href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="0.95"/>`+(label?`<text x="${x}" y="${y+h/2+12}" text-anchor="middle" fill="#e0e0ff" font-size="10">${label}</text>`:'');
+  const pad=6;
+  return `<rect x="${x-w/2-pad}" y="${y-h/2-pad}" width="${w+pad*2}" height="${h+pad*2}" rx="4" fill="rgba(30,40,60,0.85)" stroke="rgba(120,160,220,0.4)" stroke-width="1"/><image href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="1"/>`+(label?`<text x="${x}" y="${y+h/2+14}" text-anchor="middle" fill="#e0e0ff" font-size="10" font-weight="500">${label}</text>`:'');
 }
 const DIAGRAM_ICONS = {
   source: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="url(#gGrid)" stroke="#85B7EB" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#85B7EB" font-size="12">${sub}</text>`:''}`,
@@ -4022,7 +4022,7 @@ function getNodeDim(type){
 }
 
 const LAYER_ORDER = ['source','meter','busbar','breaker','switch','transformer','pcs','battery','controller','load','pv','ev','dcBus','fuse','ct','pt','relay','contactor','earth','surge','diode','resistor','capacitor','inductor','motor','lamp','terminal','contact','protection','cabinet'];
-const LAYER_Y_MAP = {source:80,meter:155,busbar:230,breaker:260,switch:260,transformer:330,pcs:330,battery:410,controller:330,load:450,pv:330,ev:410,dcBus:370};
+const LAYER_Y_MAP = {source:70,meter:140,busbar:210,breaker:270,switch:270,transformer:350,pcs:350,battery:440,controller:350,load:520,pv:350,ev:440,dcBus:400};
 
 function getLayerIndex(type, layerOrder) {
   const idx = layerOrder.indexOf(type);
@@ -4060,7 +4060,7 @@ function dagLayout(nodes, links, svgW, svgH) {
     const count = layer.length;
     const hasX = layer.every(n => typeof n.x === 'number' && n.x > 0);
     if (hasX) {
-      const xOverlap = layer.some((a, i) => layer.some((b, j) => i !== j && Math.abs(a.x - b.x) < 140));
+      const xOverlap = layer.some((a, i) => layer.some((b, j) => i !== j && Math.abs(a.x - b.x) < 180));
       if (!xOverlap) return;
     }
     const neighborXs = [];
@@ -4086,8 +4086,8 @@ function dagLayout(nodes, links, svgW, svgH) {
         n.x = Math.max(100, Math.min(svgW - 100, n.x));
       });
       for (let i = 1; i < layer.length; i++) {
-        if (layer[i].x - layer[i-1].x < 140) {
-          layer[i].x = layer[i-1].x + 140;
+        if (layer[i].x - layer[i-1].x < 180) {
+          layer[i].x = layer[i-1].x + 180;
         }
       }
     } else {
@@ -4138,7 +4138,7 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
 }
 
 function renderDiagramFromJSON(containerId, diagramData, title) {
-  const svgW = 1100, svgH = 700;
+  const svgW = 1100, svgH = 750;
   if (diagramData.nodes) dagLayout(diagramData.nodes, diagramData.links, svgW, svgH);
   let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">`;
   svg += DIAGRAM_DEFS;
