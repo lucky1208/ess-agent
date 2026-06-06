@@ -4138,25 +4138,63 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
 }
 
 function renderDiagramFromJSON(containerId, diagramData, title) {
-  const svgW = 1100, svgH = 750;
-  if (diagramData.nodes) dagLayout(diagramData.nodes, diagramData.links, svgW, svgH);
+  const svgW = 1100, svgH = 700;
+  const nodes = diagramData.nodes || [];
+  const links = diagramData.links || [];
+  const ZONE_COLORS = {source:'#185FA5',meter:'#185FA5',busbar:'#185FA5',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#534AB7',battery:'#0F6E56',controller:'#854F0B',load:'#0F6E56',pv:'#e8a838',ev:'#0F6E56'};
+  const ZONE_BG = {source:'rgba(24,95,165,0.15)',meter:'rgba(24,95,165,0.1)',busbar:'rgba(24,95,165,0.1)',breaker:'rgba(232,168,56,0.1)',switch:'rgba(232,168,56,0.1)',transformer:'rgba(232,168,56,0.12)',pcs:'rgba(83,74,183,0.15)',battery:'rgba(15,110,86,0.15)',controller:'rgba(133,79,11,0.1)',load:'rgba(15,110,86,0.1)',pv:'rgba(232,168,56,0.1)',ev:'rgba(15,110,86,0.1)'};
+  const ZONES = [
+    {name:'电源侧',types:['source','meter'],y:55,h:90,color:'#185FA5'},
+    {name:'配电母线',types:['busbar'],y:155,h:50,color:'#185FA5'},
+    {name:'开关/变压',types:['breaker','switch','transformer'],y:215,h:120,color:'#e8a838'},
+    {name:'变流/储能',types:['pcs','battery','pv','ev'],y:345,h:120,color:'#534AB7'},
+    {name:'负荷/控制',types:['load','controller'],y:475,h:120,color:'#0F6E56'}
+  ];
+  const nodeMap = {};
+  nodes.forEach(n => { nodeMap[n.id] = n; });
+  ZONES.forEach(zone => {
+    const zoneNodes = nodes.filter(n => zone.types.includes(TYPE_ALIAS[n.type]||n.type));
+    const count = zoneNodes.length;
+    if (!count) return;
+    const cardW = Math.min(200, (svgW - 80) / count - 20);
+    const totalW = count * cardW + (count - 1) * 20;
+    const startX = (svgW - totalW) / 2;
+    zoneNodes.forEach((n, i) => {
+      n.x = Math.round(startX + i * (cardW + 20) + cardW / 2);
+      n.y = zone.y + zone.h / 2;
+      n._zone = zone;
+      n._cardW = cardW;
+    });
+  });
+  nodes.filter(n => !n._zone).forEach((n, i) => {
+    n.x = 100 + i * 200;
+    n.y = 400;
+    n._cardW = 160;
+  });
   let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">`;
   svg += DIAGRAM_DEFS;
   svg += `<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern><rect width="${svgW}" height="${svgH}" fill="url(#dot)"/>`;
-  svg += `<text x="${svgW/2}" y="28" text-anchor="middle" fill="#e0e0ff" font-size="16" font-weight="bold">${title}</text>`;
-  svg += `<text x="${svgW/2}" y="46" text-anchor="middle" fill="#8888cc" font-size="11">${diagramData.bus||''} | 设计人：卢继雄 | GB/T 36558-2023</text>`;
-  if (diagramData.nodes) {
-    diagramData.nodes.forEach(n => {
-      const resolvedType = TYPE_ALIAS[n.type] || n.type;
-      const iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.source;
-      svg += iconFn(n.x, n.y + 60, n.label, n.sub);
-    });
-  }
-  if (diagramData.links) {
+  svg += `<text x="${svgW/2}" y="24" text-anchor="middle" fill="#e0e0ff" font-size="15" font-weight="bold">${title}</text>`;
+  svg += `<text x="${svgW/2}" y="42" text-anchor="middle" fill="#8888cc" font-size="10">${diagramData.bus||''} | 设计人：卢继雄 | GB/T 36558-2023</text>`;
+  ZONES.forEach(zone => {
+    const zoneNodes = nodes.filter(n => n._zone === zone);
+    if (!zoneNodes.length) return;
+    const xs = zoneNodes.map(n => n.x);
+    const minX = Math.min(...xs) - zoneNodes[0]._cardW/2 - 15;
+    const maxX = Math.max(...xs) + zoneNodes[0]._cardW/2 + 15;
+    svg += `<rect x="${minX}" y="${zone.y}" width="${maxX-minX}" height="${zone.h}" rx="8" fill="rgba(20,30,50,0.4)" stroke="${zone.color}" stroke-width="0.8" stroke-dasharray="4,2" opacity="0.6"/>`;
+    svg += `<text x="${minX+8}" y="${zone.y+14}" fill="${zone.color}" font-size="9" opacity="0.7">${zone.name}</text>`;
+  });
+  nodes.forEach(n => {
+    const resolvedType = TYPE_ALIAS[n.type] || n.type;
+    const iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.source;
+    svg += iconFn(n.x, n.y, n.label, n.sub);
+  });
+  if (links) {
     const channels = {};
-    diagramData.links.forEach(l => {
-      const from = diagramData.nodes?.find(n => n.id === l.from);
-      const to = diagramData.nodes?.find(n => n.id === l.to);
+    links.forEach(l => {
+      const from = nodeMap[l.from];
+      const to = nodeMap[l.to];
       if (from && to) {
         l._toType = to.type;
         const dash = l.dashed ? ' stroke-dasharray="4,3"' : '';
@@ -4179,41 +4217,26 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
         if (l.label) {
           const lblX = route.midX + 6;
           const lblY = route.isOrtho ? route.midY - 4 : route.midY;
-          const lblRot = route.isOrtho ? 0 : Math.atan2(to.y-from.y,to.x-from.x)*180/Math.PI;
-          svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="#C2C0B6" font-size="9" transform="rotate(${lblRot},${lblX},${lblY})">${l.label}</text>`;
+          svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="#C2C0B6" font-size="9">${l.label}</text>`;
         }
       }
     });
   }
   if (diagramData.loads) {
     diagramData.loads.forEach((ld, i) => {
-      const parent = diagramData.nodes?.find(n => n.id === ld.parent);
+      const parent = nodeMap[ld.parent];
       if (parent) {
-        const lx = parent.x, ly = parent.y + 160 + i * 60;
+        const lx = parent.x, ly = parent.y + 100 + i * 60;
         svg += DIAGRAM_ICONS.load(lx, ly, ld.label, ld.sub || '');
-        svg += `<line x1="${parent.x}" y1="${parent.y + 60 + 30}" x2="${lx}" y2="${ly - 22}" stroke="#a070d0" stroke-width="2" marker-end="url(#aP)"/>`;
+        svg += `<line x1="${parent.x}" y1="${parent.y + 30}" x2="${lx}" y2="${ly - 22}" stroke="#a070d0" stroke-width="2" marker-end="url(#aP)"/>`;
       }
     });
   }
-  if (diagramData.components) {
-    diagramData.components.forEach((c, i) => {
-      const y = 80 + i * 65;
-      const iconFn = DIAGRAM_ICONS[TYPE_ALIAS[c.type]||c.type] || DIAGRAM_ICONS.source;
-      svg += iconFn(250, y, c.label, c.sub || '');
-      if (i > 0) svg += `<line x1="250" y1="${y - 30}" x2="250" y2="${y - 25}" stroke="#4a90d9" stroke-width="2" marker-end="url(#aB)"/>`;
-    });
-  }
-  if (diagramData.connections) {
-    diagramData.connections.forEach((c, i) => {
-      const y = 100 + i * 65;
-      svg += `<text x="450" y="${y}" fill="#80b0e0" font-size="10">${c.cable || ''}</text>`;
-    });
-  }
   if (diagramData.protection) {
-    svg += `<rect x="700" y="70" width="380" height="${20 + diagramData.protection.length * 20}" rx="6" fill="none" stroke="#534AB7" stroke-width="1" stroke-dasharray="4,2"/>`;
-    svg += `<text x="890" y="86" text-anchor="middle" fill="#534AB7" font-size="10" font-weight="bold">保护配置</text>`;
+    svg += `<rect x="700" y="580" width="380" height="${20 + diagramData.protection.length * 20}" rx="6" fill="none" stroke="#534AB7" stroke-width="1" stroke-dasharray="4,2"/>`;
+    svg += `<text x="890" y="596" text-anchor="middle" fill="#534AB7" font-size="10" font-weight="bold">保护配置</text>`;
     diagramData.protection.forEach((p, i) => {
-      svg += `<text x="715" y="${105 + i * 20}" fill="#AFA9EC" font-size="9">\u25CF ${p}</text>`;
+      svg += `<text x="715" y="${615 + i * 20}" fill="#AFA9EC" font-size="9">\u25CF ${p}</text>`;
     });
   }
   svg += '</svg>';
