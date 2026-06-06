@@ -3242,6 +3242,13 @@ const ESS_SYSTEM_PROMPT = `你是一个工商业储能系统解决方案AI智能
 
 archDiagram, wiringDiagram, wiringDiagram2 中的节点和连接定义了图纸元素。前端会按国标电气制图规则渲染SVG。
 
+【IEC符号type说明】
+archDiagram的nodes.type可选: source/meter/busbar/transformer/switch/pcs/battery/controller/load/pv/ev/dcBus/breaker/fuse/ct/pt/relay/contactor/earth/surge
+wiringDiagram的components.type可选: breaker/transformer/pcs/switch/battery/meter/busbar/fuse/ct/pt/relay/contactor/earth/surge/diode/resistor/capacitor/inductor/motor/lamp/terminal/contact
+前端会用IEC 60617标准符号自动渲染每种type，所以type必须准确！breaker=断路器,transformer=变压器,switch=隔离开关,fuse=熔断器,ct=电流互感器,pt=电压互感器,relay=继电器,earth=接地
+
+【连线硬约束】archDiagram的links必须按电气拓扑顺序连接: source→meter→busbar, busbar→breaker/switch→transformer, transformer→pcs/battery/load, controller虚线连pcs和battery。禁止跨层斜线直连！禁止非相邻层连线！每条link的from/to必须是相邻层或隔一层，否则拆成两段中间经busbar/breaker中转
+
 ${ESS_DRAWING_RULES}
 
 ${ESS_DIAGRAM_SKILL_V3}
@@ -3924,22 +3931,65 @@ const DIAGRAM_DEFS=`<defs>
 <marker id="aX" markerWidth="4" markerHeight="4" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M3 2L8 5L3 8" fill="none" stroke="#9C9A92" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker>
 </defs>`;
 
+const IEC_SYM={
+  transformer:'iec_symbols_svg/iec_0264_Transformer_with_two_windings,_general_symbol_(form_1).svg',
+  breaker:'iec_symbols_svg/iec_0082_Circuit_Breaker.svg',
+  disconnector:'iec_symbols_svg/iec_0083_Disconnector,_Isolator.svg',
+  fuse:'iec_symbols_svg/iec_0105_Fuse,_general_symbol.svg',
+  earth:'iec_symbols_svg/iec_0041_Earth,_general_symbol_Earthing,_general_symbol;_Ground_(US),_general_symbol;_Gro.svg',
+  resistor:'iec_symbols_svg/iec_0188_Resistor,_general_symbol.svg',
+  capacitor:'iec_symbols_svg/iec_0198_Capacitor,_general_symbol.svg',
+  inductor:'iec_symbols_svg/iec_0203_Coil,_general_symbol;_Winding,_general_symbol_Inductor;_Choke.svg',
+  diode:'iec_symbols_svg/iec_0210_Semiconductor_diode,_general_symbol.svg',
+  contact:'iec_symbols_svg/iec_0055_Make_contact,_general_symbol,_switch,_general_symbol.svg',
+  battery:'iec_symbols_svg/iec_0353_Battery_of_primary_or_secondary_cells.svg',
+  ct:'iec_symbols_svg/iec_0273_Current_transformer,_general_symbol_(form_1).svg',
+  pt:'iec_symbols_svg/iec_0301_Voltage_transformer_Measuring_transformer_(form_1).svg',
+  relay:'iec_symbols_svg/iec_0097_Operating_device,_general_symbol;_Relay_coil,_general_symbol_Operating_coil_of_a.svg',
+  contactor:'iec_symbols_svg/iec_0079_Contactor;_Main_make_contact_of_a_contactor.svg',
+  surge:'iec_symbols_svg/iec_0115_Surge_diverter;_Lightning_arrester.svg',
+  lamp:'iec_symbols_svg/iec_0325_Lamp,_general_symbol_lamp,_general_symbol;_signal_lamp,_general_symbol.svg',
+  meter:'iec_symbols_svg/iec_0319_Voltmeter.svg',
+  motor:'iec_symbols_svg/iec_0090_Motor_starter,_general_symbol.svg',
+  terminal:'iec_symbols_svg/iec_0011_Terminal.svg',
+  plug_socket:'iec_symbols_svg/iec_0023_Plug_and_socket.svg',
+};
+function iecImg(type,x,y,w,h,label){
+  const src=IEC_SYM[type];
+  if(!src) return '';
+  return `<image href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="0.95"/>`+(label?`<text x="${x}" y="${y+h/2+12}" text-anchor="middle" fill="#e0e0ff" font-size="10">${label}</text>`:'');
+}
 const DIAGRAM_ICONS = {
   source: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="url(#gGrid)" stroke="#85B7EB" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#85B7EB" font-size="12">${sub}</text>`:''}`,
-  meter: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="#444441" stroke="#B4B2A9" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#D3D1C7" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}`,
+  meter: (x,y,label,sub) => `${iecImg('meter',x,y,36,36,'')}${sub?`<text x="${x}" y="${y+26}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}<text x="${x}" y="${y-24}" text-anchor="middle" fill="#D3D1C7" font-size="13" font-weight="500">${label}</text>`,
   busbar: (x,y,label) => `<rect x="${x-170}" y="${y-4}" width="340" height="8" rx="2" fill="#185FA5" opacity="0.85" filter="url(#sh)"/><text x="${x}" y="${y+20}" text-anchor="middle" fill="#9FE1CB" font-size="12" font-weight="500">${label}</text>`,
-  transformer: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gTrans)" stroke="#EF9F27" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#FAC775" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#EF9F27" font-size="12">${sub}</text>`:''}`,
+  transformer: (x,y,label,sub) => `${iecImg('transformer',x,y,44,50,label)}${sub?`<text x="${x}" y="${y+38}" text-anchor="middle" dominant-baseline="central" fill="#EF9F27" font-size="11">${sub}</text>`:''}`,
   pcs: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gPCS)" stroke="#AFA9EC" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#CECBF6" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#AFA9EC" font-size="12">${sub}</text>`:''}`,
-  battery: (x,y,label,sub) => `<rect x="${x-140}" y="${y-28}" width="280" height="56" rx="8" fill="url(#gESS)" stroke="#5DCAA5" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-4}" text-anchor="middle" dominant-baseline="central" fill="#9FE1CB" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#5DCAA5" font-size="12">${sub}</text>`:''}`,
+  battery: (x,y,label,sub) => `${iecImg('battery',x,y,50,36,'')}${sub?`<text x="${x}" y="${y+26}" text-anchor="middle" dominant-baseline="central" fill="#5DCAA5" font-size="11">${sub}</text>`:''}<text x="${x}" y="${y-24}" text-anchor="middle" fill="#9FE1CB" font-size="13" font-weight="500">${label}</text>`,
   controller: (x,y,label,sub) => `<rect x="${x-65}" y="${y-60}" width="130" height="120" rx="8" fill="none" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="4 3"/><text x="${x}" y="${y-40}" text-anchor="middle" fill="#FAF9F5" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y-20}" text-anchor="middle" fill="#854F0B" font-size="12">${sub}</text>`:''}`,
-  breaker: (x,y,label) => `<rect x="${x-15}" y="${y-7}" width="30" height="14" rx="3" fill="#B5D4F4" stroke="#185FA5" stroke-width="1.2"/><line x1="${x-10}" y1="${y}" x2="${x+10}" y2="${y}" stroke="#185FA5" stroke-width="1.2"/><text x="${x}" y="${y+18}" text-anchor="middle" fill="#185FA5" font-size="12">${label}</text>`,
-  switch: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gSwitch)" stroke="#F0997B" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#F5C4B3" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="12">${sub}</text>`:''}`,
+  breaker: (x,y,label) => `${iecImg('breaker',x,y,28,36,'')}${label?`<text x="${x}" y="${y+24}" text-anchor="middle" fill="#B5D4F4" font-size="11">${label}</text>`:''}`,
+  switch: (x,y,label,sub) => `${iecImg('disconnector',x,y,28,36,'')}${sub?`<text x="${x}" y="${y+26}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="11">${sub}</text>`:''}<text x="${x}" y="${y-24}" text-anchor="middle" fill="#F5C4B3" font-size="13" font-weight="500">${label}</text>`,
   load: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gLoad)" stroke="#B4B2A9" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#D3D1C7" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}`,
   pv: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="rgba(232,168,56,0.15)" stroke="#e8a838" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#fac775" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#e8a838" font-size="12">${sub}</text>`:''}`,
   ev: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="rgba(80,200,120,0.15)" stroke="#50c878" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#9fe1cb" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#50c878" font-size="12">${sub}</text>`:''}`,
   dcBus: (x,y,label) => `<rect x="${x-90}" y="${y-4}" width="180" height="8" rx="2" fill="#0F6E56" opacity="0.85" filter="url(#sh)"/><text x="${x}" y="${y+20}" text-anchor="middle" fill="#9fe1cb" font-size="12" font-weight="500">${label}</text>`,
   cabinet: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gSwitch)" stroke="#F0997B" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#F5C4B3" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="12">${sub}</text>`:''}`,
-  protection: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#ffc0c0" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#e06070" font-size="12">${sub}</text>`:''}`
+  protection: (x,y,label,sub) => `${iecImg('fuse',x,y,24,30,'')}${sub?`<text x="${x}" y="${y+24}" text-anchor="middle" dominant-baseline="central" fill="#e06070" font-size="11">${sub}</text>`:''}<text x="${x}" y="${y-22}" text-anchor="middle" fill="#ffc0c0" font-size="13" font-weight="500">${label}</text>`,
+  fuse: (x,y,label) => `${iecImg('fuse',x,y,24,30,'')}${label?`<text x="${x}" y="${y+22}" text-anchor="middle" fill="#e06070" font-size="11">${label}</text>`:''}`,
+  ct: (x,y,label) => `${iecImg('ct',x,y,30,40,'')}${label?`<text x="${x}" y="${y+28}" text-anchor="middle" fill="#e8a838" font-size="10">${label}</text>`:''}`,
+  pt: (x,y,label) => `${iecImg('pt',x,y,30,40,'')}${label?`<text x="${x}" y="${y+28}" text-anchor="middle" fill="#e8a838" font-size="10">${label}</text>`:''}`,
+  relay: (x,y,label) => `${iecImg('relay',x,y,30,30,'')}${label?`<text x="${x}" y="${y+22}" text-anchor="middle" fill="#854F0B" font-size="10">${label}</text>`:''}`,
+  contactor: (x,y,label) => `${iecImg('contactor',x,y,30,30,'')}${label?`<text x="${x}" y="${y+22}" text-anchor="middle" fill="#F0997B" font-size="10">${label}</text>`:''}`,
+  earth: (x,y) => `${iecImg('earth',x,y,20,20,'')}`,
+  surge: (x,y,label) => `${iecImg('surge',x,y,24,30,'')}${label?`<text x="${x}" y="${y+22}" text-anchor="middle" fill="#e06070" font-size="10">${label}</text>`:''}`,
+  diode: (x,y,label) => `${iecImg('diode',x,y,24,20,'')}${label?`<text x="${x}" y="${y+16}" text-anchor="middle" fill="#AFA9EC" font-size="10">${label}</text>`:''}`,
+  resistor: (x,y,label) => `${iecImg('resistor',x,y,36,18,'')}${label?`<text x="${x}" y="${y+16}" text-anchor="middle" fill="#D3D1C7" font-size="10">${label}</text>`:''}`,
+  capacitor: (x,y,label) => `${iecImg('capacitor',x,y,24,20,'')}${label?`<text x="${x}" y="${y+16}" text-anchor="middle" fill="#D3D1C7" font-size="10">${label}</text>`:''}`,
+  inductor: (x,y,label) => `${iecImg('inductor',x,y,36,18,'')}${label?`<text x="${x}" y="${y+16}" text-anchor="middle" fill="#EF9F27" font-size="10">${label}</text>`:''}`,
+  motor: (x,y,label) => `${iecImg('motor',x,y,30,30,'')}${label?`<text x="${x}" y="${y+22}" text-anchor="middle" fill="#c090e0" font-size="10">${label}</text>`:''}`,
+  lamp: (x,y,label) => `${iecImg('lamp',x,y,20,20,'')}${label?`<text x="${x}" y="${y+16}" text-anchor="middle" fill="#fac775" font-size="10">${label}</text>`:''}`,
+  terminal: (x,y) => `${iecImg('terminal',x,y,16,16,'')}`,
+  contact: (x,y,label) => `${iecImg('contact',x,y,24,20,'')}${label?`<text x="${x}" y="${y+16}" text-anchor="middle" fill="#B5D4F4" font-size="10">${label}</text>`:''}`,
 };
 const TYPE_ALIAS={grid:'source',bus:'busbar',inverter:'pcs',bess:'battery',ems:'controller',solar:'pv',charger:'ev'};
 
@@ -3960,19 +4010,34 @@ function autoLayoutNodes(nodes, svgW, svgH) {
   const LAYER_Y = [80, 155, 230, 260, 260, 330, 330, 330, 330, 450];
   const byLayer = {};
   nodes.forEach(n => { const ly = getLayerIndex(n.type, LAYER_ORDER); byLayer[ly] = byLayer[ly] || []; byLayer[ly].push(n); });
-  Object.entries(byLayer).forEach(([ly, layer]) => {
-    const yBase = LAYER_Y[parseInt(ly)] || 400;
+  const layerKeys = Object.keys(byLayer).map(Number).sort((a,b)=>a-b);
+  layerKeys.forEach((ly, lki) => {
+    const layer = byLayer[ly];
+    const yBase = LAYER_Y[ly] || 400;
     layer.forEach(n => { n.y = yBase; });
-    layer.sort((a, b) => (a.x || 0) - (b.x || 0));
     const count = layer.length;
     const hasX = layer.every(n => typeof n.x === 'number' && n.x > 0);
     if (hasX) {
-      const xs = layer.map(n => n.x);
       const xOverlap = layer.some((a, i) => layer.some((b, j) => i !== j && Math.abs(a.x - b.x) < 140));
       if (xOverlap) {
-        const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
-        const startX = svgW / 2 - (count - 1) * spacing / 2;
-        layer.forEach((n, i) => { n.x = Math.round(startX + i * spacing); });
+        const neighborXs = [];
+        if (lki > 0) { const prev = byLayer[layerKeys[lki-1]]; if(prev) prev.forEach(p => neighborXs.push(p.x)); }
+        if (lki < layerKeys.length-1) { const next = byLayer[layerKeys[lki+1]]; if(next) next.forEach(p => neighborXs.push(p.x)); }
+        if (neighborXs.length > 0 && count <= neighborXs.length) {
+          neighborXs.sort((a,b)=>a-b);
+          const picked = [];
+          for (let i = 0; i < count; i++) {
+            const targetI = Math.round(i * (neighborXs.length - 1) / Math.max(count - 1, 1));
+            picked.push(neighborXs[targetI]);
+          }
+          layer.sort((a, b) => (a.x || 0) - (b.x || 0));
+          layer.forEach((n, i) => { n.x = Math.round(picked[i]); });
+        } else {
+          const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
+          const startX = svgW / 2 - (count - 1) * spacing / 2;
+          layer.sort((a, b) => (a.x || 0) - (b.x || 0));
+          layer.forEach((n, i) => { n.x = Math.round(startX + i * spacing); });
+        }
       }
     } else {
       const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
@@ -4029,15 +4094,27 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
         if (Math.abs(from.x - to.x) < 30 && from.type !== 'controller' && to.type !== 'controller') {
           y1 = from.y + 60 + fromH/2;
           y2 = to.y + 60 - toH/2 - 8;
+          svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
         } else {
-          y1 = from.y + 60;
-          y2 = to.y + 60;
-          if (from.x < to.x) { x1 = from.x + fromW/2; x2 = to.x - toW/2 - 8; }
-          else { x1 = from.x - fromW/2; x2 = to.x + toW/2 + 8; }
+          y1 = from.y + 60 + fromH/2;
+          y2 = to.y + 60 - toH/2 - 8;
+          if (from.type === 'controller' || to.type === 'controller') {
+            y1 = from.y + 60;
+            y2 = to.y + 60;
+            if (from.x < to.x) { x1 = from.x + fromW/2; x2 = to.x - toW/2 - 8; }
+            else { x1 = from.x - fromW/2; x2 = to.x + toW/2 + 8; }
+            svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
+          } else {
+            const midY = Math.round((y1 + y2) / 2);
+            svg += `<path d="M${from.x},${y1} L${from.x},${midY} L${to.x},${midY} L${to.x},${y2}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
+          }
         }
-        svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
         if (l.label) {
-          svg += `<text x="${(from.x + to.x) / 2 + 6}" y="${(from.y + to.y) / 2 + 58}" text-anchor="start" fill="#C2C0B6" font-size="9" transform="rotate(${Math.atan2(to.y-from.y,to.x-from.x)*180/Math.PI},${(from.x+to.x)/2},${(from.y+to.y)/2+58})">${l.label}</text>`;
+          const isOrtho = Math.abs(from.x - to.x) >= 30 && from.type !== 'controller' && to.type !== 'controller';
+          const lblX = (from.x + to.x) / 2 + 6;
+          const lblY = isOrtho ? (from.y + to.y) / 2 + 58 - Math.abs(from.x - to.x) * 0.05 : (from.y + to.y) / 2 + 58;
+          const lblRot = isOrtho ? 0 : Math.atan2(to.y-from.y,to.x-from.x)*180/Math.PI;
+          svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="#C2C0B6" font-size="9" transform="rotate(${lblRot},${lblX},${lblY})">${l.label}</text>`;
         }
       }
     });
@@ -4141,13 +4218,12 @@ function renderWiringDiagramFromJSON(d) {
     // QF from bus
     s+=`<line x1="${txX}" y1="${curY}" x2="${txX}" y2="${curY+35}" class="wa" marker-end="url(#awO)"/>`;
     const qfLabel = breakers[i] ? breakers[i].label : `QF${i+1}`;
-    s+=`<rect x="${txX-10}" y="${curY+35}" width="20" height="30" fill="#2a3050" stroke="#e8a838" stroke-width="1.5" rx="2"/>`;
-    s+=`<text x="${txX}" y="${curY+55}" text-anchor="middle" class="ls" style="fill:#e0c060">${qfLabel}</text>`;
+    s+=`<image href="${IEC_SYM.breaker}" x="${txX-12}" y="${curY+35}" width="24" height="30" opacity="0.95"/>`;
+    s+=`<text x="${txX}" y="${curY+73}" text-anchor="middle" class="ls" style="fill:#e0c060">${qfLabel}</text>`;
     curY += 65;
     s+=`<line x1="${txX}" y1="${curY}" x2="${txX}" y2="${curY+25}" class="wa" marker-end="url(#awO)"/>`;
     // Transformer symbol (double circle)
-    s+=`<circle cx="${txX}" cy="${curY+45}" r="20" fill="#2a3050" stroke="#e8a838" stroke-width="2"/>`;
-    s+=`<circle cx="${txX}" cy="${curY+45}" r="13" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+    s+=`<image href="${IEC_SYM.transformer}" x="${txX-18}" y="${curY+25}" width="36" height="42" opacity="0.95"/>`;
     s+=`<text x="${txX}" y="${curY+48}" text-anchor="middle" class="ls" style="fill:#e8a838">Y/Δ</text>`;
     const txParts = (tx.label||'').split(' ');
     s+=`<text x="${txX+30}" y="${curY+38}" class="lg" style="fill:#e8a838">${txParts[0]||tx.label}</text>`;
@@ -4156,8 +4232,8 @@ function renderWiringDiagramFromJSON(d) {
     // LV breaker
     const lvQf = `QF${i+3}`;
     s+=`<line x1="${txX}" y1="${curY}" x2="${txX}" y2="${curY+20}" class="wa" style="stroke:#a070d0"/>`;
-    s+=`<rect x="${txX-10}" y="${curY+20}" width="20" height="20" fill="#2a3050" stroke="#a070d0" stroke-width="1.5" rx="2"/>`;
-    s+=`<text x="${txX}" y="${curY+35}" text-anchor="middle" class="ls" style="fill:#c090e0">${lvQf}</text>`;
+    s+=`<image href="${IEC_SYM.breaker}" x="${txX-12}" y="${curY+20}" width="24" height="20" opacity="0.95"/>`;
+    s+=`<text x="${txX}" y="${curY+48}" text-anchor="middle" class="ls" style="fill:#c090e0">${lvQf}</text>`;
     curY += 40;
     // Load
     s+=`<line x1="${txX}" y1="${curY}" x2="${txX}" y2="${curY+15}" class="wa" style="stroke:#a070d0"/>`;
@@ -5624,17 +5700,16 @@ function renderWiringSvg(R){
   const txSpacing=Math.min(150,400/Math.max(P.txCount,1));
   for(let i=0;i<P.txCount;i++){const x=250+i*txSpacing;
     s+=`<line x1="${x}" y1="${busY}" x2="${x}" y2="${busY+40}" stroke="#e8a838" stroke-width="2"/>`;
-    s+=`<rect x="${x-10}" y="${busY+40}" width="20" height="30" fill="#2a3050" stroke="#e8a838" stroke-width="1.5" rx="2"/>`;
-    s+=`<text x="${x}" y="${busY+60}" text-anchor="middle" fill="#e0c060" font-size="8">QF${i*2+1}</text>`;
+    s+=`<image href="${IEC_SYM.breaker}" x="${x-12}" y="${busY+40}" width="24" height="30" opacity="0.95"/>`;
+    s+=`<text x="${x}" y="${busY+78}" text-anchor="middle" fill="#e0c060" font-size="8">QF${i*2+1}</text>`;
     s+=`<line x1="${x}" y1="${busY+70}" x2="${x}" y2="${busY+100}" stroke="#e8a838" stroke-width="2"/>`;
-    s+=`<circle cx="${x}" cy="${busY+120}" r="20" fill="#2a3050" stroke="#e8a838" stroke-width="2"/>`;
-    s+=`<circle cx="${x}" cy="${busY+120}" r="13" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+    s+=`<image href="${IEC_SYM.transformer}" x="${x-18}" y="${busY+100}" width="36" height="42" opacity="0.95"/>`;
     s+=`<text x="${x}" y="${busY+123}" text-anchor="middle" fill="#e8a838" font-size="8">${P.txVector||'Y/Δ'}</text>`;
     s+=`<text x="${x+30}" y="${busY+112}" fill="#e8a838" font-size="9">${i+1}#T: S9-${P.txCap}/${hv}</text>`;
     s+=`<text x="${x+30}" y="${busY+126}" fill="#c09030" font-size="8">${P.txCap}kVA ${hv}/${lvKv}kV Zk=${P.txZk||4.3}%</text>`;
     s+=`<line x1="${x}" y1="${busY+140}" x2="${x}" y2="${busY+170}" stroke="#a070d0" stroke-width="2"/>`;
-    s+=`<rect x="${x-10}" y="${busY+170}" width="20" height="20" fill="#2a3050" stroke="#a070d0" stroke-width="1.5" rx="2"/>`;
-    s+=`<text x="${x}" y="${busY+185}" text-anchor="middle" fill="#c090e0" font-size="8">QF${i*2+2}</text>`;
+    s+=`<image href="${IEC_SYM.breaker}" x="${x-12}" y="${busY+170}" width="24" height="20" opacity="0.95"/>`;
+    s+=`<text x="${x}" y="${busY+198}" text-anchor="middle" fill="#c090e0" font-size="8">QF${i*2+2}</text>`;
     s+=`<line x1="${x}" y1="${busY+190}" x2="${x}" y2="${busY+220}" stroke="#a070d0" stroke-width="2"/>`;
     const loadKW=Math.round(P.txCap*P.pf*0.6);
     s+=`<rect x="${x-65}" y="${busY+220}" width="130" height="50" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/>`;
@@ -5666,8 +5741,7 @@ function renderWiringSvg(R){
     s+=`<line x1="${ex}" y1="${busY+90}" x2="${ex}" y2="${busY+130}" stroke="#50c878" stroke-width="2.5"/>`;
     let nextY=busY+130;
     if(c.needStepUp){
-      s+=`<circle cx="${ex}" cy="${nextY+20}" r="22" fill="#2a3020" stroke="#e8a838" stroke-width="2"/>`;
-      s+=`<circle cx="${ex}" cy="${nextY+20}" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+      s+=`<image href="${IEC_SYM.transformer}" x="${ex-18}" y="${nextY}" width="36" height="42" opacity="0.95"/>`;
       s+=`<text x="${ex}" y="${nextY+23}" text-anchor="middle" fill="#e8a838" font-size="8">0.69/${hv}</text>`;
       const stepKVA=Math.round(c.pcsKW*1.2);
       s+=`<text x="${ex+30}" y="${nextY+12}" fill="#e8a838" font-size="9">升压变</text>`;
@@ -5694,7 +5768,7 @@ function renderWiringSvg(R){
     s+=`<line x1="${ex}" y1="${nextY}" x2="${ex}" y2="${nextY+40}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
     s+=`<text x="${ex+40}" y="${nextY+25}" fill="#50c878" font-size="8">YJV-1.5kV DC${c.product.volt}V</text>`;
     nextY=nextY+40;
-    s+=`<rect x="${ex-10}" y="${nextY}" width="20" height="18" fill="#2a2a50" stroke="#50c878" stroke-width="1.5" rx="2"/>`;
+    s+=`<image href="${IEC_SYM.disconnector}" x="${ex-12}" y="${nextY}" width="24" height="18" opacity="0.95"/>`;
     s+=`<text x="${ex}" y="${nextY+13}" text-anchor="middle" fill="#80e080" font-size="8">DS</text>`;
     s+=`<line x1="${ex}" y1="${nextY+18}" x2="${ex}" y2="${nextY+45}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
     nextY=nextY+45;
@@ -6141,8 +6215,8 @@ async function mgGenerateSolution(){
 4. strategy: {charge,discharge,formula,island}
 5. protection: [字符串数组]
 6. risks: [字符串数组]
-7. archDiagram: {bus:"10kV",nodes:[{id,label,sub,x,y,type},...],links:[{from,to,dashed?,label?},...],loads:[{parent,label,sub},...]} 结构化JSON(不要SVG字符串!)，type可选:source/meter/busbar/transformer/switch/pcs/battery/controller/load/pv/ev/dcBus，x范围100-1000,y范围60-600，同层级y相同，相邻节点x间距≥180，从上到下:电网→PCC→母线→变压器→配电柜→(负荷/PCS)→直流母线→(电池/光伏/充电桩)，EMS用controller类型虚线连接pcs和battery
-8. wiringDiagram: {voltage,components:[{id,label,type,sub?},...],connections:[{from,to,cable},...],protection:[字符串]} 结构化JSON(不要SVG字符串!)，type可选:breaker/transformer/pcs/switch/battery/meter/busbar
+7. archDiagram: {bus:"10kV",nodes:[{id,label,sub,x,y,type},...],links:[{from,to,dashed?,label?},...],loads:[{parent,label,sub},...]} 结构化JSON(不要SVG字符串!)，type可选:source/meter/busbar/transformer/switch/pcs/battery/controller/load/pv/ev/dcBus/breaker/fuse/ct/pt/relay/contactor/earth/surge，x范围100-1000,y范围60-600，同层级y相同，相邻节点x间距≥180，从上到下:电网→PCC→母线→变压器→配电柜→(负荷/PCS)→直流母线→(电池/光伏/充电桩)，EMS用controller类型虚线连接pcs和battery。【连线硬约束】links必须按电气拓扑顺序连接:source→meter→busbar, busbar→breaker/switch→transformer, transformer→pcs/battery/load, controller虚线连pcs和battery。禁止跨层斜线直连！禁止非相邻层连线！每条link的from/to必须是相邻层或隔一层，否则拆成两段中间经busbar/breaker中转
+8. wiringDiagram: {voltage,components:[{id,label,type,sub?},...],connections:[{from,to,cable},...],protection:[字符串]} 结构化JSON(不要SVG字符串!)，type可选:breaker/transformer/pcs/switch/battery/meter/busbar/fuse/ct/pt/relay/contactor/earth/surge/diode/resistor/capacitor/inductor/motor/lamp/terminal/contact。前端会用IEC 60617标准符号自动渲染每种type，所以type必须准确！breaker=断路器,transformer=变压器,switch=隔离开关,fuse=熔断器,ct=电流互感器,pt=电压互感器,relay=继电器,earth=接地
 9. commDiagram: {layers:[{name,nodes:[{id,label,protocol,addr},...]},...]} 结构化JSON(不要SVG字符串!)，4层:云平台/站控层/边缘层/设备层
 10. bom: BOM设备清单数组, 每项{item,qty,unit,model,price}(price万元)
 11. economicsDetail: {annualRevenue,annualPvRevenue,annualNet,totalInvest,payback,irr}(Skill7电价收益:IRR/NPV/回收期/敏感性)
@@ -6547,9 +6621,9 @@ function mgDrawWiringSvg(R){
   s+=`<line x1="${cx}" y1="136" x2="${cx}" y2="${hvY}" class="bw" marker-end="url(#waB)"/>`;
   s+=`<line x1="${cx-200}" y1="${hvY}" x2="${cx+200}" y2="${hvY}" stroke="url(#wbus)" stroke-width="6" stroke-linecap="round"/><text x="${cx}" y="${hvY-6}" text-anchor="middle" class="ls" style="fill:#80b0e0">${T.voltage} 母线</text>`;
   s+=`<line x1="${cx-180}" y1="${hvY}" x2="${cx-180}" y2="${hvY+20}" class="bw" marker-end="url(#waO)"/>`;
-  s+=`<rect x="${cx-192}" y="${hvY+20}" width="24" height="24" rx="2" fill="#2a3050" stroke="#e8a838" stroke-width="1.5"/><text x="${cx-180}" y="${hvY+38}" text-anchor="middle" class="ls" style="fill:#e0c060">QF2</text>`;
+  s+=`<image href="${IEC_SYM.breaker}" x="${cx-192}" y="${hvY+20}" width="24" height="24" opacity="0.95"/><text x="${cx-180}" y="${hvY+52}" text-anchor="middle" class="ls" style="fill:#e0c060">QF2</text>`;
   s+=`<line x1="${cx-180}" y1="${hvY+44}" x2="${cx-180}" y2="${hvY+70}" class="bw" marker-end="url(#waO)"/>`;
-  s+=`<circle cx="${cx-180}" cy="${hvY+92}" r="22" fill="#2a3050" stroke="#e8a838" stroke-width="2"/><circle cx="${cx-180}" cy="${hvY+92}" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/><text x="${cx-180}" y="${hvY+95}" text-anchor="middle" class="ls" style="fill:#e8a838">Δ/Y</text><text x="${cx-140}" y="${hvY+80}" class="ls" style="fill:#c09030">主变压器</text>`;
+  s+=`<image href="${IEC_SYM.transformer}" x="${cx-198}" y="${hvY+70}" width="36" height="42" opacity="0.95"/><text x="${cx-180}" y="${hvY+95}" text-anchor="middle" class="ls" style="fill:#e8a838">Δ/Y</text><text x="${cx-140}" y="${hvY+80}" class="ls" style="fill:#c09030">主变压器</text>`;
   s+=`<line x1="${cx-180}" y1="${hvY+114}" x2="${cx-180}" y2="${lvY}" class="bw" style="stroke:#4a90d9"/>`;
   s+=`<line x1="${cx-280}" y1="${lvY}" x2="${cx-80}" y2="${lvY}" stroke="url(#wlvbus)" stroke-width="4" stroke-linecap="round"/><text x="${cx-180}" y="${lvY-6}" text-anchor="middle" class="ls" style="fill:#80e080">0.4kV 母线</text>`;
   s+=`<line x1="${cx-250}" y1="${lvY}" x2="${cx-250}" y2="${lvY+30}" class="bw" style="stroke:#a070d0" marker-end="url(#waO)"/>`;
@@ -6568,7 +6642,7 @@ function mgDrawWiringSvg(R){
   s+=`<rect x="${cx+90}" y="${by}" width="180" height="55" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/><text x="${cx+180}" y="${by+20}" text-anchor="middle" style="fill:white;font-size:12">PCS储能变流器</text><text x="${cx+180}" y="${by+40}" text-anchor="middle" class="ls" style="fill:#ffc0c0">${S.bessMW||0}MW AC↔DC ≥97%</text>`;
   by+=55;
   s+=`<line x1="${cx+180}" y1="${by}" x2="${cx+180}" y2="${by+20}" class="bw" style="stroke:#50c878" marker-end="url(#waG)"/>`;by+=20;
-  s+=`<rect x="${cx+168}" y="${by}" width="24" height="18" rx="2" fill="#2a2a50" stroke="#50c878" stroke-width="1.5"/><text x="${cx+180}" y="${by+13}" text-anchor="middle" class="ls" style="fill:#80e080">DS</text>`;
+  s+=`<image href="${IEC_SYM.disconnector}" x="${cx+168}" y="${by}" width="24" height="18" opacity="0.95"/><text x="${cx+180}" y="${by+13}" text-anchor="middle" class="ls" style="fill:#80e080">DS</text>`;
   by+=18;
   s+=`<line x1="${cx+180}" y1="${by}" x2="${cx+180}" y2="${by+20}" class="bw" style="stroke:#50c878" marker-end="url(#waG)"/>`;by+=20;
   s+=`<rect x="${cx+60}" y="${by}" width="240" height="75" rx="8" fill="#0d2a15" stroke="#50c878" stroke-width="2"/><text x="${cx+180}" y="${by+22}" text-anchor="middle" style="fill:#80e080;font-size:13">BESS储能电池系统</text><text x="${cx+180}" y="${by+42}" text-anchor="middle" class="ls" style="fill:#60c060">${S.bessKwh?(S.bessKwh/1000).toFixed(1):''}MWh LFP | ${S.bessKwh>=2000?'液冷':'风冷'}</text><text x="${cx+180}" y="${by+60}" text-anchor="middle" class="ls" style="fill:#408040;font-size:8">BMS三级+温烟感+气溶胶灭火</text>`;
@@ -6701,7 +6775,11 @@ function mgRenderAllDrawings(R,provider){
   }
   if(isLLM&&isWiringJSON(R.wiringDiagram)){
     dlog('LLM返回结构化JSON，前端渲染接线图','step');
-    renderDiagramFromJSON('mgWiringSvg',R.wiringDiagram,'电气一次接线图 (AI生成)');dlog('接线图 ✓','ok');
+    if(R.wiringDiagram.components&&R.wiringDiagram.components.length>0){
+      renderWiringDiagramFromJSON(R.wiringDiagram);dlog('接线图(专用渲染器+IEC符号) ✓','ok');
+    }else{
+      renderDiagramFromJSON('mgWiringSvg',R.wiringDiagram,'电气一次接线图 (AI生成)');dlog('接线图(通用渲染器) ✓','ok');
+    }
   }else{
     if(isLLM&&isValidSvg(R.wiringDiagram))dlog('LLM返回SVG接线图(质量差)，fallback本地模板','warn');
     else if(isLLM)dlog('LLM返回接线图无效，fallback本地','warn');
