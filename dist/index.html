@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/elkjs@0.9.3/dist/elk-api.min.js"></script>
-<script>if(typeof ELK==='undefined'){var ELK=require('elkjs')}</script>
+<script src="https://cdn.jsdelivr.net/npm/elkjs@0.9.3/lib/elk.bundled.js"></script>
 
 <style>
 :root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
@@ -6925,6 +6924,7 @@ function mgRenderAllDrawings(R,provider){
   const isValidSvg=(s)=>typeof s==='string'&&s.length>500&&s.includes('<svg')&&!s.includes('...');
   const isStructJSON=(d)=>d&&typeof d==='object'&&d.nodes;
   const isWiringJSON=(d)=>d&&typeof d==='object'&&(d.components||d.nodes||d.voltage||d.protection||d.connections);
+  const isCommJSON=(d)=>d&&typeof d==='object'&&(d.layers||d.nodes||d.protocol);
   mgById('mgDrawingEmpty').style.display='none';
   mgById('mgDrawingContent').style.display='block';
   const isLLM=provider&&provider!=='local';
@@ -6963,20 +6963,7 @@ function mgRenderAllDrawings(R,provider){
     else if(isLLM)dlog('LLM返回接线图无效，fallback本地','warn');
     mgDrawWiringSvg(R);
   }
-  if(isLLM&&isWiringJSON(R.wiringDiagram)){
-    dlog('LLM返回结构化JSON，前端渲染接线图','step');
-    if(R.wiringDiagram.components&&R.wiringDiagram.components.length>0){
-      renderWiringDiagramFromJSON(R.wiringDiagram);dlog('接线图(专用渲染器+IEC符号) ✓','ok');
-    }else if(R.wiringDiagram.nodes&&R.wiringDiagram.nodes.length>0){
-      renderDiagramFromJSON('mgWiringSvg',R.wiringDiagram,'电气一次接线图 (AI生成)');dlog('接线图(通用渲染器) ✓','ok');
-    }else{
-      renderWiringDiagramFromJSON(R.wiringDiagram);dlog('接线图(专用渲染器-默认) ✓','ok');
-    }
-  }else{
-    if(isLLM&&isValidSvg(R.wiringDiagram))dlog('LLM返回SVG接线图(质量差)，fallback本地模板','warn');
-    else if(isLLM)dlog('LLM返回接线图无效，fallback本地','warn');
-    mgDrawWiringSvg(R);
-  }
+
   if(isLLM&&isCommJSON(R.commDiagram)){
     dlog('LLM返回结构化JSON，前端渲染通信图','step');
     mgRenderCommFromJSON(R.commDiagram);dlog('通信拓扑图 ✓','ok');
