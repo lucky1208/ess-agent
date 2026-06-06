@@ -4100,7 +4100,7 @@ function dagLayout(nodes, links, svgW, svgH) {
   return nodes;
 }
 
-function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
+function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone) {
   const isCtrl = from.type === 'controller' || to.type === 'controller';
   const y1 = from.y + (isCtrl ? 0 : fromH/2);
   const y2 = to.y - (isCtrl ? 0 : toH/2);
@@ -4110,14 +4110,15 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels) {
     else { x1 = from.x - fromW/2; x2 = to.x + toW/2; }
   }
   const dy = y2 - y1;
-  const dx = x2 - x1;
   let midY;
-  if (Math.abs(dy) > 80) {
+  if (fromZone && toZone && fromZone !== toZone) {
+    const gapY = (fromZone.y + fromZone.h + toZone.y) / 2;
+    midY = Math.round(gapY);
+  } else if (Math.abs(dy) > 80) {
     midY = Math.round(y1 + dy * 0.5);
   } else {
     midY = Math.round((y1 + y2) / 2);
   }
-  const chKey = `${Math.min(x1,x2)}-${Math.max(x1,x2)}-${midY}`;
   let chOffset = 0;
   if (!channels[midY]) channels[midY] = [];
   const existing = channels[midY];
@@ -4265,7 +4266,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         const sw = l.dashed ? '1' : '1.5';
         const fromD = getNodeDim(from.type);
         const toD = getNodeDim(to.type);
-        const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels);
+        const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels, from._zone, to._zone);
         svg += `<path d="${route.path}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
         if (l.label) {
           const lblX = route.midX + 6;
@@ -6973,6 +6974,12 @@ function mgRenderAllDrawings(R,provider){
     if(isLLM)dlog('LLM未返回economicsDetail，fallback本地','warn');
     mgDrawEcon(R);
   }
+  setTimeout(()=>{
+    const archEl=mgById('mgArchSvg');
+    const wireEl=mgById('mgWiringSvg');
+    if(archEl&&(!archEl.innerHTML||archEl.innerHTML.length<100)){dlog('架构图为空，强制fallback本地模板','warn');mgDrawArchSvg(R);}
+    if(wireEl&&(!wireEl.innerHTML||wireEl.innerHTML.length<100)){dlog('接线图为空，强制fallback本地模板','warn');mgDrawWiringSvg(R);}
+  },200);
   dlog('全部图纸+BOM+经济性渲染完成 ✓','ok');
 }
 
