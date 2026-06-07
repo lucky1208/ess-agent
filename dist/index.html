@@ -10489,8 +10489,7 @@ const NODE_DIM = {
   dc_combiner:{w:180,h:44}, hv_cabinet:{w:180,h:44}, lv_cabinet:{w:180,h:44}
 };
 function getNodeDim(type){
-  const t = TYPE_ALIAS[type]||type;
-  return NODE_DIM[t]||{w:180,h:44};
+  return NODE_DIM[type]||{w:180,h:44};
 }
 
 const LAYER_ORDER = ['source','meter','busbar','breaker','switch','transformer','pcs','battery','controller','load','pv','ev','dcBus','fuse','ct','pt','relay','contactor','earth','surge','diode','resistor','capacitor','inductor','motor','lamp','terminal','contact','protection','cabinet'];
@@ -10748,7 +10747,7 @@ function buildMermaidGraph(nodes, links, title) {
   md += `classDef ctrl fill:#854f0b,stroke:#d4a030,stroke-width:2px,color:#faf9f5,stroke-dasharray: 5 3\n`;
   md += `classDef load fill:#2d5a3d,stroke:#50c878,stroke-width:2px,color:#9fe1cb\n`;
   nodes.forEach(n => {
-    const t = TYPE_ALIAS[n.type] || n.type;
+    const t = n.stdType || n.type;
     const style = TYPE_STYLE[t] || 'load';
     const label = (n.label||n.id).replace(/[<>"/\\|{}]/g,' ');
     const sub = n.sub ? `<br/>${n.sub.replace(/[<>"/\\|{}]/g,' ')}` : '';
@@ -11108,6 +11107,29 @@ const ESS_V3={
     });
     return corrections;
   },
+  buildLayoutContract(node){
+    const stdType=node.stdType||node.type;
+    const onto=this.ONTOLOGY[stdType]||{};
+    const ports=this.PORT_MODEL[stdType]||[];
+    const DIR_CONSTRAINTS={busbar:['bottom'],ac_bus:['bottom'],dc_bus:['bottom'],battery:['top','bottom'],battery_rack:['top','bottom'],battery_container:['top','bottom'],controller:['right'],ems:['right'],pv:['bottom'],ev:['top'],load:['top'],breaker:['top','bottom'],switch:['top','bottom'],transformer:['top','bottom'],grid_cabinet:['top','bottom'],pcs:['left','right'],meter:['bottom'],source:['bottom'],pcc:['bottom']};
+    const ZONE_MAP={AC_HV:'AC_HV_ZONE',AC_LV:'AC_LV_ZONE',DC_BUS:'DC_ZONE',CONTROL:'CONTROL_ZONE',COMM:'COMM_ZONE'};
+    const forbiddenZones=[];
+    const netDomains=onto.netDomain||[];
+    if(netDomains.includes('DC_BUS')){forbiddenZones.push('AC_HV_ZONE','AC_LV_ZONE');}
+    if(netDomains.includes('AC_HV')||netDomains.includes('AC_LV')){forbiddenZones.push('DC_ZONE');}
+    if(netDomains.includes('CONTROL')){forbiddenZones.push('AC_HV_ZONE','AC_LV_ZONE','DC_ZONE');}
+    return{
+      nodeId:node.id,
+      fixedLayer:node.layoutYIdx!==undefined?node.layoutYIdx:3,
+      zone:netDomains.map(d=>ZONE_MAP[d]||'UNKNOWN_ZONE'),
+      allowedPorts:DIR_CONSTRAINTS[stdType]||['top','bottom','left','right'],
+      forbiddenZones:[...new Set(forbiddenZones)],
+      routingPriority:onto.cls==='bus'?1:onto.cls==='control'?5:onto.cls==='switchgear'?2:3,
+      symbolLock:true,
+      symbolKey:node.finalSymbol||stdType,
+      iecSymbolKey:node.iecSymbol||null
+    };
+  },
   isPortCompatible(sp,tp){
     if(sp.domain==='comm'||tp.domain==='comm')return true;
     if(sp.domain!==tp.domain)return false;
@@ -11402,7 +11424,8 @@ const ESS_V3={
           onto.netDomain=Array.from(new Set([...onto.netDomain,'AC_HV']));
         }
       }
-      return{...n,stdType,deviceClass:onto.cls,ports,networkDomain:onto.netDomain,layoutLayer:layerName,layoutYIdx:layerCfg.yIdx,layoutXPos:layerCfg.xPos||'center',dagreRank:layerCfg.yIdx,finalSymbol,iecSymbol};
+      const layoutContract=this.buildLayoutContract({id:n.id,stdType,type:n.type,finalSymbol,iecSymbol,networkDomain:onto.netDomain,layoutYIdx:layerCfg.yIdx});
+      return{...n,stdType,deviceClass:onto.cls,ports,networkDomain:onto.netDomain,layoutLayer:layerName,layoutYIdx:layerCfg.yIdx,layoutXPos:layerCfg.xPos||'center',dagreRank:layerCfg.yIdx,finalSymbol,iecSymbol,layoutContract};
     });
     const nm={};nodes.forEach(n=>nm[n.id]=n);
     let edges=rawEdges.map(e=>{
@@ -11460,8 +11483,8 @@ function getBestPorts(fromNode, toNode, fromDim, toDim){
   const fx=fromNode.x, fy=fromNode.y, fw=fromDim.w, fh=fromDim.h;
   const tx=toNode.x, ty=toNode.y, tw=toDim.w, th=toDim.h;
   const DIR_CONSTRAINTS={busbar:['bottom'],ac_bus:['bottom'],dc_bus:['bottom'],battery:['top','bottom'],battery_rack:['top','bottom'],battery_container:['top','bottom'],controller:['right'],ems:['right'],bms:['right'],ems_v2:['right'],bms_v2:['right'],pv:['bottom'],pv_inverter:['left','right'],ev:['top'],load:['top'],breaker:['top','bottom'],switch:['top','bottom'],transformer:['top','bottom'],grid_cabinet:['top','bottom'],hv_cabinet:['top','bottom'],lv_cabinet:['top','bottom'],pcs:['left','right'],pcs_v2:['left','right'],sts:['left','right'],ats:['top','bottom'],dc_combiner:['top','bottom'],meter:['bottom'],source:['bottom'],pcc:['bottom']};
-  const fromRt=fromNode.stdType||TYPE_ALIAS[fromNode.type]||fromNode.type;
-  const toRt=toNode.stdType||TYPE_ALIAS[toNode.type]||toNode.type;
+  const fromRt=fromNode.stdType||fromNode.type;
+  const toRt=toNode.stdType||toNode.type;
   const fromAllowed=DIR_CONSTRAINTS[fromRt]||['top','bottom','left','right'];
   const toAllowed=DIR_CONSTRAINTS[toRt]||['top','bottom','left','right'];
   const ports=[
@@ -11482,35 +11505,34 @@ function getBestPorts(fromNode, toNode, fromDim, toDim){
 
 function dagreLayout(nodes, links, svgW, svgH){
   if(typeof dagre==='undefined'){console.warn('[dagreLayout] dagre not loaded, using fallback');return false;}
-  const RANK_ORDER={source:0,meter:0,pcc:0,busbar:1,ac_bus:1,dc_bus:1,breaker:2,switch:2,transformer:2,grid_cabinet:2,hv_cabinet:2,dc_combiner:2,pcs:3,pcs_v2:3,pv_inverter:3,battery:3,battery_rack:3,battery_container:3,pv:3,sts:3,ats:3,ev:3,load:4,controller:4,ems:4,ems_v2:4,bms:4,bms_v2:4,lv_cabinet:4};
   const g=new dagre.graphlib.Graph();
-  // Qwen 特效药 1 — 拉大间距防密集重叠
   g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:100,ranksep:140,marginx:50,marginy:50});
   g.setDefaultEdgeLabel(function(){return{};});
   const rankGroups={};
+  const nodeRankMap={};
   nodes.forEach(n=>{
-    const rt=n.stdType||TYPE_ALIAS[n.type]||n.type;
+    const rt=n.stdType||n.type;
     const dim=getNodeDim(rt);
-    // Qwen 特效药 1 — 动态节点尺寸 (按 label/sub 字符数)
     const labelLen=(n.label||'').length;
     const subLen=(n.sub||'').length;
-    const textLen=labelLen+subLen;
-    // 中文字符按 1.0 倍率, 英文按 0.6, 估算宽度
     const estW=Math.ceil(labelLen*12+subLen*8+40);
     const dynamicW=Math.max(dim.w,estW,140);
     const dynamicH=n.sub?Math.max(dim.h,80):Math.max(dim.h,60);
-    // 挂到节点, 后续 ObstacleBuilder 和 render 都能用到
     n.width=dynamicW;
     n.height=dynamicH;
-    n._cardW=dynamicW;  // 兼容旧代码
-    const rank=RANK_ORDER[rt]!==undefined?RANK_ORDER[rt]:3;
+    n._cardW=dynamicW;
+    const rank=n.layoutYIdx!==undefined?n.layoutYIdx:3;
+    nodeRankMap[n.id]=rank;
     if(!rankGroups[rank])rankGroups[rank]=[];
     rankGroups[rank].push(n.id);
     g.setNode(n.id,{width:dynamicW,height:dynamicH});
   });
   links.forEach(l=>{
     if(g.hasNode(l.from)&&g.hasNode(l.to)){
-      g.setEdge(l.from,l.to,{weight:1});
+      const fromRank=nodeRankMap[l.from]||0;
+      const toRank=nodeRankMap[l.to]||0;
+      const minLen=Math.abs(toRank-fromRank);
+      g.setEdge(l.from,l.to,{weight:1,minLen:minLen});
     }
   });
   Object.keys(rankGroups).sort((a,b)=>a-b).forEach(rank=>{
@@ -11521,7 +11543,7 @@ function dagreLayout(nodes, links, svgW, svgH){
       }
     }
   });
-  try{dagre.layout(g);console.log('[dagreLayout] success, nodes:',nodes.length);}catch(e){console.warn('[dagreLayout] dagre.layout failed:',e);return false;}
+  try{dagre.layout(g);console.log('[dagreLayout] success, nodes:',nodes.length,'ranks:',Object.keys(rankGroups));}catch(e){console.warn('[dagreLayout] dagre.layout failed:',e);return false;}
   nodes.forEach(n=>{
     const dn=g.node(n.id);
     if(dn){
@@ -11547,7 +11569,7 @@ function resolveNodeOverlaps(nodes, minGap){
   if(N<2)return;
   // 计算每个节点的精确包围盒
   const boxes=nodes.map(n=>{
-    const rt=n.stdType||TYPE_ALIAS[n.type]||n.type;
+    const rt=n.stdType||n.type;
     const dim=getNodeDim(rt);
     const w=n._cardW||dim.w;
     const h=dim.h;
@@ -11584,16 +11606,20 @@ function resolveNodeOverlaps(nodes, minGap){
   if(iter>1)console.log(`[resolveNodeOverlaps] 迭代 ${iter} 轮后收敛`);
 }
 
-function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize){
+function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize,fromDomain,toDomain){
   const cs=cellSize;
   const cols=Math.ceil(gridW/cs),rows=Math.ceil(gridH/cs);
   const sx=Math.round(fromX/cs),sy=Math.round(fromY/cs);
   const ex=Math.round(toX/cs),ey=Math.round(toY/cs);
   const blocked=new Set();
+  const domainZones=new Map();
   obstacles.forEach(o=>{
     const ox1=Math.floor((o.x-o.pad)/cs),ox2=Math.ceil((o.x+o.w+o.pad)/cs);
     const oy1=Math.floor((o.y-o.pad)/cs),oy2=Math.ceil((o.y+o.h+o.pad)/cs);
-    for(let gx=ox1;gx<=ox2;gx++)for(let gy=oy1;gy<=oy2;gy++)blocked.add(gx+','+gy);
+    for(let gx=ox1;gx<=ox2;gx++)for(let gy=oy1;gy<=oy2;gy++){
+      blocked.add(gx+','+gy);
+      if(o.networkDomain)domainZones.set(gx+','+gy,o.networkDomain);
+    }
   });
   const unblockBBox=(px,py)=>{
     for(const o of obstacles){
@@ -11607,6 +11633,8 @@ function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize){
   };
   unblockBBox(fromX,fromY);
   unblockBBox(toX,toY);
+  const CROSS_DOMAIN_PENALTY=5000;
+  const wireDomain=fromDomain||toDomain||null;
   const h=(x,y)=>Math.abs(x-ex)+Math.abs(y-ey);
   const open=new Map();
   const closed=new Set();
@@ -11639,6 +11667,12 @@ function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize){
       if(closed.has(nk)||blocked.has(nk))continue;
       let ng=(gScore.get(bestKey)||0)+1;
       if(prevDir!==null&&d.dir!==prevDir)ng+=TURN_PENALTY;
+      if(wireDomain&&domainZones.has(nk)){
+        const zoneDomains=domainZones.get(nk);
+        if(Array.isArray(zoneDomains)&&!zoneDomains.some(zd=>wireDomain.includes(zd))){
+          ng+=CROSS_DOMAIN_PENALTY;
+        }
+      }
       if(!gScore.has(nk)||ng<gScore.get(nk)){
         gScore.set(nk,ng);parent.set(nk,bestKey);dirMap.set(nk,d.dir);
         open.set(nk,{x:nx,y:ny,f:ng+h(nx,ny)});
@@ -11685,7 +11719,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     links = links.filter(e=>e.voltageDomain==='COMMUNICATION');
   }
   // LAYOUT 模式不过滤
-  const resolveType = n => n.stdType || TYPE_ALIAS[n.type] || n.type;
+  const resolveType = n => n.stdType || n.type;
   const ZONE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',busbar:'#4a90d9',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#afa9ec',battery:'#50c878',controller:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878',pcc:'#4a9ee8',grid_cabinet:'#e8a838',battery_rack:'#50c878',battery_container:'#50c878',ac_bus:'#4a90d9',dc_bus:'#afa9ec',ems:'#d4a030',ems_v2:'#d4a030',bms:'#4a90d9',bms_v2:'#4a90d9',pcs_v2:'#afa9ec',sts:'#50c878',ats:'#EF9F27',pv_inverter:'#e8a838',dc_combiner:'#534AB7',hv_cabinet:'#EF9F27',lv_cabinet:'#F0997B'};
   const ZONES = [
     {name:'电源侧',types:['source','meter','pcc'],y:55,h:100,color:'#4a9ee8'},
@@ -11738,7 +11772,8 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
       h: h + OBSTACLE_PAD * 2,
       type: 'node_box',
       pad: OBSTACLE_PAD,
-      nodeId: n.id
+      nodeId: n.id,
+      networkDomain: n.networkDomain || null
     });
     // 2) 节点 label 文字区 (中心位置)
     if(n.label && n.label.length > 0){
@@ -11820,13 +11855,13 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   });
 
   nodes.forEach(n => {
-    const resolvedType = resolveType(n);
-    let iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.cabinet || DIAGRAM_ICONS.source;
+    const type = n.stdType || n.type;
+    const symbol = n.finalSymbol || type;
+    let iconFn = DIAGRAM_ICONS[symbol] || DIAGRAM_ICONS[type] || DIAGRAM_ICONS.cabinet;
     if(n.iecSymbol && typeof iecImg === 'function'){
       iconFn = (x,y,label,sub) => iecImg(n.iecSymbol,x,y,44,50,label);
     }
-    // Qwen 母线视觉欺骗 — bus 节点用动态宽度
-    if (['ac_bus', 'dc_bus', 'busbar', 'busbar_ac', 'busbar_dc'].includes(resolvedType) && busWidthMap[n.id]) {
+    if (['ac_bus', 'dc_bus', 'busbar', 'busbar_ac', 'busbar_dc'].includes(type) && busWidthMap[n.id]) {
       const bw = busWidthMap[n.id].w;
       const isDC = resolvedType === 'dc_bus' || resolvedType === 'busbar_dc';
       const fill = isDC ? '#0F6E56' : '#185FA5';
@@ -11891,7 +11926,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         const fromX = ports.fromX, fromY = ports.fromY;
         const toX = ports.toX, toY = ports.toY;
         let pathD, routePoints;
-        const astarPath = astarRoute(fromX, fromY, toX, toY, obstacles, svgW, svgH, cellSize);
+        const astarPath = astarRoute(fromX, fromY, toX, toY, obstacles, svgW, svgH, cellSize, from.networkDomain, to.networkDomain);
         if(astarPath && astarPath.length >= 2){
           pathD = pathToSvgD(astarPath);
           routePoints = astarPath;
