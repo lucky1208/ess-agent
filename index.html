@@ -4440,6 +4440,29 @@ window.toggleTheme=function(){
   }catch(e){applyTheme('dark');}
 })();
 
+const DEVICE_CLASS={source:'source',meter:'source',grid:'source',pv:'source',wind:'source',diesel:'source',busbar:'bus',dcBus:'bus',breaker:'conversion',switch:'conversion',transformer:'conversion',pcs:'conversion',contactor:'conversion',fuse:'conversion',battery:'storage',bess:'storage',ev:'storage',load:'load',cabinet:'load',controller:'control',ems:'control',bms:'control',scada:'control',relay:'control',ct:'control',pt:'control',protection:'control'};
+const DEVICE_PORTS={
+  source:{top:'out',bottom:'out',left:'out',right:'out'},
+  meter:{top:'out',bottom:'out',left:'out',right:'out'},
+  busbar:{top:'bus',bottom:'bus',left:'bus',right:'bus'},
+  breaker:{top:'in',bottom:'out',left:'in',right:'out'},
+  switch:{top:'in',bottom:'out',left:'in',right:'out'},
+  transformer:{top:'hv',bottom:'lv',left:'hv',right:'lv'},
+  pcs:{top:'ac',bottom:'dc',left:'ac',right:'dc'},
+  battery:{top:'pos',bottom:'neg',left:'pos',right:'neg'},
+  controller:{top:'comm',bottom:'comm',left:'comm',right:'comm'},
+  load:{top:'in',bottom:'in',left:'in',right:'in'},
+  pv:{top:'out',bottom:'dc',left:'out',right:'dc'},
+  ev:{top:'ac',bottom:'dc',left:'ac',right:'dc'},
+  cabinet:{top:'in',bottom:'out',left:'in',right:'out'},
+  fuse:{top:'in',bottom:'out',left:'in',right:'out'},
+  contactor:{top:'in',bottom:'out',left:'in',right:'out'},
+  protection:{top:'in',bottom:'out',left:'in',right:'out'},
+  relay:{top:'coil',bottom:'contact',left:'coil',right:'contact'},
+  ct:{top:'primary',bottom:'secondary',left:'primary',right:'secondary'},
+  pt:{top:'primary',bottom:'secondary',left:'primary',right:'secondary'}
+};
+
 function getBestPorts(fromNode, toNode, fromDim, toDim){
   const fx=fromNode.x, fy=fromNode.y, fw=fromDim.w, fh=fromDim.h;
   const tx=toNode.x, ty=toNode.y, tw=toDim.w, th=toDim.h;
@@ -4596,7 +4619,18 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   }
   const obstacles = nodes.map(n => {
     const dim = getNodeDim(TYPE_ALIAS[n.type]||n.type)||{w:160,h:60};
-    return {x:n.x-dim.w/2, y:n.y-dim.h/2, w:dim.w, h:dim.h, pad:25};
+    return {x:n.x-dim.w/2, y:n.y-dim.h/2, w:dim.w, h:dim.h, pad:30};
+  });
+  nodes.forEach(n => {
+    const label = n.label || '';
+    if (label.length > 0) {
+      const textW = Math.min(label.length * 9, 160);
+      obstacles.push({x:n.x-textW/2, y:n.y-8, w:textW, h:16, pad:5});
+    }
+    if (n.sub) {
+      const subW = Math.min(n.sub.length * 7, 120);
+      obstacles.push({x:n.x-subW/2, y:n.y+8, w:subW, h:12, pad:3});
+    }
   });
   let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:var(--svg-bg);font-family:'Microsoft YaHei',sans-serif">`;
   svg += DIAGRAM_DEFS;
@@ -4614,7 +4648,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   });
   nodes.forEach(n => {
     const resolvedType = TYPE_ALIAS[n.type] || n.type;
-    const iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.source;
+    const iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.cabinet || DIAGRAM_ICONS.source;
     svg += iconFn(n.x, n.y, n.label, n.sub);
   });
   if (links) {
