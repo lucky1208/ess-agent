@@ -4229,61 +4229,7 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone
   const path = `M${startX},${startY} V${actualMidY} H${endX} V${endY}`;
   return { path, isOrtho: true, midX: (startX+endX)/2, midY: actualMidY, startX, startY, endX, endY, midY: actualMidY };
 }
-  function edgePoint(node, edge, halfW, halfH){
-    switch(edge){
-      case 'top':    return {x:node.x,        y:node.y - halfH};
-      case 'bottom': return {x:node.x,        y:node.y + halfH};
-      case 'left':   return {x:node.x - halfW,y:node.y};
-      case 'right':  return {x:node.x + halfW,y:node.y};
-    }
-  }
-  // 从 fromEdge 出来时,如果是 controller (虚线) 可以从任何边出
-  const fp = edgePoint(from, fromEdge, isCtrl?fromW/2:fromW/2, isCtrl?0:fromH/2);
-  const tp = edgePoint(to,   toEdge,   isCtrl?toW/2:toW/2,   isCtrl?0:toH/2);
-  const x1 = fp.x, y1 = fp.y;
-  const x2 = tp.x, y2 = tp.y;
 
-  // SKILL-10.4: 路由选择 — 优先走外圈/通道, midY 选 zone 间隙
-  let midY;
-  if (fromZone && toZone && fromZone !== toZone) {
-    const gapY = (fromZone.y + fromZone.h + toZone.y) / 2;
-    midY = Math.round(gapY);
-  } else if (fromEdge === 'left' || fromEdge === 'right') {
-    // 水平主走线: midY 选 from.y (保持水平)
-    midY = from.y;
-  } else {
-    midY = Math.round((y1 + y2) / 2);
-  }
-
-  // channel 错位 (防重叠)
-  let chOffset = 0;
-  if (!channels[midY]) channels[midY] = [];
-  const existing = channels[midY];
-  for (const e of existing) {
-    const eFrom = Math.min(e.x1, e.x2);
-    const eTo = Math.max(e.x1, e.x2);
-    const nFrom = Math.min(x1, x2);
-    const nTo = Math.max(x1, x2);
-    if (nFrom < eTo && nTo > eFrom) chOffset += 8;
-  }
-  existing.push({x1, x2});
-  const actualMidY = midY + chOffset;
-
-  // 构造 path: 取决于 fromEdge / toEdge 的组合
-  let path;
-  if ((fromEdge === 'top' || fromEdge === 'bottom') && (toEdge === 'top' || toEdge === 'bottom')) {
-    // 标准垂直: M x1,y1 V midY H x2 V y2
-    path = `M${x1},${y1} V${actualMidY} H${x2} V${y2}`;
-  } else if (fromEdge === 'right' || fromEdge === 'left') {
-    // 水平出发: M x1,y1 H midX V y2 H x2
-    const midX = Math.round((x1 + x2) / 2);
-    path = `M${x1},${y1} H${midX} V${y2} H${x2}`;
-  } else {
-    // 兜底
-    path = `M${x1},${y1} V${actualMidY} H${x2} V${y2}`;
-  }
-  return { path, isOrtho: true, midX: (x1+x2)/2, midY: actualMidY, fromEdge, toEdge, x1, y1, x2, y2 };
-}
 
 function detectCrosspoints(allLinks){
   const cps=[];
