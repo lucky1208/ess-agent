@@ -4440,27 +4440,148 @@ window.toggleTheme=function(){
   }catch(e){applyTheme('dark');}
 })();
 
-const DEVICE_CLASS={source:'source',meter:'source',grid:'source',pv:'source',wind:'source',diesel:'source',busbar:'bus',dcBus:'bus',breaker:'conversion',switch:'conversion',transformer:'conversion',pcs:'conversion',contactor:'conversion',fuse:'conversion',battery:'storage',bess:'storage',ev:'storage',load:'load',cabinet:'load',controller:'control',ems:'control',bms:'control',scada:'control',relay:'control',ct:'control',pt:'control',protection:'control'};
-const DEVICE_PORTS={
-  source:{top:'out',bottom:'out',left:'out',right:'out'},
-  meter:{top:'out',bottom:'out',left:'out',right:'out'},
-  busbar:{top:'bus',bottom:'bus',left:'bus',right:'bus'},
-  breaker:{top:'in',bottom:'out',left:'in',right:'out'},
-  switch:{top:'in',bottom:'out',left:'in',right:'out'},
-  transformer:{top:'hv',bottom:'lv',left:'hv',right:'lv'},
-  pcs:{top:'ac',bottom:'dc',left:'ac',right:'dc'},
-  battery:{top:'pos',bottom:'neg',left:'pos',right:'neg'},
-  controller:{top:'comm',bottom:'comm',left:'comm',right:'comm'},
-  load:{top:'in',bottom:'in',left:'in',right:'in'},
-  pv:{top:'out',bottom:'dc',left:'out',right:'dc'},
-  ev:{top:'ac',bottom:'dc',left:'ac',right:'dc'},
-  cabinet:{top:'in',bottom:'out',left:'in',right:'out'},
-  fuse:{top:'in',bottom:'out',left:'in',right:'out'},
-  contactor:{top:'in',bottom:'out',left:'in',right:'out'},
-  protection:{top:'in',bottom:'out',left:'in',right:'out'},
-  relay:{top:'coil',bottom:'contact',left:'coil',right:'contact'},
-  ct:{top:'primary',bottom:'secondary',left:'primary',right:'secondary'},
-  pt:{top:'primary',bottom:'secondary',left:'primary',right:'secondary'}
+const ESS_V3={
+  IEC_REGISTRY:{
+    transformer:'iec_symbols_svg/iec_0264_Transformer_with_two_windings,_general_symbol_(form_1).svg',
+    breaker:'iec_symbols_svg/iec_0052_Circuit_breaker_function.svg',
+    disconnector:'iec_symbols_svg/iec_0083_Disconnector,_Isolator.svg',
+    fuse:'iec_symbols_svg/iec_0105_Fuse,_general_symbol.svg',
+    battery:'iec_symbols_svg/iec_0353_Battery_of_primary_or_secondary_cells.svg',
+    ct:'iec_symbols_svg/iec_0273_Current_transformer,_general_symbol_(form_1).svg',
+    pt:'iec_symbols_svg/iec_0301_Voltage_transformer_Measuring_transformer_(form_1).svg',
+    earth:'iec_symbols_svg/iec_0041_Earth,_general_symbol_Earthing,_general_symbol;_Ground_(US),_general_symbol;_Gro.svg'
+  },
+  ONTOLOGY:{
+    pcc:{cls:'source',chain:['pcc','grid_source','generic_box'],netDomain:['AC_HV']},
+    transformer:{cls:'conversion',chain:['transformer','generic_box'],netDomain:['AC_HV','AC_LV']},
+    pcs:{cls:'conversion',chain:['pcs','generic_box'],netDomain:['AC_LV','DC_BUS']},
+    battery:{cls:'storage',chain:['battery','battery_rack','generic_cabinet','generic_box'],netDomain:['DC_BUS']},
+    battery_rack:{cls:'storage',chain:['battery_rack','generic_cabinet','generic_box'],netDomain:['DC_BUS']},
+    battery_container:{cls:'storage',chain:['battery_container','generic_cabinet','generic_box'],netDomain:['DC_BUS']},
+    grid_cabinet:{cls:'switchgear',chain:['grid_cabinet','generic_cabinet','generic_box'],netDomain:['AC_HV']},
+    breaker:{cls:'switchgear',chain:['breaker','generic_box'],netDomain:['AC_HV','AC_LV']},
+    busbar:{cls:'bus',chain:['busbar_ac','generic_box'],netDomain:['AC_HV']},
+    ac_bus:{cls:'bus',chain:['busbar_ac','generic_box'],netDomain:['AC_LV']},
+    dc_bus:{cls:'bus',chain:['busbar_dc','generic_box'],netDomain:['DC_BUS']},
+    load:{cls:'load',chain:['load','generic_box'],netDomain:['AC_LV']},
+    pv:{cls:'source',chain:['pv','generic_box'],netDomain:['DC_BUS']},
+    ev:{cls:'load',chain:['ev','generic_box'],netDomain:['AC_LV']},
+    controller:{cls:'control',chain:['ems_controller','generic_box'],netDomain:['CONTROL']},
+    ems:{cls:'control',chain:['ems_controller','generic_box'],netDomain:['CONTROL']},
+    meter:{cls:'source',chain:['meter','generic_box'],netDomain:['AC_HV']},
+    source:{cls:'source',chain:['grid_source','generic_box'],netDomain:['AC_HV']}
+  },
+  SYNONYMS:{'电网':'pcc','市电':'pcc','并网柜':'grid_cabinet','储能并网柜':'grid_cabinet','储能电池':'battery_rack','电池簇':'battery_rack','电池舱':'battery_container','储能变流器':'pcs','变流器':'pcs','变压器':'transformer','主变':'transformer','交流母线':'ac_bus','直流母线':'dc_bus','能量管理系统':'ems'},
+  PORT_MODEL:{
+    pcc:[{id:'out',side:'bottom',voltage:10000,domain:'ac',direction:'out'}],
+    transformer:[{id:'hv',side:'top',voltage:10000,domain:'ac',direction:'in'},{id:'lv',side:'bottom',voltage:400,domain:'ac',direction:'out'}],
+    pcs:[{id:'ac',side:'left',voltage:400,domain:'ac',direction:'in'},{id:'dc',side:'right',voltage:750,domain:'dc',direction:'out'}],
+    battery:[{id:'pos',side:'top',voltage:750,domain:'dc',direction:'bidir'},{id:'neg',side:'bottom',voltage:0,domain:'dc',direction:'bidir'}],
+    battery_rack:[{id:'dc',side:'top',voltage:750,domain:'dc',direction:'bidir'}],
+    grid_cabinet:[{id:'in',side:'top',voltage:10000,domain:'ac',direction:'in'},{id:'out',side:'bottom',voltage:10000,domain:'ac',direction:'out'}],
+    breaker:[{id:'in',side:'top',voltage:10000,domain:'ac',direction:'in'},{id:'out',side:'bottom',voltage:10000,domain:'ac',direction:'out'}],
+    busbar:[{id:'line',side:'center',voltage:10000,domain:'ac',isBus:true}],
+    ac_bus:[{id:'line',side:'center',voltage:400,domain:'ac',isBus:true}],
+    dc_bus:[{id:'line',side:'center',voltage:750,domain:'dc',isBus:true}],
+    load:[{id:'in',side:'top',voltage:400,domain:'ac',direction:'in'}],
+    pv:[{id:'dc',side:'bottom',voltage:750,domain:'dc',direction:'out'}],
+    ev:[{id:'ac',side:'top',voltage:400,domain:'ac',direction:'in'}],
+    controller:[{id:'comm',side:'right',voltage:0,domain:'comm',direction:'bidir'}],
+    ems:[{id:'comm',side:'right',voltage:0,domain:'comm',direction:'bidir'}],
+    source:[{id:'out',side:'bottom',voltage:10000,domain:'ac',direction:'out'}],
+    meter:[{id:'out',side:'bottom',voltage:10000,domain:'ac',direction:'out'}]
+  },
+  LAYOUT_LAYERS:{
+    grid:{yIdx:0,label:'电网侧'},
+    hv_distribution:{yIdx:1,label:'高压配电'},
+    conversion:{yIdx:2,label:'变换层'},
+    lv_distribution:{yIdx:3,label:'低压配电'},
+    storage:{yIdx:4,label:'储能层'},
+    control:{yIdx:0,xPos:'right',label:'控制侧'}
+  },
+  DEVICE_LAYER:{pcc:'grid',source:'grid',meter:'grid',transformer:'hv_distribution',breaker:'hv_distribution',grid_cabinet:'hv_distribution',busbar:'hv_distribution',pcs:'conversion',dc_bus:'conversion',pv:'conversion',ac_bus:'lv_distribution',load:'lv_distribution',ev:'lv_distribution',battery:'storage',battery_rack:'storage',battery_container:'storage',controller:'control',ems:'control'},
+  CONNECTION_RULES:[
+    {from:'battery',to:'ac_bus',action:'reject',reason:'储能电池不能直连交流母线，需经过PCS'},
+    {from:'battery',to:'busbar',action:'reject',reason:'储能电池不能直连交流母线，需经过PCS'},
+    {from:'battery_rack',to:'transformer',action:'reject',reason:'储能电池不能直连变压器'},
+    {from:'pv',to:'battery',action:'reject',reason:'光伏不能直连电池，需经过PCS/控制器'}
+  ],
+  DRAWING_PROFILES:{
+    ESS_SLD:{name:'储能系统一次接线图',layers:['grid','hv_distribution','conversion','storage','control'],flow:'vertical'},
+    MICROGRID:{name:'微网系统架构图',layers:['grid','conversion','lv_distribution','storage','control'],flow:'vertical'},
+    EV_STATION:{name:'充电站配电图',layers:['grid','hv_distribution','lv_distribution','load'],flow:'vertical'}
+  },
+  isPortCompatible(sp,tp){
+    if(sp.domain==='comm'||tp.domain==='comm')return true;
+    if(sp.domain!==tp.domain)return false;
+    const vTol=Math.max(sp.voltage,tp.voltage)*0.2;
+    if(Math.abs(sp.voltage-tp.voltage)>vTol)return false;
+    return true;
+  },
+  validateTopology(edges,nodes){
+    const errors=[],warnings=[];
+    const nm={};nodes.forEach(n=>nm[n.id]=n);
+    const pccNodes=nodes.filter(n=>(n.stdType||n.type)==='pcc'||(n.stdType||n.type)==='source');
+    if(pccNodes.length===0)errors.push('缺少PCC/电源节点');
+    if(pccNodes.length>1)warnings.push('存在多个PCC节点('+pccNodes.length+'个)，请确认');
+    const busNodes=nodes.filter(n=>(n.stdType||n.type)==='busbar'||(n.stdType||n.type)==='ac_bus');
+    busNodes.forEach(b=>{
+      const degree=edges.filter(e=>e.from===b.id||e.to===b.id||e.source===b.id||e.target===b.id).length;
+      if(degree<2)warnings.push('母线'+(b.label||b.id)+'仅连接'+degree+'个设备，可能不完整');
+    });
+    nodes.forEach(n=>{
+      const degree=edges.filter(e=>e.from===n.id||e.to===n.id||e.source===n.id||e.target===n.id).length;
+      if(degree===0)warnings.push('孤岛设备:'+(n.label||n.id));
+    });
+    edges.forEach(e=>{
+      const src=nm[e.from||e.source],tgt=nm[e.to||e.target];
+      if(!src||!tgt)return;
+      const sType=src.stdType||src.type,tType=tgt.stdType||tgt.type;
+      this.CONNECTION_RULES.forEach(r=>{
+        if((sType===r.from&&tType===r.to)||(sType===r.to&&tType===r.from)){
+          errors.push('非法连接:'+(src.label||src.id)+'→'+(tgt.label||tgt.id)+' ('+r.reason+')');
+        }
+      });
+    });
+    return{errors,warnings};
+  },
+  process(rawData){
+    const rawNodes=rawData.nodes||[];
+    const rawEdges=rawData.links||rawData.edges||[];
+    const nodes=rawNodes.map(n=>{
+      const rawType=(n.type||n.name||'').toLowerCase();
+      const stdType=this.SYNONYMS[rawType]||rawType;
+      const onto=this.ONTOLOGY[stdType]||{cls:'unknown',chain:['generic_box'],netDomain:['AC_LV']};
+      const ports=this.PORT_MODEL[stdType]||[{id:'in',side:'top',voltage:400,domain:'ac'},{id:'out',side:'bottom',voltage:400,domain:'ac'}];
+      const layerName=this.DEVICE_LAYER[stdType]||'lv_distribution';
+      const layerCfg=this.LAYOUT_LAYERS[layerName]||{yIdx:3};
+      const supportedSymbols=Object.keys(this.IEC_REGISTRY).concat(['pcc','grid_source','pcs','battery_rack','generic_cabinet','ems_controller','busbar_ac','busbar_dc','load','ev','pv','generic_box']);
+      let finalSymbol='generic_box';
+      for(const sym of onto.chain){if(supportedSymbols.includes(sym)){finalSymbol=sym;break;}}
+      const iecSymbol=this.IEC_REGISTRY[finalSymbol]||null;
+      return{...n,stdType,deviceClass:onto.cls,ports,networkDomain:onto.netDomain,layoutLayer:layerName,layoutYIdx:layerCfg.yIdx,layoutXPos:layerCfg.xPos||'center',dagreRank:layerCfg.yIdx,finalSymbol,iecSymbol};
+    });
+    const nm={};nodes.forEach(n=>nm[n.id]=n);
+    const edges=rawEdges.map(e=>{
+      const src=nm[e.from||e.source],tgt=nm[e.to||e.target];
+      let srcPort=null,tgtPort=null;
+      if(src&&tgt){
+        for(const sp of src.ports){
+          for(const tp of tgt.ports){
+            if(this.isPortCompatible(sp,tp)){srcPort=sp.id;tgtPort=tp.id;break;}
+          }
+          if(srcPort)break;
+        }
+      }
+      if(!srcPort&&src)srcPort=src.ports[0]?.id;
+      if(!tgtPort&&tgt)tgtPort=tgt.ports[0]?.id;
+      return{...e,sourcePort:srcPort,targetPort:tgtPort};
+    });
+    const validation=this.validateTopology(edges,nodes);
+    if(validation.errors.length>0)console.warn('[V3] 拓扑错误:',validation.errors);
+    if(validation.warnings.length>0)console.log('[V3] 拓扑警告:',validation.warnings);
+    return{nodes,edges,warnings:validation.warnings,errors:validation.errors};
+  }
 };
 
 function getBestPorts(fromNode, toNode, fromDim, toDim){
@@ -4577,8 +4698,9 @@ function pathToSvgD(path){
 
 function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   const svgW = 1100, svgH = 800;
-  const nodes = diagramData.nodes || [];
-  const links = diagramData.links || [];
+  const v3Result = ESS_V3.process(diagramData);
+  const nodes = v3Result.nodes;
+  const links = v3Result.edges;
   const ZONE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',busbar:'#4a90d9',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#afa9ec',battery:'#50c878',controller:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878'};
   const ZONES = [
     {name:'电源侧',types:['source','meter'],y:55,h:100,color:'#4a9ee8'},
