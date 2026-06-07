@@ -11725,6 +11725,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   }
   // Qwen 特效药 2 — ObstacleBuilder 3.0: 物理框 + 膨胀 35px + 文字区
   const OBSTACLE_PAD = 35;
+  const obstacles = [];
   nodes.forEach(n => {
     const w = n.width || n._cardW || 160;
     const h = n.height || 60;
