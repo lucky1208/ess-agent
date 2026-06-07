@@ -7,3 +7,7 @@ check_i18n.py
 _check.js
 
 .git_commit_msg.txt
+
+# GLM 下载的临时包 (不要入仓, dist/lib/ 已废止)
+lib/*.tgz
+lib/package/
