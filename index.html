@@ -4452,7 +4452,10 @@ const THEME_PALETTE = {
     '--svg-stroke-main':'#b0b0a0','--svg-text-light':'#e0e0ff',
     '--svg-zone-bg':'rgba(20,30,50,0.4)','--svg-zone-grid':'rgba(24,95,165,0.18)',
     '--icon-bg':'rgba(30,40,60,0.85)','--icon-border':'rgba(120,160,220,0.4)',
-    '--w-ac-bg':'#1a2a4a','--w-dc-bg':'#0d2a15','--w-pcs-bg':'#2a1520','--w-ctrl-bg':'#151530','--w-panel-bg':'#0d1520','--w-border-dim':'#3a3a5e','--w-text-dim':'#606080'
+    // 接线图专用线色
+    '--wire-ac':'#e8a838','--wire-dc':'#50c878','--wire-comm':'#6060a0',
+    '--w-ac-bg':'#1a3a6e','--w-pcs-bg':'#3a1a3a','--w-dc-bg':'#1a3a2a','--w-ctrl-bg':'#22263a',
+    '--w-panel-bg':'#22263a','--w-border-dim':'#3a3a5e'
   },
   light: {
     '--bg1':'#F5F4EE','--bg2':'#EAE8DF','--bg3':'#DDDAD0',
@@ -4461,7 +4464,10 @@ const THEME_PALETTE = {
     '--svg-stroke-main':'#5a5a55','--svg-text-light':'#1a1d21',
     '--svg-zone-bg':'rgba(200,200,180,0.25)','--svg-zone-grid':'rgba(24,95,165,0.12)',
     '--icon-bg':'rgba(230,228,218,0.95)','--icon-border':'rgba(80,100,140,0.5)',
-    '--w-ac-bg':'#d0d8e8','--w-dc-bg':'#d0e8d0','--w-pcs-bg':'#e8d0d0','--w-ctrl-bg':'#d0d0e8','--w-panel-bg':'#d8d8d0','--w-border-dim':'#8a8a9e','--w-text-dim':'#5a5a6a'
+    // 浅色模式 — 接线图线色加深, 文字深色
+    '--wire-ac':'#b07820','--wire-dc':'#207040','--wire-comm':'#404080',
+    '--w-ac-bg':'#dce8f5','--w-pcs-bg':'#f5dce8','--w-dc-bg':'#dcf5e0','--w-ctrl-bg':'#e8e8f5',
+    '--w-panel-bg':'#f5f4ee','--w-border-dim':'#a0a0a0'
   }
 };
 function applyTheme(theme){
@@ -4484,6 +4490,14 @@ window.toggleTheme=function(){
     // 重新渲染已生成的图纸 (让 LLM/JSON 渲染的 SVG 重新走一遍 var(--xxx) 解析)
     if(typeof window.mgRenderDrawings==='function'&&typeof LAST_MG_RESULT!=='undefined'&&LAST_MG_RESULT){
       try{window.mgRenderDrawings();}catch(e){console.warn('重渲染图纸失败:',e);}
+    }
+    // 接线图 (renderWiringDiagramFromJSON) 也要重渲染, 否则 var(--svg-bg) 不更新
+    if(typeof LAST_MG_RESULT!=='undefined'&&LAST_MG_RESULT&&LAST_MG_RESULT.wiringDiagram){
+      try{renderWiringDiagramFromJSON(LAST_MG_RESULT.wiringDiagram);}catch(e){console.warn('重渲染接线图失败:',e);}
+    }
+    // 系统拓扑图 (wiringDiagram2) 也要重渲染
+    if(typeof LAST_MG_RESULT!=='undefined'&&LAST_MG_RESULT&&LAST_MG_RESULT.wiringDiagram2){
+      try{renderTopoDiagramFromJSON(LAST_MG_RESULT.wiringDiagram2);}catch(e){console.warn('重渲染系统拓扑图失败:',e);}
     }
   }catch(err){console.error('toggleTheme error:',err);}
 };
@@ -5611,8 +5625,19 @@ function renderWiringDiagramFromJSON(d) {
   const W=1200, H=950;
   let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   s+=`<defs>`;
-  s+=`<style>.wa{stroke:#e8a838;stroke-width:2.5;fill:none}.wd{stroke:#50c878;stroke-width:2.5;fill:none;stroke-dasharray:8,3}.wc{stroke:#6060a0;stroke-width:1;fill:none;stroke-dasharray:4,2}.lb{fill:#e0e0ff;font-size:11px;font-weight:bold}.ls{fill:#9090a0;font-size:9px}.lg{fill:#c0c0d0;font-size:10px}</style>`;
-  s+=`<linearGradient id="bus10w" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2a50a0"/><stop offset="50%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>`;
+  // Qwen 修复 — 所有颜色用 CSS 变量, 深色/浅色模式都能正确显示
+  s+=`<style>
+    .wa{stroke:var(--wire-ac, #e8a838);stroke-width:2.5;fill:none}
+    .wd{stroke:var(--wire-dc, #50c878);stroke-width:2.5;fill:none;stroke-dasharray:8,3}
+    .wc{stroke:var(--wire-comm, #6060a0);stroke-width:1;fill:none;stroke-dasharray:4,2}
+    .lb{fill:var(--svg-text-light, #e0e0ff);font-size:11px;font-weight:bold}
+    .ls{fill:var(--svg-label, #9090a0);font-size:9px}
+    .lg{fill:var(--svg-label, #c0c0d0);font-size:10px}
+    .wire-ac{stroke:var(--wire-ac, #e8a838)}
+    .wire-dc{stroke:var(--wire-dc, #50c878)}
+    .wire-comm{stroke:var(--wire-comm, #6060a0)}
+  </style>`;
+  // Qwen 修复 — 母线用纯色 + 加 4 个引脚小方块, 任何主题下都清晰可见
   s+=`<marker id="awB" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#4a90d9"/></marker>`;
   s+=`<marker id="awO" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e8a838"/></marker>`;
   s+=`<marker id="awG" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#50c878"/></marker>`;
@@ -5644,9 +5669,15 @@ function renderWiringDiagramFromJSON(d) {
   s+=`<rect x="${cx-180}" y="55" width="580" height="90" rx="4" fill="none" stroke="#e8a838" stroke-width="1" stroke-dasharray="5,3"/>`;
   s+=`<text x="${cx+110}" y="52" style="fill:#e8a838;font-size:8">防反送电控制边界：PCC实时功率 > 50~100kW时触发限功率</text>`;
 
-  // === 10kV Bus ===
-  s+=`<line x1="${cx-200}" y1="130" x2="${cx+200}" y2="130" stroke="url(#bus10w)" stroke-width="7" stroke-linecap="round"/>`;
-  s+=`<text x="${cx}" y="122" text-anchor="middle" class="lb" style="fill:#80b0e0">厂内${volt}母线</text>`;
+  // === 10kV Bus === Qwen 修复 — 改成实色 + 3D 阴影 + 4 个引脚方块, 不依赖 gradient
+  const busY=130;
+  s+=`<rect x="${cx-220}" y="${busY-5}" width="440" height="10" rx="2" fill="#1a3a6e" stroke="#4a90d9" stroke-width="1.5"/>`;
+  s+=`<rect x="${cx-220}" y="${busY-5}" width="440" height="3" fill="#6ab0e8" opacity="0.6"/>`;
+  // 4 个引脚方块 (每个端点位置)
+  [-200, -100, 0, 100, 200].forEach(dx=>{
+    s+=`<rect x="${cx+dx-3}" y="${busY-2}" width="6" height="14" fill="#4a90d9" stroke="#1a3a6e" stroke-width="0.5"/>`;
+  });
+  s+=`<text x="${cx}" y="${busY-12}" text-anchor="middle" class="lb" style="fill:#80b0e0">厂内${volt}母线</text>`;
 
   // Count transformer loads vs BESS components
   const transformers = comps.filter(c=>c.type==='transformer');
@@ -5751,14 +5782,9 @@ function renderWiringDiagramFromJSON(d) {
   const pcsBottom = bY + 65;
   bY += 65;
 
-  // 直流安全注释(画在PCS右侧,不与DC cable冲突)
-  const safetyX = bX + 100;
-  const safetyY = pcsBottom - 55;
-  s+=`<rect x="${safetyX}" y="${safetyY}" width="120" height="45" rx="4" fill="var(--w-ctrl-bg)" stroke="#6060a0" stroke-width="1"/>`;
-  s+=`<text x="${safetyX+60}" y="${safetyY+18}" text-anchor="middle" style="fill:#a0a0ff;font-size:9;font-weight:bold">直流安全</text>`;
-  s+=`<text x="${safetyX+60}" y="${safetyY+32}" text-anchor="middle" class="ls" style="fill:#8080c0">绝缘监测</text>`;
-  s+=`<text x="${safetyX+60}" y="${safetyY+43}" text-anchor="middle" class="ls" style="fill:#8080c0">接触器+BMS联动</text>`;
-  s+=`<line x1="${safetyX}" y1="${safetyY+22}" x2="${bX+90}" y2="${safetyY+22}" class="wc"/>`;
+  // 直流安全注释(放在 PCS 框内底部, 不与 BESS 重叠)
+  s+=`<line x1="${bX-86}" y1="${pcsBottom-8}" x2="${bX+86}" y2="${pcsBottom-8}" stroke="#6060a0" stroke-width="0.5" stroke-dasharray="2,2"/>`;
+  s+=`<text x="${bX}" y="${pcsBottom-2}" text-anchor="middle" class="ls" style="fill:#a0a0ff;font-size:8">⚡ 直流安全: 绝缘监测 + 接触器+BMS联动</text>`;
 
   // DC cable
   s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+30}" class="wd" marker-end="url(#awG)"/>`;
