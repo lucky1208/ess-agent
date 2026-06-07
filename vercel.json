@@ -1,5 +1,5 @@
 {
-  "buildCommand": null,
+  "buildCommand": "echo skip-vite-build",
   "outputDirectory": "dist",
   "functions": {
     "api/*.js": {

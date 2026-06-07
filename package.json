@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "echo skip-vite-build",
+    "preview": "echo skip"
   },
   "devDependencies": {
     "vite": "^5.4.21"
