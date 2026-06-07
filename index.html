@@ -5,16 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-<script>
-(function(){
-  function ld(u,cb){var s=document.createElement('script');s.src=u;s.onload=cb;s.onerror=function(){console.warn('CDN fail:',u);if(cb)cb();};document.head.appendChild(s);}
-  ld('https://cdn.jsdelivr.net/npm/graphlib@2.1.8/dist/graphlib.min.js',function(){
-    ld('https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js',function(){
-      if(typeof dagre!=='undefined')console.log('dagre ready');else console.warn('dagre N/A, fallback manual layout');
-    });
-  });
-})();
-</script>
+<script src="lib/graphlib.min.js"></script>
+<script src="lib/dagre.min.js"></script>
 
 
 <style>
@@ -4082,7 +4074,7 @@ const DIAGRAM_ICONS = {
   terminal: (x,y) => `${iecImg('terminal',x,y,16,16,'')}`,
   contact: (x,y,label) => `${iecImg('contact',x,y,24,20,'')}${label?`<text x="${x}" y="${y+16}" text-anchor="middle" fill="#B5D4F4" font-size="10">${label}</text>`:''}`,
 };
-const TYPE_ALIAS={grid:'source',bus:'busbar',inverter:'pcs',bess:'battery',ems:'controller',solar:'pv',charger:'ev'};
+const TYPE_ALIAS={grid:'source',bus:'busbar',inverter:'pcs',bess:'battery',ems:'controller',solar:'pv',charger:'ev',grid_cabinet:'cabinet',cabinet:'cabinet'};
 
 function getArrowForLink(l){
   if(l.dashed) return 'aY';
@@ -4189,7 +4181,7 @@ function dagLayout(nodes, links, svgW, svgH) {
   return nodes;
 }
 
-function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone) {
+function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone, obstacles) {
   const isCtrl = from.type === 'controller' || to.type === 'controller';
   const x1 = from.x, x2 = to.x;
   const y1 = from.y + fromH/2;
@@ -4213,6 +4205,30 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone
   } else {
     midY = Math.round((startY + endY) / 2);
   }
+  if(obstacles&&obstacles.length>0){
+    const hMinX=Math.min(startX,endX)-5,hMaxX=Math.max(startX,endX)+5;
+    let blocked=false;
+    for(const o of obstacles){
+      if(hMinX<o.x+o.w+o.pad&&hMaxX>o.x-o.pad&&midY>o.y-o.pad&&midY<o.y+o.h+o.pad){
+        blocked=true;break;
+      }
+    }
+    if(blocked){
+      const step=10;let found=false;
+      for(let delta=step;delta<200&&!found;delta+=step){
+        const tryUp=midY-delta,tryDn=midY+delta;
+        let upOk=true,dnOk=true;
+        for(const o of obstacles){
+          if(hMinX<o.x+o.w+o.pad&&hMaxX>o.x-o.pad){
+            if(tryUp>o.y-o.pad&&tryUp<o.y+o.h+o.pad)upOk=false;
+            if(tryDn>o.y-o.pad&&tryDn<o.y+o.h+o.pad)dnOk=false;
+          }
+        }
+        if(upOk){midY=tryUp;found=true;}
+        else if(dnOk){midY=tryDn;found=true;}
+      }
+    }
+  }
   let chOffset = 0;
   const chKey = `${midY}`;
   if (!channels[chKey]) channels[chKey] = [];
@@ -4233,53 +4249,71 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone
 
 function detectCrosspoints(allLinks){
   const cps=[];
-  function segs(link){
-    const s=[];
-    s.push({x1:link.x1,y1:link.y1,x2:link.x1,y2:link.midY});
-    s.push({x1:link.x1,y1:link.midY,x2:link.x2,y2:link.midY});
-    s.push({x1:link.x2,y1:link.midY,x2:link.x2,y2:link.y2});
-    return s;
-  }
-  function crossVV(a,b){
-    const aMinY=Math.min(a.y1,a.y2),aMaxY=Math.max(a.y1,a.y2);
-    const bMinY=Math.min(b.y1,b.y2),bMaxY=Math.max(b.y1,b.y2);
-    if(a.x1===b.x1){
-      const ovS=Math.max(aMinY,bMinY),ovE=Math.min(aMaxY,bMaxY);
-      if(ovE-ovS>2) return {x:a.x1,y:(ovS+ovE)/2};
+  function normalizePath(link){
+    const segs=[];
+    const pts=link.points;
+    if(!pts||pts.length<2)return segs;
+    for(let i=1;i<pts.length;i++){
+      const p0=pts[i-1],p1=pts[i];
+      segs.push({x1:p0.x,y1:p0.y,x2:p1.x,y2:p1.y});
     }
-    return null;
+    return segs;
   }
-  function crossVH(v,h){
-    const vMinY=Math.min(v.y1,v.y2),vMaxY=Math.max(v.y1,v.y2);
+  function isH(s){return Math.abs(s.y1-s.y2)<1;}
+  function isV(s){return Math.abs(s.x1-s.x2)<1;}
+  function crossHV(h,v){
     const hMinX=Math.min(h.x1,h.x2),hMaxX=Math.max(h.x1,h.x2);
-    if(v.x1>=hMinX && v.x1<=hMaxX && h.y1>=vMinY && h.y1<=vMaxY){
+    const vMinY=Math.min(v.y1,v.y2),vMaxY=Math.max(v.y1,v.y2);
+    const EPS=2;
+    if(v.x1>=hMinX-EPS && v.x1<=hMaxX+EPS && h.y1>=vMinY-EPS && h.y1<=vMaxY+EPS){
       return {x:v.x1,y:h.y1};
     }
     return null;
   }
-  function isTEndpoint(px,py,link){
-    return (Math.abs(px-link.x1)<3 && Math.abs(py-link.y1)<3)||
-           (Math.abs(px-link.x2)<3 && Math.abs(py-link.y2)<3);
+  function isEndpoint(px,py,link){
+    if(!link.points)return false;
+    const f=link.points[0],l=link.points[link.points.length-1];
+    return (Math.abs(px-f.x)<5&&Math.abs(py-f.y)<5)||(Math.abs(px-l.x)<5&&Math.abs(py-l.y)<5);
+  }
+  function onSegmentInterior(px,py,seg){
+    const EPS=3;
+    if(isH(seg)){
+      if(Math.abs(py-seg.y1)>EPS)return false;
+      const sMinX=Math.min(seg.x1,seg.x2)+EPS,sMaxX=Math.max(seg.x1,seg.x2)-EPS;
+      return px>=sMinX&&px<=sMaxX;
+    }
+    if(isV(seg)){
+      if(Math.abs(px-seg.x1)>EPS)return false;
+      const sMinY=Math.min(seg.y1,seg.y2)+EPS,sMaxY=Math.max(seg.y1,seg.y2)-EPS;
+      return py>=sMinY&&py<=sMaxY;
+    }
+    return false;
   }
   for(let i=0;i<allLinks.length;i++){
-    const aSegs=segs(allLinks[i]);
+    const aSegs=normalizePath(allLinks[i]);
     for(let j=i+1;j<allLinks.length;j++){
-      const bSegs=segs(allLinks[j]);
+      const bSegs=normalizePath(allLinks[j]);
       for(const as of aSegs){
         for(const bs of bSegs){
-          const aV=Math.abs(as.x1-as.x2)<1, aH=Math.abs(as.y1-as.y2)<1;
-          const bV=Math.abs(bs.x1-bs.x2)<1, bH=Math.abs(bs.y1-bs.y2)<1;
-          let pt=null;
-          if(aV&&bV) pt=crossVV(as,bs);
-          else if(aV&&bH) pt=crossVH(as,bs);
-          else if(aH&&bV) pt=crossVH(bs,as);
+          let pt=null, jumperDir=null;
+          if(isH(as)&&isV(bs)){
+            pt=crossHV(as,bs);
+            if(pt) jumperDir=as.y1<bs.y1?'up':'down';
+          }else if(isV(as)&&isH(bs)){
+            pt=crossHV(bs,as);
+            if(pt) jumperDir=as.x1<bs.x1?'left':'right';
+          }
           if(pt){
-            const dup=cps.some(c=>Math.abs(c.x-pt.x)<3&&Math.abs(c.y-pt.y)<3);
+            const dup=cps.some(c=>Math.abs(c.x-pt.x)<5&&Math.abs(c.y-pt.y)<5);
             if(!dup){
-              const onEndA=isTEndpoint(pt.x,pt.y,allLinks[i]);
-              const onEndB=isTEndpoint(pt.x,pt.y,allLinks[j]);
-              const connected=onEndA||onEndB;
-              cps.push({x:pt.x,y:pt.y,color:allLinks[i].color,connected});
+              const onEndA=isEndpoint(pt.x,pt.y,allLinks[i]);
+              const onEndB=isEndpoint(pt.x,pt.y,allLinks[j]);
+              const onIntA=onSegmentInterior(pt.x,pt.y,as);
+              const onIntB=onSegmentInterior(pt.x,pt.y,bs);
+              let connected=onEndA||onEndB;
+              if(!connected&&onIntA&&onIntB) connected=false;
+              else if(onIntA||onIntB) connected=true;
+              cps.push({x:pt.x,y:pt.y,color:allLinks[i].color,connected,jumperDir:jumperDir||'up'});
             }
           }
         }
@@ -4406,6 +4440,23 @@ window.toggleTheme=function(){
   }catch(e){applyTheme('dark');}
 })();
 
+function getBestPorts(fromNode, toNode, fromDim, toDim){
+  const fx=fromNode.x, fy=fromNode.y, fw=fromDim.w, fh=fromDim.h;
+  const tx=toNode.x, ty=toNode.y, tw=toDim.w, th=toDim.h;
+  const ports=[
+    {fromEdge:'bottom',fromX:fx,fromY:fy+fh/2, toEdge:'top',   toX:tx,toY:ty-th/2},
+    {fromEdge:'top',   fromX:fx,fromY:fy-fh/2, toEdge:'bottom',toX:tx,toY:ty+th/2},
+    {fromEdge:'right', fromX:fx+fw/2,fromY:fy, toEdge:'left',  toX:tx-tw/2,toY:ty},
+    {fromEdge:'left',  fromX:fx-fw/2,fromY:fy, toEdge:'right', toX:tx+tw/2,toY:ty}
+  ];
+  let best=ports[0],bestDist=Infinity;
+  for(const p of ports){
+    const d=Math.abs(p.fromX-p.toX)+Math.abs(p.fromY-p.toY);
+    if(d<bestDist){bestDist=d;best=p;}
+  }
+  return best;
+}
+
 function dagreLayout(nodes, links, svgW, svgH){
   if(typeof dagre==='undefined') return false;
   const RANK_ORDER={source:0,meter:1,busbar:2,breaker:3,switch:3,transformer:3,pcs:4,battery:4,pv:4,ev:4,load:5,controller:5};
@@ -4431,25 +4482,31 @@ function dagreLayout(nodes, links, svgW, svgH){
 }
 
 function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize){
-  const cols=Math.ceil(gridW/cellSize),rows=Math.ceil(gridH/cellSize);
-  const sx=Math.round(fromX/cellSize),sy=Math.round(fromY/cellSize);
-  const ex=Math.round(toX/cellSize),ey=Math.round(toY/cellSize);
+  const cs=cellSize;
+  const cols=Math.ceil(gridW/cs),rows=Math.ceil(gridH/cs);
+  const sx=Math.round(fromX/cs),sy=Math.round(fromY/cs);
+  const ex=Math.round(toX/cs),ey=Math.round(toY/cs);
   const blocked=new Set();
   obstacles.forEach(o=>{
-    const ox1=Math.floor((o.x-o.pad)/cellSize),ox2=Math.ceil((o.x+o.w+o.pad)/cellSize);
-    const oy1=Math.floor((o.y-o.pad)/cellSize),oy2=Math.ceil((o.y+o.h+o.pad)/cellSize);
+    const ox1=Math.floor((o.x-o.pad)/cs),ox2=Math.ceil((o.x+o.w+o.pad)/cs);
+    const oy1=Math.floor((o.y-o.pad)/cs),oy2=Math.ceil((o.y+o.h+o.pad)/cs);
     for(let gx=ox1;gx<=ox2;gx++)for(let gy=oy1;gy<=oy2;gy++)blocked.add(gx+','+gy);
   });
+  blocked.delete(sx+','+sy);
+  blocked.delete(ex+','+ey);
   const h=(x,y)=>Math.abs(x-ex)+Math.abs(y-ey);
   const open=new Map();
   const closed=new Set();
   const parent=new Map();
   const gScore=new Map();
+  const dirMap=new Map();
+  const TURN_PENALTY=15;
   const startKey=sx+','+sy;
   gScore.set(startKey,0);
+  dirMap.set(startKey,null);
   open.set(startKey,{x:sx,y:sy,f:h(sx,sy)});
-  const dirs=[{dx:0,dy:-1},{dx:0,dy:1},{dx:-1,dy:0},{dx:1,dy:0}];
-  let iterations=0;const maxIter=cols*rows*2;
+  const dirs=[{dx:0,dy:-1,dir:'V'},{dx:0,dy:1,dir:'V'},{dx:-1,dy:0,dir:'H'},{dx:1,dy:0,dir:'H'}];
+  let iterations=0;const maxIter=cols*rows*3;
   while(open.size>0&&iterations<maxIter){
     iterations++;
     let bestKey=null,bestF=Infinity;
@@ -4457,18 +4514,20 @@ function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize){
     const cur=open.get(bestKey);open.delete(bestKey);
     if(cur.x===ex&&cur.y===ey){
       const path=[];let ck=bestKey;
-      while(ck){path.unshift({x:parseInt(ck)*cellSize,y:parseInt(ck.split(',')[1])*cellSize});ck=parent.get(ck);}
+      while(ck){const px=parseInt(ck),py=parseInt(ck.split(',')[1]);path.unshift({x:px*cs,y:py*cs});ck=parent.get(ck);}
       return path;
     }
     closed.add(bestKey);
+    const prevDir=dirMap.get(bestKey);
     for(const d of dirs){
       const nx=cur.x+d.dx,ny=cur.y+d.dy;
       if(nx<0||nx>=cols||ny<0||ny>=rows)continue;
       const nk=nx+','+ny;
       if(closed.has(nk)||blocked.has(nk))continue;
-      const ng=(gScore.get(bestKey)||0)+1;
+      let ng=(gScore.get(bestKey)||0)+1;
+      if(prevDir!==null&&d.dir!==prevDir)ng+=TURN_PENALTY;
       if(!gScore.has(nk)||ng<gScore.get(nk)){
-        gScore.set(nk,ng);parent.set(nk,bestKey);
+        gScore.set(nk,ng);parent.set(nk,bestKey);dirMap.set(nk,d.dir);
         open.set(nk,{x:nx,y:ny,f:ng+h(nx,ny)});
       }
     }
@@ -4537,7 +4596,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   }
   const obstacles = nodes.map(n => {
     const dim = getNodeDim(TYPE_ALIAS[n.type]||n.type)||{w:160,h:60};
-    return {x:n.x-dim.w/2, y:n.y-dim.h/2, w:dim.w, h:dim.h, pad:10};
+    return {x:n.x-dim.w/2, y:n.y-dim.h/2, w:dim.w, h:dim.h, pad:25};
   });
   let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:var(--svg-bg);font-family:'Microsoft YaHei',sans-serif">`;
   svg += DIAGRAM_DEFS;
@@ -4582,23 +4641,24 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         const sw = l.dashed ? '1' : '1.5';
         const fromD = getNodeDim(from.type);
         const toD = getNodeDim(to.type);
-        const isDown = to.y > from.y;
-        const fromX = from.x, fromY = isDown ? from.y + fromD.h/2 : from.y - fromD.h/2;
-        const toX = to.x, toY = isDown ? to.y - toD.h/2 : to.y + toD.h/2;
-        let pathD;
+        const ports = getBestPorts(from, to, fromD, toD);
+        const fromX = ports.fromX, fromY = ports.fromY;
+        const toX = ports.toX, toY = ports.toY;
+        let pathD, routePoints;
         const astarPath = astarRoute(fromX, fromY, toX, toY, obstacles, svgW, svgH, cellSize);
         if(astarPath && astarPath.length >= 2){
           pathD = pathToSvgD(astarPath);
+          routePoints = astarPath;
         } else {
-          const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels, from._zone, to._zone);
+          const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels, from._zone, to._zone, obstacles);
           pathD = route.path;
+          routePoints = [{x:route.startX,y:route.startY},{x:route.startX,y:route.midY},{x:route.endX,y:route.midY},{x:route.endX,y:route.endY}];
         }
         svg += `<path d="${pathD}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
-        const midX = (fromX+toX)/2, midY = (fromY+toY)/2;
-        allLinksForCross.push({x1:fromX, x2:toX, y1:fromY, y2:toY, midY, color, link:l});
+        allLinksForCross.push({x1:fromX, x2:toX, y1:fromY, y2:toY, midY:(fromY+toY)/2, color, link:l, points:routePoints});
         if (l.label) {
-          const lblX = midX + 6;
-          const lblY = midY - 4;
+          const lblX = (fromX+toX)/2 + 6;
+          const lblY = (fromY+toY)/2 - 4;
           svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="var(--svg-label)" font-size="9">${l.label}</text>`;
         }
       }
@@ -4611,7 +4671,13 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         const r=5;
         const x=cp.x.toFixed(1);
         const y=cp.y;
-        svg += `<path d="M${x},${y-r} A${r},${r} 0 0,1 ${x},${y+r}" fill="none" stroke="${cp.color}" stroke-width="1.5"/>`;
+        if(cp.jumperDir==='up'||cp.jumperDir==='down'){
+          const sweep=cp.jumperDir==='up'?0:1;
+          svg += `<path d="M${x},${y-r} A${r},${r} 0 0,${sweep} ${x},${y+r}" fill="none" stroke="${cp.color}" stroke-width="1.5"/>`;
+        } else {
+          const sweep=cp.jumperDir==='left'?0:1;
+          svg += `<path d="M${x-r},${y} A${r},${r} 0 0,${sweep} ${x+r},${y}" fill="none" stroke="${cp.color}" stroke-width="1.5"/>`;
+        }
       }
     });
   }
