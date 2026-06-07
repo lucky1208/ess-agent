@@ -11986,7 +11986,7 @@ function renderWiringDiagramFromJSON(d) {
     }catch(e){console.warn('[接线图] V4管线渲染失败，fallback到专用渲染器:',e);}
   }
   if(d && d.components && d.components.length>0){
-    const structData={nodes:d.components.map((c,i)=>({id:c.type+'_'+i,type:c.type,label:c.label||c.type,sub:c.sub||''})),links:(d.connections||[]).map(c=>({from:c.from,to:c.to,label:c.label||''}))};
+    const structData={nodes:d.components.map(c=>({id:c.id||c.type,label:c.label||c.type,type:c.type,sub:c.sub||''})),links:(d.connections||[]).map(c=>({from:c.from,to:c.to,label:c.cable||c.label||''})),bus:d.voltage||'',protection:d.protection||[]};
     if(structData.nodes.length>=2){
       try{
         renderDiagramFromJSON_SVG('mgWiringSvg', structData, '电气一次接线图 (V4引擎)');
@@ -14637,20 +14637,18 @@ function mgRenderAllDrawings(R,provider){
   }
   let wiringData = R.wiringDiagram;
   if(!wiringData && isStructJSON(R.archDiagram)){
-    dlog('wiringDiagram为空，从archDiagram.nodes合成接线图数据','step');
-    const archNodes = R.archDiagram.nodes || [];
-    const archLinks = R.archDiagram.links || [];
-    wiringData = {
-      voltage: R.archDiagram.bus || '10kV',
-      components: archNodes.map(n => ({type: n.type, label: n.label, sub: n.sub})),
-      connections: archLinks.map(l => ({from: l.from, to: l.to, label: l.label})),
-      protection: R.archDiagram.protection || []
-    };
+    dlog('wiringDiagram为空，从archDiagram直接走V4管线渲染','step');
+    renderDiagramFromJSON_SVG('mgWiringSvg', R.archDiagram, '电气一次接线图 (V4引擎)');
+    dlog('接线图(V4引擎 from archDiagram) ✓','ok');
+    wiringData = null;
+  }
+  if(!wiringData){
+    wiringData = R.wiringDiagram;
   }
   if(isWiringJSON(wiringData)){
     dlog('前端渲染接线图(三层分离架构)','step');
     if(wiringData.components&&wiringData.components.length>0){
-      renderWiringDiagramFromJSON(wiringData);dlog('接线图(专用渲染器+IEC符号) ✓','ok');
+      renderWiringDiagramFromJSON(wiringData);dlog('接线图(V4引擎+IEC符号) ✓','ok');
     }else if(wiringData.nodes&&wiringData.nodes.length>0){
       renderDiagramFromJSON('mgWiringSvg',wiringData,'电气一次接线图 (AI生成)');dlog('接线图(ELK布局+IEC符号) ✓','ok');
     }else{
