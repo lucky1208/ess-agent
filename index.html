@@ -4080,6 +4080,31 @@ const DIAGRAM_ICONS = {
   lamp: (x,y,label) => `${iecImg('lamp',x,y,20,20,'')}${label?`<text x="${x}" y="${y+16}" text-anchor="middle" fill="#fac775" font-size="10">${label}</text>`:''}`,
   terminal: (x,y) => `${iecImg('terminal',x,y,16,16,'')}`,
   contact: (x,y,label) => `${iecImg('contact',x,y,24,20,'')}${label?`<text x="${x}" y="${y+16}" text-anchor="middle" fill="#B5D4F4" font-size="10">${label}</text>`:''}`,
+
+  // === B1 阶段 储能专用符号 (ESS Custom Symbols) — 区别于 IEC 通用符号 ===
+  // 颜色方案: 紫=PCS 蓝=BMS 棕=EMS 绿=STS/ATS 黄=PV Inverter 橙=HV/LV Cabinet
+  // 每个符号有独立布局, 不依赖 iecImg 库, 直接画 SVG path
+
+  ems_v2: (x,y,label,sub) => `<rect x="${x-90}" y="${y-32}" width="180" height="64" rx="6" fill="rgba(133,79,11,0.12)" stroke="#d4a030" stroke-width="2"/><text x="${x-80}" y="${y-18}" fill="#fac775" font-size="10" font-weight="bold">EMS</text><text x="${x-80}" y="${y-4}" fill="#FAF9F5" font-size="11" font-weight="500">${label||'能量管理'}</text>${sub?`<text x="${x-80}" y="${y+12}" fill="#d4a030" font-size="9">${sub}</text>`:''}<rect x="${x+50}" y="${y-22}" width="20" height="14" fill="none" stroke="#d4a030" stroke-width="1"/><text x="${x+60}" y="${y-12}" text-anchor="middle" fill="#fac775" font-size="8">SCADA</text><line x1="${x-90}" y1="${y+18}" x2="${x-50}" y2="${y+18}" stroke="#d4a030" stroke-width="1"/><line x1="${x+50}" y1="${y+18}" x2="${x+90}" y2="${y+18}" stroke="#d4a030" stroke-width="1"/>`,
+
+  bms_v2: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="6" fill="rgba(24,95,165,0.10)" stroke="#4a90d9" stroke-width="2"/><text x="${x-80}" y="${y-8}" fill="#9FE1CB" font-size="10" font-weight="bold">BMS</text><text x="${x-80}" y="${y+6}" fill="#B5D4F4" font-size="11" font-weight="500">${label||'电池管理'}</text>${sub?`<text x="${x-80}" y="${y+18}" fill="#85B7EB" font-size="9">${sub}</text>`:''}<g transform="translate(${x+50},${y-12})"><rect x="0" y="0" width="30" height="24" fill="none" stroke="#4a90d9" stroke-width="1"/><line x1="0" y1="8" x2="30" y2="8" stroke="#4a90d9" stroke-width="0.5"/><line x1="0" y1="16" x2="30" y2="16" stroke="#4a90d9" stroke-width="0.5"/><text x="15" y="6" text-anchor="middle" fill="#9FE1CB" font-size="6">SOC</text><text x="15" y="14" text-anchor="middle" fill="#9FE1CB" font-size="6">SOH</text><text x="15" y="22" text-anchor="middle" fill="#9FE1CB" font-size="6">V/T</text></g>`,
+
+  sts: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="6" fill="rgba(15,110,86,0.10)" stroke="#50c878" stroke-width="2"/><text x="${x-80}" y="${y-8}" fill="#9FE1CB" font-size="10" font-weight="bold">STS</text><text x="${x-80}" y="${y+6}" fill="#9FE1CB" font-size="11" font-weight="500">${label||'静态开关'}</text>${sub?`<text x="${x-80}" y="${y+18}" fill="#50c878" font-size="9">${sub}</text>`:''}<g transform="translate(${x+50},${y-12})"><rect x="0" y="0" width="36" height="24" fill="none" stroke="#50c878" stroke-width="1.5"/><text x="6" y="9" fill="#9FE1CB" font-size="8">A</text><text x="6" y="18" fill="#9FE1CB" font-size="8">B</text><line x1="14" y1="6" x2="28" y2="6" stroke="#50c878" stroke-width="1.5"/><line x1="14" y1="18" x2="28" y2="18" stroke="#50c878" stroke-width="1.5"/><polygon points="20,12 28,12 24,18" fill="#50c878"/></g>`,
+
+  ats: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="6" fill="rgba(239,159,39,0.10)" stroke="#EF9F27" stroke-width="2"/><text x="${x-80}" y="${y-8}" fill="#fac775" font-size="10" font-weight="bold">ATS</text><text x="${x-80}" y="${y+6}" fill="#fac775" font-size="11" font-weight="500">${label||'自动切换'}</text>${sub?`<text x="${x-80}" y="${y+18}" fill="#EF9F27" font-size="9">${sub}</text>`:''}<g transform="translate(${x+50},${y-12})"><rect x="0" y="0" width="36" height="24" fill="none" stroke="#EF9F27" stroke-width="1.5"/><text x="5" y="9" fill="#fac775" font-size="7">市电</text><text x="5" y="18" fill="#fac775" font-size="7">柴发</text><line x1="18" y1="5" x2="30" y2="5" stroke="#EF9F27" stroke-width="1.5"/><line x1="18" y1="19" x2="30" y2="19" stroke="#EF9F27" stroke-width="1.5"/></g>`,
+
+  pv_inverter: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="6" fill="rgba(232,168,56,0.15)" stroke="#e8a838" stroke-width="2"/><text x="${x-80}" y="${y-8}" fill="#fac775" font-size="10" font-weight="bold">PV INV</text><text x="${x-80}" y="${y+6}" fill="#fac775" font-size="11" font-weight="500">${label||'光伏逆变器'}</text>${sub?`<text x="${x-80}" y="${y+18}" fill="#e8a838" font-size="9">${sub}</text>`:''}<g transform="translate(${x+50},${y-12})"><rect x="0" y="0" width="36" height="24" fill="none" stroke="#e8a838" stroke-width="1.5"/><line x1="6" y1="6" x2="6" y2="18" stroke="#e8a838" stroke-width="1.5"/><path d="M3,12 L6,9 L9,12 L6,15 Z" fill="#e8a838"/><path d="M14,12 L22,12 M19,8 L22,12 L19,16" stroke="#e8a838" stroke-width="1.5" fill="none"/><line x1="26" y1="6" x2="26" y2="18" stroke="#e8a838" stroke-width="1.5"/></g>`,
+
+  dc_combiner: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="6" fill="rgba(83,74,183,0.12)" stroke="#534AB7" stroke-width="2"/><text x="${x-80}" y="${y-8}" fill="#AFA9EC" font-size="10" font-weight="bold">DC COMB</text><text x="${x-80}" y="${y+6}" fill="#CECBF6" font-size="11" font-weight="500">${label||'直流汇流'}</text>${sub?`<text x="${x-80}" y="${y+18}" fill="#AFA9EC" font-size="9">${sub}</text>`:''}<g transform="translate(${x+50},${y-12})"><rect x="0" y="0" width="36" height="24" fill="none" stroke="#534AB7" stroke-width="1.5"/><line x1="0" y1="6" x2="36" y2="6" stroke="#534AB7" stroke-width="1"/><line x1="0" y1="18" x2="36" y2="18" stroke="#534AB7" stroke-width="1"/><line x1="18" y1="6" x2="18" y2="18" stroke="#534AB7" stroke-width="1"/><circle cx="9" cy="6" r="1.5" fill="#AFA9EC"/><circle cx="27" cy="6" r="1.5" fill="#AFA9EC"/><circle cx="18" cy="12" r="1.5" fill="#AFA9EC"/></g>`,
+
+  hv_cabinet: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="6" fill="url(#gSwitch)" stroke="#EF9F27" stroke-width="2"/><text x="${x-80}" y="${y-8}" fill="#fac775" font-size="10" font-weight="bold">HV CAB</text><text x="${x-80}" y="${y+6}" fill="#fac775" font-size="11" font-weight="500">${label||'高压开关柜'}</text>${sub?`<text x="${x-80}" y="${y+18}" fill="#EF9F27" font-size="9">${sub}</text>`:''}<g transform="translate(${x+50},${y-12})"><rect x="0" y="0" width="36" height="24" fill="none" stroke="#EF9F27" stroke-width="1.5"/><line x1="0" y1="4" x2="36" y2="4" stroke="#EF9F27" stroke-width="0.5"/><line x1="0" y1="20" x2="36" y2="20" stroke="#EF9F27" stroke-width="0.5"/><line x1="12" y1="0" x2="12" y2="24" stroke="#EF9F27" stroke-width="0.5"/><line x1="24" y1="0" x2="24" y2="24" stroke="#EF9F27" stroke-width="0.5"/><text x="6" y="15" text-anchor="middle" fill="#fac775" font-size="6">QF</text><text x="18" y="15" text-anchor="middle" fill="#fac775" font-size="6">CT</text><text x="30" y="15" text-anchor="middle" fill="#fac775" font-size="6">PT</text></g>`,
+
+  lv_cabinet: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="6" fill="url(#gSwitch)" stroke="#F0997B" stroke-width="2"/><text x="${x-80}" y="${y-8}" fill="#F5C4B3" font-size="10" font-weight="bold">LV CAB</text><text x="${x-80}" y="${y+6}" fill="#F5C4B3" font-size="11" font-weight="500">${label||'低压开关柜'}</text>${sub?`<text x="${x-80}" y="${y+18}" fill="#F0997B" font-size="9">${sub}</text>`:''}<g transform="translate(${x+50},${y-12})"><rect x="0" y="0" width="36" height="24" fill="none" stroke="#F0997B" stroke-width="1.5"/><line x1="0" y1="8" x2="36" y2="8" stroke="#F0997B" stroke-width="0.5"/><line x1="0" y1="16" x2="36" y2="16" stroke="#F0997B" stroke-width="0.5"/><text x="18" y="6" text-anchor="middle" fill="#F5C4B3" font-size="5">MCC</text><text x="6" y="14" text-anchor="middle" fill="#F5C4B3" font-size="5">QF1</text><text x="18" y="14" text-anchor="middle" fill="#F5C4B3" font-size="5">QF2</text><text x="30" y="14" text-anchor="middle" fill="#F5C4B3" font-size="5">QF3</text><text x="18" y="22" text-anchor="middle" fill="#F5C4B3" font-size="5">400V</text></g>`,
+
+  pcs_v2: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gPCS)" stroke="#AFA9EC" stroke-width="2.5" filter="url(#sh)"/><text x="${x-80}" y="${y-8}" fill="#CECBF6" font-size="10" font-weight="bold">PCS</text><text x="${x-80}" y="${y+6}" fill="#CECBF6" font-size="12" font-weight="600">${label||'储能变流器'}</text>${sub?`<text x="${x-80}" y="${y+18}" fill="#AFA9EC" font-size="9">${sub}</text>`:''}<g transform="translate(${x+50},${y-12})"><rect x="0" y="0" width="36" height="24" fill="none" stroke="#AFA9EC" stroke-width="1.5"/><text x="4" y="9" fill="#CECBF6" font-size="7">AC</text><text x="4" y="18" fill="#CECBF6" font-size="7">DC</text><path d="M16,12 L26,12 M22,8 L26,12 L22,16" stroke="#AFA9EC" stroke-width="1.5" fill="none"/><path d="M14,9 L10,9 L14,12 L10,15 L14,15" stroke="#AFA9EC" stroke-width="1.5" fill="none"/></g>`,
+
+  // === 兼容别名 — 让 stdType 直接命中 (而非依赖 type chain) ===
+  pcs_v2: undefined,  // 占位, 真身在上方已定义 (此 alias 不可少, 避免重复定义)
 };
 const TYPE_ALIAS={grid:'source',bus:'busbar',inverter:'pcs',bess:'battery',ems:'controller',solar:'pv',charger:'ev',grid_cabinet:'grid_cabinet',cabinet:'cabinet',battery_rack:'battery_rack',battery_container:'battery_container',ac_bus:'ac_bus',dc_bus:'dc_bus',pcc:'pcc'};
 
@@ -4105,7 +4130,11 @@ const NODE_DIM = {
   inductor:{w:36,h:18}, motor:{w:30,h:30}, lamp:{w:20,h:20},
   terminal:{w:16,h:16}, contact:{w:24,h:20}, protection:{w:24,h:30}, cabinet:{w:180,h:44},
   pcc:{w:220,h:44}, grid_cabinet:{w:180,h:44}, battery_rack:{w:180,h:44}, battery_container:{w:180,h:44},
-  ac_bus:{w:340,h:8}, dc_bus:{w:180,h:8}, ems:{w:130,h:120}
+  ac_bus:{w:340,h:8}, dc_bus:{w:180,h:8}, ems:{w:130,h:120},
+  // B1 新增 ESS 设备尺寸
+  bms:{w:180,h:44}, ems_v2:{w:180,h:64}, bms_v2:{w:180,h:44}, pcs_v2:{w:180,h:44},
+  sts:{w:180,h:44}, ats:{w:180,h:44}, pv_inverter:{w:180,h:44},
+  dc_combiner:{w:180,h:44}, hv_cabinet:{w:180,h:44}, lv_cabinet:{w:180,h:44}
 };
 function getNodeDim(type){
   const t = TYPE_ALIAS[type]||type;
@@ -4190,73 +4219,93 @@ function dagLayout(nodes, links, svgW, svgH) {
   return nodes;
 }
 
-function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone, obstacles) {
-  const isCtrl = from.type === 'controller' || to.type === 'controller';
-  const x1 = from.x, x2 = to.x;
-  const y1 = from.y + fromH/2;
-  const y2 = to.y - toH/2;
-  const isDown = y2 > y1;
+function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone, obstacles, portFrom, portTo) {
+  // B3 阶段 — 如果传入了 portFrom/portTo (getBestPorts 算出的边中点), 用 port 作为起讫
+  // 否则 fallback 到节点中心
   let startX, startY, endX, endY;
-  if (isDown || Math.abs(y2-y1) > 20) {
-    startX = x1; startY = isDown ? from.y + fromH/2 : from.y - fromH/2;
-    endX = x2; endY = isDown ? to.y - toH/2 : to.y + toH/2;
+  if(portFrom && portTo){
+    startX=portFrom.x; startY=portFrom.y;
+    endX=portTo.x; endY=portTo.y;
   } else {
-    startX = x1 + (x2 > x1 ? fromW/2 : -fromW/2);
-    startY = from.y;
-    endX = x2 + (x1 > x2 ? toW/2 : -toW/2);
-    endY = to.y;
+    // 旧 V4 行为: 从节点中心算 (但要扣除一半高度, 让起讫在边上)
+    startX=from.x; startY=from.y;
+    endX=to.x; endY=to.y;
   }
+  // 主方向判断
+  const dx=endX-startX, dy=endY-startY;
+  const isVertical=Math.abs(dy) > Math.abs(dx)*0.6;
   let midY;
-  if (fromZone && toZone && fromZone !== toZone) {
-    midY = Math.round((fromZone.y + fromZone.h + toZone.y) / 2);
-  } else if (Math.abs(endY - startY) > 80) {
-    midY = Math.round(startY + (endY - startY) * 0.5);
+  if(isVertical){
+    if(fromZone && toZone && fromZone !== toZone){
+      midY = Math.round((fromZone.y + fromZone.h + toZone.y) / 2);
+    } else if(Math.abs(dy) > 80){
+      midY = Math.round(startY + dy * 0.5);
+    } else {
+      midY = Math.round((startY + endY) / 2);
+    }
   } else {
-    midY = Math.round((startY + endY) / 2);
+    // 水平主走线, midY 保持 startY
+    midY = startY;
   }
-  if(obstacles&&obstacles.length>0){
-    const hMinX=Math.min(startX,endX)-5,hMaxX=Math.max(startX,endX)+5;
+  // B3 阶段 — 节点避让: 水平段 midY 必须绕开所有非端点节点
+  if(obstacles && obstacles.length > 0){
+    const hMinX=Math.min(startX,endX)-5, hMaxX=Math.max(startX,endX)+5;
     let blocked=false;
     for(const o of obstacles){
-      if(hMinX<o.x+o.w+o.pad&&hMaxX>o.x-o.pad&&midY>o.y-o.pad&&midY<o.y+o.h+o.pad){
+      // 跳过端点自身
+      if(o.nodeId===from.id || o.nodeId===to.id)continue;
+      if(hMinX<o.x+o.w+o.pad && hMaxX>o.x-o.pad && midY>o.y-o.pad && midY<o.y+o.h+o.pad){
         blocked=true;break;
       }
     }
     if(blocked){
-      const step=10;let found=false;
-      for(let delta=step;delta<200&&!found;delta+=step){
-        const tryUp=midY-delta,tryDn=midY+delta;
-        let upOk=true,dnOk=true;
+      const step=12;
+      let found=false;
+      // 尝试上下偏移, 找到第一个不冲突的 midY
+      for(let delta=step; delta<240 && !found; delta+=step){
+        const tryUp=midY-delta, tryDn=midY+delta;
+        let upOk=true, dnOk=true;
         for(const o of obstacles){
-          if(hMinX<o.x+o.w+o.pad&&hMaxX>o.x-o.pad){
-            if(tryUp>o.y-o.pad&&tryUp<o.y+o.h+o.pad)upOk=false;
-            if(tryDn>o.y-o.pad&&tryDn<o.y+o.h+o.pad)dnOk=false;
+          if(o.nodeId===from.id || o.nodeId===to.id)continue;
+          if(hMinX<o.x+o.w+o.pad && hMaxX>o.x-o.pad){
+            if(tryUp>o.y-o.pad && tryUp<o.y+o.h+o.pad)upOk=false;
+            if(tryDn>o.y-o.pad && tryDn<o.y+o.h+o.pad)dnOk=false;
           }
         }
-        if(upOk){midY=tryUp;found=true;}
-        else if(dnOk){midY=tryDn;found=true;}
+        if(upOk){midY=tryUp; found=true;}
+        else if(dnOk){midY=tryDn; found=true;}
       }
     }
   }
-  let chOffset = 0;
-  const CHANNEL_SPACING = 12;
-  let chKey = null;
+  // channel 错位 (防多条线重叠)
+  let chOffset=0;
+  const CHANNEL_SPACING=12;
+  let chKey=null;
   for(const key of Object.keys(channels)){
     if(Math.abs(parseFloat(key)-midY)<CHANNEL_SPACING){chKey=key;break;}
   }
-  if(!chKey){chKey=`${midY}`;channels[chKey]=[];}
-  const existing = channels[chKey];
-  for (const e of existing) {
-    const eFrom = Math.min(e.x1, e.x2);
-    const eTo = Math.max(e.x1, e.x2);
-    const nFrom = Math.min(startX, endX);
-    const nTo = Math.max(startX, endX);
-    if (nFrom < eTo && nTo > eFrom) chOffset += 8;
+  if(!chKey){chKey=`${midY}`; channels[chKey]=[];}
+  const existing=channels[chKey];
+  for(const e of existing){
+    const eFrom=Math.min(e.x1,e.x2);
+    const eTo=Math.max(e.x1,e.x2);
+    const nFrom=Math.min(startX,endX);
+    const nTo=Math.max(startX,endX);
+    if(nFrom<eTo && nTo>eFrom)chOffset+=8;
   }
-  existing.push({x1: startX, x2: endX});
-  const actualMidY = midY + chOffset;
-  const path = `M${startX},${startY} V${actualMidY} H${endX} V${endY}`;
-  return { path, isOrtho: true, midX: (startX+endX)/2, midY: actualMidY, startX, startY, endX, endY, midY: actualMidY };
+  existing.push({x1:startX, x2:endX});
+  const actualMidY=midY+chOffset;
+  // 构造 path
+  let path;
+  if(isVertical){
+    // 垂直: M startX,startY V midY H endX V endY
+    path=`M${startX},${startY} V${actualMidY} H${endX} V${endY}`;
+  } else {
+    // 水平: M startX,startY H midX V endY H endX
+    const midX=Math.round((startX+endX)/2);
+    path=`M${startX},${startY} H${midX} V${endY} H${endX}`;
+  }
+  return { path, isOrtho:true, midX:(startX+endX)/2, midY:actualMidY, startX, startY, endX, endY };
 }
 
 
@@ -4467,7 +4516,7 @@ const ESS_V3={
   ONTOLOGY:{
     pcc:{cls:'source',chain:['pcc','grid_source','generic_box'],netDomain:['AC_HV']},
     transformer:{cls:'conversion',chain:['transformer','generic_box'],netDomain:['AC_HV','AC_LV']},
-    pcs:{cls:'conversion',chain:['pcs','generic_box'],netDomain:['AC_LV','DC_BUS']},
+    pcs:{cls:'conversion',chain:['pcs_v2','pcs','generic_box'],netDomain:['AC_LV','DC_BUS']},
     battery:{cls:'storage',chain:['battery','battery_rack','generic_cabinet','generic_box'],netDomain:['DC_BUS']},
     battery_rack:{cls:'storage',chain:['battery_rack','generic_cabinet','generic_box'],netDomain:['DC_BUS']},
     battery_container:{cls:'storage',chain:['battery_container','generic_cabinet','generic_box'],netDomain:['DC_BUS']},
@@ -4477,14 +4526,22 @@ const ESS_V3={
     ac_bus:{cls:'bus',chain:['busbar_ac','generic_box'],netDomain:['AC_LV']},
     dc_bus:{cls:'bus',chain:['busbar_dc','generic_box'],netDomain:['DC_BUS']},
     load:{cls:'load',chain:['load','generic_box'],netDomain:['AC_LV']},
-    pv:{cls:'source',chain:['pv','generic_box'],netDomain:['DC_BUS']},
+    pv:{cls:'source',chain:['pv','pv_inverter','generic_box'],netDomain:['DC_BUS','AC_LV']},
     ev:{cls:'load',chain:['ev','generic_box'],netDomain:['AC_LV']},
-    controller:{cls:'control',chain:['ems_controller','generic_box'],netDomain:['CONTROL']},
-    ems:{cls:'control',chain:['ems_controller','generic_box'],netDomain:['CONTROL']},
+    controller:{cls:'control',chain:['bms_v2','ems_controller','generic_box'],netDomain:['CONTROL']},
+    ems:{cls:'control',chain:['ems_v2','ems_controller','generic_box'],netDomain:['CONTROL']},
+    bms:{cls:'control',chain:['bms_v2','ems_controller','generic_box'],netDomain:['CONTROL']},
     meter:{cls:'source',chain:['meter','generic_box'],netDomain:['AC_HV']},
-    source:{cls:'source',chain:['grid_source','generic_box'],netDomain:['AC_HV']}
+    source:{cls:'source',chain:['grid_source','generic_box'],netDomain:['AC_HV']},
+    // B1 新增 ESS 设备
+    sts:{cls:'switchgear',chain:['sts','generic_box'],netDomain:['AC_LV']},
+    ats:{cls:'switchgear',chain:['ats','generic_box'],netDomain:['AC_LV']},
+    pv_inverter:{cls:'conversion',chain:['pv_inverter','generic_box'],netDomain:['DC_BUS','AC_LV']},
+    dc_combiner:{cls:'bus',chain:['dc_combiner','generic_box'],netDomain:['DC_BUS']},
+    hv_cabinet:{cls:'switchgear',chain:['hv_cabinet','generic_cabinet','generic_box'],netDomain:['AC_HV']},
+    lv_cabinet:{cls:'switchgear',chain:['lv_cabinet','generic_cabinet','generic_box'],netDomain:['AC_LV']}
   },
-  SYNONYMS:{'电网':'pcc','市电':'pcc','并网柜':'grid_cabinet','储能并网柜':'grid_cabinet','高压开关柜':'grid_cabinet','进线柜':'grid_cabinet','储能电池':'battery_rack','电池簇':'battery_rack','电池舱':'battery_container','电池柜':'battery_rack','储能变流器':'pcs','变流器':'pcs','逆变器':'pcs','变压器':'transformer','主变':'transformer','箱变':'transformer','交流母线':'ac_bus','直流母线':'dc_bus','能量管理系统':'ems','ems':'ems','bms':'controller','电池管理系统':'controller','光伏阵列':'pv','光伏':'pv','光伏逆变器':'pcs','充电桩':'ev','充电机':'ev','隔离开关':'breaker','断路器':'breaker','接触器':'breaker','熔断器':'fuse','互感器':'ct','电流互感器':'ct','电压互感器':'pt','防雷':'surge','避雷器':'surge','接地':'earth','继电保护':'relay','综保':'relay','负荷':'load','负载':'load','消防':'load','空调':'load','ups':'load'},
+  SYNONYMS:{'电网':'pcc','市电':'pcc','并网柜':'grid_cabinet','储能并网柜':'grid_cabinet','高压开关柜':'hv_cabinet','进线柜':'grid_cabinet','低压开关柜':'lv_cabinet','mcc柜':'lv_cabinet','储能电池':'battery_rack','电池簇':'battery_rack','电池舱':'battery_container','电池柜':'battery_rack','储能变流器':'pcs','变流器':'pcs','逆变器':'pcs','pcs':'pcs','变压器':'transformer','主变':'transformer','箱变':'transformer','隔离变压器':'transformer','交流母线':'ac_bus','直流母线':'dc_bus','能量管理系统':'ems','ems':'ems','bms':'bms','电池管理系统':'bms','光伏阵列':'pv','光伏':'pv','光伏逆变器':'pv_inverter','pv逆变器':'pv_inverter','直流汇流':'dc_combiner','汇流箱':'dc_combiner','充电桩':'ev','充电机':'ev','隔离开关':'breaker','断路器':'breaker','接触器':'breaker','熔断器':'fuse','互感器':'ct','电流互感器':'ct','电压互感器':'pt','防雷':'surge','避雷器':'surge','接地':'earth','继电保护':'relay','综保':'relay','负荷':'load','负载':'load','消防':'load','空调':'load','ups':'load','静态开关':'sts','静态转换开关':'sts','自动切换':'ats','自动转换开关':'ats','柴发切换':'ats'},
   PORT_MODEL:{
     pcc:[{id:'out',side:'bottom',voltage:10000,domain:'ac',direction:'out'}],
     transformer:[{id:'hv',side:'top',voltage:10000,domain:'ac',direction:'in'},{id:'lv',side:'bottom',voltage:400,domain:'ac',direction:'out'}],
@@ -4531,25 +4588,30 @@ const ESS_V3={
     ESS_SLD:{
       name:'储能系统一次接线图',
       requiredTypes:['pcc','transformer','ac_bus','pcs','dc_bus','battery'],
-      optionalTypes:['breaker','meter','grid_cabinet','battery_rack','controller','ems'],
+      optionalTypes:['breaker','meter','grid_cabinet','battery_rack','controller','ems','bms','sts','ats','hv_cabinet','lv_cabinet'],
       requiredEdges:[
         {from:'pcc',to:'transformer'},{from:'transformer',to:'ac_bus'},
         {from:'ac_bus',to:'pcs'},{from:'pcs',to:'dc_bus'},{from:'dc_bus',to:'battery'}
       ],
+      // C1 阶段 — 主链 (topologyChain): 用于加权评分, 每命中一段 +20
+      topologyChain:['pcc','transformer','ac_bus','pcs','dc_bus','battery'],
       layers:['grid','hv_distribution','conversion','storage','control'],
-      flow:'vertical'
+      flow:'vertical',
+      diagramMode:'SLD'
     },
     MICROGRID:{
       name:'微网系统架构图',
       requiredTypes:['pcc','transformer','ac_bus','pcs','dc_bus','battery','pv'],
-      optionalTypes:['breaker','meter','load','controller','ems'],
+      optionalTypes:['breaker','meter','load','controller','ems','bms','sts','ats','pv_inverter','dc_combiner','hv_cabinet','lv_cabinet'],
       requiredEdges:[
         {from:'pcc',to:'transformer'},{from:'transformer',to:'ac_bus'},
         {from:'ac_bus',to:'pcs'},{from:'pcs',to:'dc_bus'},{from:'dc_bus',to:'battery'},
         {from:'dc_bus',to:'pv'}
       ],
+      topologyChain:['pcc','transformer','ac_bus','pcs','dc_bus','battery','pv'],
       layers:['grid','conversion','lv_distribution','storage','control'],
-      flow:'vertical'
+      flow:'vertical',
+      diagramMode:'SLD'
     },
     EV_STATION:{
       name:'充电站配电图',
@@ -4558,30 +4620,86 @@ const ESS_V3={
       requiredEdges:[
         {from:'pcc',to:'transformer'},{from:'transformer',to:'ac_bus'},{from:'ac_bus',to:'ev'}
       ],
+      topologyChain:['pcc','transformer','ac_bus','ev'],
       layers:['grid','hv_distribution','lv_distribution','load'],
-      flow:'vertical'
+      flow:'vertical',
+      diagramMode:'SLD'
+    },
+    CONTROL_DIAGRAM:{
+      name:'二次控制图',
+      requiredTypes:['ems','controller','pcs','battery'],
+      optionalTypes:['bms','meter','relay'],
+      requiredEdges:[
+        {from:'ems',to:'controller'},{from:'controller',to:'pcs'},{from:'controller',to:'battery'}
+      ],
+      topologyChain:['ems','controller','pcs','battery'],
+      layers:['control','conversion','storage'],
+      flow:'horizontal',
+      diagramMode:'CONTROL'
+    },
+    COMM_DIAGRAM:{
+      name:'通信拓扑图',
+      requiredTypes:['ems','pcs','controller'],
+      optionalTypes:['meter','relay','bms'],
+      requiredEdges:[
+        {from:'ems',to:'pcs'},{from:'ems',to:'controller'}
+      ],
+      topologyChain:['ems','pcs','controller'],
+      layers:['control','conversion','device'],
+      flow:'star',
+      diagramMode:'COMM'
     }
   },
+  /**
+   * C1 阶段 模板匹配 V2 — Jaccard + 拓扑链加权
+   * 旧 V4: 节点+2/-3, 边+2/-1 (容易误判)
+   * V2: 3 个维度加权 — 节点 Jaccard (40%) + 边 Jaccard (40%) + 主链命中 (20%, 每命中一段 +20)
+   * 主链 (topologyChain) 定义模板的核心链路, 比单节点/单边更鲁棒
+   * 例: ESS_SLD 主链 = [pcc→transformer→ac_bus→pcs→dc_bus→battery]
+   *     命中 5/6 段 = +100, 优先于节点多寡
+   */
   matchTemplate(nodes,edges){
     const nodeTypes=new Set(nodes.map(n=>n.stdType||n.type));
+    const userNodeTypes=Array.from(nodeTypes);
+    const userEdgeSet=new Set(edges.map(e=>{
+      const s=nodes.find(n=>n.id===(e.from||e.source));
+      const t=nodes.find(n=>n.id===(e.to||e.target));
+      if(!s||!t)return null;
+      return ((s.stdType||s.type)+'→'+(t.stdType||t.type));
+    }).filter(Boolean));
+    const userEdgeList=Array.from(userEdgeSet);
     const scores={};
     for(const[tname,tmpl]of Object.entries(this.TEMPLATES)){
-      let score=0;
-      const total=tmpl.requiredTypes.length+tmpl.optionalTypes.length;
-      tmpl.requiredTypes.forEach(t=>{if(nodeTypes.has(t))score+=2;else score-=3;});
-      tmpl.optionalTypes.forEach(t=>{if(nodeTypes.has(t))score+=1;});
-      const nm={};nodes.forEach(n=>nm[n.id]=n);
-      tmpl.requiredEdges.forEach(re=>{
-        const exists=edges.some(e=>{
-          const s=nm[e.from||e.source],t=nm[e.to||e.target];
-          return s&&t&&((s.stdType||s.type)===re.from&&(t.stdType||t.type)===re.to);
-        });
-        if(exists)score+=2;else score-=1;
-      });
-      scores[tname]=score;
+      // 1) 节点 Jaccard (40% 权重)
+      const tmplNodeTypes=new Set([...tmpl.requiredTypes||[],...tmpl.optionalTypes||[]]);
+      const userSet=new Set(userNodeTypes);
+      const intersection=new Set([...tmplNodeTypes].filter(x=>userSet.has(x)));
+      const union=new Set([...tmplNodeTypes,...userSet]);
+      const jaccardNode=union.size>0?intersection.size/union.size:0;
+      // 2) 边 Jaccard (40% 权重)
+      const tmplEdgeSet=new Set((tmpl.requiredEdges||[]).map(re=>re.from+'→'+re.to));
+      const userEdgeSetNorm=new Set(userEdgeList);
+      const edgeIntersect=new Set([...tmplEdgeSet].filter(x=>userEdgeSetNorm.has(x)));
+      const edgeUnion=new Set([...tmplEdgeSet,...userEdgeSetNorm]);
+      const jaccardEdge=edgeUnion.size>0?edgeIntersect.size/edgeUnion.size:0;
+      // 3) 主链命中加分 (20% 权重, 但单项每段 +20, 总分可能超过 100)
+      let chainScore=0;
+      if(tmpl.topologyChain&&tmpl.topologyChain.length>0){
+        const chain=tmpl.topologyChain;
+        for(let i=0;i<chain.length-1;i++){
+          const expected=chain[i]+'→'+chain[i+1];
+          if(userEdgeSetNorm.has(expected))chainScore+=20;
+          // 也允许反向
+          else if(userEdgeSetNorm.has(chain[i+1]+'→'+chain[i]))chainScore+=20;
+        }
+      }
+      // 综合得分 (0-100+)
+      const total=0.4*(jaccardNode*100)+0.4*(jaccardEdge*100)+Math.min(chainScore,40);  // chain 最多 40
+      scores[tname]={total:Math.round(total),jaccardNode:jaccardNode.toFixed(2),jaccardEdge:jaccardEdge.toFixed(2),chainScore};
     }
-    const best=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
-    return{templateName:best[0],template:this.TEMPLATES[best[0]],score:best[1],allScores:scores};
+    // 排序
+    const best=Object.entries(scores).sort((a,b)=>b[1].total-a[1].total)[0];
+    return{templateName:best[0],template:this.TEMPLATES[best[0]],score:best[1].total,detail:best[1],allScores:scores};
   },
   applyTemplateCorrection(nodes,edges,template){
     const corrections=[];
@@ -4671,19 +4789,127 @@ const ESS_V3={
     PROTECTION:{color:'#e06070',dash:'6,2',width:1,label:'保护'},
     NEUTRAL:{color:'#50c878',dash:'',width:1.5,label:'中性'}
   },
+  /**
+   * A1 阶段 电压模型 V2 — 根据电压数值动态判定电气域
+   * 输入: 电压数值(支持 V/kV/MV), 例如 35 (kV 默认), 10000 (V), 0.4 (kV), 1500 (V)
+   * 输出: 电气域字符串
+   * 规则:
+   *   voltage == 0 / null / undefined → 通信/控制 (由调用方决定)
+   *   voltage >= 1000V (1kV)         → AC_HV  (10kV/35kV/110kV 都算)
+   *   voltage < 1000V 且是 AC         → AC_LV  (0.4kV/0.69kV)
+   *   直流 (dcDomain === true)        → DC_BUS (750V/1500V)
+   * 兼容旧 V4 写死 (10000/400/750), 仍能正确分类
+   */
+  classifyVoltage(voltage, unit, isDC){
+    if(voltage==null||voltage===0||isNaN(voltage))return null;
+    let v=Number(voltage);
+    if(unit==='kV'||unit==='KV')v*=1000;
+    else if(unit==='MV'||unit==='百万伏特')v*=1e6;
+    if(isDC)return'POWER_DC';
+    if(v>=1000)return'POWER_AC_HV';
+    return'POWER_AC_LV';
+  },
+  /**
+   * A1 阶段 节点电压 V2 — 节点.params.voltage 优先, ONTOLOGY 兜底
+   * 解析: { voltage: 35, unit: 'kV' } → 35000V
+   * 允许 0.4/0.69/6/10/35/110 kV, 750/1500 V DC
+   */
+  resolveNodeVoltage(n){
+    if(!n)return 0;
+    if(n.params&&n.params.voltage!=null){
+      const u=n.params.unit||n.params.voltageUnit||'V';
+      let v=Number(n.params.voltage);
+      if(u==='kV')v*=1000;
+      else if(u==='MV')v*=1e6;
+      return v;
+    }
+    // 兜底: ONTOLOGY chain 的第一个有 voltage 的 port
+    const ports=this.PORT_MODEL[n.stdType]||n.ports||[];
+    for(const p of ports){if(p.voltage&&p.voltage>0)return p.voltage;}
+    return 0;
+  },
+  /**
+   * A1 阶段 域解析 V2 — params.voltage 优先, networkDomain 兜底
+   * 增强: 节点 params.voltage 数值大 (≥1kV) → AC_HV, 中 (<1kV) → AC_LV, 标 dc → DC
+   * 如果一端有 params.voltage 而另一端没有, 用有的一端
+   */
   resolveVoltageDomain(srcNode,tgtNode){
     const srcDomains=srcNode.networkDomain||[];
     const tgtDomains=tgtNode.networkDomain||[];
     const allDomains=[...srcDomains,...tgtDomains];
+    // 1) 控制/通信优先 (非电力线)
     if(allDomains.includes('CONTROL'))return'CONTROL';
     if(allDomains.includes('COMM'))return'COMMUNICATION';
+    // 2) params.voltage 动态分类 (A1 阶段新增)
+    const sv=this.resolveNodeVoltage(srcNode);
+    const tv=this.resolveNodeVoltage(tgtNode);
+    if(sv>0||tv>0){
+      // 端口里只要有一个标了 dc, 优先 DC
+      const isDC=srcDomains.includes('DC_BUS')||tgtDomains.includes('DC_BUS');
+      if(isDC)return'POWER_DC';
+      const v=Math.max(sv||0,tv||0);
+      if(v>=1000)return'POWER_AC_HV';
+      if(v>0)return'POWER_AC_LV';
+    }
+    // 3) 旧 V4 兜底
     if(allDomains.includes('AC_HV'))return'POWER_AC_HV';
     if(allDomains.includes('AC_LV'))return'POWER_AC_LV';
     if(allDomains.includes('DC_BUS'))return'POWER_DC';
     return'POWER_AC_LV';
   },
+  /**
+   * A2 阶段 Bus System V2 — BusObject 数据结构 + 多支路挂接
+   * BusObject: { id, orientation:'horizontal'|'vertical', voltage, networkDomain, connectionPoints:[{x, y, side, nodeId}] }
+   * 一个母线可以挂多个支路,每个支路占用母线边缘的一个 tap 点
+   * 解决: PCS1/PCS2/PCS3/PCS4 → ac_bus 的"蜘蛛网"问题,改为母线 + 多个 tap 点
+   */
+  BUS_TYPES:['busbar','ac_bus','dc_bus','busbar_ac','busbar_dc'],
+  isBusType(stdType){
+    if(!stdType)return false;
+    return this.BUS_TYPES.includes(stdType)||stdType.startsWith('busbar_');
+  },
+  /**
+   * A2 阶段 — 把 bus 节点升级成 BusObject (挂接所有支路)
+   * 输入: nodes, edges
+   * 输出: 同 nodes, 但 bus 节点带 _busConns 字段 (支路 tap 列表)
+   */
+  upgradeBuses(nodes, edges){
+    nodes.forEach(n=>{
+      if(!this.isBusType(n.stdType))return;
+      const conns=edges.filter(e=>e.from===n.id||e.to===n.id).map(e=>({
+        nodeId:e.from===n.id?e.to:e.from,
+        edgeId:e,
+        // tap 位置由 layout engine 在渲染时根据兄弟节点位置动态算
+        side:'bottom'  // 暂定全部从底出, V2.1 再细化为多方向
+      }));
+      n._busConns=conns;
+      n._isBus=true;
+      n._busOrientation=n.stdType==='dc_bus'||n.stdType==='busbar_dc'?'horizontal':'horizontal';
+    });
+  },
+  /**
+   * A3 阶段 TopologyRepair V2 — REPAIR_CHAINS 补完整链
+   * 旧 V4 只补 1 个节点 (如 battery→ac_bus 补 PCS, 但仍然缺 DC bus)
+   * V2 改为补完整链路: battery→ac_bus → battery→dc_bus→pcs→ac_bus
+   * 模板链定义: 起点域 → 终点域, 沿途要经过的标准设备
+   */
+  REPAIR_CHAINS:{
+    // battery → ac_bus  → 补 battery→dc_bus→pcs→ac_bus
+    'battery→ac_bus':{via:['dc_bus','pcs'],fromDomain:'DC_BUS',toDomain:'AC_LV'},
+    'battery→busbar':{via:['dc_bus','pcs'],fromDomain:'DC_BUS',toDomain:'AC_LV'},
+    'battery_rack→ac_bus':{via:['dc_bus','pcs'],fromDomain:'DC_BUS',toDomain:'AC_LV'},
+    'battery_rack→transformer':{via:['dc_bus','pcs','ac_bus'],fromDomain:'DC_BUS',toDomain:'AC_HV'},
+    'battery_container→ac_bus':{via:['dc_bus','pcs'],fromDomain:'DC_BUS',toDomain:'AC_LV'},
+    // pv → ac_bus → 补 pv_inverter (现在叫 pcs 当逆变器)
+    'pv→ac_bus':{via:['pv_inverter'],fromDomain:'DC_BUS',toDomain:'AC_LV'},
+    'pv→battery':{via:['dc_bus','pcs'],fromDomain:'DC_BUS',toDomain:'DC_BUS'},
+    // battery → pcc → 完整升压链
+    'battery→pcc':{via:['dc_bus','pcs','ac_bus','transformer'],fromDomain:'DC_BUS',toDomain:'AC_HV'},
+    'battery→source':{via:['dc_bus','pcs','ac_bus','transformer'],fromDomain:'DC_BUS',toDomain:'AC_HV'},
+    // dc_bus → ac_bus → 必须有 pcs
+    'dc_bus→ac_bus':{via:['pcs'],fromDomain:'DC_BUS',toDomain:'AC_LV'},
+  },
   repairTopology(edges,nodes,errors){
-    const repaired=false;
     const newNodes=[];
     const newEdges=[];
     const repairs=[];
@@ -4692,6 +4918,65 @@ const ESS_V3={
       if(!err.repair||!err.fromId||!err.toId)return;
       const src=nm[err.fromId],tgt=nm[err.toId];
       if(!src||!tgt)return;
+      // A3 V2 — 优先查 REPAIR_CHAINS, 没有再回退到 V4 单点修复
+      const fromType=src.stdType||src.type||'';
+      const toType=tgt.stdType||tgt.type||'';
+      const chainKey=`${fromType}→${toType}`;
+      let via=null;
+      if(this.REPAIR_CHAINS[chainKey]){
+        via=this.REPAIR_CHAINS[chainKey].via;
+      }else{
+        // 反向 (tgt→from 形式) 查表
+        const reverseKey=`${toType}→${fromType}`;
+        if(this.REPAIR_CHAINS[reverseKey]){
+          via=[...this.REPAIR_CHAINS[reverseKey].via].reverse();
+        }
+      }
+      if(via&&via.length>0){
+        // V2: 补完整链
+        const chainNodes=[];
+        const chainIds=[];
+        for(let i=0;i<via.length;i++){
+          const nt=via[i];
+          const nid=nt+'_'+err.fromId+'_'+err.toId+'_'+i;
+          if(nm[nid]||chainNodes.find(n=>n.id===nid))continue;
+          const chainNode={
+            id:nid,type:nt,stdType:nt,
+            label:nt==='dc_bus'?'DC母线':nt==='ac_bus'?'AC母线':nt==='pcs'?'PCS':nt==='transformer'?'变压器':nt==='pv_inverter'?'PV逆变器':nt,
+            sub:'自动补插',
+            deviceClass:nt==='pcs'||nt==='pv_inverter'?'conversion':nt==='dc_bus'||nt==='ac_bus'?'bus':'switchgear',
+            networkDomain:nt==='dc_bus'?['DC_BUS']:nt==='ac_bus'?['AC_LV']:nt==='pcs'?['AC_LV','DC_BUS']:nt==='pv_inverter'?['AC_LV','DC_BUS']:['AC_HV'],
+            layoutLayer:nt==='dc_bus'||nt==='ac_bus'?'bus':nt==='pcs'||nt==='pv_inverter'?'conversion':'hv_distribution',
+            layoutYIdx:nt==='dc_bus'?2:nt==='ac_bus'?2:nt==='pcs'?2:1,
+            layoutXPos:'center',
+            dagreRank:nt==='dc_bus'?2:nt==='ac_bus'?2:nt==='pcs'?2:1,
+            finalSymbol:nt,iecSymbol:this.IEC_REGISTRY[nt]||null,
+            ports:this.PORT_MODEL[nt]||[{id:'in',side:'top',voltage:400,domain:'ac'},{id:'out',side:'bottom',voltage:400,domain:'ac'}],
+            _autoInserted:true
+          };
+          chainNodes.push(chainNode);
+          chainIds.push(nid);
+          nm[nid]=chainNode;
+        }
+        newNodes.push(...chainNodes);
+        // 拆原边 + 链上串联
+        const brokenEdgeIdx=edges.findIndex(e=>(e.from===err.fromId&&e.to===err.toId)||(e.from===err.toId&&e.to===err.fromId));
+        let srcIsFrom=true;
+        if(brokenEdgeIdx>=0){
+          const brokenEdge=edges[brokenEdgeIdx];
+          srcIsFrom=brokenEdge.from===err.fromId;
+          edges.splice(brokenEdgeIdx,1);
+        }
+        const order=[err.fromId,...chainIds,err.toId];
+        // 如果原边方向反了, 翻转
+        const finalOrder=srcIsFrom?order:[...order].reverse();
+        for(let i=0;i<finalOrder.length-1;i++){
+          newEdges.push({from:finalOrder[i],to:finalOrder[i+1],label:'',_autoEdge:true});
+        }
+        repairs.push({inserted:via.join('→'),between:err.fromId+'↔'+err.toId,reason:err.msg,chain:true});
+        return;  // 跳过 V4 单点修复
+      }
+      // === V4 单点修复 fallback ===
       const repairType=err.repair;
       const repairId=repairType+'_'+err.fromId+'_'+err.toId;
       if(nm[repairId]||newNodes.find(n=>n.id===repairId))return;
@@ -4732,13 +5017,27 @@ const ESS_V3={
       const rawType=(n.type||n.name||'').toLowerCase();
       const stdType=this.SYNONYMS[rawType]||rawType;
       const onto=this.ONTOLOGY[stdType]||{cls:'unknown',chain:['generic_box'],netDomain:['AC_LV']};
-      const ports=this.PORT_MODEL[stdType]||[{id:'in',side:'top',voltage:400,domain:'ac'},{id:'out',side:'bottom',voltage:400,domain:'ac'}];
+      let ports=this.PORT_MODEL[stdType]||[{id:'in',side:'top',voltage:400,domain:'ac'},{id:'out',side:'bottom',voltage:400,domain:'ac'}];
       const layerName=this.DEVICE_LAYER[stdType]||'lv_distribution';
       const layerCfg=this.LAYOUT_LAYERS[layerName]||{yIdx:3};
       const supportedSymbols=Object.keys(this.IEC_REGISTRY).concat(['pcc','grid_source','pcs','battery_rack','generic_cabinet','ems_controller','busbar_ac','busbar_dc','load','ev','pv','generic_box']);
       let finalSymbol='generic_box';
       for(const sym of onto.chain){if(supportedSymbols.includes(sym)){finalSymbol=sym;break;}}
       const iecSymbol=this.IEC_REGISTRY[finalSymbol]||null;
+      // A1 阶段 电压 V2 — 读 n.params.voltage/unit, 动态调整 ports 电压
+      const paramV=(n.params&&n.params.voltage!=null)?Number(n.params.voltage):null;
+      const paramU=(n.params&&(n.params.unit||n.params.voltageUnit))||'V';
+      if(paramV!=null&&ports&&ports.length>0){
+        let v=paramV;
+        if(paramU==='kV'||paramU==='KV')v*=1000;
+        else if(paramU==='MV')v*=1e6;
+        ports=ports.map(p=>({...p,voltage:v}));
+        // 同步 networkDomain
+        if(v>=1000&&!onto.netDomain.includes('AC_HV')){
+          // 用户标了高压, 升级 netDomain
+          onto.netDomain=Array.from(new Set([...onto.netDomain,'AC_HV']));
+        }
+      }
       return{...n,stdType,deviceClass:onto.cls,ports,networkDomain:onto.netDomain,layoutLayer:layerName,layoutYIdx:layerCfg.yIdx,layoutXPos:layerCfg.xPos||'center',dagreRank:layerCfg.yIdx,finalSymbol,iecSymbol};
     });
     const nm={};nodes.forEach(n=>nm[n.id]=n);
@@ -4787,6 +5086,8 @@ const ESS_V3={
     });
     if(remainingErrors.length>0)console.warn('[V3] 拓扑错误(未修复):',remainingErrors.map(e=>e.msg||e));
     if(validation.warnings.length>0)console.log('[V3] 拓扑警告:',validation.warnings);
+    // A2 阶段 — Bus System V2 升级: 给 bus 节点加 _busConns 字段
+    this.upgradeBuses(nodes, edges);
     return{nodes,edges,warnings:validation.warnings,errors:remainingErrors.map(e=>e.msg||e),repairs:repairResult.repairs,templateName:templateMatch.templateName,templateCorrections};
   }
 };
@@ -4794,7 +5095,7 @@ const ESS_V3={
 function getBestPorts(fromNode, toNode, fromDim, toDim){
   const fx=fromNode.x, fy=fromNode.y, fw=fromDim.w, fh=fromDim.h;
   const tx=toNode.x, ty=toNode.y, tw=toDim.w, th=toDim.h;
-  const DIR_CONSTRAINTS={busbar:['bottom'],ac_bus:['bottom'],dc_bus:['bottom'],battery:['top','bottom'],battery_rack:['top','bottom'],battery_container:['top','bottom'],controller:['right'],ems:['right'],pv:['bottom'],ev:['top'],load:['top'],breaker:['top','bottom'],switch:['top','bottom'],transformer:['top','bottom'],grid_cabinet:['top','bottom'],pcs:['left','right'],meter:['bottom'],source:['bottom'],pcc:['bottom']};
+  const DIR_CONSTRAINTS={busbar:['bottom'],ac_bus:['bottom'],dc_bus:['bottom'],battery:['top','bottom'],battery_rack:['top','bottom'],battery_container:['top','bottom'],controller:['right'],ems:['right'],bms:['right'],ems_v2:['right'],bms_v2:['right'],pv:['bottom'],pv_inverter:['left','right'],ev:['top'],load:['top'],breaker:['top','bottom'],switch:['top','bottom'],transformer:['top','bottom'],grid_cabinet:['top','bottom'],hv_cabinet:['top','bottom'],lv_cabinet:['top','bottom'],pcs:['left','right'],pcs_v2:['left','right'],sts:['left','right'],ats:['top','bottom'],dc_combiner:['top','bottom'],meter:['bottom'],source:['bottom'],pcc:['bottom']};
   const fromRt=fromNode.stdType||TYPE_ALIAS[fromNode.type]||fromNode.type;
   const toRt=toNode.stdType||TYPE_ALIAS[toNode.type]||toNode.type;
   const fromAllowed=DIR_CONSTRAINTS[fromRt]||['top','bottom','left','right'];
@@ -4817,9 +5118,9 @@ function getBestPorts(fromNode, toNode, fromDim, toDim){
 
 function dagreLayout(nodes, links, svgW, svgH){
   if(typeof dagre==='undefined'){console.warn('[dagreLayout] dagre not loaded, using fallback');return false;}
-  const RANK_ORDER={source:0,meter:0,pcc:0,busbar:1,ac_bus:1,dc_bus:1,breaker:2,switch:2,transformer:2,grid_cabinet:2,pcs:3,battery:3,battery_rack:3,battery_container:3,pv:3,ev:3,load:4,controller:4,ems:4};
+  const RANK_ORDER={source:0,meter:0,pcc:0,busbar:1,ac_bus:1,dc_bus:1,breaker:2,switch:2,transformer:2,grid_cabinet:2,hv_cabinet:2,dc_combiner:2,pcs:3,pcs_v2:3,pv_inverter:3,battery:3,battery_rack:3,battery_container:3,pv:3,sts:3,ats:3,ev:3,load:4,controller:4,ems:4,ems_v2:4,bms:4,bms_v2:4,lv_cabinet:4};
   const g=new dagre.graphlib.Graph();
-  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:50,ranksep:80,marginx:60,marginy:60});
+  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:80,ranksep:100,marginx:60,marginy:60});
   g.setDefaultEdgeLabel(function(){return{};});
   const rankGroups={};
   nodes.forEach(n=>{
@@ -4848,7 +5149,58 @@ function dagreLayout(nodes, links, svgW, svgH){
     const dn=g.node(n.id);
     if(dn){n.x=Math.round(dn.x);n.y=Math.round(dn.y);}
   });
+  // B2 阶段 — 防重叠: dagre 出来后再扫一遍, 任何两个节点 bounding box 重叠就水平推开
+  resolveNodeOverlaps(nodes, 30);  // 30px 最小间距
   return true;
+}
+
+/**
+ * B2 阶段 — 防重叠 pass
+ * 算法: 两两扫描, 找 AABB 重叠, 计算 (dx,dy) 推向量, 推一下, 再扫一遍
+ * 循环直到无重叠或迭代满 50 次
+ * @param {Array} nodes - 节点列表 (含 x,y, _cardW)
+ * @param {number} minGap - 最小间距 (px)
+ */
+function resolveNodeOverlaps(nodes, minGap){
+  const N=nodes.length;
+  if(N<2)return;
+  // 计算每个节点的精确包围盒
+  const boxes=nodes.map(n=>{
+    const rt=n.stdType||TYPE_ALIAS[n.type]||n.type;
+    const dim=getNodeDim(rt);
+    const w=n._cardW||dim.w;
+    const h=dim.h;
+    return {n, w, h, halfW:w/2+minGap, halfH:h/2+minGap};
+  });
+  let iter=0;
+  let moved=true;
+  while(moved && iter<50){
+    moved=false;
+    iter++;
+    for(let i=0;i<N;i++){
+      for(let j=i+1;j<N;j++){
+        const A=boxes[i],B=boxes[j];
+        const dx=B.n.x-A.n.x;
+        const dy=B.n.y-A.n.y;
+        const overlapX=(A.halfW+B.halfW)-Math.abs(dx);
+        const overlapY=(A.halfH+B.halfH)-Math.abs(dy);
+        if(overlapX>0 && overlapY>0){
+          // 重叠: 沿重叠较小方向推开 (dx 方向)
+          if(overlapX<overlapY){
+            const pushX=overlapX/2;
+            if(dx>=0){B.n.x+=pushX;A.n.x-=pushX;}
+            else{B.n.x-=pushX;A.n.x+=pushX;}
+          }else{
+            const pushY=overlapY/2;
+            if(dy>=0){B.n.y+=pushY;A.n.y-=pushY;}
+            else{B.n.y-=pushY;A.n.y+=pushY;}
+          }
+          moved=true;
+        }
+      }
+    }
+  }
+  if(iter>1)console.log(`[resolveNodeOverlaps] 迭代 ${iter} 轮后收敛`);
 }
 
 function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize){
@@ -4934,11 +5286,26 @@ function pathToSvgD(path){
 
 function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   const svgW = 1100, svgH = 800;
+  // C2 阶段 — 4 diagramMode 过滤 (SLD / CONTROL / COMM / LAYOUT)
+  // SLD:    只画电力线 (POWER_AC_HV/LV/DC/NEUTRAL)
+  // CONTROL: 只画控制线 (CONTROL)
+  // COMM:   只画通信线 (COMMUNICATION)
+  // LAYOUT: 画所有线 (默认)
+  const diagramMode = (diagramData&&diagramData.diagramMode)||'LAYOUT';
   const v3Result = ESS_V3.process(diagramData);
   const nodes = v3Result.nodes;
-  const links = v3Result.edges;
+  let links = v3Result.edges;
+  // C2 阶段 — mode 过滤
+  if(diagramMode==='SLD'){
+    links = links.filter(e=>{const d=e.voltageDomain||'';return d.startsWith('POWER_')||d==='NEUTRAL';});
+  } else if(diagramMode==='CONTROL'){
+    links = links.filter(e=>e.voltageDomain==='CONTROL');
+  } else if(diagramMode==='COMM'){
+    links = links.filter(e=>e.voltageDomain==='COMMUNICATION');
+  }
+  // LAYOUT 模式不过滤
   const resolveType = n => n.stdType || TYPE_ALIAS[n.type] || n.type;
-  const ZONE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',busbar:'#4a90d9',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#afa9ec',battery:'#50c878',controller:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878',pcc:'#4a9ee8',grid_cabinet:'#e8a838',battery_rack:'#50c878',battery_container:'#50c878',ac_bus:'#4a90d9',dc_bus:'#afa9ec',ems:'#d4a030'};
+  const ZONE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',busbar:'#4a90d9',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#afa9ec',battery:'#50c878',controller:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878',pcc:'#4a9ee8',grid_cabinet:'#e8a838',battery_rack:'#50c878',battery_container:'#50c878',ac_bus:'#4a90d9',dc_bus:'#afa9ec',ems:'#d4a030',ems_v2:'#d4a030',bms:'#4a90d9',bms_v2:'#4a90d9',pcs_v2:'#afa9ec',sts:'#50c878',ats:'#EF9F27',pv_inverter:'#e8a838',dc_combiner:'#534AB7',hv_cabinet:'#EF9F27',lv_cabinet:'#F0997B'};
   const ZONES = [
     {name:'电源侧',types:['source','meter','pcc'],y:55,h:100,color:'#4a9ee8'},
     {name:'配电母线',types:['busbar','ac_bus','dc_bus'],y:165,h:55,color:'#4a90d9'},
@@ -5012,12 +5379,33 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
       iconFn = (x,y,label,sub) => iecImg(x,y,n.iecSymbol,label,sub);
     }
     svg += iconFn(n.x, n.y, n.label, n.sub);
+    // C3 阶段 — 工程属性显示 (tag/deviceNo/rating/manufacturer/model) 在节点下方小字
+    const props = [];
+    if(n.tag) props.push({k:'Tag',v:n.tag});
+    if(n.deviceNo) props.push({k:'No',v:n.deviceNo});
+    if(n.rating) props.push({k:'额定',v:n.rating});
+    if(n.manufacturer) props.push({k:'厂家',v:n.manufacturer});
+    if(n.model) props.push({k:'型号',v:n.model});
+    if(props.length>0){
+      const propY = n.y + 38;
+      const propText = props.map(p=>`${p.k}:${p.v}`).slice(0,2).join('  |  ');
+      svg += `<text x="${n.x}" y="${propY}" text-anchor="middle" fill="var(--svg-sub)" font-size="8" opacity="0.85">${propText}</text>`;
+    }
   });
   if (links) {
     const channels = {};
     const allLinksForCross = [];
     const cellSize = 10;
-    links.forEach(l => {
+    // C3 阶段 zIndex 分层 — 电力线先画 (底), 控制线次之, 通信线最上
+    // zIndex: power=1, control=2, comm=3
+    const Z_RANK = e => {
+      const d = e.voltageDomain||'';
+      if(d==='COMMUNICATION')return 3;
+      if(d==='CONTROL')return 2;
+      return 1;  // POWER_*/NEUTRAL/PROTECTION
+    };
+    const sortedLinks = [...links].sort((a,b)=>Z_RANK(a)-Z_RANK(b));
+    sortedLinks.forEach(l => {
       const from = nodeMap[l.from];
       const to = nodeMap[l.to];
       if (from && to) {
@@ -5050,7 +5438,8 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
           pathD = pathToSvgD(astarPath);
           routePoints = astarPath;
         } else {
-          const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels, from._zone, to._zone, obstacles);
+          // B3 阶段 — 把 getBestPorts 算出的 fromX,fromY,toX,toY 传给 orthoRoute, 让路径起讫在边中点
+          const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels, from._zone, to._zone, obstacles, {x:fromX,y:fromY}, {x:toX,y:toY});
           pathD = route.path;
           routePoints = [{x:route.startX,y:route.startY},{x:route.startX,y:route.midY},{x:route.endX,y:route.midY},{x:route.endX,y:route.endY}];
         }
