@@ -11975,6 +11975,30 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
 
 function renderArchDiagramFromJSON(d) { renderDiagramFromJSON('archSvg', d, '系统架构图 (AI生成)'); }
 function renderWiringDiagramFromJSON(d) {
+  if(d && d.nodes && d.nodes.length>0){
+    try{
+      renderDiagramFromJSON_SVG('mgWiringSvg', d, '电气一次接线图 (V4引擎)');
+      const svgEl=document.getElementById('mgWiringSvg');
+      if(svgEl && svgEl.innerHTML && svgEl.innerHTML.includes('<svg')){
+        console.log('[接线图] V4管线渲染成功');
+        return;
+      }
+    }catch(e){console.warn('[接线图] V4管线渲染失败，fallback到专用渲染器:',e);}
+  }
+  if(d && d.components && d.components.length>0){
+    const structData={nodes:d.components.map((c,i)=>({id:c.type+'_'+i,type:c.type,label:c.label||c.type,sub:c.sub||''})),links:(d.connections||[]).map(c=>({from:c.from,to:c.to,label:c.label||''}))};
+    if(structData.nodes.length>=2){
+      try{
+        renderDiagramFromJSON_SVG('mgWiringSvg', structData, '电气一次接线图 (V4引擎)');
+        const svgEl=document.getElementById('mgWiringSvg');
+        if(svgEl && svgEl.innerHTML && svgEl.innerHTML.includes('<svg')){
+          console.log('[接线图] V4管线渲染成功(components→nodes转换)');
+          return;
+        }
+      }catch(e){console.warn('[接线图] V4管线渲染失败，fallback到专用渲染器:',e);}
+    }
+  }
+  console.log('[接线图] fallback到硬编码专用渲染器');
   const W=1200, H=950;
   let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   s+=`<defs>`;
