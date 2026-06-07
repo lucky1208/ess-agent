@@ -4247,34 +4247,31 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone
     // 水平主走线, midY 保持 startY
     midY = startY;
   }
-  // B3 阶段 — 节点避让: 水平段 midY 必须绕开所有非端点节点
+  // B3 + Qwen 特效药 3 — orthoRoute 水平段防穿模 (螺旋扫描)
+  // 算法: while(isBlocked) { midY 螺旋偏移 (先 +1, 再 -1, 再 +2, 再 -2 ...) }
+  // 扫描最多 30 轮, 步长 14px (比 Qwen 的 20 更密集, 防窄通道漏)
   if(obstacles && obstacles.length > 0){
     const hMinX=Math.min(startX,endX)-5, hMaxX=Math.max(startX,endX)+5;
-    let blocked=false;
-    for(const o of obstacles){
-      // 跳过端点自身
-      if(o.nodeId===from.id || o.nodeId===to.id)continue;
-      if(hMinX<o.x+o.w+o.pad && hMaxX>o.x-o.pad && midY>o.y-o.pad && midY<o.y+o.h+o.pad){
-        blocked=true;break;
-      }
-    }
-    if(blocked){
-      const step=12;
-      let found=false;
-      // 尝试上下偏移, 找到第一个不冲突的 midY
-      for(let delta=step; delta<240 && !found; delta+=step){
-        const tryUp=midY-delta, tryDn=midY+delta;
-        let upOk=true, dnOk=true;
-        for(const o of obstacles){
-          if(o.nodeId===from.id || o.nodeId===to.id)continue;
-          if(hMinX<o.x+o.w+o.pad && hMaxX>o.x-o.pad){
-            if(tryUp>o.y-o.pad && tryUp<o.y+o.h+o.pad)upOk=false;
-            if(tryDn>o.y-o.pad && tryDn<o.y+o.h+o.pad)dnOk=false;
-          }
+    const STEP=14, MAX_ATTEMPTS=30;
+    let midY_orig=midY;
+    let attempts=0;
+    const isMidYBlocked=(tryY)=>{
+      for(const o of obstacles){
+        if(o.nodeId===from.id || o.nodeId===to.id)continue;
+        if(o.nodeId===from.id+'_label'||o.nodeId===from.id+'_sub'||
+           o.nodeId===to.id+'_label'||o.nodeId===to.id+'_sub')continue;
+        if(hMinX<o.x+o.w+o.pad && hMaxX>o.x-o.pad &&
+           tryY>o.y-o.pad && tryY<o.y+o.h+o.pad){
+          return true;
         }
-        if(upOk){midY=tryUp; found=true;}
-        else if(dnOk){midY=tryDn; found=true;}
       }
+      return false;
+    };
+    while(isMidYBlocked(midY) && attempts < MAX_ATTEMPTS){
+      // 螺旋扫描: +1, -1, +2, -2, +3, -3 ...
+      const offset=STEP*(Math.floor(attempts/2)+1);
+      midY=(attempts%2===0)?(midY_orig+offset):(midY_orig-offset);
+      attempts++;
     }
   }
   // channel 错位 (防多条线重叠)
@@ -5120,16 +5117,29 @@ function dagreLayout(nodes, links, svgW, svgH){
   if(typeof dagre==='undefined'){console.warn('[dagreLayout] dagre not loaded, using fallback');return false;}
   const RANK_ORDER={source:0,meter:0,pcc:0,busbar:1,ac_bus:1,dc_bus:1,breaker:2,switch:2,transformer:2,grid_cabinet:2,hv_cabinet:2,dc_combiner:2,pcs:3,pcs_v2:3,pv_inverter:3,battery:3,battery_rack:3,battery_container:3,pv:3,sts:3,ats:3,ev:3,load:4,controller:4,ems:4,ems_v2:4,bms:4,bms_v2:4,lv_cabinet:4};
   const g=new dagre.graphlib.Graph();
-  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:80,ranksep:100,marginx:60,marginy:60});
+  // Qwen 特效药 1 — 拉大间距防密集重叠
+  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:100,ranksep:140,marginx:50,marginy:50});
   g.setDefaultEdgeLabel(function(){return{};});
   const rankGroups={};
   nodes.forEach(n=>{
     const rt=n.stdType||TYPE_ALIAS[n.type]||n.type;
     const dim=getNodeDim(rt);
+    // Qwen 特效药 1 — 动态节点尺寸 (按 label/sub 字符数)
+    const labelLen=(n.label||'').length;
+    const subLen=(n.sub||'').length;
+    const textLen=labelLen+subLen;
+    // 中文字符按 1.0 倍率, 英文按 0.6, 估算宽度
+    const estW=Math.ceil(labelLen*12+subLen*8+40);
+    const dynamicW=Math.max(dim.w,estW,140);
+    const dynamicH=n.sub?Math.max(dim.h,80):Math.max(dim.h,60);
+    // 挂到节点, 后续 ObstacleBuilder 和 render 都能用到
+    n.width=dynamicW;
+    n.height=dynamicH;
+    n._cardW=dynamicW;  // 兼容旧代码
     const rank=RANK_ORDER[rt]!==undefined?RANK_ORDER[rt]:3;
     if(!rankGroups[rank])rankGroups[rank]=[];
     rankGroups[rank].push(n.id);
-    g.setNode(n.id,{width:dim.w+20,height:dim.h+20});
+    g.setNode(n.id,{width:dynamicW,height:dynamicH});
   });
   links.forEach(l=>{
     if(g.hasNode(l.from)&&g.hasNode(l.to)){
@@ -5147,10 +5157,14 @@ function dagreLayout(nodes, links, svgW, svgH){
   try{dagre.layout(g);console.log('[dagreLayout] success, nodes:',nodes.length);}catch(e){console.warn('[dagreLayout] dagre.layout failed:',e);return false;}
   nodes.forEach(n=>{
     const dn=g.node(n.id);
-    if(dn){n.x=Math.round(dn.x);n.y=Math.round(dn.y);}
+    if(dn){
+      // dagre 给的是中心坐标, 但 getNodeDim/width 是宽高
+      n.x=Math.round(dn.x);
+      n.y=Math.round(dn.y);
+    }
   });
-  // B2 阶段 — 防重叠: dagre 出来后再扫一遍, 任何两个节点 bounding box 重叠就水平推开
-  resolveNodeOverlaps(nodes, 30);  // 30px 最小间距
+  // Qwen 特效药 1 + B2 — 防重叠: dagre 出来后再扫一遍, 任何两个节点 bounding box 重叠就水平推开
+  resolveNodeOverlaps(nodes, 35);  // 35px 最小间距 (Qwen 推荐)
   return true;
 }
 
@@ -5343,19 +5357,60 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
       n._cardW = (getNodeDim(rt)||{w:160}).w;
     });
   }
-  const obstacles = nodes.map(n => {
-    const dim = getNodeDim(resolveType(n))||{w:160,h:60};
-    return {x:n.x-dim.w/2, y:n.y-dim.h/2, w:dim.w, h:dim.h, pad:30, nodeId:n.id};
-  });
+  // Qwen 特效药 2 — ObstacleBuilder 3.0: 物理框 + 膨胀 35px + 文字区
+  const OBSTACLE_PAD = 35;
   nodes.forEach(n => {
-    const label = n.label || '';
-    if (label.length > 0) {
-      const textW = Math.min(label.length * 9, 160);
-      obstacles.push({x:n.x-textW/2, y:n.y-8, w:textW, h:16, pad:5});
+    const w = n.width || n._cardW || 160;
+    const h = n.height || 60;
+    // 1) 节点物理框 + 35px 膨胀区 (防止线贴着边框走或穿小字)
+    obstacles.push({
+      x: n.x - w/2 - OBSTACLE_PAD,
+      y: n.y - h/2 - OBSTACLE_PAD,
+      w: w + OBSTACLE_PAD * 2,
+      h: h + OBSTACLE_PAD * 2,
+      type: 'node_box',
+      pad: OBSTACLE_PAD,
+      nodeId: n.id
+    });
+    // 2) 节点 label 文字区 (中心位置)
+    if(n.label && n.label.length > 0){
+      const labelW = Math.min(n.label.length * 11, w * 0.9);
+      obstacles.push({
+        x: n.x - labelW/2 - 5,
+        y: n.y - 8,
+        w: labelW + 10,
+        h: 14,
+        type: 'text_label',
+        pad: 3,
+        nodeId: n.id + '_label'
+      });
     }
-    if (n.sub) {
-      const subW = Math.min(n.sub.length * 7, 120);
-      obstacles.push({x:n.x-subW/2, y:n.y+8, w:subW, h:12, pad:3});
+    // 3) 节点 sub 文字区 (下方, 容易穿模的元凶)
+    if(n.sub && n.sub.length > 0){
+      const subW = Math.min(n.sub.length * 8, w * 0.9);
+      obstacles.push({
+        x: n.x - subW/2 - 5,
+        y: n.y + h/2 + 3,  // 紧贴节点底部
+        w: subW + 10,
+        h: 16,
+        type: 'text_sub',
+        pad: 3,
+        nodeId: n.id + '_sub'
+      });
+    }
+    // 4) C3 阶段 — 工程属性文字区 (节点再下方)
+    const props = [n.tag, n.deviceNo, n.rating, n.manufacturer, n.model].filter(Boolean);
+    if(props.length > 0){
+      const propW = Math.min(props.join('|').length * 7, w * 1.2);
+      obstacles.push({
+        x: n.x - propW/2 - 3,
+        y: n.y + h/2 + 22,  // sub 文字下方
+        w: propW + 6,
+        h: 14,
+        type: 'text_props',
+        pad: 2,
+        nodeId: n.id + '_props'
+      });
     }
   });
   let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:var(--svg-bg);font-family:'Microsoft YaHei',sans-serif">`;
@@ -5372,13 +5427,48 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     svg += `<rect x="${minX}" y="${zone.y}" width="${maxX-minX}" height="${zone.h}" rx="8" fill="var(--svg-zone-bg)" stroke="${zone.color}" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>`;
     svg += `<text x="${minX+8}" y="${zone.y+14}" fill="${zone.color}" font-size="10" opacity="0.9">${zone.name}</text>`;
   });
+  // Qwen 建议 — 母线视觉欺骗: 提前算每个母线的连接设备 X 范围
+  const busWidthMap = {};
+  const nodeMap2 = {};
+  nodes.forEach(n => { nodeMap2[n.id] = n; });
+  ['ac_bus', 'dc_bus', 'busbar', 'busbar_ac', 'busbar_dc'].forEach(busType => {
+    const busNodes = nodes.filter(n => (n.stdType||n.type) === busType);
+    busNodes.forEach(bus => {
+      const connXs = [];
+      // 收集所有连接到母线的设备的 X 坐标
+      for (const l of (links||[])) {
+        let other = null;
+        if (l.from === bus.id) other = nodeMap2[l.to];
+        else if (l.to === bus.id) other = nodeMap2[l.from];
+        if (other && other.x !== undefined) connXs.push(other.x);
+      }
+      if (connXs.length >= 1) {
+        let w = Math.max(...connXs) - Math.min(...connXs) + 200;
+        w = Math.max(w, 180);  // 最小宽度
+        w = Math.min(w, svgW - 100);  // 最大宽度不超 viewBox
+        busWidthMap[bus.id] = {w, minX: Math.min(...connXs), maxX: Math.max(...connXs)};
+      }
+    });
+  });
+
   nodes.forEach(n => {
     const resolvedType = resolveType(n);
     let iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.cabinet || DIAGRAM_ICONS.source;
     if(n.iecSymbol && typeof iecImg === 'function'){
       iconFn = (x,y,label,sub) => iecImg(x,y,n.iecSymbol,label,sub);
     }
-    svg += iconFn(n.x, n.y, n.label, n.sub);
+    // Qwen 母线视觉欺骗 — bus 节点用动态宽度
+    if (['ac_bus', 'dc_bus', 'busbar', 'busbar_ac', 'busbar_dc'].includes(resolvedType) && busWidthMap[n.id]) {
+      const bw = busWidthMap[n.id].w;
+      const isDC = resolvedType === 'dc_bus' || resolvedType === 'busbar_dc';
+      const fill = isDC ? '#0F6E56' : '#185FA5';
+      svg += `<rect x="${n.x - bw/2}" y="${n.y - 4}" width="${bw}" height="8" rx="2" fill="${fill}" opacity="0.85" filter="url(#sh)"/>`;
+      svg += `<text x="${n.x}" y="${n.y + 20}" text-anchor="middle" fill="${isDC?'#9fe1cb':'#9FE1CB'}" font-size="12" font-weight="500">${n.label||(isDC?'DC母线':'AC母线')}</text>`;
+      // 母线下方小指示 (kV 电压)
+      if(n.sub) svg += `<text x="${n.x}" y="${n.y + 36}" text-anchor="middle" fill="var(--svg-sub)" font-size="10">${n.sub}</text>`;
+    } else {
+      svg += iconFn(n.x, n.y, n.label, n.sub);
+    }
     // C3 阶段 — 工程属性显示 (tag/deviceNo/rating/manufacturer/model) 在节点下方小字
     const props = [];
     if(n.tag) props.push({k:'Tag',v:n.tag});
