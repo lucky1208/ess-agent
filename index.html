@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/graphlib@2.1.8/dist/graphlib.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"></script>
 
 
 <style>
@@ -4181,23 +4183,71 @@ function dagLayout(nodes, links, svgW, svgH) {
 
 function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone) {
   const isCtrl = from.type === 'controller' || to.type === 'controller';
-  const y1 = from.y + (isCtrl ? 0 : fromH/2);
-  const y2 = to.y - (isCtrl ? 0 : toH/2);
-  let x1 = from.x, x2 = to.x;
-  if (isCtrl) {
-    if (from.x < to.x) { x1 = from.x + fromW/2; x2 = to.x - toW/2; }
-    else { x1 = from.x - fromW/2; x2 = to.x + toW/2; }
+  const x1 = from.x, x2 = to.x;
+  const y1 = from.y + fromH/2;
+  const y2 = to.y - toH/2;
+  const isDown = y2 > y1;
+  let startX, startY, endX, endY;
+  if (isDown || Math.abs(y2-y1) > 20) {
+    startX = x1; startY = isDown ? from.y + fromH/2 : from.y - fromH/2;
+    endX = x2; endY = isDown ? to.y - toH/2 : to.y + toH/2;
+  } else {
+    startX = x1 + (x2 > x1 ? fromW/2 : -fromW/2);
+    startY = from.y;
+    endX = x2 + (x1 > x2 ? toW/2 : -toW/2);
+    endY = to.y;
   }
-  const dy = y2 - y1;
+  let midY;
+  if (fromZone && toZone && fromZone !== toZone) {
+    midY = Math.round((fromZone.y + fromZone.h + toZone.y) / 2);
+  } else if (Math.abs(endY - startY) > 80) {
+    midY = Math.round(startY + (endY - startY) * 0.5);
+  } else {
+    midY = Math.round((startY + endY) / 2);
+  }
+  let chOffset = 0;
+  const chKey = `${midY}`;
+  if (!channels[chKey]) channels[chKey] = [];
+  const existing = channels[chKey];
+  for (const e of existing) {
+    const eFrom = Math.min(e.x1, e.x2);
+    const eTo = Math.max(e.x1, e.x2);
+    const nFrom = Math.min(startX, endX);
+    const nTo = Math.max(startX, endX);
+    if (nFrom < eTo && nTo > eFrom) chOffset += 8;
+  }
+  existing.push({x1: startX, x2: endX});
+  const actualMidY = midY + chOffset;
+  const path = `M${startX},${startY} V${actualMidY} H${endX} V${endY}`;
+  return { path, isOrtho: true, midX: (startX+endX)/2, midY: actualMidY, startX, startY, endX, endY, midY: actualMidY };
+}
+  function edgePoint(node, edge, halfW, halfH){
+    switch(edge){
+      case 'top':    return {x:node.x,        y:node.y - halfH};
+      case 'bottom': return {x:node.x,        y:node.y + halfH};
+      case 'left':   return {x:node.x - halfW,y:node.y};
+      case 'right':  return {x:node.x + halfW,y:node.y};
+    }
+  }
+  // 从 fromEdge 出来时,如果是 controller (虚线) 可以从任何边出
+  const fp = edgePoint(from, fromEdge, isCtrl?fromW/2:fromW/2, isCtrl?0:fromH/2);
+  const tp = edgePoint(to,   toEdge,   isCtrl?toW/2:toW/2,   isCtrl?0:toH/2);
+  const x1 = fp.x, y1 = fp.y;
+  const x2 = tp.x, y2 = tp.y;
+
+  // SKILL-10.4: 路由选择 — 优先走外圈/通道, midY 选 zone 间隙
   let midY;
   if (fromZone && toZone && fromZone !== toZone) {
     const gapY = (fromZone.y + fromZone.h + toZone.y) / 2;
     midY = Math.round(gapY);
-  } else if (Math.abs(dy) > 80) {
-    midY = Math.round(y1 + dy * 0.5);
+  } else if (fromEdge === 'left' || fromEdge === 'right') {
+    // 水平主走线: midY 选 from.y (保持水平)
+    midY = from.y;
   } else {
     midY = Math.round((y1 + y2) / 2);
   }
+
+  // channel 错位 (防重叠)
   let chOffset = 0;
   if (!channels[midY]) channels[midY] = [];
   const existing = channels[midY];
@@ -4210,35 +4260,73 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone
   }
   existing.push({x1, x2});
   const actualMidY = midY + chOffset;
-  // 强制每个连线都"绕开"端点设备的 4 边中点入线 (SKILL-10.1: 从设备边中点出发)
-  // from 端: 如果 y1 < from.y, 走 from.y 顶边; 否则走 from.y 底边
-  // to 端: 类似
-  const path = `M${x1},${y1} V${actualMidY} H${x2} V${y2}`;
-  return { path, isOrtho: true, midX: (x1+x2)/2, midY: actualMidY };
+
+  // 构造 path: 取决于 fromEdge / toEdge 的组合
+  let path;
+  if ((fromEdge === 'top' || fromEdge === 'bottom') && (toEdge === 'top' || toEdge === 'bottom')) {
+    // 标准垂直: M x1,y1 V midY H x2 V y2
+    path = `M${x1},${y1} V${actualMidY} H${x2} V${y2}`;
+  } else if (fromEdge === 'right' || fromEdge === 'left') {
+    // 水平出发: M x1,y1 H midX V y2 H x2
+    const midX = Math.round((x1 + x2) / 2);
+    path = `M${x1},${y1} H${midX} V${y2} H${x2}`;
+  } else {
+    // 兜底
+    path = `M${x1},${y1} V${actualMidY} H${x2} V${y2}`;
+  }
+  return { path, isOrtho: true, midX: (x1+x2)/2, midY: actualMidY, fromEdge, toEdge, x1, y1, x2, y2 };
 }
 
-/**
- * 检测两两连线交叉点 (SKILL-10.3: 强制交叉点打点)
- * 输入: paths = [{x1,y1,x2,y2,color,link}, ...] (每条线两端点 + 走线 midY, 走线 = M..V..H..V.. 模式)
- * 返回: crosspoints = [{x, y, color, connected: bool}, ...]
- *   - 两线确实交叉 → 圆点(connected=false 默认是路过打半圆, 但因我们没存 link-to-link 关系, 一律按"打点"处理, 简化)
- */
 function detectCrosspoints(allLinks){
   const cps=[];
+  function segs(link){
+    const s=[];
+    s.push({x1:link.x1,y1:link.y1,x2:link.x1,y2:link.midY});
+    s.push({x1:link.x1,y1:link.midY,x2:link.x2,y2:link.midY});
+    s.push({x1:link.x2,y1:link.midY,x2:link.x2,y2:link.y2});
+    return s;
+  }
+  function crossVV(a,b){
+    const aMinY=Math.min(a.y1,a.y2),aMaxY=Math.max(a.y1,a.y2);
+    const bMinY=Math.min(b.y1,b.y2),bMaxY=Math.max(b.y1,b.y2);
+    if(a.x1===b.x1){
+      const ovS=Math.max(aMinY,bMinY),ovE=Math.min(aMaxY,bMaxY);
+      if(ovE-ovS>2) return {x:a.x1,y:(ovS+ovE)/2};
+    }
+    return null;
+  }
+  function crossVH(v,h){
+    const vMinY=Math.min(v.y1,v.y2),vMaxY=Math.max(v.y1,v.y2);
+    const hMinX=Math.min(h.x1,h.x2),hMaxX=Math.max(h.x1,h.x2);
+    if(v.x1>=hMinX && v.x1<=hMaxX && h.y1>=vMinY && h.y1<=vMaxY){
+      return {x:v.x1,y:h.y1};
+    }
+    return null;
+  }
+  function isTEndpoint(px,py,link){
+    return (Math.abs(px-link.x1)<3 && Math.abs(py-link.y1)<3)||
+           (Math.abs(px-link.x2)<3 && Math.abs(py-link.y2)<3);
+  }
   for(let i=0;i<allLinks.length;i++){
+    const aSegs=segs(allLinks[i]);
     for(let j=i+1;j<allLinks.length;j++){
-      const a=allLinks[i],b=allLinks[j];
-      // 简化: 只检测两条 L 形连线 (M..V..H..V..) 在 midY 段的水平交叉
-      // 假设 midY 是统一的水平段 Y 坐标
-      if(a.midY===b.midY){
-        const aFrom=Math.min(a.x1,a.x2), aTo=Math.max(a.x1,a.x2);
-        const bFrom=Math.min(b.x1,b.x2), bTo=Math.max(b.x1,b.x2);
-        if(aFrom<bTo && aTo>bFrom){
-          // 真正重叠 (不是挨着)
-          const overlapFrom=Math.max(aFrom,bFrom);
-          const overlapTo=Math.min(aTo,bTo);
-          if(overlapTo-overlapFrom>2){
-            cps.push({x:(overlapFrom+overlapTo)/2, y:a.midY, color:a.color});
+      const bSegs=segs(allLinks[j]);
+      for(const as of aSegs){
+        for(const bs of bSegs){
+          const aV=Math.abs(as.x1-as.x2)<1, aH=Math.abs(as.y1-as.y2)<1;
+          const bV=Math.abs(bs.x1-bs.x2)<1, bH=Math.abs(bs.y1-bs.y2)<1;
+          let pt=null;
+          if(aV&&bV) pt=crossVV(as,bs);
+          else if(aV&&bH) pt=crossVH(as,bs);
+          else if(aH&&bV) pt=crossVH(bs,as);
+          if(pt){
+            const dup=cps.some(c=>Math.abs(c.x-pt.x)<3&&Math.abs(c.y-pt.y)<3);
+            if(!dup){
+              const onEndA=isTEndpoint(pt.x,pt.y,allLinks[i]);
+              const onEndB=isTEndpoint(pt.x,pt.y,allLinks[j]);
+              const connected=onEndA||onEndB;
+              cps.push({x:pt.x,y:pt.y,color:allLinks[i].color,connected});
+            }
           }
         }
       }
@@ -4306,36 +4394,150 @@ function renderDiagramFromJSON(containerId, diagramData, title) {
 
 /**
  * 主题切换 (SKILL-10.6: 暗色/亮色模式适配)
- * 切换 body.data-theme, SVG 内部用 var(--xxx) 自动适配
- * 调用 mgRenderDrawings 重新渲染已生成的图纸
+ * 强设 documentElement 上的 CSS 变量, 配合 body[data-theme] 双重保险
+ * (某些 Vercel CDN 缓存场景下 body[data-theme] 选择器可能不匹配, setProperty 一定生效)
  */
+const THEME_PALETTE = {
+  dark: {
+    '--bg1':'#1A1D21','--bg2':'#22262B','--bg3':'#2A2E33',
+    '--border':'rgba(222,220,209,.15)','--text1':'#FAFAF5','--text2':'#C2C0B6',
+    '--svg-bg':'#0d1117','--svg-dot':'#1a1f2e','--svg-title':'#e0e0ff','--svg-sub':'#8888cc','--svg-label':'#C2C0B6',
+    '--svg-stroke-main':'#b0b0a0','--svg-text-light':'#e0e0ff',
+    '--svg-zone-bg':'rgba(20,30,50,0.4)','--svg-zone-grid':'rgba(24,95,165,0.18)',
+    '--icon-bg':'rgba(30,40,60,0.85)','--icon-border':'rgba(120,160,220,0.4)',
+    '--w-ac-bg':'#1a2a4a','--w-dc-bg':'#0d2a15','--w-pcs-bg':'#2a1520','--w-ctrl-bg':'#151530','--w-panel-bg':'#0d1520','--w-border-dim':'#3a3a5e','--w-text-dim':'#606080'
+  },
+  light: {
+    '--bg1':'#F5F4EE','--bg2':'#EAE8DF','--bg3':'#DDDAD0',
+    '--border':'rgba(30,30,30,.15)','--text1':'#1a1d21','--text2':'#4a4a45',
+    '--svg-bg':'#FAFAF5','--svg-dot':'#E0DDD0','--svg-title':'#1a1d21','--svg-sub':'#5a5a55','--svg-label':'#303030',
+    '--svg-stroke-main':'#5a5a55','--svg-text-light':'#1a1d21',
+    '--svg-zone-bg':'rgba(200,200,180,0.25)','--svg-zone-grid':'rgba(24,95,165,0.12)',
+    '--icon-bg':'rgba(230,228,218,0.95)','--icon-border':'rgba(80,100,140,0.5)',
+    '--w-ac-bg':'#d0d8e8','--w-dc-bg':'#d0e8d0','--w-pcs-bg':'#e8d0d0','--w-ctrl-bg':'#d0d0e8','--w-panel-bg':'#d8d8d0','--w-border-dim':'#8a8a9e','--w-text-dim':'#5a5a6a'
+  }
+};
+function applyTheme(theme){
+  const palette = THEME_PALETTE[theme] || THEME_PALETTE.dark;
+  const root = document.documentElement;
+  Object.keys(palette).forEach(k=>{
+    root.style.setProperty(k, palette[k]);
+  });
+  document.body.dataset.theme = theme;
+  try{localStorage.setItem('ess-theme',theme);}catch(e){}
+  const btn=document.getElementById('themeToggleBtn');
+  if(btn)btn.textContent=theme==='dark'?'🌙':'☀️';
+  console.log('[theme] applied', theme);
+}
 window.toggleTheme=function(){
   try{
     const cur=document.body.dataset.theme||'dark';
     const next=cur==='dark'?'light':'dark';
-    document.body.dataset.theme=next;
-    try{localStorage.setItem('ess-theme',next);}catch(e){}
-    const btn=document.getElementById('themeToggleBtn');
-    if(btn)btn.textContent=next==='dark'?'🌙':'☀️';
+    applyTheme(next);
     // 重新渲染已生成的图纸 (让 LLM/JSON 渲染的 SVG 重新走一遍 var(--xxx) 解析)
     if(typeof window.mgRenderDrawings==='function'&&typeof LAST_MG_RESULT!=='undefined'&&LAST_MG_RESULT){
       try{window.mgRenderDrawings();}catch(e){console.warn('重渲染图纸失败:',e);}
     }
-    // 同步调色板
-    console.log('[theme] 切换到',next);
   }catch(err){console.error('toggleTheme error:',err);}
 };
 // 启动时恢复用户偏好
 (function(){
   try{
     const saved=localStorage.getItem('ess-theme');
-    if(saved&&(saved==='dark'||saved==='light')){
-      document.body.dataset.theme=saved;
-      const btn=document.getElementById('themeToggleBtn');
-      if(btn)btn.textContent=saved==='dark'?'🌙':'☀️';
+    if(saved==='light'||saved==='dark'){
+      applyTheme(saved);
+    } else {
+      applyTheme('dark');  // 默认深色
     }
-  }catch(e){}
+  }catch(e){applyTheme('dark');}
 })();
+
+function dagreLayout(nodes, links, svgW, svgH){
+  if(typeof dagre==='undefined') return false;
+  const RANK_ORDER={source:0,meter:1,busbar:2,breaker:3,switch:3,transformer:3,pcs:4,battery:4,pv:4,ev:4,load:5,controller:5};
+  const g=new dagre.graphlib.Graph();
+  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:50,ranksep:80,marginx:60,marginy:60,align:'CU'});
+  g.setDefaultEdgeLabel(function(){return{};});
+  nodes.forEach(n=>{
+    const rt=TYPE_ALIAS[n.type]||n.type;
+    const dim=getNodeDim(rt);
+    g.setNode(n.id,{width:dim.w+20,height:dim.h+20,rank:RANK_ORDER[rt]!==undefined?RANK_ORDER[rt]:3});
+  });
+  links.forEach(l=>{
+    if(g.hasNode(l.from)&&g.hasNode(l.to)){
+      g.setEdge(l.from,l.to,{weight:1});
+    }
+  });
+  try{dagre.layout(g);}catch(e){console.warn('dagre layout failed:',e);return false;}
+  nodes.forEach(n=>{
+    const dn=g.node(n.id);
+    if(dn){n.x=Math.round(dn.x);n.y=Math.round(dn.y);}
+  });
+  return true;
+}
+
+function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize){
+  const cols=Math.ceil(gridW/cellSize),rows=Math.ceil(gridH/cellSize);
+  const sx=Math.round(fromX/cellSize),sy=Math.round(fromY/cellSize);
+  const ex=Math.round(toX/cellSize),ey=Math.round(toY/cellSize);
+  const blocked=new Set();
+  obstacles.forEach(o=>{
+    const ox1=Math.floor((o.x-o.pad)/cellSize),ox2=Math.ceil((o.x+o.w+o.pad)/cellSize);
+    const oy1=Math.floor((o.y-o.pad)/cellSize),oy2=Math.ceil((o.y+o.h+o.pad)/cellSize);
+    for(let gx=ox1;gx<=ox2;gx++)for(let gy=oy1;gy<=oy2;gy++)blocked.add(gx+','+gy);
+  });
+  const h=(x,y)=>Math.abs(x-ex)+Math.abs(y-ey);
+  const open=new Map();
+  const closed=new Set();
+  const parent=new Map();
+  const gScore=new Map();
+  const startKey=sx+','+sy;
+  gScore.set(startKey,0);
+  open.set(startKey,{x:sx,y:sy,f:h(sx,sy)});
+  const dirs=[{dx:0,dy:-1},{dx:0,dy:1},{dx:-1,dy:0},{dx:1,dy:0}];
+  let iterations=0;const maxIter=cols*rows*2;
+  while(open.size>0&&iterations<maxIter){
+    iterations++;
+    let bestKey=null,bestF=Infinity;
+    for(const[k,v]of open){if(v.f<bestF){bestF=v.f;bestKey=k;}}
+    const cur=open.get(bestKey);open.delete(bestKey);
+    if(cur.x===ex&&cur.y===ey){
+      const path=[];let ck=bestKey;
+      while(ck){path.unshift({x:parseInt(ck)*cellSize,y:parseInt(ck.split(',')[1])*cellSize});ck=parent.get(ck);}
+      return path;
+    }
+    closed.add(bestKey);
+    for(const d of dirs){
+      const nx=cur.x+d.dx,ny=cur.y+d.dy;
+      if(nx<0||nx>=cols||ny<0||ny>=rows)continue;
+      const nk=nx+','+ny;
+      if(closed.has(nk)||blocked.has(nk))continue;
+      const ng=(gScore.get(bestKey)||0)+1;
+      if(!gScore.has(nk)||ng<gScore.get(nk)){
+        gScore.set(nk,ng);parent.set(nk,bestKey);
+        open.set(nk,{x:nx,y:ny,f:ng+h(nx,ny)});
+      }
+    }
+  }
+  return [{x:fromX,y:fromY},{x:toX,y:toY}];
+}
+
+function pathToSvgD(path){
+  if(path.length<2)return'';
+  let d=`M${path[0].x},${path[0].y}`;
+  for(let i=1;i<path.length;i++){
+    const prev=path[i-1],cur=path[i];
+    const dx=cur.x-prev.x,dy=cur.y-prev.y;
+    if(Math.abs(dx)>0&&Math.abs(dy)>0){
+      d+=` H${cur.x} V${cur.y}`;
+    }else if(Math.abs(dx)>0){
+      d+=` H${cur.x}`;
+    }else{
+      d+=` V${cur.y}`;
+    }
+  }
+  return d;
+}
 
 function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   const svgW = 1100, svgH = 800;
@@ -4351,24 +4553,37 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   ];
   const nodeMap = {};
   nodes.forEach(n => { nodeMap[n.id] = n; });
-  ZONES.forEach(zone => {
-    const zoneNodes = nodes.filter(n => zone.types.includes(TYPE_ALIAS[n.type]||n.type));
-    const count = zoneNodes.length;
-    if (!count) return;
-    const cardW = Math.min(200, (svgW - 80) / count - 30);
-    const totalW = count * cardW + (count - 1) * 30;
-    const startX = (svgW - totalW) / 2;
-    zoneNodes.forEach((n, i) => {
-      n.x = Math.round(startX + i * (cardW + 30) + cardW / 2);
-      n.y = zone.y + zone.h / 2;
-      n._zone = zone;
-      n._cardW = cardW;
+  const dagreOk = dagreLayout(nodes, links, svgW, svgH);
+  if(!dagreOk){
+    ZONES.forEach(zone => {
+      const zoneNodes = nodes.filter(n => zone.types.includes(TYPE_ALIAS[n.type]||n.type));
+      const count = zoneNodes.length;
+      if (!count) return;
+      const cardW = Math.min(200, (svgW - 80) / count - 30);
+      const totalW = count * cardW + (count - 1) * 30;
+      const startX = (svgW - totalW) / 2;
+      zoneNodes.forEach((n, i) => {
+        n.x = Math.round(startX + i * (cardW + 30) + cardW / 2);
+        n.y = zone.y + zone.h / 2;
+        n._zone = zone;
+        n._cardW = cardW;
+      });
     });
-  });
-  nodes.filter(n => !n._zone).forEach((n, i) => {
-    n.x = 100 + i * 200;
-    n.y = 400;
-    n._cardW = 160;
+    nodes.filter(n => !n._zone).forEach((n, i) => {
+      n.x = 100 + i * 200;
+      n.y = 400;
+      n._cardW = 160;
+    });
+  } else {
+    nodes.forEach(n => {
+      const rt = TYPE_ALIAS[n.type]||n.type;
+      for(const z of ZONES){if(z.types.includes(rt)){n._zone=z;break;}}
+      n._cardW = (getNodeDim(rt)||{w:160}).w;
+    });
+  }
+  const obstacles = nodes.map(n => {
+    const dim = getNodeDim(TYPE_ALIAS[n.type]||n.type)||{w:160,h:60};
+    return {x:n.x-dim.w/2, y:n.y-dim.h/2, w:dim.w, h:dim.h, pad:10};
   });
   let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:var(--svg-bg);font-family:'Microsoft YaHei',sans-serif">`;
   svg += DIAGRAM_DEFS;
@@ -4391,7 +4606,8 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   });
   if (links) {
     const channels = {};
-    const allLinksForCross = [];  // 收集用于交叉点检测
+    const allLinksForCross = [];
+    const cellSize = 10;
     links.forEach(l => {
       const from = nodeMap[l.from];
       const to = nodeMap[l.to];
@@ -4412,21 +4628,37 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         const sw = l.dashed ? '1' : '1.5';
         const fromD = getNodeDim(from.type);
         const toD = getNodeDim(to.type);
-        const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels, from._zone, to._zone);
-        svg += `<path d="${route.path}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
-        // 收集进交叉检测
-        allLinksForCross.push({x1:from.x, x2:to.x, y1:from.y, y2:to.y, midY:route.midY, color, link:l});
+        const isDown = to.y > from.y;
+        const fromX = from.x, fromY = isDown ? from.y + fromD.h/2 : from.y - fromD.h/2;
+        const toX = to.x, toY = isDown ? to.y - toD.h/2 : to.y + toD.h/2;
+        let pathD;
+        const astarPath = astarRoute(fromX, fromY, toX, toY, obstacles, svgW, svgH, cellSize);
+        if(astarPath && astarPath.length >= 2){
+          pathD = pathToSvgD(astarPath);
+        } else {
+          const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels, from._zone, to._zone);
+          pathD = route.path;
+        }
+        svg += `<path d="${pathD}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
+        const midX = (fromX+toX)/2, midY = (fromY+toY)/2;
+        allLinksForCross.push({x1:fromX, x2:toX, y1:fromY, y2:toY, midY, color, link:l});
         if (l.label) {
-          const lblX = route.midX + 6;
-          const lblY = route.midY - 4;
+          const lblX = midX + 6;
+          const lblY = midY - 4;
           svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="var(--svg-label)" font-size="9">${l.label}</text>`;
         }
       }
     });
-    // SKILL-10.3: 强制交叉点画实心圆点
     const cps = detectCrosspoints(allLinksForCross);
     cps.forEach(cp => {
-      svg += `<circle cx="${cp.x.toFixed(1)}" cy="${cp.y}" r="3" fill="${cp.color}" stroke="var(--svg-bg)" stroke-width="1"/>`;
+      if(cp.connected){
+        svg += `<circle cx="${cp.x.toFixed(1)}" cy="${cp.y}" r="3" fill="${cp.color}" stroke="var(--svg-bg)" stroke-width="1"/>`;
+      } else {
+        const r=5;
+        const x=cp.x.toFixed(1);
+        const y=cp.y;
+        svg += `<path d="M${x},${y-r} A${r},${r} 0 0,1 ${x},${y+r}" fill="none" stroke="${cp.color}" stroke-width="1.5"/>`;
+      }
     });
   }
   if (diagramData.loads) {
@@ -4462,8 +4694,8 @@ function renderWiringDiagramFromJSON(d) {
   s+=`<marker id="awG" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#50c878"/></marker>`;
   s+=`<marker id="awR" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#e06070"/></marker>`;
   s+=`</defs>`;
-  s+=`<rect width="${W}" height="${H}" fill="#0d1117"/>`;
-  s+=`<pattern id="dw" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
+  s+=`<rect width="${W}" height="${H}" fill="var(--svg-bg)"/>`;
+  s+=`<pattern id="dw" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="var(--svg-dot)"/></pattern>`;
   s+=`<rect width="${W}" height="${H}" fill="url(#dw)"/>`;
 
   const comps = d.components || [];
@@ -4479,7 +4711,7 @@ function renderWiringDiagramFromJSON(d) {
   s+=`<line x1="${cx}" y1="38" x2="${cx}" y2="65" class="wa" style="stroke:#4a90d9" marker-end="url(#awB)"/>`;
 
   // === PCC/计量 ===
-  s+=`<rect x="${cx-60}" y="65" width="120" height="35" rx="4" fill="#1a2a4a" stroke="#4a90d9" stroke-width="1.5"/>`;
+  s+=`<rect x="${cx-60}" y="65" width="120" height="35" rx="4" fill="var(--w-ac-bg)" stroke="#4a90d9" stroke-width="1.5"/>`;
   s+=`<text x="${cx}" y="85" text-anchor="middle" class="ls" style="fill:#80b0e0">计量/PCC</text>`;
   s+=`<text x="${cx}" y="95" text-anchor="middle" style="fill:#6090c0;font-size:7">PT+CT(电力局资产)</text>`;
   s+=`<line x1="${cx}" y1="100" x2="${cx}" y2="130" class="wa" style="stroke:#4a90d9" marker-end="url(#awB)"/>`;
@@ -4533,7 +4765,7 @@ function renderWiringDiagramFromJSON(d) {
     curY += 40;
     // Load
     s+=`<line x1="${txX}" y1="${curY}" x2="${txX}" y2="${curY+15}" class="wa" style="stroke:#a070d0"/>`;
-    s+=`<rect x="${txX-65}" y="${curY+15}" width="130" height="50" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/>`;
+    s+=`<rect x="${txX-65}" y="${curY+15}" width="130" height="50" rx="6" fill="var(--w-pcs-bg)" stroke="#a070d0" stroke-width="1.5"/>`;
     s+=`<text x="${txX}" y="${curY+35}" text-anchor="middle" class="lb" style="fill:#c090e0;font-size:10">0.4kV负荷${i+1}</text>`;
     s+=`<text x="${txX}" y="${curY+53}" text-anchor="middle" class="ls" style="fill:#8060a0">~${Math.round(500/(txCount||1))}kW</text>`;
   });
@@ -4557,7 +4789,7 @@ function renderWiringDiagramFromJSON(d) {
   }
 
   // 并网柜
-  s+=`<rect x="${bX-70}" y="${bY}" width="140" height="55" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="2"/>`;
+  s+=`<rect x="${bX-70}" y="${bY}" width="140" height="55" rx="6" fill="var(--w-dc-bg)" stroke="#50c878" stroke-width="2"/>`;
   s+=`<text x="${bX}" y="${bY+20}" text-anchor="middle" style="fill:#80e080;font-size:11;font-weight:bold">储能${volt}并网柜</text>`;
   s+=`<text x="${bX}" y="${bY+35}" text-anchor="middle" class="ls" style="fill:#60a060">断路器+继保</text>`;
   s+=`<text x="${bX}" y="${bY+48}" text-anchor="middle" class="ls" style="fill:#508050;font-size:7">过流/速断/接地/防孤岛</text>`;
@@ -4567,7 +4799,7 @@ function renderWiringDiagramFromJSON(d) {
 
   // 升压变 (if 10kV)
   if(is10kV) {
-    s+=`<circle cx="${bX}" cy="${bY+20}" r="22" fill="#2a3020" stroke="#e8a838" stroke-width="2"/>`;
+    s+=`<circle cx="${bX}" cy="${bY+20}" r="22" fill="var(--w-ac-bg)" stroke="#e8a838" stroke-width="2"/>`;
     s+=`<circle cx="${bX}" cy="${bY+20}" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
     s+=`<text x="${bX}" y="${bY+23}" text-anchor="middle" class="ls" style="fill:#e8a838">0.69/10</text>`;
     s+=`<text x="${bX+30}" y="${bY+15}" class="lg" style="fill:#e8a838">升压变</text>`;
@@ -4577,7 +4809,7 @@ function renderWiringDiagramFromJSON(d) {
     bY += 20;
 
     // AC柜
-    s+=`<rect x="${bX-60}" y="${bY}" width="120" height="35" rx="4" fill="#2a2020" stroke="#e06070" stroke-width="1.5"/>`;
+    s+=`<rect x="${bX-60}" y="${bY}" width="120" height="35" rx="4" fill="var(--w-pcs-bg)" stroke="#e06070" stroke-width="1.5"/>`;
     s+=`<text x="${bX}" y="${bY+18}" text-anchor="middle" style="fill:#ff8090;font-size:10;font-weight:bold">AC柜(0.69kV)</text>`;
     s+=`<text x="${bX}" y="${bY+30}" text-anchor="middle" class="ls" style="fill:#c06070">计量/隔离</text>`;
     bY += 35;
@@ -4588,7 +4820,7 @@ function renderWiringDiagramFromJSON(d) {
   // PCS
   const pcs = pcsList[0];
   const pcsLabel = pcs ? pcs.label : 'PCS 1.25MW';
-  s+=`<rect x="${bX-90}" y="${bY}" width="180" height="65" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/>`;
+  s+=`<rect x="${bX-90}" y="${bY}" width="180" height="65" rx="8" fill="var(--w-pcs-bg)" stroke="#e06070" stroke-width="2"/>`;
   s+=`<text x="${bX}" y="${bY+23}" text-anchor="middle" style="fill:white;font-size:12;font-weight:bold">PCS</text>`;
   s+=`<text x="${bX}" y="${bY+41}" text-anchor="middle" class="ls" style="fill:#ffc0c0;font-size:10">${pcsLabel}</text>`;
   s+=`<text x="${bX}" y="${bY+55}" text-anchor="middle" class="ls" style="fill:#c06070;font-size:9">AC↔DC ≥97%</text>`;
@@ -4598,7 +4830,7 @@ function renderWiringDiagramFromJSON(d) {
   // 直流安全注释(画在PCS右侧,不与DC cable冲突)
   const safetyX = bX + 100;
   const safetyY = pcsBottom - 55;
-  s+=`<rect x="${safetyX}" y="${safetyY}" width="120" height="45" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+  s+=`<rect x="${safetyX}" y="${safetyY}" width="120" height="45" rx="4" fill="var(--w-ctrl-bg)" stroke="#6060a0" stroke-width="1"/>`;
   s+=`<text x="${safetyX+60}" y="${safetyY+18}" text-anchor="middle" style="fill:#a0a0ff;font-size:9;font-weight:bold">直流安全</text>`;
   s+=`<text x="${safetyX+60}" y="${safetyY+32}" text-anchor="middle" class="ls" style="fill:#8080c0">绝缘监测</text>`;
   s+=`<text x="${safetyX+60}" y="${safetyY+43}" text-anchor="middle" class="ls" style="fill:#8080c0">接触器+BMS联动</text>`;
@@ -4612,7 +4844,7 @@ function renderWiringDiagramFromJSON(d) {
   // DC disconnect
   const sw = switches[0];
   const swLabel = sw ? sw.label : 'DS';
-  s+=`<rect x="${bX-10}" y="${bY}" width="20" height="18" fill="#2a2a50" stroke="#50c878" stroke-width="1.5" rx="2"/>`;
+  s+=`<rect x="${bX-10}" y="${bY}" width="20" height="18" fill="var(--w-ctrl-bg)" stroke="#50c878" stroke-width="1.5" rx="2"/>`;
   s+=`<text x="${bX}" y="${bY+13}" text-anchor="middle" class="ls" style="fill:#80e080">${swLabel}</text>`;
   bY += 18;
   s+=`<line x1="${bX}" y1="${bY}" x2="${bX}" y2="${bY+20}" class="wd" marker-end="url(#awG)"/>`;
@@ -4621,23 +4853,23 @@ function renderWiringDiagramFromJSON(d) {
   // BESS Battery
   const bat = batteries[0];
   const batLabel = bat ? bat.label : '电池储能系统';
-  s+=`<rect x="${bX-120}" y="${bY}" width="240" height="100" rx="8" fill="#0d2a15" stroke="#50c878" stroke-width="2"/>`;
+  s+=`<rect x="${bX-120}" y="${bY}" width="240" height="100" rx="8" fill="var(--w-dc-bg)" stroke="#50c878" stroke-width="2"/>`;
   s+=`<text x="${bX}" y="${bY+25}" text-anchor="middle" style="fill:#80e080;font-size:13;font-weight:bold">${batLabel}</text>`;
   if(bat && bat.sub) s+=`<text x="${bX}" y="${bY+45}" text-anchor="middle" class="lg" style="fill:#60c060">${bat.sub}</text>`;
   s+=`<text x="${bX}" y="${bY+62}" text-anchor="middle" class="ls" style="fill:#408040">BMS三级+温烟感+气溶胶</text>`;
   s+=`<text x="${bX}" y="${bY+78}" text-anchor="middle" class="ls" style="fill:#308030;font-size:7">LFP | 液冷/风冷 | IP55</text>`;
 
   // BMS box
-  s+=`<rect x="${bX+130}" y="${bY+25}" width="90" height="40" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+  s+=`<rect x="${bX+130}" y="${bY+25}" width="90" height="40" rx="4" fill="var(--w-ctrl-bg)" stroke="#6060a0" stroke-width="1"/>`;
   s+=`<text x="${bX+175}" y="${bY+43}" text-anchor="middle" class="ls" style="fill:#8080c0">BMS三级</text>`;
   s+=`<text x="${bX+175}" y="${bY+58}" text-anchor="middle" class="ls" style="fill:#6060a0;font-size:7">电芯→簇→系统</text>`;
   s+=`<line x1="${bX+120}" y1="${bY+45}" x2="${bX+130}" y2="${bY+45}" class="wc"/>`;
 
   // === EMS Controller ===
   const emsY = Math.max(bY + 20, 165);
-  s+=`<rect x="850" y="${emsY}" width="160" height="180" rx="8" fill="#151530" stroke="#6060a0" stroke-width="1.5"/>`;
+  s+=`<rect x="850" y="${emsY}" width="160" height="180" rx="8" fill="var(--w-ctrl-bg)" stroke="#6060a0" stroke-width="1.5"/>`;
   s+=`<text x="930" y="${emsY+25}" text-anchor="middle" style="fill:#a0a0ff;font-size:11;font-weight:bold">EMS能量管理</text>`;
-  s+=`<line x1="865" y1="${emsY+35}" x2="995" y2="${emsY+35}" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<line x1="865" y1="${emsY+35}" x2="995" y2="${emsY+35}" stroke="var(--w-border-dim)" stroke-width="1"/>`;
   s+=`<text x="930" y="${emsY+55}" text-anchor="middle" class="ls" style="fill:#8080c0">● 峰谷自动调度</text>`;
   s+=`<text x="930" y="${emsY+75}" text-anchor="middle" class="ls" style="fill:#8080c0">● PCC功率实时监测</text>`;
   s+=`<text x="930" y="${emsY+95}" text-anchor="middle" class="ls" style="fill:#8080c0">● 防逆流双闭环</text>`;
@@ -4650,9 +4882,9 @@ function renderWiringDiagramFromJSON(d) {
   s+=`<line x1="850" y1="${emsY+105}" x2="${bX+90}" y2="${emsY+25}" class="wc"/>`;
 
   // === Cable Schedule ===
-  s+=`<rect x="60" y="430" width="380" height="${conns.length*20+80}" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<rect x="60" y="430" width="380" height="${conns.length*20+80}" rx="6" fill="var(--w-panel-bg)" stroke="var(--w-border-dim)" stroke-width="1"/>`;
   s+=`<text x="250" y="455" text-anchor="middle" style="fill:#a0a0ff;font-size:11;font-weight:bold">电缆与设备清单</text>`;
-  s+=`<line x1="70" y1="465" x2="430" y2="465" stroke="#2a2a3e" stroke-width="1"/>`;
+  s+=`<line x1="70" y1="465" x2="430" y2="465" stroke="var(--w-border-dim)" stroke-width="1"/>`;
   conns.forEach((c,i)=>{
     const y=485+i*20;
     const cableInfo = c.cable ? ` → ${c.cable}` : '';
@@ -4663,9 +4895,9 @@ function renderWiringDiagramFromJSON(d) {
   // === Protection Config ===
   if(prots.length>0) {
     const protY = 430 + conns.length*20 + 80 + 15;
-    s+=`<rect x="60" y="${protY}" width="380" height="${prots.length*20+50}" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+    s+=`<rect x="60" y="${protY}" width="380" height="${prots.length*20+50}" rx="6" fill="var(--w-panel-bg)" stroke="var(--w-border-dim)" stroke-width="1"/>`;
     s+=`<text x="250" y="${protY+25}" text-anchor="middle" style="fill:#e06060;font-size:11;font-weight:bold">保护配置</text>`;
-    s+=`<line x1="70" y1="${protY+35}" x2="430" y2="${protY+35}" stroke="#2a2a3e" stroke-width="1"/>`;
+    s+=`<line x1="70" y1="${protY+35}" x2="430" y2="${protY+35}" stroke="var(--w-border-dim)" stroke-width="1"/>`;
     prots.forEach((p,i)=>{
       s+=`<text x="75" y="${protY+55+i*20}" class="ls" style="fill:#e06060">● ${p}</text>`;
     });
@@ -5984,8 +6216,8 @@ function renderWiringSvg(R){
   s+=`<defs>`;
   s+=`<linearGradient id="bus10w" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2a50a0"/><stop offset="50%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>`;
   s+=`</defs>`;
-  s+=`<rect width="${W}" height="${H}" fill="#0d1117"/>`;
-  s+=`<pattern id="dw" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
+  s+=`<rect width="${W}" height="${H}" fill="var(--svg-bg)"/>`;
+  s+=`<pattern id="dw" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="var(--svg-dot)"/></pattern>`;
   s+=`<rect width="${W}" height="${H}" fill="url(#dw)"/>`;
   const hv=P.txHv;const lvKv=(P.txLv/1000).toFixed(1);
   s+=`<text x="200" y="30" fill="#4a90d9" font-size="11" font-weight="bold" text-anchor="middle">国网${hv}kV</text>`;

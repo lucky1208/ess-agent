@@ -180,18 +180,18 @@
 
 | 设备名称 | 新符号 | 旧符号 | 说明 |
 |---------|--------|--------|------|
-| 断路器 | ![](file:///E:/symbols/bkr.png) □ | □ | 矩形框内× |
-| 隔离开关 | ![](file:///E:/symbols/dis.png) □ | □ | 矩形框内· |
-| 负荷开关 | ![](file:///E:/symbols/load.png) □ | □ | 矩形框内⊙ |
-| 变压器（双绕组） | ![](file:///E:/symbols/tx2.png) | ○/◎ | 圆内画横线 |
-| 变压器（三绕组） | ![](file:///E:/symbols/tx3.png) | ◎ | 圆内画两根横线 |
-| 电流互感器 | ![](file:///E:/symbols/ct.png) | ⊗ | 圆内画× |
-| 电压互感器 | ![](file:///E:/symbols/vt.png) | ⊗ | 圆内画+ |
-| 避雷器 | ![](file:///E:/symbols/spd.png) | □ | 等边三角形 |
-| 接地 | ![](file:///E:/symbols/gnd.png) | ▣ | 等边三角形+横线 |
-| 熔断器 | ![](file:///E:/symbols/fuse.png) □ | □ | 矩形框内对角线 |
-| 电抗器 | ![](file:///E:/symbols/reactor.png) | □ | 矩形框内箭头 |
-| 无功补偿/电容器 | ![](file:///E:/symbols/cap.png) | □ | 两平行线段 |
+| 断路器 | ![](iec_symbols_svg/breaker.svg) □ | □ | 矩形框内× |
+| 隔离开关 | ![](iec_symbols_svg/disconnector.svg) □ | □ | 矩形框内· |
+| 负荷开关 | ![](iec_symbols_svg/load_switch.svg) □ | □ | 矩形框内⊙ |
+| 变压器（双绕组） | ![](iec_symbols_svg/transformer_2w.svg) | ○/◎ | 圆内画横线 |
+| 变压器（三绕组） | ![](iec_symbols_svg/transformer_3w.svg) | ◎ | 圆内画两根横线 |
+| 电流互感器 | ![](iec_symbols_svg/current_transformer.svg) | ⊗ | 圆内画× |
+| 电压互感器 | ![](iec_symbols_svg/voltage_transformer.svg) | ⊗ | 圆内画+ |
+| 避雷器 | ![](iec_symbols_svg/surge_arrester.svg) | □ | 等边三角形 |
+| 接地 | ![](iec_symbols_svg/earth_ground.svg) | ▣ | 等边三角形+横线 |
+| 熔断器 | ![](iec_symbols_svg/fuse.svg) □ | □ | 矩形框内对角线 |
+| 电抗器 | ![](iec_symbols_svg/reactor.svg) | □ | 矩形框内箭头 |
+| 无功补偿/电容器 | ![](iec_symbols_svg/capacitor.svg) | □ | 两平行线段 |
 
 > **注**：实际绘图时请使用CAD/Paper软件中符合GB/T 4728.1~4728.13的符号库。
 
