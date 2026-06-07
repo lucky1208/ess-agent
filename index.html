@@ -4239,8 +4239,12 @@ function orthoRoute(from, to, fromH, toH, fromW, toW, channels, fromZone, toZone
     }
   }
   let chOffset = 0;
-  const chKey = `${midY}`;
-  if (!channels[chKey]) channels[chKey] = [];
+  const CHANNEL_SPACING = 12;
+  let chKey = null;
+  for(const key of Object.keys(channels)){
+    if(Math.abs(parseFloat(key)-midY)<CHANNEL_SPACING){chKey=key;break;}
+  }
+  if(!chKey){chKey=`${midY}`;channels[chKey]=[];}
   const existing = channels[chKey];
   for (const e of existing) {
     const eFrom = Math.min(e.x1, e.x2);
@@ -4510,17 +4514,117 @@ const ESS_V3={
   },
   DEVICE_LAYER:{pcc:'grid',source:'grid',meter:'grid',transformer:'hv_distribution',breaker:'hv_distribution',grid_cabinet:'hv_distribution',busbar:'hv_distribution',pcs:'conversion',dc_bus:'conversion',pv:'conversion',ac_bus:'lv_distribution',load:'lv_distribution',ev:'lv_distribution',battery:'storage',battery_rack:'storage',battery_container:'storage',controller:'control',ems:'control'},
   CONNECTION_RULES:[
-    {from:'battery',to:'ac_bus',action:'reject',directional:true,reason:'储能电池不能直连交流母线，需经过PCS'},
-    {from:'battery',to:'busbar',action:'reject',directional:true,reason:'储能电池不能直连交流母线，需经过PCS'},
-    {from:'battery_rack',to:'transformer',action:'reject',directional:true,reason:'储能电池不能直连变压器'},
-    {from:'pv',to:'battery',action:'reject',directional:true,reason:'光伏不能直连电池，需经过PCS/控制器'},
-    {from:'battery',to:'pcc',action:'reject',directional:true,reason:'储能电池不能直连电网，需经过PCS+变压器'},
-    {from:'pv',to:'ac_bus',action:'reject',directional:true,reason:'光伏不能直连交流母线，需经过逆变器'}
+    {from:'battery',to:'ac_bus',action:'reject',repair:'pcs',reason:'储能电池不能直连交流母线，需经过PCS'},
+    {from:'battery',to:'busbar',action:'reject',repair:'pcs',reason:'储能电池不能直连交流母线，需经过PCS'},
+    {from:'battery_rack',to:'ac_bus',action:'reject',repair:'pcs',reason:'电池簇不能直连交流母线，需经过PCS'},
+    {from:'battery_rack',to:'transformer',action:'reject',repair:'pcs',reason:'电池簇不能直连变压器，需经过PCS'},
+    {from:'battery_container',to:'ac_bus',action:'reject',repair:'pcs',reason:'电池舱不能直连交流母线，需经过PCS'},
+    {from:'pv',to:'battery',action:'reject',repair:'pcs',reason:'光伏不能直连电池，需经过PCS/逆变器'},
+    {from:'pv',to:'ac_bus',action:'reject',repair:'pcs',reason:'光伏不能直连交流母线，需经过逆变器'},
+    {from:'battery',to:'pcc',action:'reject',repair:'pcs',reason:'储能电池不能直连电网，需经过PCS+变压器'},
+    {from:'battery',to:'source',action:'reject',repair:'pcs',reason:'储能电池不能直连电源，需经过PCS+变压器'},
+    {from:'dc_bus',to:'ac_bus',action:'reject',repair:'pcs',reason:'DC母线不能直连AC母线，需经过PCS'},
+    {from:'controller',to:'busbar',action:'reject',reason:'控制器不能直连功率母线'},
+    {from:'ems',to:'busbar',action:'reject',reason:'EMS不能直连功率母线'}
   ],
-  DRAWING_PROFILES:{
-    ESS_SLD:{name:'储能系统一次接线图',layers:['grid','hv_distribution','conversion','storage','control'],flow:'vertical'},
-    MICROGRID:{name:'微网系统架构图',layers:['grid','conversion','lv_distribution','storage','control'],flow:'vertical'},
-    EV_STATION:{name:'充电站配电图',layers:['grid','hv_distribution','lv_distribution','load'],flow:'vertical'}
+  TEMPLATES:{
+    ESS_SLD:{
+      name:'储能系统一次接线图',
+      requiredTypes:['pcc','transformer','ac_bus','pcs','dc_bus','battery'],
+      optionalTypes:['breaker','meter','grid_cabinet','battery_rack','controller','ems'],
+      requiredEdges:[
+        {from:'pcc',to:'transformer'},{from:'transformer',to:'ac_bus'},
+        {from:'ac_bus',to:'pcs'},{from:'pcs',to:'dc_bus'},{from:'dc_bus',to:'battery'}
+      ],
+      layers:['grid','hv_distribution','conversion','storage','control'],
+      flow:'vertical'
+    },
+    MICROGRID:{
+      name:'微网系统架构图',
+      requiredTypes:['pcc','transformer','ac_bus','pcs','dc_bus','battery','pv'],
+      optionalTypes:['breaker','meter','load','controller','ems'],
+      requiredEdges:[
+        {from:'pcc',to:'transformer'},{from:'transformer',to:'ac_bus'},
+        {from:'ac_bus',to:'pcs'},{from:'pcs',to:'dc_bus'},{from:'dc_bus',to:'battery'},
+        {from:'dc_bus',to:'pv'}
+      ],
+      layers:['grid','conversion','lv_distribution','storage','control'],
+      flow:'vertical'
+    },
+    EV_STATION:{
+      name:'充电站配电图',
+      requiredTypes:['pcc','transformer','ac_bus','ev'],
+      optionalTypes:['breaker','meter','load','pcs','battery'],
+      requiredEdges:[
+        {from:'pcc',to:'transformer'},{from:'transformer',to:'ac_bus'},{from:'ac_bus',to:'ev'}
+      ],
+      layers:['grid','hv_distribution','lv_distribution','load'],
+      flow:'vertical'
+    }
+  },
+  matchTemplate(nodes,edges){
+    const nodeTypes=new Set(nodes.map(n=>n.stdType||n.type));
+    const scores={};
+    for(const[tname,tmpl]of Object.entries(this.TEMPLATES)){
+      let score=0;
+      const total=tmpl.requiredTypes.length+tmpl.optionalTypes.length;
+      tmpl.requiredTypes.forEach(t=>{if(nodeTypes.has(t))score+=2;else score-=3;});
+      tmpl.optionalTypes.forEach(t=>{if(nodeTypes.has(t))score+=1;});
+      const nm={};nodes.forEach(n=>nm[n.id]=n);
+      tmpl.requiredEdges.forEach(re=>{
+        const exists=edges.some(e=>{
+          const s=nm[e.from||e.source],t=nm[e.to||e.target];
+          return s&&t&&((s.stdType||s.type)===re.from&&(t.stdType||t.type)===re.to);
+        });
+        if(exists)score+=2;else score-=1;
+      });
+      scores[tname]=score;
+    }
+    const best=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
+    return{templateName:best[0],template:this.TEMPLATES[best[0]],score:best[1],allScores:scores};
+  },
+  applyTemplateCorrection(nodes,edges,template){
+    const corrections=[];
+    const nodeTypes=new Set(nodes.map(n=>n.stdType||n.type));
+    const nm={};nodes.forEach(n=>nm[n.id]=n);
+    template.requiredTypes.forEach(reqType=>{
+      if(!nodeTypes.has(reqType)){
+        const autoId='auto_'+reqType+'_'+Date.now();
+        const autoLabel=reqType==='pcc'?'PCC':reqType==='ac_bus'?'AC母线':reqType==='dc_bus'?'DC母线':reqType.toUpperCase();
+        const onto=this.ONTOLOGY[reqType]||{cls:'unknown',chain:['generic_box'],netDomain:['AC_LV']};
+        const newNode={
+          id:autoId,type:reqType,stdType:reqType,
+          label:autoLabel,sub:'模板补插',
+          deviceClass:onto.cls,
+          networkDomain:onto.netDomain,
+          layoutLayer:this.DEVICE_LAYER[reqType]||'lv_distribution',
+          layoutYIdx:(this.LAYOUT_LAYERS[this.DEVICE_LAYER[reqType]||'lv_distribution']||{yIdx:3}).yIdx,
+          layoutXPos:'center',
+          finalSymbol:reqType,iecSymbol:this.IEC_REGISTRY[reqType]||null,
+          ports:this.PORT_MODEL[reqType]||[],
+          _autoInserted:true
+        };
+        nodes.push(newNode);
+        nm[autoId]=newNode;
+        nodeTypes.add(reqType);
+        corrections.push({type:'add_node',nodeType:reqType,reason:'模板要求节点缺失'});
+      }
+    });
+    template.requiredEdges.forEach(re=>{
+      const exists=edges.some(e=>{
+        const s=nm[e.from||e.source],t=nm[e.to||e.target];
+        return s&&t&&((s.stdType||s.type)===re.from&&(t.stdType||t.type)===re.to);
+      });
+      if(!exists){
+        const srcNode=nodes.find(n=>(n.stdType||n.type)===re.from);
+        const tgtNode=nodes.find(n=>(n.stdType||n.type)===re.to);
+        if(srcNode&&tgtNode){
+          edges.push({from:srcNode.id,to:tgtNode.id,label:''});
+          corrections.push({type:'add_edge',from:re.from,to:re.to,reason:'模板要求连接缺失'});
+        }
+      }
+    });
+    return corrections;
   },
   isPortCompatible(sp,tp){
     if(sp.domain==='comm'||tp.domain==='comm')return true;
@@ -4550,13 +4654,76 @@ const ESS_V3={
       const sType=src.stdType||src.type,tType=tgt.stdType||tgt.type;
       this.CONNECTION_RULES.forEach(r=>{
         const fwd=sType===r.from&&tType===r.to;
-        const rev=!r.directional&&sType===r.to&&tType===r.from;
+        const rev=sType===r.to&&tType===r.from;
         if(fwd||rev){
-          errors.push('非法连接:'+(src.label||src.id)+'→'+(tgt.label||tgt.id)+' ('+r.reason+')');
+          errors.push({msg:'非法连接:'+(src.label||src.id)+'↔'+(tgt.label||tgt.id)+' ('+r.reason+')',fromId:src.id,toId:tgt.id,fromType:sType,toType:tType,repair:r.repair||null});
         }
       });
     });
     return{errors,warnings};
+  },
+  VOLTAGE_DOMAINS:{
+    POWER_AC_HV:{color:'#4a9ee8',dash:'',width:2,label:'AC高压'},
+    POWER_AC_LV:{color:'#4a90d9',dash:'',width:1.5,label:'AC低压'},
+    POWER_DC:{color:'#afa9ec',dash:'',width:1.5,label:'DC'},
+    CONTROL:{color:'#d4a030',dash:'4,3',width:1,label:'控制'},
+    COMMUNICATION:{color:'#d4a030',dash:'2,2',width:1,label:'通信'},
+    PROTECTION:{color:'#e06070',dash:'6,2',width:1,label:'保护'},
+    NEUTRAL:{color:'#50c878',dash:'',width:1.5,label:'中性'}
+  },
+  resolveVoltageDomain(srcNode,tgtNode){
+    const srcDomains=srcNode.networkDomain||[];
+    const tgtDomains=tgtNode.networkDomain||[];
+    const allDomains=[...srcDomains,...tgtDomains];
+    if(allDomains.includes('CONTROL'))return'CONTROL';
+    if(allDomains.includes('COMM'))return'COMMUNICATION';
+    if(allDomains.includes('AC_HV'))return'POWER_AC_HV';
+    if(allDomains.includes('AC_LV'))return'POWER_AC_LV';
+    if(allDomains.includes('DC_BUS'))return'POWER_DC';
+    return'POWER_AC_LV';
+  },
+  repairTopology(edges,nodes,errors){
+    const repaired=false;
+    const newNodes=[];
+    const newEdges=[];
+    const repairs=[];
+    const nm={};nodes.forEach(n=>nm[n.id]=n);
+    errors.forEach(err=>{
+      if(!err.repair||!err.fromId||!err.toId)return;
+      const src=nm[err.fromId],tgt=nm[err.toId];
+      if(!src||!tgt)return;
+      const repairType=err.repair;
+      const repairId=repairType+'_'+err.fromId+'_'+err.toId;
+      if(nm[repairId]||newNodes.find(n=>n.id===repairId))return;
+      const repairLabel=repairType==='pcs'?'PCS':repairType==='breaker'?'断路器':repairType==='inverter'?'逆变器':repairType;
+      const repairNode={
+        id:repairId,type:repairType,stdType:repairType,
+        label:repairLabel,sub:'自动补插',
+        deviceClass:repairType==='pcs'?'conversion':'switchgear',
+        networkDomain:repairType==='pcs'?['AC_LV','DC_BUS']:['AC_HV','AC_LV'],
+        layoutLayer:repairType==='pcs'?'conversion':'hv_distribution',
+        layoutYIdx:repairType==='pcs'?2:1,
+        layoutXPos:'center',dagreRank:repairType==='pcs'?3:2,
+        finalSymbol:repairType,iecSymbol:this.IEC_REGISTRY[repairType]||null,
+        ports:this.PORT_MODEL[repairType]||[{id:'in',side:'top',voltage:400,domain:'ac',direction:'in'},{id:'out',side:'bottom',voltage:400,domain:'ac',direction:'out'}],
+        _autoInserted:true
+      };
+      newNodes.push(repairNode);
+      nm[repairId]=repairNode;
+      const brokenEdgeIdx=edges.findIndex(e=>(e.from===err.fromId&&e.to===err.toId)||(e.from===err.toId&&e.to===err.fromId));
+      if(brokenEdgeIdx>=0){
+        const brokenEdge=edges[brokenEdgeIdx];
+        const srcIsFrom=brokenEdge.from===err.fromId;
+        newEdges.push({from:srcIsFrom?err.fromId:err.toId,to:repairId,label:brokenEdge.label||''});
+        newEdges.push({from:repairId,to:srcIsFrom?err.toId:err.fromId,label:''});
+        edges.splice(brokenEdgeIdx,1);
+      }else{
+        newEdges.push({from:err.fromId,to:repairId,label:''});
+        newEdges.push({from:repairId,to:err.toId,label:''});
+      }
+      repairs.push({inserted:repairType,between:err.fromId+'↔'+err.toId,reason:err.msg});
+    });
+    return{newNodes,newEdges,repairs};
   },
   process(rawData){
     const rawNodes=rawData.nodes||[];
@@ -4575,7 +4742,7 @@ const ESS_V3={
       return{...n,stdType,deviceClass:onto.cls,ports,networkDomain:onto.netDomain,layoutLayer:layerName,layoutYIdx:layerCfg.yIdx,layoutXPos:layerCfg.xPos||'center',dagreRank:layerCfg.yIdx,finalSymbol,iecSymbol};
     });
     const nm={};nodes.forEach(n=>nm[n.id]=n);
-    const edges=rawEdges.map(e=>{
+    let edges=rawEdges.map(e=>{
       const src=nm[e.from||e.source],tgt=nm[e.to||e.target];
       let srcPort=null,tgtPort=null;
       if(src&&tgt){
@@ -4591,9 +4758,36 @@ const ESS_V3={
       return{...e,sourcePort:srcPort,targetPort:tgtPort};
     });
     const validation=this.validateTopology(edges,nodes);
-    if(validation.errors.length>0)console.warn('[V3] 拓扑错误:',validation.errors);
+    const repairResult=this.repairTopology(edges,nodes,validation.errors);
+    if(repairResult.newNodes.length>0){
+      nodes.push(...repairResult.newNodes);
+      edges.push(...repairResult.newEdges);
+      repairResult.newNodes.forEach(n=>nm[n.id]=n);
+      console.log('[V3] 拓扑修复:',repairResult.repairs);
+    }
+    const remainingErrors=validation.errors.filter(e=>!e.repair||!repairResult.repairs.find(r=>r.between===e.fromId+'↔'+e.toId));
+    const templateMatch=this.matchTemplate(nodes,edges);
+    let templateCorrections=[];
+    if(templateMatch.score>0){
+      templateCorrections=this.applyTemplateCorrection(nodes,edges,templateMatch.template);
+      if(templateCorrections.length>0){
+        templateCorrections.forEach(c=>{if(c.type==='add_node'){const n=nodes.find(nn=>nn.id===c.nodeType||nn.stdType===c.nodeType);if(n)nm[n.id]=n;}});
+        console.log('[V3] 模板纠偏('+templateMatch.templateName+'):',templateCorrections);
+      }
+    }
+    edges.forEach(e=>{
+      const src=nm[e.from||e.source],tgt=nm[e.to||e.target];
+      if(src&&tgt){
+        e.voltageDomain=this.resolveVoltageDomain(src,tgt);
+        const vd=this.VOLTAGE_DOMAINS[e.voltageDomain]||this.VOLTAGE_DOMAINS.POWER_AC_LV;
+        e.wireColor=vd.color;
+        e.wireDash=vd.dash;
+        e.wireWidth=vd.width;
+      }
+    });
+    if(remainingErrors.length>0)console.warn('[V3] 拓扑错误(未修复):',remainingErrors.map(e=>e.msg||e));
     if(validation.warnings.length>0)console.log('[V3] 拓扑警告:',validation.warnings);
-    return{nodes,edges,warnings:validation.warnings,errors:validation.errors};
+    return{nodes,edges,warnings:validation.warnings,errors:remainingErrors.map(e=>e.msg||e),repairs:repairResult.repairs,templateName:templateMatch.templateName,templateCorrections};
   }
 };
 
@@ -4829,15 +5023,22 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
       if (from && to) {
         const fromRt = resolveType(from), toRt = resolveType(to);
         l._toType = toRt;
-        const dash = l.dashed ? ' stroke-dasharray="4,3"' : '';
-        let color;
-        if (l.dashed) { color = '#d4a030'; }
-        else {
+        let color, dashAttr, sw;
+        if(l.wireColor){
+          color=l.wireColor;
+          dashAttr=l.wireDash?' stroke-dasharray="'+l.wireDash+'"':'';
+          sw=l.wireWidth||1.5;
+        } else if(l.dashed){
+          color='#d4a030';
+          dashAttr=' stroke-dasharray="4,3"';
+          sw=1;
+        } else {
           const WIRE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',pcc:'#4a9ee8',busbar:'#4a90d9',ac_bus:'#4a90d9',dc_bus:'#afa9ec',breaker:'#e8a838',switch:'#e8a838',transformer:'#4a9ee8',grid_cabinet:'#e8a838',pcs:'#afa9ec',battery:'#50c878',battery_rack:'#50c878',battery_container:'#50c878',controller:'#d4a030',ems:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878'};
           color = WIRE_COLORS[toRt] || '#4a9ee8';
+          dashAttr='';
+          sw=1.5;
         }
         const arrow = getArrowForLink(l);
-        const sw = l.dashed ? '1' : '1.5';
         const fromD = getNodeDim(fromRt);
         const toD = getNodeDim(toRt);
         const ports = getBestPorts(from, to, fromD, toD);
@@ -4853,7 +5054,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
           pathD = route.path;
           routePoints = [{x:route.startX,y:route.startY},{x:route.startX,y:route.midY},{x:route.endX,y:route.midY},{x:route.endX,y:route.endY}];
         }
-        svg += `<path d="${pathD}" fill="none" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
+        svg += `<path d="${pathD}" fill="none" stroke="${color}" stroke-width="${sw}"${dashAttr} marker-end="url(#${arrow})"/>`;
         allLinksForCross.push({x1:fromX, x2:toX, y1:fromY, y2:toY, midY:(fromY+toY)/2, color, link:l, points:routePoints});
         if (l.label) {
           const lblX = (fromX+toX)/2 + 6;
@@ -4897,27 +5098,25 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
       svg += `<text x="715" y="${695 + i * 20}" fill="#cecbf6" font-size="9">\u25CF ${p}</text>`;
     });
   }
-  const LEGEND_ITEMS=[
-    {color:'#4a9ee8',label:'AC高压(10kV)',dash:false},
-    {color:'#4a90d9',label:'AC母线',dash:false},
-    {color:'#afa9ec',label:'DC/PCS回路',dash:false},
-    {color:'#50c878',label:'储能/负荷',dash:false},
-    {color:'#e8a838',label:'开关/保护',dash:false},
-    {color:'#d4a030',label:'通信/控制',dash:true}
-  ];
+  const LEGEND_ITEMS=Object.values(ESS_V3.VOLTAGE_DOMAINS).map(vd=>({color:vd.color,label:vd.label,dash:vd.dash,width:vd.width}));
   const lgX=svgW-180,lgY=svgH-20-LEGEND_ITEMS.length*16;
   svg += `<rect x="${lgX-8}" y="${lgY-14}" width="186" height="${LEGEND_ITEMS.length*16+20}" rx="4" fill="var(--svg-bg)" stroke="var(--svg-stroke-main)" stroke-width="0.5" opacity="0.9"/>`;
   svg += `<text x="${lgX}" y="${lgY}" fill="var(--svg-title)" font-size="9" font-weight="bold">图例</text>`;
   LEGEND_ITEMS.forEach((it,i)=>{
     const iy=lgY+14+i*16;
-    const dashAttr=it.dash?' stroke-dasharray="4,3"':'';
-    svg += `<line x1="${lgX}" y1="${iy}" x2="${lgX+25}" y2="${iy}" stroke="${it.color}" stroke-width="1.5"${dashAttr}/>`;
+    const dashAttr=it.dash?' stroke-dasharray="'+it.dash+'"':'';
+    svg += `<line x1="${lgX}" y1="${iy}" x2="${lgX+25}" y2="${iy}" stroke="${it.color}" stroke-width="${it.width||1.5}"${dashAttr}/>`;
     svg += `<text x="${lgX+30}" y="${iy+3}" fill="var(--svg-label)" font-size="8">${it.label}</text>`;
   });
   if(v3Result.errors&&v3Result.errors.length>0){
     const errY=svgH-8;
     svg += `<rect x="10" y="${errY-14}" width="${svgW-20}" height="18" rx="3" fill="#ff4444" opacity="0.15"/>`;
     svg += `<text x="${svgW/2}" y="${errY}" text-anchor="middle" fill="#ff6666" font-size="9">\u26A0 ${v3Result.errors.join('; ')}</text>`;
+  }
+  if(v3Result.repairs&&v3Result.repairs.length>0){
+    const repY=svgH-28-(v3Result.errors&&v3Result.errors.length?18:0);
+    svg += `<rect x="10" y="${repY-14}" width="${svgW-20}" height="18" rx="3" fill="#50c878" opacity="0.1"/>`;
+    svg += `<text x="${svgW/2}" y="${repY}" text-anchor="middle" fill="#50c878" font-size="8">\u2713 拓扑修复: ${v3Result.repairs.map(r=>'插入'+r.inserted+'于'+r.between).join('; ')}</text>`;
   }
   if(v3Result.warnings&&v3Result.warnings.length>0){
     const warnY=svgH-28;
