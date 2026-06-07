@@ -10392,7 +10392,7 @@ function iecImg(type,x,y,w,h,label){
   const src=IEC_SYM[type];
   if(!src) return '';
   const pad=6;
-  return `<rect x="${x-w/2-pad}" y="${y-h/2-pad}" width="${w+pad*2}" height="${h+pad*2}" rx="4" fill="var(--icon-bg)" stroke="var(--icon-border)" stroke-width="1"/><image class="ies-icon-img" href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="1"/>`+(label?`<text x="${x}" y="${y+h/2+14}" text-anchor="middle" fill="var(--svg-text-light)" font-size="10" font-weight="500">${label}</text>`:'');
+  return `<rect x="${x-w/2-pad}" y="${y-h/2-pad}" width="${w+pad*2}" height="${h+pad*2}" rx="4" fill="#1a1a2e" stroke="#4a4a6a" stroke-width="1"/><image class="ies-icon-img" href="${src}" x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" opacity="1"/>`+(label?`<text x="${x}" y="${y+h/2+14}" text-anchor="middle" fill="#c0c0d0" font-size="10" font-weight="500">${label}</text>`:'');
 }
 const DIAGRAM_ICONS = {
   source: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="url(#gGrid)" stroke="#85B7EB" stroke-width="2" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#85B7EB" font-size="12">${sub}</text>`:''}`,
@@ -11068,9 +11068,10 @@ const ESS_V3={
     const corrections=[];
     const nodeTypes=new Set(nodes.map(n=>n.stdType||n.type));
     const nm={};nodes.forEach(n=>nm[n.id]=n);
+    let autoIdx=0;
     template.requiredTypes.forEach(reqType=>{
       if(!nodeTypes.has(reqType)){
-        const autoId='auto_'+reqType+'_'+Date.now();
+        const autoId='auto_'+reqType+'_'+(autoIdx++);
         const autoLabel=reqType==='pcc'?'PCC':reqType==='ac_bus'?'AC母线':reqType==='dc_bus'?'DC母线':reqType.toUpperCase();
         const onto=this.ONTOLOGY[reqType]||{cls:'unknown',chain:['generic_box'],netDomain:['AC_LV']};
         const newNode={
@@ -11088,7 +11089,7 @@ const ESS_V3={
         nodes.push(newNode);
         nm[autoId]=newNode;
         nodeTypes.add(reqType);
-        corrections.push({type:'add_node',nodeType:reqType,reason:'模板要求节点缺失'});
+        corrections.push({type:'add_node',nodeType:reqType,nodeId:autoId,reason:'模板要求节点缺失'});
       }
     });
     template.requiredEdges.forEach(re=>{
@@ -11430,10 +11431,10 @@ const ESS_V3={
     const remainingErrors=validation.errors.filter(e=>!e.repair||!repairResult.repairs.find(r=>r.between===e.fromId+'↔'+e.toId));
     const templateMatch=this.matchTemplate(nodes,edges);
     let templateCorrections=[];
-    if(templateMatch.score>0){
+    if(templateMatch.score>-5){
       templateCorrections=this.applyTemplateCorrection(nodes,edges,templateMatch.template);
       if(templateCorrections.length>0){
-        templateCorrections.forEach(c=>{if(c.type==='add_node'){const n=nodes.find(nn=>nn.id===c.nodeType||nn.stdType===c.nodeType);if(n)nm[n.id]=n;}});
+        templateCorrections.forEach(c=>{if(c.type==='add_node'&&c.nodeId){const n=nodes.find(nn=>nn.id===c.nodeId);if(n)nm[n.id]=n;}});
         console.log('[V3] 模板纠偏('+templateMatch.templateName+'):',templateCorrections);
       }
     }
@@ -11822,7 +11823,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     const resolvedType = resolveType(n);
     let iconFn = DIAGRAM_ICONS[resolvedType] || DIAGRAM_ICONS.cabinet || DIAGRAM_ICONS.source;
     if(n.iecSymbol && typeof iecImg === 'function'){
-      iconFn = (x,y,label,sub) => iecImg(x,y,n.iecSymbol,label,sub);
+      iconFn = (x,y,label,sub) => iecImg(n.iecSymbol,x,y,44,50,label);
     }
     // Qwen 母线视觉欺骗 — bus 节点用动态宽度
     if (['ac_bus', 'dc_bus', 'busbar', 'busbar_ac', 'busbar_dc'].includes(resolvedType) && busWidthMap[n.id]) {
