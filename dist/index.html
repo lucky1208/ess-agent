@@ -11905,7 +11905,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     }
     if (['ac_bus', 'dc_bus', 'busbar', 'busbar_ac', 'busbar_dc'].includes(type) && busWidthMap[n.id]) {
       const bw = busWidthMap[n.id].w;
-      const isDC = resolvedType === 'dc_bus' || resolvedType === 'busbar_dc';
+      const isDC = type === 'dc_bus' || type === 'busbar_dc';
       const fill = isDC ? '#0F6E56' : '#185FA5';
       svg += `<rect x="${n.x - bw/2}" y="${n.y - 4}" width="${bw}" height="8" rx="2" fill="${fill}" opacity="0.85" filter="url(#sh)"/>`;
       svg += `<text x="${n.x}" y="${n.y + 20}" text-anchor="middle" fill="${isDC?'#9fe1cb':'#9FE1CB'}" font-size="12" font-weight="500">${n.label||(isDC?'DC母线':'AC母线')}</text>`;
