@@ -10903,7 +10903,7 @@ const ESS_V3={
     hv_cabinet:{cls:'switchgear',chain:['hv_cabinet','generic_cabinet','generic_box'],netDomain:['AC_HV']},
     lv_cabinet:{cls:'switchgear',chain:['lv_cabinet','generic_cabinet','generic_box'],netDomain:['AC_LV']}
   },
-  SYNONYMS:{'电网':'pcc','市电':'pcc','国网':'pcc','南网':'pcc','电网公司':'pcc','pg&e':'pcc','utility':'pcc','grid':'pcc','power_grid':'pcc','并网柜':'grid_cabinet','储能并网柜':'grid_cabinet','高压开关柜':'hv_cabinet','进线柜':'grid_cabinet','低压开关柜':'lv_cabinet','mcc柜':'lv_cabinet','储能电池':'battery_rack','电池簇':'battery_rack','电池舱':'battery_container','电池柜':'battery_rack','储能变流器':'pcs','变流器':'pcs','逆变器':'pcs','pcs':'pcs','变压器':'transformer','主变':'transformer','箱变':'transformer','隔离变压器':'transformer','交流母线':'ac_bus','直流母线':'dc_bus','能量管理系统':'ems','ems':'ems','bms':'bms','电池管理系统':'bms','光伏阵列':'pv','光伏':'pv','光伏逆变器':'pv_inverter','pv逆变器':'pv_inverter','直流汇流':'dc_combiner','汇流箱':'dc_combiner','充电桩':'ev','充电机':'ev','隔离开关':'breaker','断路器':'breaker','接触器':'breaker','熔断器':'fuse','互感器':'ct','电流互感器':'ct','电压互感器':'pt','防雷':'surge','避雷器':'surge','接地':'earth','继电保护':'relay','综保':'relay','负荷':'load','负载':'load','消防':'load','空调':'load','ups':'load','静态开关':'sts','静态转换开关':'sts','自动切换':'ats','自动转换开关':'ats','柴发切换':'ats','储能柜':'battery_container','储能舱':'battery_container','储能集装箱':'battery_container','bess':'battery_container','battery container':'battery_container','battery energy storage':'battery_container','battery_rack':'battery_rack','battery_cluster':'battery_rack'},
+  SYNONYMS:{'电网':'pcc','市电':'pcc','国网':'pcc','南网':'pcc','电网公司':'pcc','pg&e':'pcc','pge':'pcc','pacific gas':'pcc','national grid':'pcc','sce':'pcc','sdg&e':'pcc','power company':'pcc','electric utility':'pcc','utility grid':'pcc','utility':'pcc','grid':'pcc','power_grid':'pcc','并网柜':'grid_cabinet','储能并网柜':'grid_cabinet','高压开关柜':'hv_cabinet','进线柜':'grid_cabinet','低压开关柜':'lv_cabinet','mcc柜':'lv_cabinet','储能电池':'battery_rack','电池簇':'battery_rack','电池舱':'battery_container','电池柜':'battery_rack','储能变流器':'pcs','变流器':'pcs','逆变器':'pcs','pcs':'pcs','变压器':'transformer','主变':'transformer','箱变':'transformer','隔离变压器':'transformer','升压变':'transformer','降压变':'transformer','交流母线':'ac_bus','直流母线':'dc_bus','能量管理系统':'ems','ems':'ems','bms':'bms','电池管理系统':'bms','光伏阵列':'pv','光伏':'pv','太阳能':'pv','光伏逆变器':'pv_inverter','pv逆变器':'pv_inverter','直流汇流':'dc_combiner','汇流箱':'dc_combiner','充电桩':'ev','充电机':'ev','超充':'ev','ev充电':'ev','隔离开关':'breaker','断路器':'breaker','接触器':'breaker','空开':'breaker','熔断器':'fuse','互感器':'ct','电流互感器':'ct','ta':'ct','电压互感器':'pt','tv':'pt','防雷':'surge','避雷器':'surge','接地':'earth','继电保护':'relay','综保':'relay','负荷':'load','负载':'load','消防':'load','空调':'load','照明':'load','ups':'load','关键负荷':'load','一般负荷':'load','静态开关':'sts','静态转换开关':'sts','自动切换':'ats','自动转换开关':'ats','ats':'ats','柴发切换':'ats','储能柜':'battery_container','储能舱':'battery_container','储能集装箱':'battery_container','bess':'battery_container','battery container':'battery_container','battery energy storage':'battery_container','battery_rack':'battery_rack','battery_cluster':'battery_rack','计量表':'meter','电表':'meter','关口表':'meter','双向电表':'meter','智能电表':'meter'},
   PORT_MODEL:{
     pcc:[{id:'out',side:'bottom',voltage:10000,domain:'ac',direction:'out'}],
     transformer:[{id:'hv',side:'top',voltage:10000,domain:'ac',direction:'in'},{id:'lv',side:'bottom',voltage:400,domain:'ac',direction:'out'}],
@@ -11761,7 +11761,38 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     links = links.filter(e=>e.voltageDomain==='COMMUNICATION');
   }
   // LAYOUT 模式不过滤
-  const resolveType = n => n.stdType || n.type;
+  const RESOLVE_MAP = {
+    'source':'source','pcc':'source','grid':'source','utility':'source',
+    'busbar':'busbar','ac_bus':'busbar','busbar_ac':'busbar',
+    'dc_bus':'dcBus','busbar_dc':'dcBus','dc_busbar':'dcBus',
+    'transformer':'transformer',
+    'breaker':'breaker','circuit_breaker':'breaker',
+    'switch':'switch','disconnector':'switch','isolator':'switch',
+    'pcs':'pcs','pcs_v2':'pcs_v2','inverter':'pcs','converter':'pcs',
+    'battery':'battery','battery_rack':'battery_rack',
+    'battery_container':'battery_container','bess':'battery_container',
+    'controller':'controller','ems':'ems','ems_v2':'ems_v2',
+    'bms':'bms_v2','bms_v2':'bms_v2',
+    'load':'load',
+    'pv':'pv','solar':'pv','pv_inverter':'pv_inverter',
+    'ev':'ev','charger':'ev','ev_charger':'ev',
+    'dc_combiner':'dc_combiner',
+    'grid_cabinet':'grid_cabinet','hv_cabinet':'hv_cabinet','lv_cabinet':'lv_cabinet',
+    'cabinet':'cabinet','switchgear':'cabinet',
+    'meter':'meter',
+    'fuse':'fuse','ct':'ct','pt':'pt','relay':'relay','contactor':'contactor',
+    'surge':'surge','earth':'earth','protection':'protection',
+    'sts':'sts','ats':'ats',
+  };
+  const resolveType = n => {
+    const raw = n.stdType || n.type || '';
+    if (RESOLVE_MAP[raw]) return RESOLVE_MAP[raw];
+    const lower = raw.toLowerCase();
+    for (const [k, v] of Object.entries(RESOLVE_MAP)) {
+      if (lower.includes(k) || k.includes(lower)) return v;
+    }
+    return raw || 'cabinet';
+  };
   const ZONE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',busbar:'#4a90d9',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#afa9ec',battery:'#50c878',controller:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878',pcc:'#4a9ee8',grid_cabinet:'#e8a838',battery_rack:'#50c878',battery_container:'#50c878',ac_bus:'#4a90d9',dc_bus:'#afa9ec',dcbus:'#afa9ec',acbus:'#4a90d9',ems:'#d4a030',ems_v2:'#d4a030',bms:'#4a90d9',bms_v2:'#4a90d9',pcs_v2:'#afa9ec',sts:'#50c878',ats:'#EF9F27',pv_inverter:'#e8a838',dc_combiner:'#534AB7',hv_cabinet:'#EF9F27',lv_cabinet:'#F0997B'};
   const ZONES = [
     {name:'电源侧',types:['source','meter','pcc'],y:55,h:100,color:'#4a9ee8'},
@@ -11897,12 +11928,17 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   });
 
   nodes.forEach(n => {
-    const type = n.stdType || n.type;
-    const symbol = n.finalSymbol || type;
-    let iconFn = DIAGRAM_ICONS[symbol] || DIAGRAM_ICONS[type] || DIAGRAM_ICONS.cabinet;
-    if(n.iecSymbol && typeof iecImg === 'function'){
+    const resolvedRt = resolveType(n);
+    let iconFn = DIAGRAM_ICONS[n.finalSymbol]
+               || DIAGRAM_ICONS[resolvedRt]
+               || DIAGRAM_ICONS[n.stdType]
+               || DIAGRAM_ICONS[n.type]
+               || DIAGRAM_ICONS.cabinet;
+    if(!iconFn) iconFn = DIAGRAM_ICONS.cabinet;
+    if(n.iecSymbol && IEC_SYM[n.iecSymbol] && typeof iecImg === 'function'){
       iconFn = (x,y,label,sub) => iecImg(n.iecSymbol,x,y,44,50,label);
     }
+    const type = resolvedRt;
     if (['ac_bus', 'dc_bus', 'dcbus', 'acbus', 'busbar', 'busbar_ac', 'busbar_dc'].includes(type) && busWidthMap[n.id]) {
       const bw = busWidthMap[n.id].w;
       const isDC = type === 'dc_bus' || type === 'dcbus' || type === 'busbar_dc';
@@ -11935,7 +11971,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   if (links) {
     const channels = {};
     const allLinksForCross = [];
-    const cellSize = 10;
+    const cellSize = 15;
     // C3 阶段 zIndex 分层 — 电力线先画 (底), 控制线次之, 通信线最上
     // zIndex: power=1, control=2, comm=3
     const Z_RANK = e => {
@@ -11961,10 +11997,10 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
           dashAttr=' stroke-dasharray="4,3"';
           sw=1;
         } else {
-          const WIRE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',pcc:'#4a9ee8',busbar:'#4a90d9',ac_bus:'#4a90d9',dc_bus:'#afa9ec',breaker:'#e8a838',switch:'#e8a838',transformer:'#4a9ee8',grid_cabinet:'#e8a838',pcs:'#afa9ec',battery:'#50c878',battery_rack:'#50c878',battery_container:'#50c878',controller:'#d4a030',ems:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878'};
-          color = WIRE_COLORS[toRt] || '#4a9ee8';
+          const WIRE_COLORS = {source:'#4A9EE8',pcc:'#4A9EE8',meter:'#4A9EE8',busbar:'#4A90D9',ac_bus:'#4A90D9',dc_bus:'#AFA9EC',dcBus:'#AFA9EC',breaker:'#E8A838',switch:'#E8A838',transformer:'#4A9EE8',grid_cabinet:'#E8A838',hv_cabinet:'#EF9F27',lv_cabinet:'#F0997B',pcs:'#AFA9EC',pcs_v2:'#AFA9EC',battery:'#50C878',battery_rack:'#50C878',battery_container:'#50C878',controller:'#D4A030',ems:'#D4A030',ems_v2:'#D4A030',bms_v2:'#4A90D9',load:'#9FE1CB',pv:'#E8A838',pv_inverter:'#E8A838',ev:'#50C878',dc_combiner:'#534AB7',sts:'#50C878',ats:'#EF9F27'};
+          color = WIRE_COLORS[toRt] || WIRE_COLORS[fromRt] || '#85B7EB';
           dashAttr='';
-          sw=1.5;
+          sw = (toRt==='busbar'||toRt==='ac_bus'||fromRt==='busbar'||fromRt==='source') ? 2.5 : 2;
         }
         const arrow = getArrowForLink(l);
         const fromD = getNodeDim(fromRt);
