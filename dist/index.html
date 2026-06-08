@@ -11167,13 +11167,13 @@ const ESS_V3={
     return{errors,warnings};
   },
   VOLTAGE_DOMAINS:{
-    POWER_AC_HV:{color:'#4a9ee8',dash:'',width:2,label:'AC高压'},
-    POWER_AC_LV:{color:'#4a90d9',dash:'',width:1.5,label:'AC低压'},
-    POWER_DC:{color:'#afa9ec',dash:'',width:1.5,label:'DC'},
+    POWER_AC_HV:{color:'#3b8beb',dash:'',width:2.5,label:'AC高压'},
+    POWER_AC_LV:{color:'#e8a838',dash:'',width:2,label:'AC低压'},
+    POWER_DC:{color:'#50c878',dash:'',width:2,label:'DC'},
     CONTROL:{color:'#d4a030',dash:'4,3',width:1,label:'控制'},
-    COMMUNICATION:{color:'#d4a030',dash:'2,2',width:1,label:'通信'},
+    COMMUNICATION:{color:'#a070d0',dash:'2,2',width:1,label:'通信'},
     PROTECTION:{color:'#e06070',dash:'6,2',width:1,label:'保护'},
-    NEUTRAL:{color:'#50c878',dash:'',width:1.5,label:'中性'}
+    NEUTRAL:{color:'#70b0d0',dash:'',width:1.5,label:'中性'}
   },
   /**
    * A1 阶段 电压模型 V2 — 根据电压数值动态判定电气域
@@ -11489,7 +11489,7 @@ const ESS_V3={
     });
     const templateMatch=this.matchTemplate(nodes,edges);
     let templateCorrections=[];
-    if(templateMatch.score>-5){
+    if(templateMatch.score>15){
       templateCorrections=this.applyTemplateCorrection(nodes,edges,templateMatch.template);
       if(templateCorrections.length>0){
         nodes.forEach(n=>nm[n.id]=n);
@@ -11541,7 +11541,7 @@ function getBestPorts(fromNode, toNode, fromDim, toDim){
 function dagreLayout(nodes, links, svgW, svgH){
   if(typeof dagre==='undefined'){console.warn('[dagreLayout] dagre not loaded, using fallback');return false;}
   const g=new dagre.graphlib.Graph();
-  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:100,ranksep:140,marginx:50,marginy:50});
+  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:120,ranksep:180,marginx:60,marginy:60});
   g.setDefaultEdgeLabel(function(){return{};});
   const rankGroups={};
   const nodeRankMap={};
@@ -11925,6 +11925,11 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
       const propY = n.y + 38;
       const propText = props.map(p=>`${p.k}:${p.v}`).slice(0,2).join('  |  ');
       svg += `<text x="${n.x}" y="${propY}" text-anchor="middle" fill="var(--svg-sub)" font-size="8" opacity="0.85">${propText}</text>`;
+    }
+    if(n._autoInserted){
+      const dim=getNodeDim(type);
+      svg += `<rect x="${n.x-dim.w/2+2}" y="${n.y-dim.h/2+2}" width="${dim.w-4}" height="${dim.h-4}" rx="4" fill="none" stroke="#e8a838" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>`;
+      svg += `<text x="${n.x+dim.w/2-4}" y="${n.y-dim.h/2+10}" text-anchor="end" fill="#e8a838" font-size="7" opacity="0.7">AUTO</text>`;
     }
   });
   if (links) {
