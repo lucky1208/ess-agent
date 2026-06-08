@@ -10903,7 +10903,7 @@ const ESS_V3={
     hv_cabinet:{cls:'switchgear',chain:['hv_cabinet','generic_cabinet','generic_box'],netDomain:['AC_HV']},
     lv_cabinet:{cls:'switchgear',chain:['lv_cabinet','generic_cabinet','generic_box'],netDomain:['AC_LV']}
   },
-  SYNONYMS:{'电网':'pcc','市电':'pcc','并网柜':'grid_cabinet','储能并网柜':'grid_cabinet','高压开关柜':'hv_cabinet','进线柜':'grid_cabinet','低压开关柜':'lv_cabinet','mcc柜':'lv_cabinet','储能电池':'battery_rack','电池簇':'battery_rack','电池舱':'battery_container','电池柜':'battery_rack','储能变流器':'pcs','变流器':'pcs','逆变器':'pcs','pcs':'pcs','变压器':'transformer','主变':'transformer','箱变':'transformer','隔离变压器':'transformer','交流母线':'ac_bus','直流母线':'dc_bus','能量管理系统':'ems','ems':'ems','bms':'bms','电池管理系统':'bms','光伏阵列':'pv','光伏':'pv','光伏逆变器':'pv_inverter','pv逆变器':'pv_inverter','直流汇流':'dc_combiner','汇流箱':'dc_combiner','充电桩':'ev','充电机':'ev','隔离开关':'breaker','断路器':'breaker','接触器':'breaker','熔断器':'fuse','互感器':'ct','电流互感器':'ct','电压互感器':'pt','防雷':'surge','避雷器':'surge','接地':'earth','继电保护':'relay','综保':'relay','负荷':'load','负载':'load','消防':'load','空调':'load','ups':'load','静态开关':'sts','静态转换开关':'sts','自动切换':'ats','自动转换开关':'ats','柴发切换':'ats'},
+  SYNONYMS:{'电网':'pcc','市电':'pcc','国网':'pcc','南网':'pcc','电网公司':'pcc','pg&e':'pcc','utility':'pcc','grid':'pcc','power_grid':'pcc','并网柜':'grid_cabinet','储能并网柜':'grid_cabinet','高压开关柜':'hv_cabinet','进线柜':'grid_cabinet','低压开关柜':'lv_cabinet','mcc柜':'lv_cabinet','储能电池':'battery_rack','电池簇':'battery_rack','电池舱':'battery_container','电池柜':'battery_rack','储能变流器':'pcs','变流器':'pcs','逆变器':'pcs','pcs':'pcs','变压器':'transformer','主变':'transformer','箱变':'transformer','隔离变压器':'transformer','交流母线':'ac_bus','直流母线':'dc_bus','能量管理系统':'ems','ems':'ems','bms':'bms','电池管理系统':'bms','光伏阵列':'pv','光伏':'pv','光伏逆变器':'pv_inverter','pv逆变器':'pv_inverter','直流汇流':'dc_combiner','汇流箱':'dc_combiner','充电桩':'ev','充电机':'ev','隔离开关':'breaker','断路器':'breaker','接触器':'breaker','熔断器':'fuse','互感器':'ct','电流互感器':'ct','电压互感器':'pt','防雷':'surge','避雷器':'surge','接地':'earth','继电保护':'relay','综保':'relay','负荷':'load','负载':'load','消防':'load','空调':'load','ups':'load','静态开关':'sts','静态转换开关':'sts','自动切换':'ats','自动转换开关':'ats','柴发切换':'ats','储能柜':'battery_container','储能舱':'battery_container','储能集装箱':'battery_container','bess':'battery_container','battery container':'battery_container','battery energy storage':'battery_container','battery_rack':'battery_rack','battery_cluster':'battery_rack'},
   PORT_MODEL:{
     pcc:[{id:'out',side:'bottom',voltage:10000,domain:'ac',direction:'out'}],
     transformer:[{id:'hv',side:'top',voltage:10000,domain:'ac',direction:'in'},{id:'lv',side:'bottom',voltage:400,domain:'ac',direction:'out'}],
@@ -11141,7 +11141,7 @@ const ESS_V3={
     const errors=[],warnings=[];
     const nm={};nodes.forEach(n=>nm[n.id]=n);
     const pccNodes=nodes.filter(n=>(n.stdType||n.type)==='pcc'||(n.stdType||n.type)==='source');
-    if(pccNodes.length===0)errors.push('缺少PCC/电源节点');
+    if(pccNodes.length===0)errors.push({msg:'缺少PCC/电源节点',type:'missing_pcc',repair:'pcc'});
     if(pccNodes.length>1)warnings.push('存在多个PCC节点('+pccNodes.length+'个)，请确认');
     const busNodes=nodes.filter(n=>(n.stdType||n.type)==='busbar'||(n.stdType||n.type)==='ac_bus');
     busNodes.forEach(b=>{
@@ -11401,7 +11401,16 @@ const ESS_V3={
     const rawEdges=rawData.links||rawData.edges||[];
     const nodes=rawNodes.map(n=>{
       const rawType=(n.type||n.name||'').toLowerCase();
-      const stdType=this.SYNONYMS[rawType]||rawType;
+      const rawLabel=(n.label||'').toLowerCase();
+      const searchStr=rawType+' '+rawLabel;
+      let stdType=this.SYNONYMS[rawType]||null;
+      if(!stdType){
+        const sortedKeys=Object.keys(this.SYNONYMS).sort((a,b)=>b.length-a.length);
+        for(const key of sortedKeys){
+          if(searchStr.includes(key)){stdType=this.SYNONYMS[key];break;}
+        }
+      }
+      if(!stdType)stdType=rawType;
       const onto=this.ONTOLOGY[stdType]||{cls:'unknown',chain:['generic_box'],netDomain:['AC_LV']};
       let ports=this.PORT_MODEL[stdType]||[{id:'in',side:'top',voltage:400,domain:'ac'},{id:'out',side:'bottom',voltage:400,domain:'ac'}];
       const layerName=this.DEVICE_LAYER[stdType]||'lv_distribution';
@@ -11451,13 +11460,19 @@ const ESS_V3={
       repairResult.newNodes.forEach(n=>nm[n.id]=n);
       console.log('[V3] 拓扑修复:',repairResult.repairs);
     }
-    const remainingErrors=validation.errors.filter(e=>!e.repair||!repairResult.repairs.find(r=>r.between===e.fromId+'↔'+e.toId));
+    const remainingErrors=validation.errors.filter(e=>{
+      const msg=typeof e==='string'?e:(e.msg||'');
+      const repair=typeof e==='object'?e.repair:null;
+      if(!repair)return true;
+      const fromId=e.fromId||'',toId=e.toId||'';
+      return !repairResult.repairs.find(r=>r.between===fromId+'↔'+toId);
+    });
     const templateMatch=this.matchTemplate(nodes,edges);
     let templateCorrections=[];
     if(templateMatch.score>-5){
       templateCorrections=this.applyTemplateCorrection(nodes,edges,templateMatch.template);
       if(templateCorrections.length>0){
-        templateCorrections.forEach(c=>{if(c.type==='add_node'&&c.nodeId){const n=nodes.find(nn=>nn.id===c.nodeId);if(n)nm[n.id]=n;}});
+        nodes.forEach(n=>nm[n.id]=n);
         console.log('[V3] 模板纠偏('+templateMatch.templateName+'):',templateCorrections);
       }
     }
@@ -11622,13 +11637,20 @@ function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize,fromDomai
     }
   });
   const unblockBBox=(px,py)=>{
+    let closest=null,closestDist=Infinity;
     for(const o of obstacles){
+      if(o.type!=='node_box')continue;
       const cx=o.x+o.w/2, cy=o.y+o.h/2;
       if(Math.abs(px-cx)<=o.w/2+o.pad && Math.abs(py-cy)<=o.h/2+o.pad){
-        const ox1=Math.floor((o.x-o.pad)/cs),ox2=Math.ceil((o.x+o.w+o.pad)/cs);
-        const oy1=Math.floor((o.y-o.pad)/cs),oy2=Math.ceil((o.y+o.h+o.pad)/cs);
-        for(let gx=ox1;gx<=ox2;gx++)for(let gy=oy1;gy<=oy2;gy++)blocked.delete(gx+','+gy);
+        const dist=Math.hypot(px-cx,py-cy);
+        if(dist<closestDist){closestDist=dist;closest=o;}
       }
+    }
+    if(closest){
+      const o=closest;
+      const ox1=Math.floor((o.x-o.pad)/cs),ox2=Math.ceil((o.x+o.w+o.pad)/cs);
+      const oy1=Math.floor((o.y-o.pad)/cs),oy2=Math.ceil((o.y+o.h+o.pad)/cs);
+      for(let gx=ox1;gx<=ox2;gx++)for(let gy=oy1;gy<=oy2;gy++)blocked.delete(gx+','+gy);
     }
   };
   unblockBBox(fromX,fromY);
