@@ -11649,8 +11649,8 @@ function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize,fromDomai
   const blocked=new Set();
   const domainZones=new Map();
   obstacles.forEach(o=>{
-    const ox1=Math.floor((o.x-o.pad)/cs),ox2=Math.ceil((o.x+o.w+o.pad)/cs);
-    const oy1=Math.floor((o.y-o.pad)/cs),oy2=Math.ceil((o.y+o.h+o.pad)/cs);
+    const ox1=Math.floor(o.x/cs),ox2=Math.ceil((o.x+o.w)/cs);
+    const oy1=Math.floor(o.y/cs),oy2=Math.ceil((o.y+o.h)/cs);
     for(let gx=ox1;gx<=ox2;gx++)for(let gy=oy1;gy<=oy2;gy++){
       blocked.add(gx+','+gy);
       if(o.networkDomain)domainZones.set(gx+','+gy,o.networkDomain);
@@ -11697,7 +11697,7 @@ function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize,fromDomai
     const cur=open.get(bestKey);open.delete(bestKey);
     if(cur.x===ex&&cur.y===ey){
       const path=[];let ck=bestKey;
-      while(ck){const px=parseInt(ck),py=parseInt(ck.split(',')[1]);path.unshift({x:px*cs,y:py*cs});ck=parent.get(ck);}
+      while(ck){const parts=ck.split(',');const px=parseInt(parts[0]),py=parseInt(parts[1]);path.unshift({x:px*cs,y:py*cs});ck=parent.get(ck);}
       return path;
     }
     closed.add(bestKey);
@@ -11721,7 +11721,9 @@ function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize,fromDomai
       }
     }
   }
-  return [{x:fromX,y:fromY},{x:toX,y:toY}];
+  // A*失败: 返回V-H-V正交路径而非直线, 避免穿越元器件
+  const midY = (fromY + toY) / 2;
+  return [{x:fromX,y:fromY},{x:fromX,y:midY},{x:toX,y:midY},{x:toX,y:toY}];
 }
 
 function pathToSvgD(path){
@@ -11832,7 +11834,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     });
   }
   // Qwen 特效药 2 — ObstacleBuilder 3.0: 物理框 + 膨胀 35px + 文字区
-  const OBSTACLE_PAD = 35;
+  const OBSTACLE_PAD = 20;
   const obstacles = [];
   nodes.forEach(n => {
     const w = n.width || n._cardW || 160;
