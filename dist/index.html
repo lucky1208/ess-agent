@@ -11541,7 +11541,7 @@ function getBestPorts(fromNode, toNode, fromDim, toDim){
 function dagreLayout(nodes, links, svgW, svgH){
   if(typeof dagre==='undefined'){console.warn('[dagreLayout] dagre not loaded, using fallback');return false;}
   const g=new dagre.graphlib.Graph();
-  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:120,ranksep:180,marginx:60,marginy:60});
+  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:100,ranksep:110,marginx:60,marginy:60});
   g.setDefaultEdgeLabel(function(){return{};});
   const rankGroups={};
   const nodeRankMap={};
@@ -11742,7 +11742,7 @@ function pathToSvgD(path){
 }
 
 function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
-  const svgW = 1100, svgH = 800;
+  const svgW = 1100, svgH = 1100;  // Fix: 5 ranks × ranksep 110 + margin 200 = 750 < 1100, 装得下
   // C2 阶段 — 4 diagramMode 过滤 (SLD / CONTROL / COMM / LAYOUT)
   // SLD:    只画电力线 (POWER_AC_HV/LV/DC/NEUTRAL)
   // CONTROL: 只画控制线 (CONTROL)
@@ -11762,13 +11762,13 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   }
   // LAYOUT 模式不过滤
   const resolveType = n => n.stdType || n.type;
-  const ZONE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',busbar:'#4a90d9',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#afa9ec',battery:'#50c878',controller:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878',pcc:'#4a9ee8',grid_cabinet:'#e8a838',battery_rack:'#50c878',battery_container:'#50c878',ac_bus:'#4a90d9',dc_bus:'#afa9ec',ems:'#d4a030',ems_v2:'#d4a030',bms:'#4a90d9',bms_v2:'#4a90d9',pcs_v2:'#afa9ec',sts:'#50c878',ats:'#EF9F27',pv_inverter:'#e8a838',dc_combiner:'#534AB7',hv_cabinet:'#EF9F27',lv_cabinet:'#F0997B'};
+  const ZONE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',busbar:'#4a90d9',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#afa9ec',battery:'#50c878',controller:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878',pcc:'#4a9ee8',grid_cabinet:'#e8a838',battery_rack:'#50c878',battery_container:'#50c878',ac_bus:'#4a90d9',dc_bus:'#afa9ec',dcbus:'#afa9ec',acbus:'#4a90d9',ems:'#d4a030',ems_v2:'#d4a030',bms:'#4a90d9',bms_v2:'#4a90d9',pcs_v2:'#afa9ec',sts:'#50c878',ats:'#EF9F27',pv_inverter:'#e8a838',dc_combiner:'#534AB7',hv_cabinet:'#EF9F27',lv_cabinet:'#F0997B'};
   const ZONES = [
     {name:'电源侧',types:['source','meter','pcc'],y:55,h:100,color:'#4a9ee8'},
-    {name:'配电母线',types:['busbar','ac_bus','dc_bus'],y:165,h:55,color:'#4a90d9'},
+    {name:'配电母线',types:['busbar','ac_bus','dc_bus','dcbus','acbus','busbar_ac','busbar_dc'],y:165,h:55,color:'#4a90d9'},
     {name:'开关/变压',types:['breaker','switch','transformer','grid_cabinet'],y:230,h:130,color:'#e8a838'},
-    {name:'变流/储能',types:['pcs','battery','battery_rack','battery_container','pv','ev'],y:370,h:130,color:'#afa9ec'},
-    {name:'负荷/控制',types:['load','controller','ems'],y:510,h:130,color:'#50c878'}
+    {name:'变流/储能',types:['pcs','battery','battery_rack','battery_container','pv','ev','dc_combiner','pv_inverter'],y:370,h:130,color:'#afa9ec'},
+    {name:'负荷/控制',types:['load','controller','ems','ems_v2','sts','ats'],y:510,h:130,color:'#50c878'}
   ];
   const nodeMap = {};
   nodes.forEach(n => { nodeMap[n.id] = n; });
@@ -11876,7 +11876,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   const busWidthMap = {};
   const nodeMap2 = {};
   nodes.forEach(n => { nodeMap2[n.id] = n; });
-  ['ac_bus', 'dc_bus', 'busbar', 'busbar_ac', 'busbar_dc'].forEach(busType => {
+  ['ac_bus', 'dc_bus', 'dcbus', 'acbus', 'busbar', 'busbar_ac', 'busbar_dc'].forEach(busType => {
     const busNodes = nodes.filter(n => (n.stdType||n.type) === busType);
     busNodes.forEach(bus => {
       const connXs = [];
@@ -11903,9 +11903,9 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     if(n.iecSymbol && typeof iecImg === 'function'){
       iconFn = (x,y,label,sub) => iecImg(n.iecSymbol,x,y,44,50,label);
     }
-    if (['ac_bus', 'dc_bus', 'busbar', 'busbar_ac', 'busbar_dc'].includes(type) && busWidthMap[n.id]) {
+    if (['ac_bus', 'dc_bus', 'dcbus', 'acbus', 'busbar', 'busbar_ac', 'busbar_dc'].includes(type) && busWidthMap[n.id]) {
       const bw = busWidthMap[n.id].w;
-      const isDC = type === 'dc_bus' || type === 'busbar_dc';
+      const isDC = type === 'dc_bus' || type === 'dcbus' || type === 'busbar_dc';
       const fill = isDC ? '#0F6E56' : '#185FA5';
       svg += `<rect x="${n.x - bw/2}" y="${n.y - 4}" width="${bw}" height="8" rx="2" fill="${fill}" opacity="0.85" filter="url(#sh)"/>`;
       svg += `<text x="${n.x}" y="${n.y + 20}" text-anchor="middle" fill="${isDC?'#9fe1cb':'#9FE1CB'}" font-size="12" font-weight="500">${n.label||(isDC?'DC母线':'AC母线')}</text>`;
