@@ -10458,7 +10458,7 @@ const DIAGRAM_ICONS = {
   // === 兼容别名 — 让 stdType 直接命中 (而非依赖 type chain) ===
   pcs_v2: undefined,  // 占位, 真身在上方已定义 (此 alias 不可少, 避免重复定义)
 };
-const TYPE_ALIAS={grid:'source',bus:'busbar',inverter:'pcs',bess:'battery',ems:'controller',solar:'pv',charger:'ev',grid_cabinet:'grid_cabinet',cabinet:'cabinet',battery_rack:'battery_rack',battery_container:'battery_container',ac_bus:'ac_bus',dc_bus:'dc_bus',pcc:'pcc'};
+
 
 function getArrowForLink(l){
   if(l.dashed) return 'aY';
@@ -11301,7 +11301,26 @@ const ESS_V3={
     const repairs=[];
     const nm={};nodes.forEach(n=>nm[n.id]=n);
     errors.forEach(err=>{
-      if(!err.repair||!err.fromId||!err.toId)return;
+      if(!err.repair)return;
+      if(err.type==='missing_pcc'){
+        const pccId='pcc_auto_'+(nodes.length+newNodes.length);
+        if(nm[pccId])return;
+        const pccNode={
+          id:pccId,type:'pcc',stdType:'pcc',
+          label:'PCC并网点',sub:'自动补插',
+          deviceClass:'source',networkDomain:['AC_HV'],
+          layoutLayer:'source',layoutYIdx:0,layoutXPos:'center',dagreRank:0,
+          finalSymbol:'pcc',iecSymbol:this.IEC_REGISTRY?.pcc||null,
+          ports:this.PORT_MODEL.pcc||[{id:'out',side:'bottom',voltage:10000,domain:'ac'}],
+          _autoInserted:true
+        };
+        newNodes.push(pccNode);nm[pccId]=pccNode;
+        const firstBus=nodes.find(n=>(n.stdType||n.type)==='busbar'||(n.stdType||n.type)==='ac_bus');
+        if(firstBus)newEdges.push({from:pccId,to:firstBus.id,label:'',_autoEdge:true});
+        repairs.push({inserted:'pcc',as:pccId,reason:err.msg});
+        return;
+      }
+      if(!err.fromId||!err.toId)return;
       const src=nm[err.fromId],tgt=nm[err.toId];
       if(!src||!tgt)return;
       // A3 V2 — 优先查 REPAIR_CHAINS, 没有再回退到 V4 单点修复
@@ -11464,6 +11483,7 @@ const ESS_V3={
       const msg=typeof e==='string'?e:(e.msg||'');
       const repair=typeof e==='object'?e.repair:null;
       if(!repair)return true;
+      if(e.type==='missing_pcc')return !repairResult.repairs.find(r=>r.inserted==='pcc');
       const fromId=e.fromId||'',toId=e.toId||'';
       return !repairResult.repairs.find(r=>r.between===fromId+'↔'+toId);
     });
