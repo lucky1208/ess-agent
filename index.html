@@ -10875,32 +10875,32 @@ const ESS_V3={
     earth:'iec_symbols_svg/iec_0041_Earth,_general_symbol_Earthing,_general_symbol;_Ground_(US),_general_symbol;_Gro.svg'
   },
   ONTOLOGY:{
-    pcc:{cls:'source',chain:['pcc','grid_source','generic_box'],netDomain:['AC_HV']},
-    transformer:{cls:'conversion',chain:['transformer','generic_box'],netDomain:['AC_HV','AC_LV']},
-    pcs:{cls:'conversion',chain:['pcs_v2','pcs','generic_box'],netDomain:['AC_LV','DC_BUS']},
-    battery:{cls:'storage',chain:['battery','battery_rack','generic_cabinet','generic_box'],netDomain:['DC_BUS']},
-    battery_rack:{cls:'storage',chain:['battery_rack','generic_cabinet','generic_box'],netDomain:['DC_BUS']},
-    battery_container:{cls:'storage',chain:['battery_container','generic_cabinet','generic_box'],netDomain:['DC_BUS']},
-    grid_cabinet:{cls:'switchgear',chain:['grid_cabinet','generic_cabinet','generic_box'],netDomain:['AC_HV']},
-    breaker:{cls:'switchgear',chain:['breaker','generic_box'],netDomain:['AC_HV','AC_LV']},
-    busbar:{cls:'bus',chain:['busbar_ac','generic_box'],netDomain:['AC_HV']},
-    ac_bus:{cls:'bus',chain:['busbar_ac','generic_box'],netDomain:['AC_LV']},
-    dc_bus:{cls:'bus',chain:['busbar_dc','generic_box'],netDomain:['DC_BUS']},
-    load:{cls:'load',chain:['load','generic_box'],netDomain:['AC_LV']},
-    pv:{cls:'source',chain:['pv','pv_inverter','generic_box'],netDomain:['DC_BUS','AC_LV']},
-    ev:{cls:'load',chain:['ev','generic_box'],netDomain:['AC_LV']},
-    controller:{cls:'control',chain:['bms_v2','ems_controller','generic_box'],netDomain:['CONTROL']},
-    ems:{cls:'control',chain:['ems_v2','ems_controller','generic_box'],netDomain:['CONTROL']},
-    bms:{cls:'control',chain:['bms_v2','ems_controller','generic_box'],netDomain:['CONTROL']},
-    meter:{cls:'source',chain:['meter','generic_box'],netDomain:['AC_HV']},
-    source:{cls:'source',chain:['grid_source','generic_box'],netDomain:['AC_HV']},
+    pcc:{cls:'source',chain:['pcc','grid_source','cabinet'],netDomain:['AC_HV']},
+    transformer:{cls:'conversion',chain:['transformer','cabinet'],netDomain:['AC_HV','AC_LV']},
+    pcs:{cls:'conversion',chain:['pcs_v2','pcs','cabinet'],netDomain:['AC_LV','DC_BUS']},
+    battery:{cls:'storage',chain:['battery','battery_rack','generic_cabinet','cabinet'],netDomain:['DC_BUS']},
+    battery_rack:{cls:'storage',chain:['battery_rack','generic_cabinet','cabinet'],netDomain:['DC_BUS']},
+    battery_container:{cls:'storage',chain:['battery_container','generic_cabinet','cabinet'],netDomain:['DC_BUS']},
+    grid_cabinet:{cls:'switchgear',chain:['grid_cabinet','generic_cabinet','cabinet'],netDomain:['AC_HV']},
+    breaker:{cls:'switchgear',chain:['breaker','cabinet'],netDomain:['AC_HV','AC_LV']},
+    busbar:{cls:'bus',chain:['busbar_ac','cabinet'],netDomain:['AC_HV']},
+    ac_bus:{cls:'bus',chain:['busbar_ac','cabinet'],netDomain:['AC_LV']},
+    dc_bus:{cls:'bus',chain:['busbar_dc','cabinet'],netDomain:['DC_BUS']},
+    load:{cls:'load',chain:['load','cabinet'],netDomain:['AC_LV']},
+    pv:{cls:'source',chain:['pv','pv_inverter','cabinet'],netDomain:['DC_BUS','AC_LV']},
+    ev:{cls:'load',chain:['ev','cabinet'],netDomain:['AC_LV']},
+    controller:{cls:'control',chain:['bms_v2','ems_controller','cabinet'],netDomain:['CONTROL']},
+    ems:{cls:'control',chain:['ems_v2','ems_controller','cabinet'],netDomain:['CONTROL']},
+    bms:{cls:'control',chain:['bms_v2','ems_controller','cabinet'],netDomain:['CONTROL']},
+    meter:{cls:'source',chain:['meter','cabinet'],netDomain:['AC_HV']},
+    source:{cls:'source',chain:['grid_source','cabinet'],netDomain:['AC_HV']},
     // B1 新增 ESS 设备
-    sts:{cls:'switchgear',chain:['sts','generic_box'],netDomain:['AC_LV']},
-    ats:{cls:'switchgear',chain:['ats','generic_box'],netDomain:['AC_LV']},
-    pv_inverter:{cls:'conversion',chain:['pv_inverter','generic_box'],netDomain:['DC_BUS','AC_LV']},
-    dc_combiner:{cls:'bus',chain:['dc_combiner','generic_box'],netDomain:['DC_BUS']},
-    hv_cabinet:{cls:'switchgear',chain:['hv_cabinet','generic_cabinet','generic_box'],netDomain:['AC_HV']},
-    lv_cabinet:{cls:'switchgear',chain:['lv_cabinet','generic_cabinet','generic_box'],netDomain:['AC_LV']}
+    sts:{cls:'switchgear',chain:['sts','cabinet'],netDomain:['AC_LV']},
+    ats:{cls:'switchgear',chain:['ats','cabinet'],netDomain:['AC_LV']},
+    pv_inverter:{cls:'conversion',chain:['pv_inverter','cabinet'],netDomain:['DC_BUS','AC_LV']},
+    dc_combiner:{cls:'bus',chain:['dc_combiner','cabinet'],netDomain:['DC_BUS']},
+    hv_cabinet:{cls:'switchgear',chain:['hv_cabinet','generic_cabinet','cabinet'],netDomain:['AC_HV']},
+    lv_cabinet:{cls:'switchgear',chain:['lv_cabinet','generic_cabinet','cabinet'],netDomain:['AC_LV']}
   },
   SYNONYMS:{'电网':'pcc','市电':'pcc','国网':'pcc','南网':'pcc','电网公司':'pcc','pg&e':'pcc','pge':'pcc','pacific gas':'pcc','national grid':'pcc','sce':'pcc','sdg&e':'pcc','power company':'pcc','electric utility':'pcc','utility grid':'pcc','utility':'pcc','grid':'pcc','power_grid':'pcc','并网柜':'grid_cabinet','储能并网柜':'grid_cabinet','高压开关柜':'hv_cabinet','进线柜':'grid_cabinet','低压开关柜':'lv_cabinet','mcc柜':'lv_cabinet','储能电池':'battery_rack','电池簇':'battery_rack','电池舱':'battery_container','电池柜':'battery_rack','储能变流器':'pcs','变流器':'pcs','逆变器':'pcs','pcs':'pcs','变压器':'transformer','主变':'transformer','箱变':'transformer','隔离变压器':'transformer','升压变':'transformer','降压变':'transformer','交流母线':'ac_bus','直流母线':'dc_bus','能量管理系统':'ems','ems':'ems','bms':'bms','电池管理系统':'bms','光伏阵列':'pv','光伏':'pv','太阳能':'pv','光伏逆变器':'pv_inverter','pv逆变器':'pv_inverter','直流汇流':'dc_combiner','汇流箱':'dc_combiner','充电桩':'ev','充电机':'ev','超充':'ev','ev充电':'ev','隔离开关':'breaker','断路器':'breaker','接触器':'breaker','空开':'breaker','熔断器':'fuse','互感器':'ct','电流互感器':'ct','ta':'ct','电压互感器':'pt','tv':'pt','防雷':'surge','避雷器':'surge','接地':'earth','继电保护':'relay','综保':'relay','负荷':'load','负载':'load','消防':'load','空调':'load','照明':'load','ups':'load','关键负荷':'load','一般负荷':'load','静态开关':'sts','静态转换开关':'sts','自动切换':'ats','自动转换开关':'ats','ats':'ats','柴发切换':'ats','储能柜':'battery_container','储能舱':'battery_container','储能集装箱':'battery_container','bess':'battery_container','battery container':'battery_container','battery energy storage':'battery_container','battery_rack':'battery_rack','battery_cluster':'battery_rack','计量表':'meter','电表':'meter','关口表':'meter','双向电表':'meter','智能电表':'meter'},
   PORT_MODEL:{
@@ -11071,7 +11071,7 @@ const ESS_V3={
       if(!nodeTypes.has(reqType)){
         const autoId='auto_'+reqType+'_'+(autoIdx++);
         const autoLabel=reqType==='pcc'?'PCC':reqType==='ac_bus'?'AC母线':reqType==='dc_bus'?'DC母线':reqType.toUpperCase();
-        const onto=this.ONTOLOGY[reqType]||{cls:'unknown',chain:['generic_box'],netDomain:['AC_LV']};
+        const onto=this.ONTOLOGY[reqType]||{cls:'unknown',chain:['cabinet'],netDomain:['AC_LV']};
         const newNode={
           id:autoId,type:reqType,stdType:reqType,
           label:autoLabel,sub:'模板补插',
@@ -11429,12 +11429,12 @@ const ESS_V3={
         }
       }
       if(!stdType)stdType=rawType;
-      const onto=this.ONTOLOGY[stdType]||{cls:'unknown',chain:['generic_box'],netDomain:['AC_LV']};
+      const onto=this.ONTOLOGY[stdType]||{cls:'unknown',chain:['cabinet'],netDomain:['AC_LV']};
       let ports=this.PORT_MODEL[stdType]||[{id:'in',side:'top',voltage:400,domain:'ac'},{id:'out',side:'bottom',voltage:400,domain:'ac'}];
       const layerName=this.DEVICE_LAYER[stdType]||'lv_distribution';
       const layerCfg=this.LAYOUT_LAYERS[layerName]||{yIdx:3};
-      const supportedSymbols=Object.keys(this.IEC_REGISTRY).concat(['pcc','grid_source','pcs','battery_rack','generic_cabinet','ems_controller','busbar_ac','busbar_dc','load','ev','pv','generic_box']);
-      let finalSymbol='generic_box';
+      const supportedSymbols=Object.keys(this.IEC_REGISTRY).concat(['pcc','grid_source','pcs','battery_rack','generic_cabinet','ems_controller','busbar_ac','busbar_dc','load','ev','pv','cabinet']);
+      let finalSymbol='cabinet';
       for(const sym of onto.chain){if(supportedSymbols.includes(sym)){finalSymbol=sym;break;}}
       const iecSymbol=this.IEC_REGISTRY[finalSymbol]||null;
       // A1 阶段 电压 V2 — 读 n.params.voltage/unit, 动态调整 ports 电压
@@ -11589,8 +11589,60 @@ function dagreLayout(nodes, links, svgW, svgH){
     }
   });
   // Qwen 特效药 1 + B2 — 防重叠: dagre 出来后再扫一遍, 任何两个节点 bounding box 重叠就水平推开
-  resolveNodeOverlaps(nodes, 35);  // 35px 最小间距 (Qwen 推荐)
+  resolveNodeOverlaps(nodes, 35);
+  postProcessElectricalLayout(nodes, links, svgW);
   return true;
+}
+
+function postProcessElectricalLayout(nodes, links, svgW){
+  const nm={};nodes.forEach(n=>nm[n.id]=n);
+  const busTypes=new Set(['busbar','ac_bus','dc_bus','busbar_ac','busbar_dc']);
+  const controlTypes=new Set(['controller','ems','ems_v2','bms','bms_v2']);
+  const busNodes=nodes.filter(n=>busTypes.has(n.stdType||n.type));
+  busNodes.forEach(bus=>{
+    const connIds=[];
+    links.forEach(l=>{
+      const fid=l.from||l.source, tid=l.to||l.target;
+      if(fid===bus.id&&nm[tid])connIds.push(tid);
+      else if(tid===bus.id&&nm[fid])connIds.push(fid);
+    });
+    const connNodes=connIds.map(id=>nm[id]).filter(Boolean);
+    if(connNodes.length>0){
+      const xs=connNodes.map(n=>n.x);
+      bus.x=Math.round(svgW/2);
+      const minX=Math.min(...xs),maxX=Math.max(...xs);
+      const busW=maxX-minX+200;
+      bus.width=Math.min(Math.max(busW,300),svgW-100);
+    }
+  });
+  nodes.forEach(n=>{
+    const rt=n.stdType||n.type;
+    if(controlTypes.has(rt)){
+      n.x=Math.min(n.x,120);
+    }
+  });
+  const layerY={};
+  nodes.forEach(n=>{
+    const rank=n.layoutYIdx;
+    if(rank!==undefined){
+      if(!layerY[rank])layerY[rank]=[];
+      layerY[rank].push(n);
+    }
+  });
+  Object.values(layerY).forEach(group=>{
+    group.sort((a,b)=>a.x-b.x);
+    if(group.length>1){
+      const totalW=group.reduce((s,n)=>s+(n.width||n._cardW||180),0);
+      const gaps=(group.length-1)*40;
+      const startX=(svgW-totalW-gaps)/2;
+      let cx=startX;
+      group.forEach(n=>{
+        const hw=(n.width||n._cardW||180)/2;
+        n.x=Math.round(cx+hw);
+        cx+=hw*2+40;
+      });
+    }
+  });
 }
 
 /**
@@ -12011,15 +12063,30 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         const fromX = ports.fromX, fromY = ports.fromY;
         const toX = ports.toX, toY = ports.toY;
         let pathD, routePoints;
-        const astarPath = astarRoute(fromX, fromY, toX, toY, obstacles, svgW, svgH, cellSize, from.networkDomain, to.networkDomain, from, to);
-        if(astarPath && astarPath.length >= 2){
-          pathD = pathToSvgD(astarPath);
-          routePoints = astarPath;
+        const busTypes=new Set(['busbar','ac_bus','dc_bus','busbar_ac','busbar_dc','dcBus']);
+        if(busTypes.has(fromRt)||busTypes.has(toRt)){
+          const midX=(fromX+toX)/2;
+          pathD=`M${fromX},${fromY} V${toY} H${toX}`;
+          if(Math.abs(fromX-toX)>5)pathD=`M${fromX},${fromY} V${toY} H${toX}`;
+          routePoints=[{x:fromX,y:fromY},{x:fromX,y:toY},{x:toX,y:toY}];
+        } else if(Math.abs(fromY-toY)<30){
+          const bypassY=Math.max(fromY,toY)+60;
+          pathD=`M${fromX},${fromY} V${bypassY} H${toX} V${toY}`;
+          routePoints=[{x:fromX,y:fromY},{x:fromX,y:bypassY},{x:toX,y:bypassY},{x:toX,y:toY}];
         } else {
-          // B3 阶段 — 把 getBestPorts 算出的 fromX,fromY,toX,toY 传给 orthoRoute, 让路径起讫在边中点
-          const route = orthoRoute(from, to, fromD.h, toD.h, fromD.w, toD.w, channels, from._zone, to._zone, obstacles, {x:fromX,y:fromY}, {x:toX,y:toY});
-          pathD = route.path;
-          routePoints = [{x:route.startX,y:route.startY},{x:route.startX,y:route.midY},{x:route.endX,y:route.midY},{x:route.endX,y:route.endY}];
+          const midY=Math.round((fromY+toY)/2);
+          const channelKey='ch_'+midY;
+          if(!channels[channelKey])channels[channelKey]=0;
+          const chOffset=channels[channelKey]*15;
+          channels[channelKey]++;
+          const midXAdjusted=Math.round((fromX+toX)/2)+chOffset;
+          pathD=`M${fromX},${fromY} V${midY} H${midXAdjusted} V${midY}`;
+          if(Math.abs(fromX-toX)>5){
+            pathD=`M${fromX},${fromY} V${midY} H${toX} V${toY}`;
+          } else {
+            pathD=`M${fromX},${fromY} V${toY}`;
+          }
+          routePoints=[{x:fromX,y:fromY},{x:fromX,y:midY},{x:toX,y:midY},{x:toX,y:toY}];
         }
         svg += `<path d="${pathD}" fill="none" stroke="${color}" stroke-width="${sw}"${dashAttr} marker-end="url(#${arrow})"/>`;
         allLinksForCross.push({x1:fromX, x2:toX, y1:fromY, y2:toY, midY:(fromY+toY)/2, color, link:l, points:routePoints});
