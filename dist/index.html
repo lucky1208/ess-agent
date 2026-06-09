@@ -11792,7 +11792,7 @@ function pathToSvgD(path){
 }
 
 function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
-  const svgW = 1100, svgH = 1400;
+  let svgW = 1100, svgH = 1400;
   // C2 阶段 — 4 diagramMode 过滤 (SLD / CONTROL / COMM / LAYOUT)
   // SLD:    只画电力线 (POWER_AC_HV/LV/DC/NEUTRAL)
   // CONTROL: 只画控制线 (CONTROL)
@@ -11883,7 +11883,23 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
       n._cardW = (getNodeDim(rt)||{w:160}).w;
     });
   }
-  // Qwen 特效药 2 — ObstacleBuilder 3.0: 物理框 + 膨胀 35px + 文字区
+  // viewBox 自适应: 根据节点实际范围动态调整
+  if(nodes.length>0){
+    const xs=nodes.map(n=>n.x+(n.width||n._cardW||180)/2);
+    const ys=nodes.map(n=>n.y+(n.height||60)/2);
+    const maxX=Math.max(...xs)+80;
+    const maxY=Math.max(...ys)+120;
+    svgW=Math.max(svgW,Math.min(maxX,1600));
+    svgH=Math.max(svgH,Math.min(maxY,1800));
+  }
+  // 坐标clamp: 所有节点不超出viewBox
+  nodes.forEach(n=>{
+    const hw=(n.width||n._cardW||180)/2+10;
+    const hh=(n.height||60)/2+10;
+    n.x=Math.max(hw+10,Math.min(n.x,svgW-hw-10));
+    n.y=Math.max(hh+10,Math.min(n.y,svgH-hh-60));
+  });
+  // Qwen 特效药 2 — ObstacleBuilder 3.0: 物理框 + 膨胀 20px + 文字区
   const OBSTACLE_PAD = 20;
   const obstacles = [];
   nodes.forEach(n => {
@@ -11947,7 +11963,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   svg += `<text x="${svgW/2}" y="24" text-anchor="middle" fill="var(--svg-title)" font-size="15" font-weight="bold">${title}</text>`;
   svg += `<text x="${svgW/2}" y="42" text-anchor="middle" fill="var(--svg-sub)" font-size="10">${diagramData.bus||''} | 设计人：卢继雄 | GB/T 36558-2023</text>`;
   ZONES.forEach(zone => {
-    const zoneNodes = nodes.filter(n => n._zone === zone);
+    const zoneNodes = nodes.filter(n => zone.types.includes(resolveType(n)));
     if (!zoneNodes.length) return;
     const xs = zoneNodes.map(n => n.x);
     const minX = Math.min(...xs) - (zoneNodes[0]._cardW||180)/2 - 15;
