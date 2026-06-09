@@ -11518,7 +11518,7 @@ function getBestPorts(fromNode, toNode, fromDim, toDim){
   const fw=fromNode.width||fromNode._cardW||fromDim.w, fh=fromNode.height||fromDim.h;
   const tx=toNode.x, ty=toNode.y;
   const tw=toNode.width||toNode._cardW||toDim.w, th=toNode.height||toDim.h;
-  const DIR_CONSTRAINTS={busbar:['bottom'],ac_bus:['bottom'],dc_bus:['bottom'],battery:['top','bottom'],battery_rack:['top','bottom'],battery_container:['top','bottom'],controller:['right'],ems:['right'],bms:['right'],ems_v2:['right'],bms_v2:['right'],pv:['bottom'],pv_inverter:['left','right'],ev:['top'],load:['top'],breaker:['top','bottom'],switch:['top','bottom'],transformer:['top','bottom'],grid_cabinet:['top','bottom'],hv_cabinet:['top','bottom'],lv_cabinet:['top','bottom'],pcs:['left','right'],pcs_v2:['left','right'],sts:['left','right'],ats:['top','bottom'],dc_combiner:['top','bottom'],meter:['bottom'],source:['bottom'],pcc:['bottom']};
+  const DIR_CONSTRAINTS={busbar:['bottom'],ac_bus:['bottom'],dc_bus:['bottom'],battery:['top','bottom'],battery_rack:['top','bottom'],battery_container:['top','bottom'],controller:['right'],ems:['right'],bms:['right'],ems_v2:['right'],bms_v2:['right'],pv:['bottom'],pv_inverter:['top','bottom'],ev:['top'],load:['top'],breaker:['top','bottom'],switch:['top','bottom'],transformer:['top','bottom'],grid_cabinet:['top','bottom'],hv_cabinet:['top','bottom'],lv_cabinet:['top','bottom'],pcs:['top','bottom'],pcs_v2:['top','bottom'],sts:['top','bottom'],ats:['top','bottom'],dc_combiner:['top','bottom'],meter:['bottom'],source:['bottom'],pcc:['bottom']};
   const fromRt=fromNode.stdType||fromNode.type;
   const toRt=toNode.stdType||toNode.type;
   const fromAllowed=DIR_CONSTRAINTS[fromRt]||['top','bottom','left','right'];
@@ -11542,7 +11542,7 @@ function getBestPorts(fromNode, toNode, fromDim, toDim){
 function dagreLayout(nodes, links, svgW, svgH){
   if(typeof dagre==='undefined'){console.warn('[dagreLayout] dagre not loaded, using fallback');return false;}
   const g=new dagre.graphlib.Graph();
-  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:100,ranksep:110,marginx:60,marginy:60});
+  g.setGraph({width:svgW,height:svgH,rankdir:'TB',nodesep:140,ranksep:200,marginx:60,marginy:60});
   g.setDefaultEdgeLabel(function(){return{};});
   const rankGroups={};
   const nodeRankMap={};
@@ -11642,7 +11642,7 @@ function resolveNodeOverlaps(nodes, minGap){
   if(iter>1)console.log(`[resolveNodeOverlaps] 迭代 ${iter} 轮后收敛`);
 }
 
-function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize,fromDomain,toDomain){
+function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize,fromDomain,toDomain,fromNode,toNode){
   const cs=cellSize;
   const cols=Math.ceil(gridW/cs),rows=Math.ceil(gridH/cs);
   const sx=Math.round(fromX/cs),sy=Math.round(fromY/cs);
@@ -11657,25 +11657,20 @@ function astarRoute(fromX,fromY,toX,toY,obstacles,gridW,gridH,cellSize,fromDomai
       if(o.networkDomain)domainZones.set(gx+','+gy,o.networkDomain);
     }
   });
-  const unblockBBox=(px,py)=>{
-    let closest=null,closestDist=Infinity;
+  const unblockBBox=(px,py,fromNode,toNode)=>{
+    const exemptIds=new Set();
+    if(fromNode)exemptIds.add(fromNode.id);
+    if(toNode)exemptIds.add(toNode.id);
     for(const o of obstacles){
       if(o.type!=='node_box')continue;
-      const cx=o.x+o.w/2, cy=o.y+o.h/2;
-      if(Math.abs(px-cx)<=o.w/2+o.pad && Math.abs(py-cy)<=o.h/2+o.pad){
-        const dist=Math.hypot(px-cx,py-cy);
-        if(dist<closestDist){closestDist=dist;closest=o;}
-      }
-    }
-    if(closest){
-      const o=closest;
-      const ox1=Math.floor((o.x-o.pad)/cs),ox2=Math.ceil((o.x+o.w+o.pad)/cs);
-      const oy1=Math.floor((o.y-o.pad)/cs),oy2=Math.ceil((o.y+o.h+o.pad)/cs);
+      if(!exemptIds.has(o.nodeId))continue;
+      const ox1=Math.floor(o.x/cs),ox2=Math.ceil((o.x+o.w)/cs);
+      const oy1=Math.floor(o.y/cs),oy2=Math.ceil((o.y+o.h)/cs);
       for(let gx=ox1;gx<=ox2;gx++)for(let gy=oy1;gy<=oy2;gy++)blocked.delete(gx+','+gy);
     }
   };
-  unblockBBox(fromX,fromY);
-  unblockBBox(toX,toY);
+  unblockBBox(fromX,fromY,fromNode,toNode);
+  unblockBBox(toX,toY,fromNode,toNode);
   const CROSS_DOMAIN_PENALTY=5000;
   const wireDomain=fromDomain||toDomain||null;
   const h=(x,y)=>Math.abs(x-ex)+Math.abs(y-ey);
@@ -11745,7 +11740,7 @@ function pathToSvgD(path){
 }
 
 function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
-  const svgW = 1100, svgH = 1100;  // Fix: 5 ranks × ranksep 110 + margin 200 = 750 < 1100, 装得下
+  const svgW = 1100, svgH = 1400;
   // C2 阶段 — 4 diagramMode 过滤 (SLD / CONTROL / COMM / LAYOUT)
   // SLD:    只画电力线 (POWER_AC_HV/LV/DC/NEUTRAL)
   // CONTROL: 只画控制线 (CONTROL)
@@ -11798,11 +11793,13 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
   };
   const ZONE_COLORS = {source:'#4a9ee8',meter:'#4a9ee8',busbar:'#4a90d9',breaker:'#e8a838',switch:'#e8a838',transformer:'#e8a838',pcs:'#afa9ec',battery:'#50c878',controller:'#d4a030',load:'#50c878',pv:'#e8a838',ev:'#50c878',pcc:'#4a9ee8',grid_cabinet:'#e8a838',battery_rack:'#50c878',battery_container:'#50c878',ac_bus:'#4a90d9',dc_bus:'#afa9ec',dcbus:'#afa9ec',acbus:'#4a90d9',ems:'#d4a030',ems_v2:'#d4a030',bms:'#4a90d9',bms_v2:'#4a90d9',pcs_v2:'#afa9ec',sts:'#50c878',ats:'#EF9F27',pv_inverter:'#e8a838',dc_combiner:'#534AB7',hv_cabinet:'#EF9F27',lv_cabinet:'#F0997B'};
   const ZONES = [
-    {name:'电源侧',types:['source','meter','pcc'],y:55,h:100,color:'#4a9ee8'},
-    {name:'配电母线',types:['busbar','ac_bus','dc_bus','dcbus','acbus','busbar_ac','busbar_dc'],y:165,h:55,color:'#4a90d9'},
-    {name:'开关/变压',types:['breaker','switch','transformer','grid_cabinet'],y:230,h:130,color:'#e8a838'},
-    {name:'变流/储能',types:['pcs','battery','battery_rack','battery_container','pv','ev','dc_combiner','pv_inverter'],y:370,h:130,color:'#afa9ec'},
-    {name:'负荷/控制',types:['load','controller','ems','ems_v2','sts','ats'],y:510,h:130,color:'#50c878'}
+    {name:'电源侧',types:['source','meter','pcc'],y:60,h:100,color:'#4a9ee8'},
+    {name:'配电母线',types:['busbar','ac_bus','dc_bus','dcbus','acbus','busbar_ac','busbar_dc'],y:175,h:55,color:'#4a90d9'},
+    {name:'开关/变压',types:['breaker','switch','transformer','grid_cabinet','hv_cabinet','lv_cabinet'],y:245,h:130,color:'#e8a838'},
+    {name:'变流',types:['pcs','pcs_v2','pv_inverter','dc_combiner'],y:395,h:100,color:'#afa9ec'},
+    {name:'储能',types:['battery','battery_rack','battery_container','bess'],y:520,h:100,color:'#50c878'},
+    {name:'负荷',types:['load','pv','ev','sts','ats'],y:645,h:100,color:'#9fe1cb'},
+    {name:'控制',types:['controller','ems','ems_v2','bms','bms_v2'],y:770,h:120,color:'#d4a030'}
   ];
   const nodeMap = {};
   nodes.forEach(n => { nodeMap[n.id] = n; });
@@ -11917,8 +11914,10 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
       // 收集所有连接到母线的设备的 X 坐标
       for (const l of (links||[])) {
         let other = null;
-        if (l.from === bus.id) other = nodeMap2[l.to];
-        else if (l.to === bus.id) other = nodeMap2[l.from];
+        const fromId = l.from || l.source;
+        const toId = l.to || l.target;
+        if (fromId === bus.id) other = nodeMap2[toId];
+        else if (toId === bus.id) other = nodeMap2[fromId];
         if (other && other.x !== undefined) connXs.push(other.x);
       }
       if (connXs.length >= 1) {
@@ -11942,7 +11941,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
       iconFn = (x,y,label,sub) => iecImg(n.iecSymbol,x,y,44,50,label);
     }
     const type = resolvedRt;
-    if (['ac_bus', 'dc_bus', 'dcbus', 'acbus', 'busbar', 'busbar_ac', 'busbar_dc'].includes(type) && busWidthMap[n.id]) {
+    if (['ac_bus', 'dc_bus', 'dcbus', 'acbus', 'busbar', 'busbar_ac', 'busbar_dc', 'dcBus'].includes(type) && busWidthMap[n.id]) {
       const bw = busWidthMap[n.id].w;
       const isDC = type === 'dc_bus' || type === 'dcbus' || type === 'busbar_dc';
       const fill = isDC ? '#0F6E56' : '#185FA5';
@@ -11985,8 +11984,8 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     };
     const sortedLinks = [...links].sort((a,b)=>Z_RANK(a)-Z_RANK(b));
     sortedLinks.forEach(l => {
-      const from = nodeMap[l.from];
-      const to = nodeMap[l.to];
+      const from = nodeMap[l.from || l.source];
+      const to = nodeMap[l.to || l.target];
       if (from && to) {
         const fromRt = resolveType(from), toRt = resolveType(to);
         l._toType = toRt;
@@ -12012,7 +12011,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         const fromX = ports.fromX, fromY = ports.fromY;
         const toX = ports.toX, toY = ports.toY;
         let pathD, routePoints;
-        const astarPath = astarRoute(fromX, fromY, toX, toY, obstacles, svgW, svgH, cellSize, from.networkDomain, to.networkDomain);
+        const astarPath = astarRoute(fromX, fromY, toX, toY, obstacles, svgW, svgH, cellSize, from.networkDomain, to.networkDomain, from, to);
         if(astarPath && astarPath.length >= 2){
           pathD = pathToSvgD(astarPath);
           routePoints = astarPath;
@@ -12027,7 +12026,7 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         if (l.label) {
           const lblX = (fromX+toX)/2 + 6;
           const lblY = (fromY+toY)/2 - 4;
-          svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="var(--svg-label)" font-size="9">${l.label}</text>`;
+          svg += `<text x="${lblX}" y="${lblY}" text-anchor="start" fill="${color}" font-size="9" opacity="0.8">${l.label}</text>`;
         }
       }
     });
