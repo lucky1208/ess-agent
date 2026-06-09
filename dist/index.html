@@ -10472,21 +10472,20 @@ function getArrowForLink(l){
 }
 
 const NODE_DIM = {
-  source:{w:220,h:44}, meter:{w:60,h:60}, busbar:{w:340,h:8},
-  transformer:{w:44,h:50}, breaker:{w:28,h:36}, switch:{w:28,h:36},
-  pcs:{w:180,h:44}, battery:{w:50,h:36}, controller:{w:130,h:120},
-  load:{w:180,h:44}, pv:{w:180,h:44}, ev:{w:180,h:44}, dcBus:{w:180,h:8},
-  fuse:{w:24,h:30}, ct:{w:30,h:40}, pt:{w:30,h:40}, relay:{w:30,h:30},
-  contactor:{w:30,h:30}, earth:{w:20,h:20}, surge:{w:24,h:30},
-  diode:{w:24,h:20}, resistor:{w:36,h:18}, capacitor:{w:24,h:20},
-  inductor:{w:36,h:18}, motor:{w:30,h:30}, lamp:{w:20,h:20},
-  terminal:{w:16,h:16}, contact:{w:24,h:20}, protection:{w:24,h:30}, cabinet:{w:180,h:44},
-  pcc:{w:220,h:44}, grid_cabinet:{w:180,h:44}, battery_rack:{w:180,h:44}, battery_container:{w:180,h:44},
-  ac_bus:{w:340,h:8}, dc_bus:{w:180,h:8}, ems:{w:130,h:120},
-  // B1 新增 ESS 设备尺寸
-  bms:{w:180,h:44}, ems_v2:{w:180,h:64}, bms_v2:{w:180,h:44}, pcs_v2:{w:180,h:44},
-  sts:{w:180,h:44}, ats:{w:180,h:44}, pv_inverter:{w:180,h:44},
-  dc_combiner:{w:180,h:44}, hv_cabinet:{w:180,h:44}, lv_cabinet:{w:180,h:44}
+  source:{w:220,h:60}, meter:{w:80,h:60}, busbar:{w:340,h:12},
+  transformer:{w:180,h:60}, breaker:{w:120,h:50}, switch:{w:120,h:50},
+  pcs:{w:180,h:60}, battery:{w:120,h:50}, controller:{w:140,h:120},
+  load:{w:180,h:60}, pv:{w:180,h:60}, ev:{w:180,h:60}, dcBus:{w:180,h:12},
+  fuse:{w:80,h:40}, ct:{w:80,h:50}, pt:{w:80,h:50}, relay:{w:80,h:40},
+  contactor:{w:80,h:40}, earth:{w:40,h:30}, surge:{w:80,h:40},
+  diode:{w:60,h:30}, resistor:{w:60,h:30}, capacitor:{w:60,h:30},
+  inductor:{w:60,h:30}, motor:{w:60,h:40}, lamp:{w:40,h:30},
+  terminal:{w:30,h:30}, contact:{w:60,h:30}, protection:{w:80,h:40}, cabinet:{w:180,h:60},
+  pcc:{w:220,h:60}, grid_cabinet:{w:180,h:60}, battery_rack:{w:180,h:60}, battery_container:{w:180,h:60},
+  ac_bus:{w:340,h:12}, dc_bus:{w:180,h:12}, ems:{w:140,h:120},
+  bms:{w:180,h:60}, ems_v2:{w:180,h:70}, bms_v2:{w:180,h:60}, pcs_v2:{w:180,h:60},
+  sts:{w:180,h:60}, ats:{w:180,h:60}, pv_inverter:{w:180,h:60},
+  dc_combiner:{w:180,h:60}, hv_cabinet:{w:180,h:60}, lv_cabinet:{w:180,h:60}
 };
 function getNodeDim(type){
   return NODE_DIM[type]||{w:180,h:44};
@@ -11515,8 +11514,10 @@ const ESS_V3={
 };
 
 function getBestPorts(fromNode, toNode, fromDim, toDim){
-  const fx=fromNode.x, fy=fromNode.y, fw=fromDim.w, fh=fromDim.h;
-  const tx=toNode.x, ty=toNode.y, tw=toDim.w, th=toDim.h;
+  const fx=fromNode.x, fy=fromNode.y;
+  const fw=fromNode.width||fromNode._cardW||fromDim.w, fh=fromNode.height||fromDim.h;
+  const tx=toNode.x, ty=toNode.y;
+  const tw=toNode.width||toNode._cardW||toDim.w, th=toNode.height||toDim.h;
   const DIR_CONSTRAINTS={busbar:['bottom'],ac_bus:['bottom'],dc_bus:['bottom'],battery:['top','bottom'],battery_rack:['top','bottom'],battery_container:['top','bottom'],controller:['right'],ems:['right'],bms:['right'],ems_v2:['right'],bms_v2:['right'],pv:['bottom'],pv_inverter:['left','right'],ev:['top'],load:['top'],breaker:['top','bottom'],switch:['top','bottom'],transformer:['top','bottom'],grid_cabinet:['top','bottom'],hv_cabinet:['top','bottom'],lv_cabinet:['top','bottom'],pcs:['left','right'],pcs_v2:['left','right'],sts:['left','right'],ats:['top','bottom'],dc_combiner:['top','bottom'],meter:['bottom'],source:['bottom'],pcc:['bottom']};
   const fromRt=fromNode.stdType||fromNode.type;
   const toRt=toNode.stdType||toNode.type;
