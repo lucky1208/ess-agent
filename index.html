@@ -11966,10 +11966,15 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
     const zoneNodes = nodes.filter(n => zone.types.includes(resolveType(n)));
     if (!zoneNodes.length) return;
     const xs = zoneNodes.map(n => n.x);
-    const minX = Math.min(...xs) - (zoneNodes[0]._cardW||180)/2 - 15;
-    const maxX = Math.max(...xs) + (zoneNodes[0]._cardW||180)/2 + 15;
-    svg += `<rect x="${minX}" y="${zone.y}" width="${maxX-minX}" height="${zone.h}" rx="8" fill="var(--svg-zone-bg)" stroke="${zone.color}" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>`;
-    svg += `<text x="${minX+8}" y="${zone.y+14}" fill="${zone.color}" font-size="10" opacity="0.9">${zone.name}</text>`;
+    const ys = zoneNodes.map(n => n.y);
+    const cardWs = zoneNodes.map(n => n.width||n._cardW||180);
+    const cardHs = zoneNodes.map(n => n.height||60);
+    const minX = Math.min(...xs.map((x,i)=>x-cardWs[i]/2)) - 20;
+    const maxX = Math.max(...xs.map((x,i)=>x+cardWs[i]/2)) + 20;
+    const minY = Math.min(...ys.map((y,i)=>y-cardHs[i]/2)) - 15;
+    const maxY = Math.max(...ys.map((y,i)=>y+cardHs[i]/2)) + 15;
+    svg += `<rect x="${minX}" y="${minY}" width="${maxX-minX}" height="${maxY-minY}" rx="8" fill="var(--svg-zone-bg)" stroke="${zone.color}" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>`;
+    svg += `<text x="${minX+8}" y="${minY+14}" fill="${zone.color}" font-size="10" opacity="0.9">${zone.name}</text>`;
   });
   // Qwen 建议 — 母线视觉欺骗: 提前算每个母线的连接设备 X 范围
   const busWidthMap = {};
@@ -12080,13 +12085,22 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
         const toX = ports.toX, toY = ports.toY;
         let pathD, routePoints;
         const busTypes=new Set(['busbar','ac_bus','dc_bus','busbar_ac','busbar_dc','dcBus']);
-        if(busTypes.has(fromRt)||busTypes.has(toRt)){
-          const midX=(fromX+toX)/2;
-          pathD=`M${fromX},${fromY} V${toY} H${toX}`;
-          if(Math.abs(fromX-toX)>5)pathD=`M${fromX},${fromY} V${toY} H${toX}`;
-          routePoints=[{x:fromX,y:fromY},{x:fromX,y:toY},{x:toX,y:toY}];
+        const isDashed=l.dashed||(l.wireDash&&l.wireDash.length>0);
+        if(isDashed){
+          const leftX=Math.min(fromX,toX)-80;
+          const clampedLeftX=Math.max(40,leftX);
+          pathD=`M${fromX},${fromY} H${clampedLeftX} V${toY} H${toX}`;
+          routePoints=[{x:fromX,y:fromY},{x:clampedLeftX,y:fromY},{x:clampedLeftX,y:toY},{x:toX,y:toY}];
+        } else if(busTypes.has(fromRt)||busTypes.has(toRt)){
+          if(Math.abs(fromX-toX)<5){
+            pathD=`M${fromX},${fromY} V${toY}`;
+            routePoints=[{x:fromX,y:fromY},{x:toX,y:toY}];
+          } else {
+            pathD=`M${fromX},${fromY} V${toY} H${toX}`;
+            routePoints=[{x:fromX,y:fromY},{x:fromX,y:toY},{x:toX,y:toY}];
+          }
         } else if(Math.abs(fromY-toY)<30){
-          const bypassY=Math.max(fromY,toY)+60;
+          const bypassY=Math.max(fromY,toY)+80;
           pathD=`M${fromX},${fromY} V${bypassY} H${toX} V${toY}`;
           routePoints=[{x:fromX,y:fromY},{x:fromX,y:bypassY},{x:toX,y:bypassY},{x:toX,y:toY}];
         } else {
@@ -12095,12 +12109,10 @@ function renderDiagramFromJSON_SVG(containerId, diagramData, title) {
           if(!channels[channelKey])channels[channelKey]=0;
           const chOffset=channels[channelKey]*15;
           channels[channelKey]++;
-          const midXAdjusted=Math.round((fromX+toX)/2)+chOffset;
-          pathD=`M${fromX},${fromY} V${midY} H${midXAdjusted} V${midY}`;
-          if(Math.abs(fromX-toX)>5){
-            pathD=`M${fromX},${fromY} V${midY} H${toX} V${toY}`;
-          } else {
+          if(Math.abs(fromX-toX)<5){
             pathD=`M${fromX},${fromY} V${toY}`;
+          } else {
+            pathD=`M${fromX},${fromY} V${midY} H${toX} V${toY}`;
           }
           routePoints=[{x:fromX,y:fromY},{x:fromX,y:midY},{x:toX,y:midY},{x:toX,y:toY}];
         }
