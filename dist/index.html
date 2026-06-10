@@ -1134,6 +1134,9 @@ ACC AC一体柜专题
 <div class="mg-code" id="swDeliveryList" style="max-height:260px">等待生成...</div>
 </div>
 
+</div>
+</div>
+
 <!-- ========== AIDC PAGES ========== -->
 <div id="page-aidc-design" class="aidc-content" style="display:none;padding:24px 32px">
 <div class="sec-title">AIDC方案设计 Agent <span style="font-size:10px;color:#888">v2026.06.10</span></div>
@@ -1272,6 +1275,10 @@ ACC AC一体柜专题
 <div class="detail-specs" id="detailSpecs"></div>
 </div>
 </div>
+
+<script>
+console.log('=== AIDC DEBUG: First script block executing ===');
+</script>
 
 <script>
 (function(){
@@ -2393,6 +2400,8 @@ function switchLang(lang){
   localStorage.setItem('lang',lang);
 }
 
+console.log('=== AIDC DEBUG: Main script block executing ===');
+
 const PRODUCTS=[
   {id:'GRID-20M',name:'GOTION GRID 20MWh',cat:'集装箱储能',model:'ESD1331-025P20060',cap:20060,power:10031,volt:1331.2,cell:'LFP-314Ah',size:'5m×10m×4.6m',weight:'170t',cool:'风液一体',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-20M_product.jpeg',features:['PACK级消防','20MWh超大容量','风液一体温控']},
   {id:'GRID-7M-588',name:'GOTION GRID 7MWh (588Ah)',cat:'集装箱储能',model:'ESD1331-025P7044',cap:7045,power:1761,volt:1331.2,cell:'LFP-588Ah',size:'6.1m×2.4m×2.9m',weight:'≤54t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-7M_product.jpeg',features:['588Ah大电芯','液冷温控','PACK级消防']},
@@ -2458,6 +2467,7 @@ function showPage(id){
 }
 
 function switchCategory(cat){
+  console.log('switchCategory called:', cat);
   document.querySelectorAll('.category-tab').forEach(t=>t.classList.remove('active'));
   const catIdx=cat==='ess'?0:cat==='microgrid'?1:2;
   document.querySelectorAll('.category-tab')[catIdx].classList.add('active');
@@ -2528,13 +2538,16 @@ function mgShowWiki(id){
 }
 
 function showAidcPage(id){
+  console.log('showAidcPage called:', id);
   document.querySelectorAll('#aidcNav .sub-tab').forEach(t=>t.classList.remove('active'));
   const subPages=['aidc-design','aidc-power','aidc-cooling','aidc-pue','aidc-layout','aidc-bom','aidc-drawings'];
   const tabIdx=subPages.indexOf(id);
   if(tabIdx>=0) document.querySelectorAll('#aidcNav .sub-tab')[tabIdx].classList.add('active');
   document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
   const el=document.getElementById('page-'+id);
+  console.log('AIDC element found:', el, 'id:', 'page-'+id);
   if(el) el.style.display='block';
+  console.log('AIDC element display:', el?el.style.display:'N/A');
   if(id==='aidc-design'&&LAST_AIDC_RESULT) aidcRenderBrief();
   if(id==='aidc-power'&&LAST_AIDC_RESULT) aidcRenderPower();
   if(id==='aidc-cooling'&&LAST_AIDC_RESULT) aidcRenderCooling();
