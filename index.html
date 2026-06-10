@@ -3681,7 +3681,7 @@ const DIAGRAM_ICONS = {
   cabinet: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gSwitch)" stroke="#F0997B" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#F5C4B3" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="12">${sub}</text>`:''}`,
   protection: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#ffc0c0" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#e06070" font-size="12">${sub}</text>`:''}`
 };
-const TYPE_ALIAS={grid:'source',bus:'busbar',inverter:'pcs',bess:'battery',ems:'controller',solar:'pv',charger:'ev'};
+const TYPE_ALIAS={grid:'source',bus:'busbar',inverter:'pcs',bess:'battery',ems:'controller',solar:'pv',charger:'ev',dcbus:'dcBus',acbus:'busbar',dc_bus:'dcBus',ac_bus:'busbar',pv_inverter:'pv',dc_combiner:'busbar',ems_v2:'controller',bms_v2:'battery',sts:'switch',ats:'switch'};
 
 function getArrowForLink(l){
   if(l.dashed) return 'aY';
