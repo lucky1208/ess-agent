@@ -208,6 +208,7 @@ select.form-input{appearance:auto}
 <nav class="category-tabs">
 <div class="category-tab active" onclick="switchCategory('ess')">储能方案智能体</div>
 <div class="category-tab" onclick="switchCategory('microgrid')">微网交付智能体</div>
+<div class="category-tab" onclick="switchCategory('aidc')">AIDC方案智能体</div>
 </nav>
 
 <div id="essNav">
@@ -229,6 +230,18 @@ select.form-input{appearance:auto}
 <div class="sub-tab" onclick="showMicroPage('mg-trading')">电力交易</div>
 <div class="sub-tab" onclick="showMicroPage('mg-twin')">数字孪生</div>
 <div class="sub-tab" onclick="showMicroPage('mg-wiki')">微网百科</div>
+</nav>
+</div>
+
+<div id="aidcNav" style="display:none">
+<nav class="sub-tabs">
+<div class="sub-tab active" onclick="showAidcPage('aidc-design')">方案设计</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-power')">供电架构</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-cooling')">液冷散热</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-pue')">PUE优化</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-layout')">机柜布局</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-bom')">BOM清单</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-drawings')">图纸</div>
 </nav>
 </div>
 
@@ -1118,6 +1131,131 @@ ACC AC一体柜专题
 <div class="mg-card mg-col-6">
 <h3>项目交付总清单</h3>
 <div class="mg-code" id="swDeliveryList" style="max-height:260px">等待生成...</div>
+</div>
+
+<!-- ========== AIDC PAGES ========== -->
+<div id="page-aidc-design" class="aidc-content" style="display:none;padding:24px 32px">
+<div class="sec-title">AIDC方案设计 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">输入数据中心参数，AI自动生成算力规划、供电架构、液冷散热、PUE优化方案</div>
+<div style="background:linear-gradient(135deg,#8B5CF6,#3B82F6);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
+<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px">AI 数据中心方案智能体</div>
+<div style="font-size:11px;color:#d0d8f0;line-height:1.5">从同一份方案JSON同源输出：算力规划、供电架构、液冷散热、PUE优化、机柜布局、BOM清单、经济性分析。AI自动识别算力需求推荐最佳供电与散热方案</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:16px">
+<div style="border-left:3px solid #8B5CF6;padding-left:14px">
+<div class="sec-title" style="margin-bottom:8px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+<span>自然语言描述</span>
+</div>
+<textarea id="aidcNaturalInput" class="form-input" rows="3" placeholder="例：上海张江AI算力中心，GPU集群800卡H100，总IT负荷12MW，10kV双路接入，要求PUE<1.25，液冷散热" style="resize:vertical;font-size:12px;line-height:1.4"></textarea>
+<button class="btn btn-primary" onclick="aidcParseNatural()" style="margin-top:8px;width:100%;font-size:12px;padding:8px">AI识别参数并生成方案</button>
+</div>
+<div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">项目名称</label><input type="text" class="form-input" id="aidcProjName" value="上海张江AI算力中心"></div>
+<div class="form-group"><label class="form-label">所在区域</label><input type="text" class="form-input" id="aidcRegion" value="上海市浦东新区"></div>
+<div class="form-group"><label class="form-label">数据中心等级</label><select class="form-input" id="aidcTier"><option value="tier3" selected>Tier III</option><option value="tier4">Tier IV</option><option value="tier2">Tier II</option></select></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">GPU型号</label><select class="form-input" id="aidcGpuType"><option value="h100" selected>NVIDIA H100</option><option value="a100">NVIDIA A100</option><option value="h200">NVIDIA H200</option><option value="b200">NVIDIA B200</option><option value="ascend910b">昇腾910B</option></select></div>
+<div class="form-group"><label class="form-label">GPU数量(卡)</label><input type="number" class="form-input" id="aidcGpuCount" value="800" step="8"></div>
+<div class="form-group"><label class="form-label">总IT负荷(kW)</label><input type="number" class="form-input" id="aidcItLoad" value="12000" step="100"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">接入电压(kV)</label><select class="form-input" id="aidcVoltage"><option value="10" selected>10kV</option><option value="35">35kV</option><option value="110">110kV</option></select></div>
+<div class="form-group"><label class="form-label">供电冗余</label><select class="form-input" id="aidcRedundancy"><option value="2n">2N</option><option value="2n1" selected>2(N+1)</option><option value="n1">N+1</option></select></div>
+<div class="form-group"><label class="form-label">散热方式</label><select class="form-input" id="aidcCooling"><option value="liquid" selected>液冷</option><option value="air">风冷</option><option value="hybrid">液冷+风冷混合</option></select></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">PUE目标</label><input type="number" class="form-input" id="aidcPueTarget" value="1.25" step="0.01" min="1.05" max="2.0"></div>
+<div class="form-group"><label class="form-label">机柜功率密度(kW/柜)</label><input type="number" class="form-input" id="aidcRackPower" value="40" step="5"></div>
+<div class="form-group"><label class="form-label">预算(万元)</label><input type="number" class="form-input" id="aidcBudget" value="50000" step="1000"></div>
+</div>
+<div class="form-row" style="margin-top:4px">
+<div class="form-group"><label class="form-label">峰电价(元/kWh)</label><input type="number" class="form-input" id="aidcPricePeak" value="1.05" step="0.01"></div>
+<div class="form-group"><label class="form-label">谷电价(元/kWh)</label><input type="number" class="form-input" id="aidcPriceValley" value="0.35" step="0.01"></div>
+<div class="form-group"><label class="form-label">AI模型</label><select class="form-input" id="aidcLlmProvider"><option value="local">本地规则引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option><option value="bailian">Qwen3.7-Max (阿里百炼)</option></select></div>
+</div>
+</div>
+</div>
+<button class="btn btn-primary" onclick="aidcGenerateSolution()" style="width:100%;padding:12px;font-size:14px;margin-bottom:16px">生成AIDC方案</button>
+<div class="success-msg" id="aidcSuccessMsg" style="display:none">方案已生成！请切换到其他标签查看供电架构、液冷散热、PUE优化等详情</div>
+<div id="aidcAnalysisLog" class="mg-log" style="display:none;margin-top:12px"></div>
+<div id="aidcSolutionBrief" style="font-size:12px;color:var(--text2);line-height:1.8"></div>
+</div>
+
+<div id="page-aidc-power" class="aidc-content" style="display:none;padding:24px 32px">
+<div class="sec-title">供电架构 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">从方案JSON同源生成：供电单线图、UPS配置、配电架构、冗余方案。遵循GB 50174/GB 50052标准</div>
+<div id="aidcPowerEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div id="aidcPowerContent" style="display:none">
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">AIDC供电单线图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcPowerSvg','AIDC供电单线图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="aidcPowerSvg"></div>
+</div>
+<div id="aidcPowerDetail" style="font-size:12px;line-height:1.8;color:var(--text2)"></div>
+</div>
+</div>
+
+<div id="page-aidc-cooling" class="aidc-content" style="display:none;padding:24px 32px">
+<div class="sec-title">液冷散热 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">从方案JSON同源生成：冷板设计、CDU配置、管路布局、散热能力评估</div>
+<div id="aidcCoolingEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div id="aidcCoolingContent" style="display:none">
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">液冷管路拓扑图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcCoolingSvg','液冷管路拓扑图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="aidcCoolingSvg"></div>
+</div>
+<div id="aidcCoolingDetail" style="font-size:12px;line-height:1.8;color:var(--text2)"></div>
+</div>
+</div>
+
+<div id="page-aidc-pue" class="aidc-content" style="display:none;padding:24px 32px">
+<div class="sec-title">PUE优化 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">PUE目标分解、节能策略推荐、自然冷却潜力评估、经济性分析</div>
+<div id="aidcPueEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div id="aidcPueContent" style="display:none">
+<div id="aidcPueDetail" style="font-size:12px;line-height:1.8;color:var(--text2)"></div>
+</div>
+</div>
+
+<div id="page-aidc-layout" class="aidc-content" style="display:none;padding:24px 32px">
+<div class="sec-title">机柜布局 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">机柜功率密度规划、冷热通道设计、设备平面布置图</div>
+<div id="aidcLayoutEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div id="aidcLayoutContent" style="display:none">
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">设备平面布置图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcLayoutSvg','设备平面布置图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="aidcLayoutSvg"></div>
+</div>
+<div id="aidcLayoutDetail" style="font-size:12px;line-height:1.8;color:var(--text2)"></div>
+</div>
+</div>
+
+<div id="page-aidc-bom" class="aidc-content" style="display:none;padding:24px 32px">
+<div class="sec-title">BOM清单 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">完整设备清单、型号规格、数量、价格汇总</div>
+<div id="aidcBomEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div id="aidcBomContent" style="display:none">
+<div id="aidcBomTable"></div>
+<div id="aidcEconTable"></div>
+</div>
+</div>
+
+<div id="page-aidc-drawings" class="aidc-content" style="display:none;padding:24px 32px">
+<div class="sec-title">图纸汇总 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">所有AIDC图纸集中展示与下载</div>
+<div id="aidcDrawingsEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div id="aidcDrawingsContent" style="display:none">
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">AIDC系统架构图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcArchSvg','AIDC系统架构图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="aidcArchSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">AIDC电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcWiringSvg','AIDC电气一次接线图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="aidcWiringSvg"></div>
+</div>
+</div>
 </div>
 
 <footer class="footer" data-i18n="footer_text">
@@ -2303,6 +2441,7 @@ const CASES=[
 ];
 
 let LAST_RESULT=null;let currentDiagramIdx=0;let LAST_MG_RESULT=null;
+let LAST_AIDC_RESULT=null;
 let currentFilter='全部';
 
 function showPage(id){
@@ -2319,23 +2458,37 @@ function showPage(id){
 
 function switchCategory(cat){
   document.querySelectorAll('.category-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.category-tab')[cat==='ess'?0:1].classList.add('active');
+  const catIdx=cat==='ess'?0:cat==='microgrid'?1:2;
+  document.querySelectorAll('.category-tab')[catIdx].classList.add('active');
   const essNav=document.getElementById('essNav');
   const mgNav=document.getElementById('microgridNav');
+  const aidcNav=document.getElementById('aidcNav');
   const mc=document.querySelector('.main-container');
   if(cat==='ess'){
     essNav.style.display='block';
     mgNav.style.display='none';
+    aidcNav.style.display='none';
     if(mc)mc.style.display='';
     document.querySelectorAll('.tab-content').forEach(t=>t.style.display='');
     document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
     showPage('devices');
-  }else{
+  }else if(cat==='microgrid'){
     essNav.style.display='none';
     mgNav.style.display='block';
+    aidcNav.style.display='none';
     if(mc)mc.style.display='none';
     document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
     showMicroPage('mg-design');
+  }else{
+    essNav.style.display='none';
+    mgNav.style.display='none';
+    aidcNav.style.display='block';
+    if(mc)mc.style.display='none';
+    document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
+    showAidcPage('aidc-design');
   }
 }
 
@@ -2371,6 +2524,24 @@ function mgShowWiki(id){
     subEl.querySelectorAll('[id^="mm-"]').forEach(el=>{delete el.dataset.rendered;el.innerHTML='';});
   }
   setTimeout(()=>renderMermaid('page-mg-'+id),300);
+}
+
+function showAidcPage(id){
+  document.querySelectorAll('#aidcNav .sub-tab').forEach(t=>t.classList.remove('active'));
+  const subPages=['aidc-design','aidc-power','aidc-cooling','aidc-pue','aidc-layout','aidc-bom','aidc-drawings'];
+  const tabIdx=subPages.indexOf(id);
+  if(tabIdx>=0) document.querySelectorAll('#aidcNav .sub-tab')[tabIdx].classList.add('active');
+  document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
+  const el=document.getElementById('page-'+id);
+  if(el) el.style.display='block';
+  if(id==='aidc-design'&&LAST_AIDC_RESULT) aidcRenderBrief();
+  if(id==='aidc-power'&&LAST_AIDC_RESULT) aidcRenderPower();
+  if(id==='aidc-cooling'&&LAST_AIDC_RESULT) aidcRenderCooling();
+  if(id==='aidc-pue'&&LAST_AIDC_RESULT) aidcRenderPue();
+  if(id==='aidc-layout'&&LAST_AIDC_RESULT) aidcRenderLayout();
+  if(id==='aidc-bom'&&LAST_AIDC_RESULT) aidcRenderBom();
+  if(id==='aidc-drawings'&&LAST_AIDC_RESULT) aidcRenderDrawings();
+}
 }
 
 function showSwSub(id){
@@ -6014,6 +6185,466 @@ function mgParseNatural(){
   if(/(苏州|江苏)/.test(raw))sv('mgRegion','江苏省苏州市');
   if(found>=2) setTimeout(()=>mgGenerateSolution(),300);
   else alert('识别到'+found+'个参数，已填入表单。请点击「生成微网方案」');
+}
+
+/* ========== AIDC方案智能体 ========== */
+function aidcVal(id){const el=document.getElementById(id);return el?el.value:'';}
+function aidcNum(id,def){const v=parseFloat(aidcVal(id));return isNaN(v)?def:v;}
+
+const AIDC_SKILLS_SUMMARY=`
+## AIDC数据中心方案8项Skill规则
+
+### Skill 1: 算力规划
+- GPU选型: H100(700W/TDP, FP64 34TF)/A100(400W, FP64 19.5TF)/H200(700W, 141GB HBM3e)/B200(1000W, FP4 4.5PF)/昇腾910B(310W, FP16 256TF)
+- 服务器: 8卡/GPU服务器, H100服务器功耗≈10kW/台, A100≈6.5kW/台, B200≈15kW/台
+- 算力密度: 标准机柜8台GPU服务器=64卡, H100机柜≈80kW, A100机柜≈52kW, B200机柜≈120kW
+- 集群规模: 小型<128卡/中型128-1024卡/大型1024-16384卡/超大规模>16384卡
+- 网络: 计算网络InfiniBand NDR400/以太网RoCEv2, 存储网络100GbE, 管理网络10GbE
+- 存储: 并行文件系统Lustre/GPFS, 全闪存NVMe-oF, 容量≥5PB/1000卡
+
+### Skill 2: 供电架构
+- 接入: IT负荷<10MW→10kV双路/10-50MW→35kV双路/>50MW→110kV双路
+- 变压器: 10kV/0.4kV 2000-2500kVA Dyn11, 负载率≤80%
+- UPS: 在线双变换, 容量=IT负荷×1.2, 电池后备15-30min, 效率≥96%(ECO模式)
+- 冗余: Tier III=2(N+1)/Tier IV=2N/2(N+1), STS静态切换<10ms
+- 配电: 列头柜智能PDU, 双路供电A/B路, 每机柜双PDU
+- 发电机: 备用柴油发电机, 容量≥IT负荷+制冷×1.1, 启动时间≤15s, 油箱≥8h
+
+### Skill 3: 液冷散热
+- 冷板式液冷: GPU/CPU冷板+CDU(冷量分配单元)+室外干冷器/冷却塔, 供回水温度35/45℃
+- 浸没式液冷: 单相/双相浸没, 介质3M Novec/Galden, PUE可达1.03-1.08
+- CDU配置: 每CDU冷量100-300kW, 冗余N+1, 流量调节0-100%
+- 管路: 不锈钢/PPR管, 主管DN80-DN150, 支管DN20-DN32, 流速≤2.5m/s
+- 冷却塔: 开式/闭式, 湿球温度设计, 变频风机, 补水量≤2%循环量
+- 漏液检测: 每机柜漏液绳+CDU漏液传感器+快速关断阀, 响应<5s
+
+### Skill 4: PUE优化
+- PUE=数据中心总耗电/IT设备耗电, 目标: 液冷≤1.25/风冷≤1.40/自然冷却≤1.15
+- PUE分解: 制冷系数CF=制冷耗电/IT耗电, 供配电损耗PLF=配电损耗/IT耗电
+- 自然冷却: 室外温度<15℃时免费制冷(Free Cooling), 年可用时长: 哈尔滨>4500h/北京>3500h/上海>2500h/广州>1500h
+- 变频技术: 冷水泵/冷却塔风机/精密空调风机变频, 节能30-50%
+- 供配电优化: 高效UPS(96%+)/高压直流HVDC/模块化UPS按需扩容
+- AI节能: 基于负荷预测的制冷优化, 动态调节供回水温度, 年节电5-15%
+
+### Skill 5: 机柜布局
+- 机柜标准: 42U/47U高度, 600mm/800mm宽, 1000mm/1100mm深
+- 冷热通道: 冷通道封闭/热通道封闭, 通道宽度: 冷1200mm/热1000mm
+- 功率密度: 低密度<8kW/柜(风冷)/中密度8-30kW/柜(风冷+辅助)/高密度30-80kW/柜(液冷)/超高密度>80kW/柜(浸没式)
+- 行列规划: 每行8-12柜, 行间距≥1200mm, 维护通道≥1000mm
+- 弱电/强电: 强电列头柜在行首/尾, 弱电(网络)在行中或行首
+
+### Skill 6: 经济性分析
+- TCO=CAPEX+OPEX×年限, CAPEX: 建筑30%/供电25%/制冷15%/IT设备20%/其他10%
+- 电费: PUE×IT负荷×8760h×电价, 占OPEX 60-70%
+- PUE每降低0.1: 年节电=IT负荷×8760×0.1×电价
+- 回收期: 增量投资/年节约电费, 液冷vs风冷回收期3-5年
+- IRR: Σ[净现金流t/(1+IRR)^t]=0, 目标>10%
+
+### Skill 7: 消防安全
+- 规范: GB 50174/GB 50016/NFPA 75/NFPA 76
+- 灭火: 七氟丙烷(FM200, 浓度7%)/IG541(混合气体)/细水雾, 早期预警VESDA
+- 联动: 烟感→告警→温感→断电→灭火→排烟, 全链<30s
+- 液冷漏液: 漏液绳检测→CDU关断→声光报警→BMS通知, <5s响应
+
+### Skill 8: 合规标准
+- GB 50174 数据中心设计规范
+- GB 50052 供配电系统设计规范
+- GB/T 2887 计算站场地技术条件
+- TIA-942 数据中心电信基础设施标准
+- Uptime Institute Tier I-IV 认证
+- 等保2.0 三级(金融/政务)/二级(一般企业)
+`;
+
+const AIDC_SYSTEM_PROMPT=`你是一个AI数据中心(AIDC)解决方案AI智能体，由华为云码道CodeArts驱动。
+
+## 你的职责
+根据用户提供的算力需求、供电条件、散热要求等参数，给出完整的AIDC数据中心配置方案。
+
+## 关键设计原则
+1. 供电可靠性: Tier III可用性99.982%/Tier IV可用性99.995%
+2. PUE目标: 液冷方案≤1.25, 风冷方案≤1.40
+3. 冗余配置: 2(N+1)为推荐方案, 关键负荷2N
+4. 液冷优先: GPU功率>300W推荐液冷, 整柜>30kW必须液冷
+5. 经济性: TCO最优, 电费占比>60%OPEX, PUE每降0.1年省电费显著
+
+## 输出格式要求
+你必须返回严格的JSON（不要markdown代码块），包含以下字段：
+{
+  "summary": "方案概述",
+  "compute": {"gpuType":"H100","gpuCount":800,"servers":100,"racks":13,"totalFlops":"27.2 PFLOPS(FP64)","itLoadKw":10000},
+  "power": {"voltage":"10kV","redundancy":"2(N+1)","transformers":[{"cap":2500,"qty":6,"vector":"Dyn11"}],"ups":[{"cap":1200,"qty":10,"backup":"20min"}],"generators":[{"cap":2000,"qty":2,"fuel":"diesel","tank":"8h"}],"pcc":"10kV双路供电+STS切换"},
+  "cooling": {"type":"liquid","cdu":[{"cap":200,"qty":30,"redundancy":"N+2"}],"coolingTower":[{"cap":1500,"qty":4}],"supplyTemp":35,"returnTemp":45,"leakDetect":"漏液绳+快速关断"},
+  "pue": {"target":1.22,"coolingFactor":0.15,"powerLossFactor":0.07,"freeCoolingHours":3200,"annualPue":1.18},
+  "layout": {"totalRacks":13,"gpuRacks":13,"networkRacks":4,"rows":2,"coldAisle":1200,"hotAisle":1000,"rackPower":"80kW/柜"},
+  "economics": {"capex":45000,"opexAnnual":8500,"electricityAnnual":6800,"tco10y":130000,"payback":4.5,"irr":12.3,"pueSavingAnnual":520},
+  "protection": ["UPS后备20min","柴发8h后备","漏液检测<5s关断","七氟丙烷灭火","VESDA极早期"],
+  "bom": [{"item":"GPU服务器H100 8卡","qty":100,"unit":"台","price":180,"total":18000},{"item":"CDU 200kW","qty":30,"unit":"台","price":15,"total":450},{"item":"UPS 1200kVA","qty":10,"unit":"台","price":35,"total":350}],
+  "archDiagram": {"bus":"10kV","nodes":[{"id":"grid1","label":"市电1路","sub":"10kV","x":200,"y":80,"type":"source"},{"id":"grid2","label":"市电2路","sub":"10kV","x":400,"y":80,"type":"source"},{"id":"pcc1","label":"PCC1","sub":"10kV开关柜","x":200,"y":160,"type":"meter"},{"id":"pcc2","label":"PCC2","sub":"10kV开关柜","x":400,"y":160,"type":"meter"},{"id":"busbar","label":"10kV母线","sub":"双路","x":300,"y":240,"type":"busbar"},{"id":"tx1","label":"1#变压器","sub":"2500kVA 10/0.4kV","x":150,"y":330,"type":"transformer"},{"id":"tx2","label":"2#变压器","sub":"2500kVA 10/0.4kV","x":300,"y":330,"type":"transformer"},{"id":"ups1","label":"UPS-A","sub":"1200kVA","x":150,"y":420,"type":"ups"},{"id":"ups2","label":"UPS-B","sub":"1200kVA","x":300,"y":420,"type":"ups"},{"id":"pdu","label":"智能PDU","sub":"列头柜","x":225,"y":510,"type":"switch"},{"id":"rack","label":"GPU机柜","sub":"80kW×13柜","x":225,"y":600,"type":"load"},{"id":"cdu","label":"CDU","sub":"200kW×30","x":500,"y":510,"type":"controller"},{"id":"ct","label":"冷却塔","sub":"1500kW×4","x":500,"y":600,"type":"load"}],"links":[{"from":"grid1","to":"pcc1"},{"from":"grid2","to":"pcc2"},{"from":"pcc1","to":"busbar"},{"from":"pcc2","to":"busbar"},{"from":"busbar","to":"tx1"},{"from":"busbar","to":"tx2"},{"from":"tx1","to":"ups1"},{"from":"tx2","to":"ups2"},{"from":"ups1","to":"pdu"},{"from":"ups2","to":"pdu"},{"from":"pdu","to":"rack"},{"from":"cdu","to":"rack","dashed":true},{"from":"ct","to":"cdu"}]},
+  "wiringDiagram": {"voltage":"10kV","components":[{"id":"QF1","label":"QF1进线断路器","type":"breaker"},{"id":"T1","label":"变压器2500kVA 10/0.4kV","type":"transformer"},{"id":"UPS1","label":"UPS 1200kVA","type":"ups"},{"id":"STS1","label":"STS静态切换","type":"switch"},{"id":"PDU1","label":"智能PDU","type":"switch"},{"id":"RACK1","label":"GPU服务器柜","type":"load"}],"connections":[{"from":"QF1","to":"T1","cable":"YJV22-10-3×70"},{"from":"T1","to":"UPS1","cable":"低压母排"},{"from":"UPS1","to":"STS1","cable":"低压电缆"},{"from":"STS1","to":"PDU1","cable":"低压电缆"},{"from":"PDU1","to":"RACK1","cable":"低压电缆"}],"protection":["进线:过流+速断+零序","变压器:差动+瓦斯+温度","UPS:过载+短路+电池低","PDU:过流+漏电保护"]}
+}
+
+archDiagram, wiringDiagram 中的节点和连接定义了图纸元素。前端会按国标电气制图规则渲染SVG。
+
+${AIDC_SKILLS_SUMMARY}
+`;
+
+function aidcGetParams(){
+  return{
+    projName:aidcVal('aidcProjName'),region:aidcVal('aidcRegion'),
+    tier:aidcVal('aidcTier'),gpuType:aidcVal('aidcGpuType'),
+    gpuCount:aidcNum('aidcGpuCount',800),itLoad:aidcNum('aidcItLoad',12000),
+    voltage:aidcVal('aidcVoltage'),redundancy:aidcVal('aidcRedundancy'),
+    cooling:aidcVal('aidcCooling'),pueTarget:aidcNum('aidcPueTarget',1.25),
+    rackPower:aidcNum('aidcRackPower',40),budget:aidcNum('aidcBudget',50000),
+    pricePeak:aidcNum('aidcPricePeak',1.05),priceValley:aidcNum('aidcPriceValley',0.35),
+    provider:aidcVal('aidcLlmProvider')||'local'
+  };
+}
+
+function aidcGenParamPrompt(P){
+  const gpuMap={h100:'NVIDIA H100',a100:'NVIDIA A100',h200:'NVIDIA H200',b200:'NVIDIA B200','ascend910b':'昇腾910B'};
+  const tierMap={tier3:'Tier III',tier4:'Tier IV',tier2:'Tier II'};
+  const redMap={'2n':'2N','2n1':'2(N+1)','n1':'N+1'};
+  const coolMap={liquid:'液冷',air:'风冷',hybrid:'液冷+风冷混合'};
+  return `## AIDC数据中心项目参数
+- 项目名称: ${P.projName}
+- 区域: ${P.region} | 等级: ${tierMap[P.tier]}
+- GPU: ${gpuMap[P.gpuType]} × ${P.gpuCount}卡 | 服务器: ${Math.ceil(P.gpuCount/8)}台
+- 总IT负荷: ${P.itLoad}kW | 机柜功率密度: ${P.rackPower}kW/柜
+- 接入: ${P.voltage}kV双路 | 冗余: ${redMap[P.redundancy]} | 散热: ${coolMap[P.cooling]}
+- PUE目标: ${P.pueTarget} | 预算: ${P.budget}万元
+- 峰电价: ${P.pricePeak}元 | 谷电价: ${P.priceValley}元
+请根据以上参数，输出AIDC数据中心解决方案JSON。`;
+}
+
+function aidcLocalEngine(P){
+  const gpuSpecs={h100:{tdp:700,servers8:10,flops:'34 TFLOPS(FP64)'},a100:{tdp:400,servers8:6.5,flops:'19.5 TFLOPS(FP64)'},h200:{tdp:700,servers8:10,flops:'34 TFLOPS(FP64)'},b200:{tdp:1000,servers8:15,flops:'4.5 PFLOPS(FP4)'},'ascend910b':{tdp:310,servers8:5,flops:'256 TFLOPS(FP16)'}};
+  const spec=gpuSpecs[P.gpuType]||gpuSpecs.h100;
+  const servers=Math.ceil(P.gpuCount/8);
+  const gpuRacks=Math.ceil(servers/8);
+  const netRacks=Math.ceil(gpuRacks*0.3);
+  const totalRacks=gpuRacks+netRacks;
+  const itLoad=P.itLoad||servers*spec.servers8;
+  const totalLoad=itLoad*(P.pueTarget||1.25);
+  const coolingLoad=totalLoad-itLoad;
+  const txCap=P.voltage==='35'?3150:P.voltage==='110'?10000:2500;
+  const txCount=Math.ceil(totalLoad*1.2/txCap/0.8);
+  const upsCap=P.redundancy==='2n'?itLoad*1.2:itLoad*0.6*1.2;
+  const upsCount=Math.ceil(upsCap/1200);
+  const genCap=Math.ceil(totalLoad*1.1/1000)*1000;
+  const isLiquid=P.cooling==='liquid'||P.cooling==='hybrid';
+  const cduCap=200;
+  const cduCount=Math.ceil(coolingLoad*0.7/cduCap)+2;
+  const ctCap=1500;
+  const ctCount=Math.ceil(coolingLoad*0.7/ctCap)+1;
+  const capex=Math.round(itLoad*3.5+(isLiquid?itLoad*0.8:itLoad*0.4)+itLoad*0.5+servers*0.18+totalRacks*0.3);
+  const elecAnnual=Math.round(totalLoad*8760*P.pricePeak*0.7/10000+totalLoad*8760*P.priceValley*0.3/10000);
+  const opexAnnual=Math.round(elecAnnual*1.15+capex*0.02);
+  const pueSaving=Math.round(itLoad*8760*0.1*P.pricePeak/10000);
+  const tco10y=capex+opexAnnual*10;
+  const payback=isLiquid?(capex-itLoad*3.9)/(itLoad*8760*(1.4-P.pueTarget)*P.pricePeak/10000):0;
+  const irr=payback>0?(opexAnnual*0.1/(capex)*100).toFixed(1):'N/A';
+  return{
+    projName:P.projName,region:P.region,tier:P.tier,
+    compute:{gpuType:P.gpuType,gpuCount:P.gpuCount,servers,racks:gpuRacks,totalFlops:(P.gpuCount*parseFloat(spec.flops)/1000).toFixed(1)+' PFLOPS',itLoadKw:itLoad},
+    power:{voltage:P.voltage+'kV',redundancy:P.redundancy,transformers:[{cap:txCap,qty:txCount,vector:'Dyn11'}],ups:[{cap:1200,qty:upsCount,backup:'20min'}],generators:[{cap:genCap,qty:2,fuel:'diesel',tank:'8h'}],pcc:P.voltage+'kV双路供电+STS切换'},
+    cooling:{type:P.cooling,cdu:[{cap:cduCap,qty:cduCount,redundancy:'N+2'}],coolingTower:[{cap:ctCap,qty:ctCount}],supplyTemp:35,returnTemp:45,leakDetect:'漏液绳+快速关断'},
+    pue:{target:P.pueTarget,coolingFactor:((P.pueTarget-1)*0.7).toFixed(2),powerLossFactor:((P.pueTarget-1)*0.3).toFixed(2),freeCoolingHours:P.region.includes('哈尔滨')?4500:P.region.includes('北京')?3500:P.region.includes('上海')?2500:1500,annualPue:(P.pueTarget-0.05).toFixed(2)},
+    layout:{totalRacks,gpuRacks,networkRacks:netRacks,rows:Math.ceil(gpuRacks/6),coldAisle:1200,hotAisle:1000,rackPower:P.rackPower+'kW/柜'},
+    economics:{capex,opexAnnual,electricityAnnual:elecAnnual,tco10y,payback:payback>0?payback.toFixed(1):'N/A',irr,pueSavingAnnual:pueSaving},
+    protection:['UPS后备20min','柴发8h后备','漏液检测<5s关断','七氟丙烷灭火','VESDA极早期','STS静态切换<10ms'],
+    bom:[
+      {item:'GPU服务器'+P.gpuType.toUpperCase()+' 8卡',qty:servers,unit:'台',price:Math.round(spec.tdp*0.26),total:servers*Math.round(spec.tdp*0.26)},
+      {item:'CDU '+cduCap+'kW',qty:cduCount,unit:'台',price:15,total:cduCount*15},
+      {item:'UPS 1200kVA',qty:upsCount,unit:'台',price:35,total:upsCount*35},
+      {item:'变压器'+txCap+'kVA',qty:txCount,unit:'台',price:20,total:txCount*20},
+      {item:'冷却塔'+ctCap+'kW',qty:ctCount,unit:'台',price:25,total:ctCount*25},
+      {item:'柴发'+genCap+'kW',qty:2,unit:'台',price:Math.round(genCap*0.003),total:Math.round(genCap*0.006)},
+      {item:'智能PDU',qty:totalRacks*2,unit:'个',price:0.8,total:totalRacks*1.6},
+      {item:'网络交换机100GbE',qty:Math.ceil(gpuRacks/4),unit:'台',price:12,total:Math.ceil(gpuRacks/4)*12}
+    ],
+    archDiagram:{bus:P.voltage+'kV',nodes:[
+      {id:'grid1',label:'市电1路',sub:P.voltage+'kV',x:200,y:80,type:'source'},
+      {id:'grid2',label:'市电2路',sub:P.voltage+'kV',x:400,y:80,type:'source'},
+      {id:'pcc1',label:'PCC1',sub:P.voltage+'kV开关柜',x:200,y:160,type:'meter'},
+      {id:'pcc2',label:'PCC2',sub:P.voltage+'kV开关柜',x:400,y:160,type:'meter'},
+      {id:'busbar',label:P.voltage+'kV母线',sub:'双路',x:300,y:240,type:'busbar'},
+      {id:'tx1',label:'1#变压器',sub:txCap+'kVA '+P.voltage+'/0.4kV',x:150,y:330,type:'transformer'},
+      {id:'tx2',label:'2#变压器',sub:txCap+'kVA '+P.voltage+'/0.4kV',x:300,y:330,type:'transformer'},
+      {id:'ups1',label:'UPS-A',sub:'1200kVA',x:150,y:420,type:'ups'},
+      {id:'ups2',label:'UPS-B',sub:'1200kVA',x:300,y:420,type:'ups'},
+      {id:'pdu',label:'智能PDU',sub:'列头柜',x:225,y:510,type:'switch'},
+      {id:'rack',label:'GPU机柜',sub:P.rackPower+'kW×'+gpuRacks+'柜',x:225,y:600,type:'load'},
+      {id:'cdu',label:'CDU',sub:cduCap+'kW×'+cduCount,x:500,y:510,type:'controller'},
+      {id:'ct',label:'冷却塔',sub:ctCap+'kW×'+ctCount,x:500,y:600,type:'load'}
+    ],links:[
+      {from:'grid1',to:'pcc1'},{from:'grid2',to:'pcc2'},
+      {from:'pcc1',to:'busbar'},{from:'pcc2',to:'busbar'},
+      {from:'busbar',to:'tx1'},{from:'busbar',to:'tx2'},
+      {from:'tx1',to:'ups1'},{from:'tx2',to:'ups2'},
+      {from:'ups1',to:'pdu'},{from:'ups2',to:'pdu'},
+      {from:'pdu',to:'rack'},
+      {from:'cdu',to:'rack',dashed:true},{from:'ct',to:'cdu'}
+    ]},
+    wiringDiagram:{voltage:P.voltage+'kV',components:[
+      {id:'QF1',label:'QF1进线断路器',type:'breaker'},
+      {id:'T1',label:'变压器'+txCap+'kVA '+P.voltage+'/0.4kV Dyn11',type:'transformer'},
+      {id:'UPS1',label:'UPS 1200kVA',type:'ups'},
+      {id:'STS1',label:'STS静态切换',type:'switch'},
+      {id:'PDU1',label:'智能PDU',type:'switch'},
+      {id:'RACK1',label:'GPU服务器柜',type:'load'}
+    ],connections:[
+      {from:'QF1',to:'T1',cable:'YJV22-10-3×70'},
+      {from:'T1',to:'UPS1',cable:'低压母排'},
+      {from:'UPS1',to:'STS1',cable:'低压电缆'},
+      {from:'STS1',to:'PDU1',cable:'低压电缆'},
+      {from:'PDU1',to:'RACK1',cable:'低压电缆'}
+    ],protection:['进线:过流+速断+零序','变压器:差动+瓦斯+温度','UPS:过载+短路+电池低','PDU:过流+漏电保护']}
+  };
+}
+
+async function aidcGenerateSolution(){
+  const P=aidcGetParams();
+  if(!P.itLoad){alert('请填写IT负荷');return;}
+  _currentLogId='aidcAnalysisLog';
+  _streamLogReasoningEl=null;_streamLogContentEl=null;
+  const logEl=document.getElementById('aidcAnalysisLog');
+  if(logEl){logEl.innerHTML='';logEl.style.display='block';}
+  const addLog=(msg,type)=>{
+    if(!logEl)return;
+    const d=document.createElement('div');
+    d.style.cssText=`font-size:12px;padding:2px 0;color:${type==='step'?'#80b0e0':type==='ok'?'#50c878':type==='warn'?'#e8a838':'#C2C0B6'};word-break:break-all;`;
+    d.textContent=msg;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;
+  };
+  let result;
+  const provider=P.provider;
+  if(provider==='local'){
+    addLog('[本地规则引擎] 启动AIDC方案生成...','step');
+    addLog(`GPU: ${P.gpuType.toUpperCase()} × ${P.gpuCount}卡, IT负荷: ${P.itLoad}kW, ${P.cooling==='liquid'?'液冷':'风冷'}方案`,'step');
+    result=aidcLocalEngine(P);
+    addLog('规则引擎匹配完成 ✓','ok');
+  }else{
+    try{
+      addLog(`[${provider.toUpperCase()}] 构建AIDC方案Prompt...`,'step');
+      const userPrompt=aidcGenParamPrompt(P);
+      addLog('─── 发送给LLM的完整输入 ───','step');
+      userPrompt.split('\n').forEach(line=>{if(line.trim())addLog(line,'');});
+      addLog('─── 输入结束 ───','step');
+      const skillCount=AIDC_SKILLS_SUMMARY.split('\n').filter(l=>l.trim()&&l.startsWith('-')).length;
+      addLog('AIDC Skill: '+skillCount+'条已注入system prompt','step');
+      addLog(`调用${provider.toUpperCase()} API (SSE流式)...`,'step');
+      const messages=[{role:'system',content:AIDC_SYSTEM_PROMPT},{role:'user',content:userPrompt}];
+      const data=await callLLM(messages,true,provider);
+      addLog(`响应完成, tokens: ${data.usage?.total_tokens||'?'}`,'ok');
+      const content=data.choices?.[0]?.message?.content||'';
+      const reasoning=data.choices?.[0]?.message?.reasoning_content||'';
+      if(reasoning){
+        addLog('─── AI思考过程 ───','step');
+        reasoning.split('\n').forEach(line=>{if(line.trim())addLog(line,'');});
+        addLog('─── 思考结束 ───','step');
+      }
+      addLog('解析LLM输出JSON...','step');
+      let jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+      if(!jsonStr.startsWith('{')){const m=jsonStr.match(/\{[\s\S]*\}/);if(m)jsonStr=m[0];}
+      try{result=JSON.parse(jsonStr);addLog('JSON解析成功 ✓','ok');}
+      catch(e){
+        addLog('JSON.parse失败: '+e.message,'warn');
+        addLog('尝试补全截断...','step');
+        let fixed=jsonStr;
+        const ob=(fixed.match(/{/g)||[]).length,cb=(fixed.match(/}/g)||[]).length;
+        const os=(fixed.match(/\[/g)||[]).length,cs=(fixed.match(/]/g)||[]).length;
+        fixed+='}'.repeat(Math.max(0,ob-cb))+']'.repeat(Math.max(0,os-cs));
+        try{result=JSON.parse(fixed);addLog('补全后JSON解析成功 ✓','ok');}
+        catch(e2){addLog('补全失败, fallback到规则引擎','warn');result=aidcLocalEngine(P);}
+      }
+    }catch(e){addLog('LLM调用失败: '+e.message,'warn');addLog('Fallback到本地规则引擎...','warn');result=aidcLocalEngine(P);}
+  }
+  _currentLogId='analysisLog';
+  LAST_AIDC_RESULT=result;
+  document.getElementById('aidcSuccessMsg').style.display='block';
+  aidcRenderBrief();
+}
+
+function aidcRenderBrief(){
+  const R=LAST_AIDC_RESULT;if(!R)return;
+  const el=document.getElementById('aidcSolutionBrief');
+  const C=R.compute||{};const E=R.economics||{};const P=R.power||{};const Cl=R.cooling||{};const Pu=R.pue||{};
+  el.innerHTML=`<div class="result-panel"><h3 style="color:#8B5CF6">推荐方案: ${R.projName||''}</h3>
+  <p style="line-height:2"><b>GPU:</b> ${C.gpuType?.toUpperCase()||''} × ${C.gpuCount||0}卡 (${C.servers||0}台服务器, ${C.racks||0}柜) | <b>算力:</b> ${C.totalFlops||''}</p>
+  <p style="line-height:2"><b>IT负荷:</b> ${C.itLoadKw||0}kW | <b>供电:</b> ${P.voltage||''} ${P.redundancy||''} | <b>散热:</b> ${Cl.type||''} | <b>PUE目标:</b> ${Pu.target||''}</p>
+  <p style="line-height:2"><b>CAPEX:</b> ≈${E.capex||0}万元 | <b>OPEX/年:</b> ≈${E.opexAnnual||0}万元 | <b>电费/年:</b> ≈${E.electricityAnnual||0}万元 | <b>TCO(10年):</b> ≈${E.tco10y||0}万元</p>
+  <p style="line-height:2"><b>回收期:</b> ≈${E.payback||'N/A'}年 | <b>IRR:</b> ${E.irr||'N/A'}% | <b>PUE优化年省:</b> ≈${E.pueSavingAnnual||0}万元</p>
+  <p style="line-height:2;color:#e8a838"><b>保护:</b> ${(R.protection||[]).join(' | ')}</p></div>`;
+}
+
+function aidcRenderPower(){
+  const R=LAST_AIDC_RESULT;if(!R)return;
+  document.getElementById('aidcPowerEmpty').style.display='none';
+  document.getElementById('aidcPowerContent').style.display='block';
+  const arch=R.archDiagram;
+  if(arch&&!document.getElementById('aidcPowerSvg').innerHTML.trim()){
+    document.getElementById('aidcPowerSvg').innerHTML=renderArchDiagramSvg(arch);
+  }
+  const P=R.power||{};
+  document.getElementById('aidcPowerDetail').innerHTML=`<div class="result-panel">
+  <h3 style="color:#3B82F6">供电架构详情</h3>
+  <p><b>接入电压:</b> ${P.voltage}双路 | <b>冗余:</b> ${P.redundancy}</p>
+  <p><b>变压器:</b> ${(P.transformers||[]).map(t=>t.cap+'kVA×'+t.qty+'台 '+t.vector).join(', ')}</p>
+  <p><b>UPS:</b> ${(P.ups||[]).map(u=>u.cap+'kVA×'+u.qty+'台 后备'+u.backup).join(', ')}</p>
+  <p><b>柴发:</b> ${(P.generators||[]).map(g=>g.cap+'kW×'+g.qty+'台 燃油'+g.tank).join(', ')}</p>
+  <p><b>PCC:</b> ${P.pcc}</p></div>`;
+}
+
+function aidcRenderCooling(){
+  const R=LAST_AIDC_RESULT;if(!R)return;
+  document.getElementById('aidcCoolingEmpty').style.display='none';
+  document.getElementById('aidcCoolingContent').style.display='block';
+  const Cl=R.cooling||{};
+  document.getElementById('aidcCoolingDetail').innerHTML=`<div class="result-panel">
+  <h3 style="color:#50c878">液冷散热详情</h3>
+  <p><b>散热方式:</b> ${Cl.type==='liquid'?'液冷':Cl.type==='air'?'风冷':'液冷+风冷混合'}</p>
+  <p><b>CDU:</b> ${(Cl.cdu||[]).map(c=>c.cap+'kW×'+c.qty+'台 冗余'+c.redundancy).join(', ')}</p>
+  <p><b>冷却塔:</b> ${(Cl.coolingTower||[]).map(c=>c.cap+'kW×'+c.qty+'台').join(', ')}</p>
+  <p><b>供回水温度:</b> ${Cl.supplyTemp}℃/${Cl.returnTemp}℃</p>
+  <p><b>漏液检测:</b> ${Cl.leakDetect}</p></div>`;
+}
+
+function aidcRenderPue(){
+  const R=LAST_AIDC_RESULT;if(!R)return;
+  document.getElementById('aidcPueEmpty').style.display='none';
+  document.getElementById('aidcPueContent').style.display='block';
+  const Pu=R.pue||{};const E=R.economics||{};
+  document.getElementById('aidcPueDetail').innerHTML=`<div class="result-panel">
+  <h3 style="color:#e8a838">PUE优化详情</h3>
+  <p><b>PUE目标:</b> ${Pu.target} | <b>年化PUE:</b> ${Pu.annualPue||'-'}</p>
+  <p><b>制冷系数CF:</b> ${Pu.coolingFactor} | <b>配电损耗PLF:</b> ${Pu.powerLossFactor}</p>
+  <p><b>自然冷却时长:</b> ${Pu.freeCoolingHours||0}h/年</p>
+  <p><b>PUE每降0.1年省电费:</b> ≈${E.pueSavingAnnual||0}万元</p>
+  <table class="result-table" style="font-size:11px;margin-top:12px"><tr><th>优化措施</th><th>预期PUE降幅</th><th>年节约(万元)</th><th>投资(万元)</th><th>回收期</th></tr>
+  <tr><td>液冷替代风冷</td><td>-0.15~-0.25</td><td>${Math.round(E.pueSavingAnnual*1.5)||0}</td><td>${Math.round((R.compute?.itLoadKw||10000)*0.3)||0}</td><td>3-5年</td></tr>
+  <tr><td>自然冷却(Free Cooling)</td><td>-0.05~-0.10</td><td>${Math.round(E.pueSavingAnnual*0.5)||0}</td><td>${Math.round((R.compute?.itLoadKw||10000)*0.05)||0}</td><td>1-2年</td></tr>
+  <tr><td>变频水泵/风机</td><td>-0.03~-0.05</td><td>${Math.round(E.pueSavingAnnual*0.3)||0}</td><td>${Math.round((R.compute?.itLoadKw||10000)*0.02)||0}</td><td><1年</td></tr>
+  <tr><td>AI智能调优</td><td>-0.02~-0.05</td><td>${Math.round(E.pueSavingAnnual*0.2)||0}</td><td>50</td><td>2-3年</td></tr>
+  </table></div>`;
+}
+
+function aidcRenderLayout(){
+  const R=LAST_AIDC_RESULT;if(!R)return;
+  document.getElementById('aidcLayoutEmpty').style.display='none';
+  document.getElementById('aidcLayoutContent').style.display='block';
+  const L=R.layout||{};
+  document.getElementById('aidcLayoutDetail').innerHTML=`<div class="result-panel">
+  <h3 style="color:#8B5CF6">机柜布局详情</h3>
+  <p><b>总机柜数:</b> ${L.totalRacks}柜 (GPU柜${L.gpuRacks}+网络柜${L.networkRacks}) | <b>排列:</b> ${L.rows}行</p>
+  <p><b>机柜功率密度:</b> ${L.rackPower} | <b>冷通道:</b> ${L.coldAisle}mm | <b>热通道:</b> ${L.hotAisle}mm</p></div>`;
+  if(!document.getElementById('aidcLayoutSvg').innerHTML.trim()){
+    const rows=L.rows||2;
+    const racksPerRow=Math.ceil(L.gpuRacks/rows);
+    let svg='<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#1a1a2e">';
+    svg+='<rect x="0" y="0" width="800" height="400" fill="#1a1a2e"/>';
+    svg+='<text x="400" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">AIDC设备平面布置图</text>';
+    for(let r=0;r<rows;r++){
+      const yBase=60+r*180;
+      svg+=`<rect x="50" y="${yBase}" width="700" height="30" rx="4" fill="#2d2d44" stroke="#4a4a6a"/>`;
+      svg+=`<text x="400" y="${yBase+20}" text-anchor="middle" fill="#80b0e0" font-size="11">冷通道 ${L.coldAisle}mm</text>`;
+      for(let c=0;c<racksPerRow;c++){
+        const x=80+c*90;
+        if(x>700)break;
+        svg+=`<rect x="${x}" y="${yBase+35}" width="70" height="100" rx="3" fill="#3B82F6" opacity="0.3" stroke="#3B82F6"/>`;
+        svg+=`<text x="${x+35}" y="${yBase+85}" text-anchor="middle" fill="#fff" font-size="9">GPU柜${r*racksPerRow+c+1}</text>`;
+        svg+=`<text x="${x+35}" y="${yBase+100}" text-anchor="middle" fill="#80b0e0" font-size="8">${L.rackPower}</text>`;
+      }
+      svg+=`<rect x="50" y="${yBase+140}" width="700" height="25" rx="4" fill="#2d2d44" stroke="#4a4a6a"/>`;
+      svg+=`<text x="400" y="${yBase+157}" text-anchor="middle" fill="#e8a838" font-size="11">热通道 ${L.hotAisle}mm</text>`;
+    }
+    svg+='</svg>';
+    document.getElementById('aidcLayoutSvg').innerHTML=svg;
+  }
+}
+
+function aidcRenderBom(){
+  const R=LAST_AIDC_RESULT;if(!R)return;
+  document.getElementById('aidcBomEmpty').style.display='none';
+  document.getElementById('aidcBomContent').style.display='block';
+  const bom=R.bom||[];
+  let html='<div class="result-panel"><h3 style="color:#3B82F6">BOM设备清单</h3>';
+  html+='<table class="result-table" style="font-size:11px"><tr><th>设备</th><th>数量</th><th>单位</th><th>单价(万元)</th><th>合计(万元)</th></tr>';
+  let total=0;
+  bom.forEach(b=>{
+    html+=`<tr><td>${b.item}</td><td>${b.qty}</td><td>${b.unit}</td><td>${b.price}</td><td>${b.total}</td></tr>`;
+    total+=b.total;
+  });
+  html+=`<tr style="font-weight:bold;color:#50c878"><td colspan="4">合计</td><td>${total.toFixed(1)}</td></tr>`;
+  html+='</table>';
+  const E=R.economics||{};
+  html+='<h3 style="margin-top:16px;color:#e8a838">经济性分析</h3>';
+  html+='<table class="result-table" style="font-size:11px"><tr><th>指标</th><th>数值</th></tr>';
+  html+=`<tr><td>CAPEX(初投资)</td><td>${E.capex||0}万元</td></tr>`;
+  html+=`<tr><td>OPEX(年运营)</td><td>${E.opexAnnual||0}万元</td></tr>`;
+  html+=`<tr><td>年电费</td><td>${E.electricityAnnual||0}万元</td></tr>`;
+  html+=`<tr><td>TCO(10年)</td><td>${E.tco10y||0}万元</td></tr>`;
+  html+=`<tr><td>投资回收期</td><td>${E.payback||'N/A'}年</td></tr>`;
+  html+=`<tr><td>IRR</td><td>${E.irr||'N/A'}%</td></tr>`;
+  html+=`<tr><td>PUE优化年省电费</td><td>${E.pueSavingAnnual||0}万元</td></tr>`;
+  html+='</table></div>';
+  document.getElementById('aidcBomTable').innerHTML=html;
+}
+
+function aidcRenderDrawings(){
+  const R=LAST_AIDC_RESULT;if(!R)return;
+  document.getElementById('aidcDrawingsEmpty').style.display='none';
+  document.getElementById('aidcDrawingsContent').style.display='block';
+  const arch=R.archDiagram;
+  if(arch&&!document.getElementById('aidcArchSvg').innerHTML.trim()){
+    document.getElementById('aidcArchSvg').innerHTML=renderArchDiagramSvg(arch);
+  }
+  const wiring=R.wiringDiagram;
+  if(wiring&&!document.getElementById('aidcWiringSvg').innerHTML.trim()){
+    document.getElementById('aidcWiringSvg').innerHTML=renderWiringDiagramSvg(wiring);
+  }
+}
+
+function aidcParseNatural(){
+  const raw=aidcVal('aidcNaturalInput');
+  if(!raw){alert('请输入需求描述');return;}
+  let found=0;
+  const sv=(id,val)=>{const el=document.getElementById(id);if(el&&val!=null){el.value=val;found++;}};
+  const mGpu=raw.match(/(H100|A100|H200|B200|910B)/i);
+  const mGpuCount=raw.match(/(\d+)\s*卡/);
+  const mLoad=raw.match(/(\d+)\s*[Mk]?W\s*(?:IT|负荷|负载)/);
+  const mVoltage=raw.match(/(\d+)\s*kV/);
+  const mPue=raw.match(/PUE\s*[<≤]\s*([\d.]+)/);
+  const mRack=raw.match(/([\d]+)\s*kW\s*[\/每]?\s*柜/);
+  if(mGpu){
+    const g=mGpu[1].toUpperCase();
+    if(g==='H100')sv('aidcGpuType','h100');
+    else if(g==='A100')sv('aidcGpuType','a100');
+    else if(g==='H200')sv('aidcGpuType','h200');
+    else if(g==='B200')sv('aidcGpuType','b200');
+    else if(g.includes('910'))sv('aidcGpuType','ascend910b');
+  }
+  if(mGpuCount)sv('aidcGpuCount',parseInt(mGpuCount[1]));
+  if(mLoad)sv('aidcItLoad',parseFloat(mLoad[1])*(raw.includes('MW')?1000:1));
+  if(mVoltage)sv('aidcVoltage',mVoltage[1]);
+  if(mPue)sv('aidcPueTarget',parseFloat(mPue[1]));
+  if(mRack)sv('aidcRackPower',parseInt(mRack[1]));
+  if(/液冷/.test(raw))sv('aidcCooling','liquid');
+  if(/风冷/.test(raw))sv('aidcCooling','air');
+  if(/(上海|张江)/.test(raw))sv('aidcRegion','上海市浦东新区');
+  if(/(北京|亦庄)/.test(raw))sv('aidcRegion','北京市亦庄开发区');
+  if(found>=2) setTimeout(()=>aidcGenerateSolution(),300);
+  else alert('识别到'+found+'个参数，已填入表单。请点击「生成AIDC方案」');
+}
+
+function downloadAidcDiagram(svgId,filename){
+  const svgEl=document.getElementById(svgId);
+  if(!svgEl)return;
+  const svgData=svgEl.innerHTML;
+  const blob=new Blob([svgData],{type:'image/svg+xml;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
 }
 
 /* ========== 电气图纸Agent ========== */
