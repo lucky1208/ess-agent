@@ -6665,9 +6665,8 @@ function aidcRenderPower(){
   const R=LAST_AIDC_RESULT;if(!R)return;
   document.getElementById('aidcPowerEmpty').style.display='none';
   document.getElementById('aidcPowerContent').style.display='block';
-  const arch=R.archDiagram;
-  if(arch&&!document.getElementById('aidcPowerSvg').innerHTML.trim()){
-    document.getElementById('aidcPowerSvg').innerHTML=renderArchDiagramSvg(arch);
+  if(!document.getElementById('aidcPowerSvg').innerHTML.trim()){
+    aidcDrawDualPowerSvg(R);
   }
   const P=R.power||{};
   document.getElementById('aidcPowerDetail').innerHTML=`<div class="result-panel">
@@ -6778,13 +6777,11 @@ function aidcRenderDrawings(){
   const R=LAST_AIDC_RESULT;if(!R)return;
   document.getElementById('aidcDrawingsEmpty').style.display='none';
   document.getElementById('aidcDrawingsContent').style.display='block';
-  const arch=R.archDiagram;
-  if(arch&&!document.getElementById('aidcArchSvg').innerHTML.trim()){
-    document.getElementById('aidcArchSvg').innerHTML=renderArchDiagramSvg(arch);
+  if(!document.getElementById('aidcArchSvg').innerHTML.trim()){
+    aidcDrawArchSvg(R);
   }
-  const wiring=R.wiringDiagram;
-  if(wiring&&!document.getElementById('aidcWiringSvg').innerHTML.trim()){
-    document.getElementById('aidcWiringSvg').innerHTML=renderWiringDiagramSvg(wiring);
+  if(!document.getElementById('aidcWiringSvg').innerHTML.trim()){
+    aidcDrawWiringSvg(R);
   }
   if(!document.getElementById('aidcDualPowerSvg').innerHTML.trim()){
     aidcDrawDualPowerSvg(R);
@@ -6792,6 +6789,89 @@ function aidcRenderDrawings(){
   if(!document.getElementById('aidcLiquidSvg').innerHTML.trim()){
     aidcDrawLiquidSvg(R);
   }
+}
+
+function aidcDrawArchSvg(R){
+  const P=R.power||{},C=R.compute||{},Cl=R.cooling||{},L=R.layout||{};
+  const W=900,H=650;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">AIDC系统架构图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${R.projName||''} | ${P.voltage||''} ${P.redundancy||''} | PUE ${R.pue?.target||''}</text>`;
+  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${color}18" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+17}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+32}" text-anchor="middle" fill="${color}99" font-size="8">${sub}</text>`;};
+  const drawArrow=(x1,y1,x2,y2)=>{s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#80b0e0" stroke-width="2"/>`;s+=`<polygon points="${x2-4},${y2-7} ${x2+4},${y2-7} ${x2},${y2}" fill="#80b0e0"/>`;};
+  const cx=W/2;let y=65;
+  drawBox(cx-70,y,140,35,'市电A路',P.voltage||'10kV','#4a90d9');
+  drawBox(cx+170,y,140,35,'市电B路',P.voltage||'10kV','#4a90d9');
+  y+=50;
+  drawArrow(cx,y-15,cx,y);
+  drawArrow(cx+240,y-15,cx+240,y);
+  drawBox(cx-70,y,140,35,'PCC-A','','#4a90d9');
+  drawBox(cx+170,y,140,35,'PCC-B','','#4a90d9');
+  y+=50;
+  drawArrow(cx,y-15,cx+120,y);
+  drawArrow(cx+240,y-15,cx+120,y);
+  drawBox(cx+50,y,140,35,P.voltage+'母线','双路','#606080');
+  y+=50;
+  drawArrow(cx+120,y-15,cx,y);
+  drawArrow(cx+120,y-15,cx+240,y);
+  const txArr=P.transformers||[{cap:2500,qty:2}];
+  drawBox(cx-70,y,140,35,'变压器A',txArr[0].cap+'kVA','#e8a838');
+  drawBox(cx+170,y,140,35,'变压器B',txArr[0].cap+'kVA','#e8a838');
+  y+=50;
+  drawArrow(cx,y-15,cx,y);
+  drawArrow(cx+240,y-15,cx+240,y);
+  const upsArr=P.ups||[{cap:1200,qty:2}];
+  drawBox(cx-70,y,140,35,'UPS-A',upsArr[0].cap+'kVA','#50c878');
+  drawBox(cx+170,y,140,35,'UPS-B',upsArr[0].cap+'kVA','#50c878');
+  y+=50;
+  drawArrow(cx,y-15,cx+120,y);
+  drawArrow(cx+240,y-15,cx+120,y);
+  drawBox(cx+50,y,140,35,'STS+PDU','双路切换','#e06070');
+  y+=50;
+  drawArrow(cx+120,y-15,cx+120,y);
+  drawBox(cx+50,y,140,35,'GPU机柜',C.itLoadKw+'kW','#8B5CF6');
+  s+=`<line x1="${cx+190}" y1="${y+17}" x2="${cx+300}" y2="${y+17}" stroke="#50c878" stroke-width="1.5" stroke-dasharray="4,2"/>`;
+  const cduArr=Cl.cdu||[{cap:200,qty:4}];
+  drawBox(cx+300,y,140,35,'CDU',cduArr[0].cap+'kW×'+cduArr[0].qty,'#50c878');
+  const ctArr=Cl.coolingTower||[{cap:1500,qty:2}];
+  drawBox(cx+300,y+50,140,35,'冷却塔',ctArr[0].cap+'kW×'+ctArr[0].qty,'#4a90d9');
+  s+=`<line x1="${cx+370}" y1="${y+35}" x2="${cx+370}" y2="${y+50}" stroke="#50c878" stroke-width="1.5"/>`;
+  s+=`<text x="${W/2}" y="${H-15}" text-anchor="middle" fill="#6080a0" font-size="8">${R.protection?.join(' | ')||''}</text>`;
+  s+=`</svg>`;
+  document.getElementById('aidcArchSvg').innerHTML=s;
+}
+
+function aidcDrawWiringSvg(R){
+  const P=R.power||{},C=R.compute||{};
+  const W=800,H=500;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">AIDC电气一次接线图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${R.projName||''} | ${P.voltage||''} | ${(P.transformers||[])[0]?.cap||2500}kVA</text>`;
+  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${color}18" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+17}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+32}" text-anchor="middle" fill="${color}99" font-size="8">${sub}</text>`;};
+  const drawArrow=(x1,y1,x2,y2)=>{s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#80b0e0" stroke-width="2"/>`;s+=`<polygon points="${x2-4},${y2-7} ${x2+4},${y2-7} ${x2},${y2}" fill="#80b0e0"/>`;};
+  const cx=W/2;let y=65;
+  drawBox(cx-70,y,140,35,'QF进线断路器',P.voltage||'10kV','#4a90d9');
+  y+=50;
+  drawArrow(cx,y-15,cx,y);
+  const txArr=P.transformers||[{cap:2500,qty:2}];
+  drawBox(cx-70,y,140,35,'变压器',txArr[0].cap+'kVA '+P.voltage+'/0.4kV','#e8a838');
+  y+=50;
+  drawArrow(cx,y-15,cx,y);
+  s+=`<text x="${cx+80}" y="${y-5}" fill="#e8a838" font-size="7">YJV22-10-3×70</text>`;
+  const upsArr=P.ups||[{cap:1200,qty:2}];
+  drawBox(cx-70,y,140,35,'UPS',upsArr[0].cap+'kVA','#50c878');
+  y+=50;
+  drawArrow(cx,y-15,cx,y);
+  drawBox(cx-70,y,140,35,'STS静态切换','<10ms','#e06070');
+  y+=50;
+  drawArrow(cx,y-15,cx,y);
+  drawBox(cx-70,y,140,35,'智能PDU','双路A/B','#e8a838');
+  y+=50;
+  drawArrow(cx,y-15,cx,y);
+  drawBox(cx-70,y,140,35,'GPU服务器柜',C.itLoadKw+'kW','#8B5CF6');
+  s+=`<text x="${W/2}" y="${H-20}" text-anchor="middle" fill="#6080a0" font-size="8">保护: 进线过流+速断+零序 | 变压器差动+瓦斯+温度 | UPS过载+短路+电池低 | PDU过流+漏电</text>`;
+  s+=`</svg>`;
+  document.getElementById('aidcWiringSvg').innerHTML=s;
 }
 
 function aidcDrawDualPowerSvg(R){
