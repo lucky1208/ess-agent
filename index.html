@@ -469,7 +469,7 @@ ACC AC一体柜专题
 <div class="form-row" style="margin-top:4px">
 <div class="form-group"><label class="form-label">峰段电价($/kWh)</label><input type="number" class="form-input" id="mgPricePeak" value="0.42" step="0.01"></div>
 <div class="form-group"><label class="form-label">谷段电价($/kWh)</label><input type="number" class="form-input" id="mgPriceValley" value="0.12" step="0.01"></div>
-<div class="form-group"><label class="form-label">AI模型</label><select class="form-input" id="mgLlmProvider"><option value="local">本地规则引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option><option value="bailian">Qwen3.7-Max (阿里百炼)</option></select></div>
+<div class="form-group"><label class="form-label">AI模型</label><select class="form-input" id="mgLlmProvider"><option value="local">本地模型引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option><option value="bailian">Qwen3.7-Max (阿里百炼)</option></select></div>
 </div>
 </div>
 </div>
@@ -1198,7 +1198,7 @@ ACC AC一体柜专题
 <div class="form-row" style="margin-top:4px">
 <div class="form-group"><label class="form-label">峰电价(元/kWh)</label><input type="number" class="form-input" id="aidcPricePeak" value="1.05" step="0.01"></div>
 <div class="form-group"><label class="form-label">谷电价(元/kWh)</label><input type="number" class="form-input" id="aidcPriceValley" value="0.35" step="0.01"></div>
-<div class="form-group"><label class="form-label">AI模型</label><select class="form-input" id="aidcLlmProvider"><option value="local">本地规则引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option><option value="bailian">Qwen3.7-Max (阿里百炼)</option></select></div>
+<div class="form-group"><label class="form-label">AI模型</label><select class="form-input" id="aidcLlmProvider"><option value="local">本地模型引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option><option value="bailian">Qwen3.7-Max (阿里百炼)</option></select></div>
 </div>
 </div>
 </div>
@@ -3519,7 +3519,7 @@ async function generateSolution() {
   } catch (e) {
     console.error('LLM error:', e);
     addLog('LLM调用失败: ' + e.message, 'warn');
-    addLog('Fallback到本地规则引擎...', 'warn');
+    addLog('Fallback到本地模型引擎...', 'warn');
     const P = getParams();
     const result = selectEquipment(P);
     LAST_RESULT = result;
@@ -6184,7 +6184,7 @@ async function mgGenerateSolution(){
   let result;
   const provider=mgVal('mgLlmProvider')||'local';
   if(provider==='local'){
-    mgAddLog('[本地规则引擎] 启动微网方案+图纸配套生成...','step');
+    mgAddLog('[本地模型引擎] 启动微网方案+图纸配套生成...','step');
     result=mgLocalEngine(P);
     mgAddLog('规则引擎匹配完成 ✓','ok');
   }else{
@@ -6325,7 +6325,7 @@ ${ESS_DIAGRAM_SKILL_V3}`;
         }
         if(!ok)throw new Error('JSON解析失败(4级修复均失败)');
       }
-    }catch(e){mgAddLog('LLM调用失败: '+e.message,'warn');mgAddLog('Fallback到本地规则引擎...','warn');result=mgLocalEngine(P);}
+    }catch(e){mgAddLog('LLM调用失败: '+e.message,'warn');mgAddLog('Fallback到本地模型引擎...','warn');result=mgLocalEngine(P);}
   }
   _currentLogId='analysisLog';
   LAST_MG_RESULT=result;
@@ -6603,7 +6603,7 @@ async function aidcGenerateSolution(){
   let result;
   const provider=P.provider;
   if(provider==='local'){
-    addLog('[本地规则引擎] 启动AIDC方案生成...','step');
+    addLog('[本地模型引擎] 启动AIDC方案生成...','step');
     addLog(`GPU: ${P.gpuType.toUpperCase()} × ${P.gpuCount}卡, IT负荷: ${P.itLoad}kW, ${P.cooling==='liquid'?'液冷':'风冷'}方案`,'step');
     result=aidcLocalEngine(P);
     addLog('规则引擎匹配完成 ✓','ok');
@@ -6641,7 +6641,7 @@ async function aidcGenerateSolution(){
         try{result=JSON.parse(fixed);addLog('补全后JSON解析成功 ✓','ok');}
         catch(e2){addLog('补全失败, fallback到规则引擎','warn');result=aidcLocalEngine(P);}
       }
-    }catch(e){addLog('LLM调用失败: '+e.message,'warn');addLog('Fallback到本地规则引擎...','warn');result=aidcLocalEngine(P);}
+    }catch(e){addLog('LLM调用失败: '+e.message,'warn');addLog('Fallback到本地模型引擎...','warn');result=aidcLocalEngine(P);}
   }
   _currentLogId='analysisLog';
   LAST_AIDC_RESULT=result;
@@ -6666,7 +6666,7 @@ function aidcRenderPower(){
   document.getElementById('aidcPowerEmpty').style.display='none';
   document.getElementById('aidcPowerContent').style.display='block';
   if(!document.getElementById('aidcPowerSvg').innerHTML.trim()){
-    aidcDrawDualPowerSvg(R);
+    aidcDrawPowerLineSvg(R);
   }
   const P=R.power||{};
   document.getElementById('aidcPowerDetail').innerHTML=`<div class="result-panel">
@@ -6682,6 +6682,9 @@ function aidcRenderCooling(){
   const R=LAST_AIDC_RESULT;if(!R)return;
   document.getElementById('aidcCoolingEmpty').style.display='none';
   document.getElementById('aidcCoolingContent').style.display='block';
+  if(!document.getElementById('aidcCoolingSvg').innerHTML.trim()){
+    aidcDrawCoolingLineSvg(R);
+  }
   const Cl=R.cooling||{};
   document.getElementById('aidcCoolingDetail').innerHTML=`<div class="result-panel">
   <h3 style="color:#50c878">液冷散热详情</h3>
@@ -6874,6 +6877,80 @@ function aidcDrawWiringSvg(R){
   document.getElementById('aidcWiringSvg').innerHTML=s;
 }
 
+function aidcDrawPowerLineSvg(R){
+  const P=R.power||{},C=R.compute||{};
+  const W=800,H=550;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">AIDC供电单线图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${R.projName||''} | ${P.voltage||''}双路 | ${P.redundancy||''}</text>`;
+  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${color}18" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+17}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+32}" text-anchor="middle" fill="${color}99" font-size="8">${sub}</text>`;};
+  const drawArrow=(x1,y1,x2,y2)=>{s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#80b0e0" stroke-width="2"/>`;s+=`<polygon points="${x2-4},${y2-7} ${x2+4},${y2-7} ${x2},${y2}" fill="#80b0e0"/>`;};
+  const cx=W/2;let y=65;
+  drawBox(cx-70,y,140,38,'市电A路',P.voltage||'10kV','#4a90d9');
+  y+=52;
+  drawArrow(cx,y-14,cx,y);
+  drawBox(cx-70,y,140,38,'QF-A进线断路器','过流+速断','#4a90d9');
+  y+=52;
+  drawArrow(cx,y-14,cx,y);
+  const txArr=P.transformers||[{cap:2500,qty:2}];
+  drawBox(cx-70,y,140,38,'变压器A',txArr[0].cap+'kVA Dyn11','#e8a838');
+  y+=52;
+  drawArrow(cx,y-14,cx,y);
+  s+=`<text x="${cx+80}" y="${y-5}" fill="#e8a838" font-size="7">YJV22-10-3×70</text>`;
+  const upsArr=P.ups||[{cap:1200,qty:2}];
+  drawBox(cx-70,y,140,38,'UPS-A',upsArr[0].cap+'kVA '+upsArr[0].backup,'#50c878');
+  y+=52;
+  drawArrow(cx,y-14,cx,y);
+  drawBox(cx-70,y,140,38,'STS静态切换','<10ms','#e06070');
+  y+=52;
+  drawArrow(cx,y-14,cx,y);
+  drawBox(cx-70,y,140,38,'智能PDU','双路A/B','#e8a838');
+  y+=52;
+  drawArrow(cx,y-14,cx,y);
+  drawBox(cx-70,y,140,38,'GPU服务器柜',C.itLoadKw+'kW IT负荷','#8B5CF6');
+  const genArr=P.generators||[{cap:2000,qty:2}];
+  s+=`<line x1="${cx-70}" y1="${y-130}" x2="${cx-200}" y2="${y-80}" stroke="#a070d0" stroke-width="1.5" stroke-dasharray="4,2"/>`;
+  drawBox(cx-270,y-100,140,38,'柴发A',genArr[0].cap+'kW '+genArr[0].tank,'#a070d0');
+  s+=`<text x="${W/2}" y="${H-15}" text-anchor="middle" fill="#6080a0" font-size="8">保护: 进线过流+速断+零序 | 变压器差动+瓦斯+温度 | UPS过载+短路+电池低 | PDU过流+漏电</text>`;
+  s+=`</svg>`;
+  document.getElementById('aidcPowerSvg').innerHTML=s;
+}
+
+function aidcDrawCoolingLineSvg(R){
+  const Cl=R.cooling||{},C=R.compute||{},L=R.layout||{};
+  const W=800,H=450;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">液冷管路拓扑图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${R.projName||''} | ${Cl.type==='liquid'?'液冷':Cl.type==='air'?'风冷':'混合'} | 供水${Cl.supplyTemp||35}℃/回水${Cl.returnTemp||45}℃</text>`;
+  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${color}18" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+17}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+32}" text-anchor="middle" fill="${color}99" font-size="8">${sub}</text>`;};
+  const drawArrow=(x1,y1,x2,y2,color)=>{s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color||'#80b0e0'}" stroke-width="2"/>`;s+=`<polygon points="${x2-4},${y2-7} ${x2+4},${y2-7} ${x2},${y2}" fill="${color||'#80b0e0'}"/>`;};
+  const cx=W/2;let y=65;
+  const ctArr=Cl.coolingTower||[{cap:1500,qty:2}];
+  drawBox(cx-70,y,140,38,'冷却塔',ctArr[0].cap+'kW×'+ctArr[0].qty,'#4a90d9');
+  y+=52;
+  drawArrow(cx,y-14,cx,y,'#4a90d9');
+  s+=`<text x="${cx+80}" y="${y-5}" fill="#4a90d9" font-size="7">冷却水 30/35℃</text>`;
+  drawBox(cx-70,y,140,38,'冷水泵','变频 N+1','#50c878');
+  y+=52;
+  drawArrow(cx,y-14,cx,y,'#50c878');
+  const cduArr=Cl.cdu||[{cap:200,qty:4}];
+  drawBox(cx-70,y,140,38,'CDU',cduArr[0].cap+'kW×'+cduArr[0].qty,'#50c878');
+  y+=52;
+  drawArrow(cx,y-14,cx,y,'#50c878');
+  s+=`<text x="${cx+80}" y="${y-5}" fill="#50c878" font-size="7">供回水 ${Cl.supplyTemp||35}/${Cl.returnTemp||45}℃</text>`;
+  drawBox(cx-70,y,140,38,'Manifold','分水器/集水器','#e8a838');
+  y+=52;
+  drawArrow(cx,y-14,cx,y,'#e8a838');
+  drawBox(cx-70,y,140,38,'GPU机柜',L.gpuRacks||0+'柜 '+L.rackPower||'','#8B5CF6');
+  s+=`<line x1="${cx-70}" y1="${y+19}" x2="${cx-140}" y2="${y+19}" stroke="#e06070" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+  s+=`<text x="${cx-145}" y="${y+23}" text-anchor="end" fill="#e06070" font-size="8">漏液绳</text>`;
+  s+=`<line x1="${cx+70}" y1="${y+19}" x2="${cx+140}" y2="${y+19}" stroke="#e06070" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+  s+=`<text x="${cx+145}" y="${y+23}" fill="#e06070" font-size="8">关断阀</text>`;
+  s+=`<text x="${W/2}" y="${H-15}" text-anchor="middle" fill="#6080a0" font-size="8">管路: 不锈钢主管DN80-DN150 | 流速≤2.5m/s | CDU冗余${cduArr[0].redundancy||'N+1'} | 漏液检测<5s关断</text>`;
+  s+=`</svg>`;
+  document.getElementById('aidcCoolingSvg').innerHTML=s;
+}
+
 function aidcDrawDualPowerSvg(R){
   const P=R.power||{},C=R.compute||{};
   const W=800,H=600;
@@ -7009,7 +7086,9 @@ function mgRenderDrawings(){
   mgById('mgDrawingEmpty').style.display='none';
   mgById('mgDrawingContent').style.display='block';
   const hasArch=mgById('mgArchSvg').innerHTML.trim();
-  if(!hasArch){mgDrawArchSvg(R);mgDrawWiringSvg(R);mgDrawCommSvg(R);mgDrawProtectSvg(R);mgDrawLogicSvg(R);mgDrawBom(R);mgDrawEcon(R);}
+  if(!hasArch){mgDrawArchSvg(R);mgDrawWiringSvg(R);mgDrawCommSvg(R);mgDrawBom(R);mgDrawEcon(R);}
+  if(!mgById('mgProtectSvg').innerHTML.trim()) mgDrawProtectSvg(R);
+  if(!mgById('mgLogicSvg').innerHTML.trim()) mgDrawLogicSvg(R);
 }
 
 function mgDrawArchSvg(R){
