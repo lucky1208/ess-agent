@@ -393,6 +393,18 @@ ACC AC一体柜专题
 <div class="diagram-header"><h3 class="diagram-title" data-i18n="diagram_topo">系统拓扑图</h3><div class="diagram-actions"><button onclick="downloadSVG('wiring2Svg','系统拓扑图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="wiring2Svg"></div>
 </div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">平面布置图</h3><div class="diagram-actions"><button onclick="downloadSVG('layoutSvg','平面布置图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="layoutSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">电缆走向图</h3><div class="diagram-actions"><button onclick="downloadSVG('cableSvg','电缆走向图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="cableSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">PCS-BESS电气原理图</h3><div class="diagram-actions"><button onclick="downloadSVG('principleSvg','PCS-BESS电气原理图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="principleSvg"></div>
+</div>
 <div class="diagram-container" id="bomSection" style="display:none">
 <div class="diagram-header"><h3 class="diagram-title" data-i18n="diagram_bom">物料清单(BOM)</h3><div class="diagram-actions"><button onclick="exportBOMCSV()" data-i18n="export_csv">导出 CSV</button><button onclick="exportBOMExcel()" data-i18n="export_excel">导出 Excel</button></div></div>
 <div id="bomContent"></div>
@@ -485,6 +497,14 @@ ACC AC一体柜专题
 <div class="diagram-container">
 <div class="diagram-header"><h3 class="diagram-title">微网通信拓扑图</h3><div class="diagram-actions"><button onclick="downloadMGDiagram('mgCommSvg','微网通信拓扑图.svg')">下载 SVG</button></div></div>
 <div class="diagram-svg" id="mgCommSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">微网保护配置图</h3><div class="diagram-actions"><button onclick="downloadMGDiagram('mgProtectSvg','微网保护配置图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="mgProtectSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">微网控制逻辑图</h3><div class="diagram-actions"><button onclick="downloadMGDiagram('mgLogicSvg','微网控制逻辑图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="mgLogicSvg"></div>
 </div>
 <div class="diagram-container">
 <div class="diagram-header"><h3 class="diagram-title">BOM设备清单</h3></div>
@@ -1258,6 +1278,14 @@ ACC AC一体柜专题
 <div class="diagram-container">
 <div class="diagram-header"><h3 class="diagram-title">AIDC电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcWiringSvg','AIDC电气一次接线图.svg')">下载 SVG</button></div></div>
 <div class="diagram-svg" id="aidcWiringSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">AIDC双路供电拓扑图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcDualPowerSvg','AIDC双路供电拓扑图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="aidcDualPowerSvg"></div>
+</div>
+<div class="diagram-container">
+<div class="diagram-header"><h3 class="diagram-title">AIDC液冷管路图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcLiquidSvg','AIDC液冷管路图.svg')">下载 SVG</button></div></div>
+<div class="diagram-svg" id="aidcLiquidSvg"></div>
 </div>
 </div>
 </div>
@@ -2458,7 +2486,7 @@ function showPage(id){
   const mainEl = document.querySelector('main.content');
   if(mainEl) mainEl.style.display = id==='config' ? 'none' : 'block';
   if(id==='devices')renderDeviceLibrary(currentFilter);
-  if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);}
+  if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderLayoutSvg(LAST_RESULT);renderCableSvg(LAST_RESULT);renderPrincipleSvg(LAST_RESULT);renderBOM(LAST_RESULT);}
   if(id==='cases')renderCases();
 }
 
@@ -3400,6 +3428,9 @@ async function generateSolution() {
       renderArchSvg(result);
       renderWiringSvg(result);
       renderTopoSvg(result);
+      renderLayoutSvg(result);
+      renderCableSvg(result);
+      renderPrincipleSvg(result);
       renderBOM(result);
       showRanking(result);
       showPage('config');
@@ -5851,6 +5882,152 @@ function renderBOM(R){
   if(sec){sec.style.display='block';document.getElementById('bomContent').innerHTML=html;}
 }
 
+function renderLayoutSvg(R){
+  if(!R||!R.candidates||!R.candidates.length)return;
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];
+  const W=900,H=500;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="background:#0d1117">`;
+  s+=`<defs><filter id="shL"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.3"/></filter></defs>`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">储能电站平面布置图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${P.projName||''} | ${P.use10kV?P.txHv+'kV':'0.4kV'}接入 | ${(c.totalCap/1000).toFixed(1)}MWh</text>`;
+  const yardW=760,yardH=360,yardX=70,yardY=70;
+  s+=`<rect x="${yardX}" y="${yardY}" width="${yardW}" height="${yardH}" rx="6" fill="none" stroke="#3a4a5a" stroke-width="2" stroke-dasharray="8,4"/>`;
+  s+=`<text x="${yardX+10}" y="${yardY+16}" fill="#6080a0" font-size="10">场地边界 (80m × 40m)</text>`;
+  let y=yardY+30;
+  const bessCount=c.qty||1;
+  const bessW=120,bessH=60,bessGap=15;
+  const totalBessW=bessCount*(bessW+bessGap)-bessGap;
+  const bessStartX=yardX+(yardW-totalBessW)/2;
+  s+=`<text x="${yardX+15}" y="${y}" fill="#50c878" font-size="11" font-weight="bold">电池舱区</text>`;
+  y+=8;
+  for(let i=0;i<bessCount;i++){
+    const x=bessStartX+i*(bessW+bessGap);
+    s+=`<rect x="${x}" y="${y}" width="${bessW}" height="${bessH}" rx="4" fill="#1a3a2a" stroke="#50c878" stroke-width="1.5" filter="url(#shL)"/>`;
+    s+=`<text x="${x+bessW/2}" y="${y+22}" text-anchor="middle" fill="#50c878" font-size="10" font-weight="bold">BESS-${i+1}</text>`;
+    s+=`<text x="${x+bessW/2}" y="${y+38}" text-anchor="middle" fill="#80d0a0" font-size="8">${c.product.name}</text>`;
+    s+=`<text x="${x+bessW/2}" y="${y+50}" text-anchor="middle" fill="#60a080" font-size="7">${c.product.cool} | ${c.product.fire}</text>`;
+  }
+  y+=bessH+20;
+  s+=`<text x="${yardX+15}" y="${y}" fill="#e06070" font-size="11" font-weight="bold">PCS/升压变区</text>`;
+  y+=8;
+  const pcsW=100,pcsH=50;
+  const pcsX=yardX+yardW/2-pcsW/2-80;
+  s+=`<rect x="${pcsX}" y="${y}" width="${pcsW}" height="${pcsH}" rx="4" fill="#3a1a1a" stroke="#e06070" stroke-width="1.5" filter="url(#shL)"/>`;
+  s+=`<text x="${pcsX+pcsW/2}" y="${y+20}" text-anchor="middle" fill="#e06070" font-size="10" font-weight="bold">PCS</text>`;
+  s+=`<text x="${pcsX+pcsW/2}" y="${y+36}" text-anchor="middle" fill="#f08090" font-size="8">${c.pcsKW}kW</text>`;
+  if(c.needStepUp){
+    const suX=pcsX+pcsW+30;
+    s+=`<rect x="${suX}" y="${y}" width="${pcsW}" height="${pcsH}" rx="4" fill="#3a2a1a" stroke="#e8a838" stroke-width="1.5" filter="url(#shL)"/>`;
+    s+=`<text x="${suX+pcsW/2}" y="${y+20}" text-anchor="middle" fill="#e8a838" font-size="10" font-weight="bold">升压变</text>`;
+    s+=`<text x="${suX+pcsW/2}" y="${y+36}" text-anchor="middle" fill="#f0c060" font-size="8">${Math.round(c.pcsKW*1.2)}kVA</text>`;
+    s+=`<line x1="${pcsX+pcsW}" y1="${y+pcsH/2}" x2="${suX}" y2="${y+pcsH/2}" stroke="#e8a838" stroke-width="2"/>`;
+  }
+  y+=pcsH+20;
+  s+=`<text x="${yardX+15}" y="${y}" fill="#4a90d9" font-size="11" font-weight="bold">配电区</text>`;
+  y+=8;
+  const distX=yardX+yardW/2-60;
+  s+=`<rect x="${distX}" y="${y}" width="120" height="45" rx="4" fill="#1a2a4a" stroke="#4a90d9" stroke-width="1.5" filter="url(#shL)"/>`;
+  s+=`<text x="${distX+60}" y="${y+18}" text-anchor="middle" fill="#4a90d9" font-size="10" font-weight="bold">${P.use10kV?P.txHv+'kV并网柜':'0.4kV配电柜'}</text>`;
+  s+=`<text x="${distX+60}" y="${y+34}" text-anchor="middle" fill="#80b0e0" font-size="8">KYN28A-12 | 含保护</text>`;
+  s+=`</svg>`;
+  document.getElementById('layoutSvg').innerHTML=s;
+}
+
+function renderCableSvg(R){
+  if(!R||!R.candidates||!R.candidates.length)return;
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];
+  const W=800,H=600;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="background:#0d1117">`;
+  s+=`<defs><marker id="aC" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><polygon points="0,0 6,2 0,4" fill="#80b0e0"/></marker></defs>`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">电缆走向图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${P.projName||''} | ${(c.totalCap/1000).toFixed(1)}MWh | ${P.use10kV?P.txHv+'kV':'0.4kV'}接入</text>`;
+  const cx=W/2;let y=70;
+  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${color}22" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+18}" text-anchor="middle" fill="${color}" font-size="11" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+34}" text-anchor="middle" fill="${color}aa" font-size="8">${sub}</text>`;};
+  const drawCable=(x1,y1,x2,y2,label)=>{s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#80b0e0" stroke-width="2" marker-end="url(#aC)"/>`;if(label)s+=`<text x="${(x1+x2)/2+8}" y="${(y1+y2)/2+4}" fill="#e8a838" font-size="8">${label}</text>`;};
+  drawBox(cx-80,y,160,45,'电网'+P.txHv+'kV',P.region||'','#4a90d9');
+  y+=55;
+  drawCable(cx,y-10,cx,y,P.use10kV?'YJV22-10-3×70':'');
+  drawBox(cx-80,y,160,45,'PCC并网柜','QF断路器+CT/PT','#4a90d9');
+  y+=55;
+  drawCable(cx,y-10,cx,y,'母排/电缆');
+  drawBox(cx-80,y,160,45,P.txHv+'kV母线','用户侧','#606080');
+  y+=55;
+  if(P.use10kV){
+    drawCable(cx-60,y-10,cx-120,y,'YJV22-10-3×50');
+    drawBox(cx-200,y,160,45,'1#变压器',P.txCap+'kVA '+P.txHv+'/0.4kV','#e8a838');
+    drawCable(cx+60,y-10,cx+120,y,'YJV22-10-3×50');
+    drawBox(cx+40,y,160,45,'储能支路','','#50c878');
+    y+=55;
+    drawCable(cx-120,y-10,cx-120,y,'低压母排');
+    drawBox(cx-200,y,160,40,'0.4kV负荷','~'+Math.round(P.txCap*P.pf*0.6)+'kW','#a070d0');
+    drawCable(cx+120,y-10,cx+120,y,'YJV-1kV-3×240');
+    drawBox(cx+40,y,160,40,'升压变',Math.round(c.pcsKW*1.2)+'kVA','#e8a838');
+    y+=50;
+    drawCable(cx+120,y-10,cx+120,y,'YJV-0.6kV-3×185');
+    drawBox(cx+40,y,160,40,'PCS',c.pcsKW+'kW','#e06070');
+    y+=50;
+    drawCable(cx+120,y-10,cx+120,y,'YJV-1.5kV-1×400');
+    drawBox(cx+40,y,160,40,'电池舱',c.product.name,'#50c878');
+  }else{
+    drawCable(cx,y-10,cx,y,'');
+    drawBox(cx-80,y,160,45,'0.4kV母线','','#606080');
+    y+=55;
+    drawCable(cx,y-10,cx,y,'YJV-0.6kV-3×185');
+    drawBox(cx-80,y,160,45,'PCS',c.pcsKW+'kW','#e06070');
+    y+=55;
+    drawCable(cx,y-10,cx,y,'YJV-1.5kV-1×400');
+    drawBox(cx-80,y,160,45,'电池舱',c.product.name,'#50c878');
+  }
+  s+=`<text x="${W/2}" y="${H-20}" text-anchor="middle" fill="#6080a0" font-size="9">电缆选型依据: 载流量K_t×K_g×K_n×I_table / 压降ΔU≤5% / 热稳定S_min=I_k×√t_k/C</text>`;
+  s+=`</svg>`;
+  document.getElementById('cableSvg').innerHTML=s;
+}
+
+function renderPrincipleSvg(R){
+  if(!R||!R.candidates||!R.candidates.length)return;
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];
+  const W=900,H=550;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="background:#0d1117">`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">PCS-BESS电气原理图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${c.product.name} | ${c.pcsKW}kW PCS | ${(c.totalCap/1000).toFixed(1)}MWh</text>`;
+  const cx=W/2;let y=70;
+  const drawBox=(x,y,w,h,label,sub,color,dashed=false)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${color}22" stroke="${color}" stroke-width="1.5" ${dashed?'stroke-dasharray="4,2"':''}/>`;s+=`<text x="${x+w/2}" y="${y+16}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+30}" text-anchor="middle" fill="${color}aa" font-size="7">${sub}</text>`;};
+  const drawLine=(x1,y1,x2,y2,label)=>{s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#80b0e0" stroke-width="2"/>`;if(label)s+=`<text x="${Math.max(x1,x2)+8}" y="${(y1+y2)/2+4}" fill="#e8a838" font-size="7">${label}</text>`;};
+  drawBox(cx-80,y,160,40,'电池簇','LFP 314Ah 1P240S','#50c878');
+  y+=50;
+  drawLine(cx,y-10,cx,y,'DC 768~1331V');
+  drawBox(cx-80,y,160,35,'汇流柜','簇并联×'+c.qty,'#50c878');
+  y+=45;
+  drawLine(cx,y-10,cx,y,'');
+  drawBox(cx-80,y,160,35,'DC断路器','DC1500V/630A','#e8a838');
+  y+=45;
+  drawLine(cx,y-10,cx,y,'DC 1500V');
+  drawBox(cx-80,y,160,45,'PCS','AC/DC IGBT '+c.pcsKW+'kW','#e06070');
+  s+=`<text x="${cx+90}" y="${y+25}" fill="#60a080" font-size="7">P/Q并网 | V/F离网</text>`;
+  y+=55;
+  drawLine(cx,y-10,cx,y,'AC 400V/690V');
+  drawBox(cx-80,y,160,35,'ACB','框架断路器 2000A','#e8a838');
+  y+=45;
+  drawLine(cx,y-10,cx,y,'');
+  if(c.needStepUp){
+    drawBox(cx-80,y,160,40,'升压变',Math.round(c.pcsKW*1.2)+'kVA 0.4/10kV','#e8a838');
+    y+=50;
+    drawLine(cx,y-10,cx,y,'AC 10kV');
+  }
+  drawBox(cx-80,y,160,35,'并网柜','KYN28A-12 QF','#4a90d9');
+  y+=45;
+  drawLine(cx,y-10,cx,y,'');
+  drawBox(cx-80,y,160,40,P.txHv+'kV母线','用户侧','#606080');
+  s+=`<line x1="${cx+80}" y1="${y+20}" x2="${cx+180}" y2="${y+20}" stroke="#50c878" stroke-width="1.5" stroke-dasharray="4,2"/>`;
+  drawBox(cx+180,y-5,140,50,'EMS','能量管理','#50c878',true);
+  s+=`<line x1="${cx+180}" y1="${y+45}" x2="${cx+180}" y2="${y+80}" stroke="#50c878" stroke-width="1" stroke-dasharray="3,2"/>`;
+  s+=`<text x="${cx+250}" y="${y+75}" fill="#60a080" font-size="7">CAN/RS485</text>`;
+  s+=`<text x="${W/2}" y="${H-30}" text-anchor="middle" fill="#6080a0" font-size="9">保护配置: BMS三级(预警/停机/急停) + PCS(过流/过压/欠压/频偏) + 并网柜(防孤岛AFD+逆功率)</text>`;
+  s+=`<text x="${W/2}" y="${H-15}" text-anchor="middle" fill="#6080a0" font-size="8">SOC管理: LFP 停放10%/停充90%/急停5%/过充95% | 温度: 正常25±5℃/告警40℃/停机50℃/急停55℃</text>`;
+  s+=`</svg>`;
+  document.getElementById('principleSvg').innerHTML=s;
+}
+
 function _getBOMData(){
   if(window._currentBOM) return window._currentBOM;
   if(LAST_RESULT && LAST_RESULT.bom) return LAST_RESULT.bom.map((b,i)=>({no:i+1,name:b.item,spec:'',qty:b.qty,unit:b.unit||'台',note:''}));
@@ -6609,6 +6786,98 @@ function aidcRenderDrawings(){
   if(wiring&&!document.getElementById('aidcWiringSvg').innerHTML.trim()){
     document.getElementById('aidcWiringSvg').innerHTML=renderWiringDiagramSvg(wiring);
   }
+  if(!document.getElementById('aidcDualPowerSvg').innerHTML.trim()){
+    aidcDrawDualPowerSvg(R);
+  }
+  if(!document.getElementById('aidcLiquidSvg').innerHTML.trim()){
+    aidcDrawLiquidSvg(R);
+  }
+}
+
+function aidcDrawDualPowerSvg(R){
+  const P=R.power||{},C=R.compute||{};
+  const W=800,H=600;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">AIDC双路供电拓扑图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${R.projName||''} | ${P.voltage||''} | ${P.redundancy||''} | Tier ${R.tier==='tier4'?'IV':'III'}</text>`;
+  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${color}18" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+17}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+32}" text-anchor="middle" fill="${color}99" font-size="8">${sub}</text>`;};
+  const drawArrow=(x1,y1,x2,y2)=>{s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#80b0e0" stroke-width="2"/>`;s+=`<polygon points="${x2-4},${y2-7} ${x2+4},${y2-7} ${x2},${y2}" fill="#80b0e0"/>`;};
+  let y=65;
+  const leftX=180,rightX=520,cx=W/2;
+  drawBox(leftX-70,y,140,40,'市电A路',P.voltage||'10kV','#4a90d9');
+  drawBox(rightX-70,y,140,40,'市电B路',P.voltage||'10kV','#4a90d9');
+  y+=55;
+  drawArrow(leftX,y-15,leftX,y);
+  drawArrow(rightX,y-15,rightX,y);
+  drawBox(leftX-70,y,140,40,'PCC-A',P.voltage+'开关柜','#4a90d9');
+  drawBox(rightX-70,y,140,40,'PCC-B',P.voltage+'开关柜','#4a90d9');
+  y+=55;
+  drawArrow(leftX,y-15,leftX,y);
+  drawArrow(rightX,y-15,rightX,y);
+  const txArr=P.transformers||[{cap:2500,qty:2}];
+  drawBox(leftX-70,y,140,40,'变压器A',txArr[0].cap+'kVA','#e8a838');
+  drawBox(rightX-70,y,140,40,'变压器B',txArr[0].cap+'kVA','#e8a838');
+  y+=55;
+  drawArrow(leftX,y-15,leftX,y);
+  drawArrow(rightX,y-15,rightX,y);
+  const upsArr=P.ups||[{cap:1200,qty:2}];
+  drawBox(leftX-70,y,140,40,'UPS-A',upsArr[0].cap+'kVA','#50c878');
+  drawBox(rightX-70,y,140,40,'UPS-B',upsArr[0].cap+'kVA','#50c878');
+  y+=55;
+  drawArrow(leftX,y-15,cx,y);
+  drawArrow(rightX,y-15,cx,y);
+  drawBox(cx-70,y,140,40,'STS静态切换','<10ms','#e06070');
+  y+=55;
+  drawArrow(cx,y-15,cx,y);
+  drawBox(cx-70,y,140,40,'智能PDU','双路A/B','#e8a838');
+  y+=55;
+  drawArrow(cx,y-15,cx,y);
+  drawBox(cx-70,y,140,40,'GPU服务器柜',C.itLoadKw+'kW IT负荷','#8B5CF6');
+  y+=55;
+  const genArr=P.generators||[{cap:2000,qty:2}];
+  s+=`<line x1="${leftX}" y1="${y-155}" x2="${leftX-120}" y2="${y-100}" stroke="#a070d0" stroke-width="1.5" stroke-dasharray="4,2"/>`;
+  drawBox(leftX-190,y-120,140,40,'柴发A',genArr[0].cap+'kW','#a070d0');
+  drawBox(rightX-190+140,y-120,140,40,'柴发B',genArr[0].cap+'kW','#a070d0');
+  s+=`<text x="${W/2}" y="${H-20}" text-anchor="middle" fill="#6080a0" font-size="8">冗余: ${P.redundancy} | UPS后备${upsArr[0].backup||'20min'} | 柴发${genArr[0].tank||'8h'}后备 | STS切换<10ms</text>`;
+  s+=`</svg>`;
+  document.getElementById('aidcDualPowerSvg').innerHTML=s;
+}
+
+function aidcDrawLiquidSvg(R){
+  const Cl=R.cooling||{},C=R.compute||{};
+  const W=800,H=500;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">AIDC液冷管路图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${R.projName||''} | ${Cl.type==='liquid'?'液冷':Cl.type==='air'?'风冷':'混合'} | 供水${Cl.supplyTemp||35}℃/回水${Cl.returnTemp||45}℃</text>`;
+  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${color}18" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+17}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+32}" text-anchor="middle" fill="${color}99" font-size="8">${sub}</text>`;};
+  const drawArrow=(x1,y1,x2,y2,color)=>{s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color||'#80b0e0'}" stroke-width="2"/>`;s+=`<polygon points="${x2-4},${y2-7} ${x2+4},${y2-7} ${x2},${y2}" fill="${color||'#80b0e0'}"/>`;};
+  const cx=W/2;let y=65;
+  const ctArr=Cl.coolingTower||[{cap:1500,qty:2}];
+  drawBox(cx-70,y,140,40,'冷却塔',ctArr[0].cap+'kW×'+ctArr[0].qty,'#4a90d9');
+  y+=55;
+  drawArrow(cx,y-15,cx,y,'#4a90d9');
+  s+=`<text x="${cx+75}" y="${y-5}" fill="#4a90d9" font-size="7">冷却水 30/35℃</text>`;
+  drawBox(cx-70,y,140,40,'冷水泵','变频 N+1','#50c878');
+  y+=55;
+  drawArrow(cx,y-15,cx,y,'#50c878');
+  const cduArr=Cl.cdu||[{cap:200,qty:4}];
+  drawBox(cx-70,y,140,40,'CDU',cduArr[0].cap+'kW×'+cduArr[0].qty,'#50c878');
+  y+=55;
+  drawArrow(cx,y-15,cx,y,'#50c878');
+  s+=`<text x="${cx+75}" y="${y-5}" fill="#50c878" font-size="7">供回水 ${Cl.supplyTemp||35}/${Cl.returnTemp||45}℃</text>`;
+  drawBox(cx-70,y,140,40,'Manifold','分水器/集水器','#e8a838');
+  y+=55;
+  drawArrow(cx,y-15,cx,y,'#e8a838');
+  const L=R.layout||{};
+  drawBox(cx-70,y,140,40,'GPU机柜',L.gpuRacks||0+'柜 '+L.rackPower||'','#8B5CF6');
+  s+=`<line x1="${cx-70}" y1="${y+20}" x2="${cx-140}" y2="${y+20}" stroke="#e06070" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+  s+=`<text x="${cx-145}" y="${y+24}" text-anchor="end" fill="#e06070" font-size="8">漏液绳检测</text>`;
+  s+=`<line x1="${cx+70}" y1="${y+20}" x2="${cx+140}" y2="${y+20}" stroke="#e06070" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+  s+=`<text x="${cx+145}" y="${y+24}" fill="#e06070" font-size="8">快速关断阀</text>`;
+  s+=`<text x="${W/2}" y="${H-30}" text-anchor="middle" fill="#6080a0" font-size="8">管路: 不锈钢主管DN80-DN150 支管DN20-DN32 | 流速≤2.5m/s | CDU冗余${cduArr[0].redundancy||'N+1'}</text>`;
+  s+=`<text x="${W/2}" y="${H-15}" text-anchor="middle" fill="#6080a0" font-size="7">漏液检测: 每机柜漏液绳+CDU漏液传感器+快速关断阀 响应<5s | 补水量≤2%循环量</text>`;
+  s+=`</svg>`;
+  document.getElementById('aidcLiquidSvg').innerHTML=s;
 }
 
 function aidcParseNatural(){
@@ -6660,7 +6929,7 @@ function mgRenderDrawings(){
   mgById('mgDrawingEmpty').style.display='none';
   mgById('mgDrawingContent').style.display='block';
   const hasArch=mgById('mgArchSvg').innerHTML.trim();
-  if(!hasArch){mgDrawArchSvg(R);mgDrawWiringSvg(R);mgDrawCommSvg(R);mgDrawBom(R);mgDrawEcon(R);}
+  if(!hasArch){mgDrawArchSvg(R);mgDrawWiringSvg(R);mgDrawCommSvg(R);mgDrawProtectSvg(R);mgDrawLogicSvg(R);mgDrawBom(R);mgDrawEcon(R);}
 }
 
 function mgDrawArchSvg(R){
@@ -6884,6 +7153,87 @@ function mgDrawEcon(R){
   h+=`<tr><td>投资回收期</td><td style="color:#e8a838;font-weight:bold">${E.payback||0}年</td><td>${parseFloat(E.payback)<8?'经济可行':'需优化方案'}</td></tr>`;
   h+=`<tr><td>项目IRR</td><td>${E.irr||'N/A'}%</td><td>内部收益率</td></tr></table>`;
   mgById('mgEconTable').innerHTML=h;
+}
+
+function mgDrawProtectSvg(R){
+  const T=R.topology||{},S=R.sizing||{};
+  const W=800,H=500;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">微网保护配置图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${R.projName||''} | ${T.name||''} | GB/T 36558</text>`;
+  const cx=W/2;let y=70;
+  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${color}22" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+16}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+30}" text-anchor="middle" fill="${color}aa" font-size="7">${sub}</text>`;};
+  drawBox(cx-80,y,160,40,'PCC并网点',T.voltage||'10kV','#4a90d9');
+  y+=50;
+  s+=`<line x1="${cx}" y1="${y-10}" x2="${cx}" y2="${y}" stroke="#4a90d9" stroke-width="2"/>`;
+  s+=`<text x="${W/2}" y="${y-2}" fill="#e8a838" font-size="9" font-weight="bold">保护配置</text>`;
+  y+=10;
+  const prots=[
+    {code:'27',name:'欠压保护',set:'U<85%Un',time:'0.5s',color:'#e06070'},
+    {code:'59',name:'过压保护',set:'U>115%Un',time:'0.5s',color:'#e06070'},
+    {code:'81U',name:'高频保护',set:'f>51.5Hz',time:'0.2s',color:'#e06070'},
+    {code:'81D',name:'低频保护',set:'f<49.5Hz',time:'0.2s',color:'#e06070'},
+    {code:'25',name:'同期检测',set:'ΔU<10% Δf<0.5Hz',time:'-',color:'#50c878'},
+    {code:'32',name:'逆功率',set:'P<0 阈值3%',time:'500ms',color:'#e8a838'}
+  ];
+  const cols=3,colW=220,rowH=50;
+  const startX=cx-cols*colW/2+colW/2;
+  prots.forEach((p,i)=>{
+    const col=i%cols,row=Math.floor(i/cols);
+    const x=startX+col*colW,yy=y+row*(rowH+10);
+    s+=`<rect x="${x-90}" y="${yy}" width="180" height="${rowH}" rx="4" fill="${p.color}15" stroke="${p.color}" stroke-width="1"/>`;
+    s+=`<text x="${x}" y="${yy+16}" text-anchor="middle" fill="${p.color}" font-size="10" font-weight="bold">${p.code} ${p.name}</text>`;
+    s+=`<text x="${x}" y="${yy+30}" text-anchor="middle" fill="${p.color}aa" font-size="8">整定: ${p.set}</text>`;
+    s+=`<text x="${x}" y="${yy+42}" text-anchor="middle" fill="#6080a0" font-size="7">延时: ${p.time}</text>`;
+  });
+  y+=Math.ceil(prots.length/cols)*(rowH+10)+20;
+  s+=`<text x="${W/2}" y="${y}" text-anchor="middle" fill="#50c878" font-size="11" font-weight="bold">防孤岛三重保障</text>`;
+  y+=20;
+  const islands=['AFD频率偏移(主动)','电压偏移(+10%/-15%)','df/dt>2Hz/s(频变化率)'];
+  islands.forEach((item,i)=>{
+    s+=`<text x="${W/2}" y="${y+i*18}" text-anchor="middle" fill="#50c878" font-size="9">${i+1}. ${item}</text>`;
+  });
+  s+=`<text x="${W/2}" y="${H-20}" text-anchor="middle" fill="#6080a0" font-size="8">级差配合: 速断<过流<过负荷 Δt≥0.3s | BMS三级: 预警→停机→急停</text>`;
+  s+=`</svg>`;
+  mgById('mgProtectSvg').innerHTML=s;
+}
+
+function mgDrawLogicSvg(R){
+  const T=R.topology||{},S=R.sizing||{};
+  const W=700,H=550;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">微网控制逻辑图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${R.projName||''} | ${T.name||''}</text>`;
+  const cx=W/2;let y=70;
+  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${color}22" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+18}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+34}" text-anchor="middle" fill="${color}aa" font-size="8">${sub}</text>`;};
+  const drawArrow=(x1,y1,x2,y2)=>{s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#80b0e0" stroke-width="2"/>`;s+=`<polygon points="${x2-4},${y2-8} ${x2+4},${y2-8} ${x2},${y2}" fill="#80b0e0"/>`;};
+  drawBox(cx-90,y,180,40,'电网正常运行','PQ并网控制','#4a90d9');
+  y+=55;
+  drawArrow(cx,y-15,cx,y);
+  drawBox(cx-90,y,180,40,'EMS实时监控','功率/SOC/频率','#50c878');
+  y+=55;
+  drawArrow(cx,y-15,cx,y);
+  s+=`<rect x="${cx-90}" y="${y}" width="180" height="40" rx="6" fill="#e8a83822" stroke="#e8a838" stroke-width="1.5"/>`;
+  s+=`<text x="${cx}" y="${y+18}" text-anchor="middle" fill="#e8a838" font-size="10" font-weight="bold">电网异常检测</text>`;
+  s+=`<text x="${cx}" y="${y+34}" text-anchor="middle" fill="#e8a838aa" font-size="8">U>115%或<85% | f>51.5或<49.5Hz</text>`;
+  y+=55;
+  drawArrow(cx,y-15,cx,y);
+  drawBox(cx-90,y,180,40,'并离网切换','STS<20ms','#e06070');
+  y+=55;
+  drawArrow(cx,y-15,cx,y);
+  drawBox(cx-90,y,180,40,'PCS V/f控制','储能主电源','#50c878');
+  y+=55;
+  drawArrow(cx,y-15,cx,y);
+  drawBox(cx-90,y,180,40,'关键负荷供电','切除非关键','#a070d0');
+  y+=55;
+  s+=`<line x1="${cx}" y1="${y-15}" x2="${cx}" y2="${y}" stroke="#80b0e0" stroke-width="2"/>`;
+  s+=`<polygon points="${cx-4},${y-8} ${cx+4},${y-8} ${cx},${y}" fill="#80b0e0"/>`;
+  s+=`<rect x="${cx-90}" y="${y}" width="180" height="40" rx="6" fill="#4a90d922" stroke="#4a90d9" stroke-width="1.5"/>`;
+  s+=`<text x="${cx}" y="${y+18}" text-anchor="middle" fill="#4a90d9" font-size="10" font-weight="bold">电网恢复</text>`;
+  s+=`<text x="${cx}" y="${y+34}" text-anchor="middle" fill="#4a90d9aa" font-size="8">同期检测→重新并网</text>`;
+  s+=`<text x="${W/2}" y="${H-20}" text-anchor="middle" fill="#6080a0" font-size="8">策略层级: L0安全保护(不可覆盖) > L1系统约束 > L2模式运行(互斥) > L3策略叠加(可叠加)</text>`;
+  s+=`</svg>`;
+  mgById('mgLogicSvg').innerHTML=s;
 }
 
 function mgRenderAllDrawings(R,provider){
