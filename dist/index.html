@@ -7198,7 +7198,7 @@ function mgDrawArchSvg(R){
     box(cx-220,busY+40,170,52,'#1a1530','#e8a838','主变压器',T.transformer||'10/0.4kV');
     line(cx-220,busY+92,cx-220,lvBusY,'#4a90d9','gaB');
   }
-  s+=`<line x1="${cx-330}" y1="${lvBusY}" x2="${cx-110}" y2="${lvBusY}" stroke="url(#glvbus)" stroke-width="5" stroke-linecap="round"/><text x="${cx-220}" y="${lvBusY-6}" text-anchor="middle" fill="#80e080" font-size="10">${lvBus} 母线</text>`;
+  s+=`<line x1="${cx-350}" y1="${lvBusY}" x2="${cx-60}" y2="${lvBusY}" stroke="url(#glvbus)" stroke-width="7" stroke-linecap="round"/><text x="${cx-205}" y="${lvBusY-8}" text-anchor="middle" fill="#80e080" font-size="12" font-weight="bold">${lvBus} 母线</text>`;
   line(cx-300,lvBusY,cx-300,lvBusY+30,'#a070d0','gaR',2);
   box(cx-300,lvBusY+33,120,44,'#1a1530','#a070d0','关键负荷',`${S.peakLoad||0}kW`);
   line(cx-140,lvBusY,cx-140,lvBusY+30,'#a070d0','gaR',2);
@@ -7258,7 +7258,7 @@ function mgDrawWiringSvg(R){
   s+=`<line x1="${cx-180}" y1="${hvY+44}" x2="${cx-180}" y2="${hvY+70}" class="bw" marker-end="url(#waO)"/>`;
   s+=`<circle cx="${cx-180}" cy="${hvY+92}" r="22" fill="#2a3050" stroke="#e8a838" stroke-width="2"/><circle cx="${cx-180}" cy="${hvY+92}" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/><text x="${cx-180}" y="${hvY+95}" text-anchor="middle" class="ls" style="fill:#e8a838">Δ/Y</text><text x="${cx-140}" y="${hvY+80}" class="ls" style="fill:#c09030">主变压器</text>`;
   s+=`<line x1="${cx-180}" y1="${hvY+114}" x2="${cx-180}" y2="${lvY}" class="bw" style="stroke:#4a90d9"/>`;
-  s+=`<line x1="${cx-280}" y1="${lvY}" x2="${cx-80}" y2="${lvY}" stroke="url(#wlvbus)" stroke-width="4" stroke-linecap="round"/><text x="${cx-180}" y="${lvY-6}" text-anchor="middle" class="ls" style="fill:#80e080">0.4kV 母线</text>`;
+  s+=`<line x1="${cx-300}" y1="${lvY}" x2="${cx+100}" y2="${lvY}" stroke="url(#wlvbus)" stroke-width="6" stroke-linecap="round"/><text x="${cx-100}" y="${lvY-8}" text-anchor="middle" class="ls" style="fill:#80e080;font-weight:bold">0.4kV 母线</text>`;
   s+=`<line x1="${cx-250}" y1="${lvY}" x2="${cx-250}" y2="${lvY+30}" class="bw" style="stroke:#a070d0" marker-end="url(#waO)"/>`;
   s+=`<rect x="${cx-310}" y="${lvY+30}" width="120" height="40" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/><text x="${cx-250}" y="${lvY+53}" text-anchor="middle" class="ls" style="fill:#c090e0;font-size:10">关键负荷</text><text x="${cx-250}" y="${lvY+65}" text-anchor="middle" class="ls" style="fill:#8060a0;font-size:8">${S.peakLoad||0}kW</text>`;
   s+=`<line x1="${cx-110}" y1="${lvY}" x2="${cx-110}" y2="${lvY+30}" class="bw" style="stroke:#a070d0" marker-end="url(#waO)"/>`;
