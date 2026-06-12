@@ -1,0 +1,2538 @@
+
+const I18N={
+zh:{
+header_title:'Open ESS Agent — 开源储能系统解决方案AI智能体',
+header_spec:'设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905',
+footer_text:'版权所有@卢继雄  请尊重知识产权',
+nav_devices:'设备库',nav_input:'用户输入',nav_diagrams:'生成图纸',nav_cases:'应用案例',
+sidebar_ai_title:'AI智能体自动配置',
+sidebar_ai_desc:'输入需求信息，智能体自动生成完整解决方案：设备选型、系统架构图、电气接线图、电气拓扑图、BOM清单、充放电策略、经济性分析',
+method1_title:'方式一：自然语言描述',
+method1_desc:'请用自然语言描述你的需求，AI自动识别参数并生成方案',
+ai_detect_btn:'AI识别并配置',
+method2_title:'方式二：详细信息输入',
+method2_desc:'逐项填写场地参数，手动配置储能方案',
+site_info:'场地基本信息',proj_name:'项目名称',proj_addr:'项目地址',region:'省份/城市',
+tx_config:'变压器配置',tx_cap:'单台容量 (kVA)',tx_count:'变压器数量',tx_hv:'高压侧 (kV)',tx_lv:'低压侧 (V)',tx_vector:'联结组别',tx_zk:'短路阻抗 (%)',
+has_hv_room:'是否有10kV配电室',hv_room_yes:'有（推荐10kV接入）',hv_room_no:'无（将用0.4kV接入）',
+load_title:'用电负荷',load_month_high:'月用电-旺季 (万kWh)',load_month_low:'月用电-淡季 (万kWh)',load_max:'最大负荷 (kW)',pf:'功率因数',work_days:'年工作天数',
+price_title:'峰谷电价',price_peak:'峰段 (元/kWh)',price_valley:'谷段 (元/kWh)',price_flat:'平段 (元/kWh)',hours_peak:'峰段时长 (h)',special_note:'特别说明',special_note_ph:'如：要求防逆流三重保障、必须10kV接入、预算不超过300万...',
+generate_btn:'生成解决方案',
+device_library_title:'储能设备产品库',
+diagram_arch:'系统架构图',diagram_wiring:'电气一次接线图',diagram_topo:'电气拓扑图',diagram_bom:'物料清单(BOM)',diagram_ref:'参考设计图（大庆管业5MWh项目）',
+download_svg:'下载 SVG',cases_title:'应用案例',
+llm_provider:'AI模型',llm_local:'本地小模型',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen3.7-Max (阿里百炼)'
+},
+en:{
+header_title:'Open ESS Agent — Open-source ESS Solution AI Agent',
+header_spec:'Design Standards: System-level GB/T 36558-2023 | Wiring GB 50055 | Grid-connection GB/T 34120, GB/T 34131 | Station GB/T 42288 | Designer: Lu Jixiong | Tel: 15026953905',
+footer_text:'Copyright @ Lu Jixiong. Please respect intellectual property rights',
+nav_devices:'Device Library',nav_input:'User Input',nav_diagrams:'Generate Diagrams',nav_cases:'Use Cases',
+sidebar_ai_title:'AI Agent Auto Configuration',
+sidebar_ai_desc:'Input your requirements, the AI agent auto-generates a complete solution: equipment selection, system architecture, wiring diagram, topology diagram, BOM, charge/discharge strategy, economic analysis',
+method1_title:'Method 1: Natural Language',
+method1_desc:'Describe your requirements in natural language, AI auto-identifies parameters and generates solution',
+ai_detect_btn:'AI Detect & Configure',
+method2_title:'Method 2: Detailed Input',
+method2_desc:'Fill in site parameters item by item, manually configure ESS solution',
+site_info:'Site Basic Info',proj_name:'Project Name',proj_addr:'Project Address',region:'Province/City',
+tx_config:'Transformer Config',tx_cap:'Capacity per Unit (kVA)',tx_count:'Transformer Qty',tx_hv:'HV Side (kV)',tx_lv:'LV Side (V)',tx_vector:'Vector Group',tx_zk:'Short-circuit Impedance (%)',
+has_hv_room:'Has 10kV Distribution Room?',hv_room_yes:'Yes (10kV access recommended)',hv_room_no:'No (0.4kV access will be used)',
+load_title:'Electrical Load',load_month_high:'Monthly Usage-Peak (10k kWh)',load_month_low:'Monthly Usage-Off-peak (10k kWh)',load_max:'Max Load (kW)',pf:'Power Factor',work_days:'Working Days/Year',
+price_title:'Time-of-Use Pricing',price_peak:'Peak (CNY/kWh)',price_valley:'Valley (CNY/kWh)',price_flat:'Flat (CNY/kWh)',hours_peak:'Peak Duration (h)',special_note:'Special Notes',special_note_ph:'e.g. Require anti-reverse-flow 3-level protection, must 10kV connection, budget under 3M CNY...',
+generate_btn:'Generate Solution',
+device_library_title:'ESS Device Product Library',
+diagram_arch:'System Architecture',diagram_wiring:'Electrical Single-line Diagram',diagram_topo:'Electrical Topology',diagram_bom:'Bill of Materials (BOM)',diagram_ref:'Reference Design (Daqing 5MWh Project)',
+download_svg:'Download SVG',cases_title:'Use Cases',
+llm_provider:'AI Model',llm_local:'Local Mini Model',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen3.7-Max (Alibaba)'
+},
+ar:{
+header_title:'Open ESS Agent — وكيل الذكاء الاصطناعي لحلول أنظمة تخزين الطاقة مفتوحة المصدر',
+header_spec:'معايير التصميم: مستوى النظام GB/T 36558-2023 | التوصيل GB 50055 | ربط الشبكة GB/T 34120, GB/T 34131 | المحطة GB/T 42288 | المصمم: لو جيشيونغ | هاتف: 15026953905',
+footer_text:'حقوق النشر @ لو جيشيونغ. يرجى احترام حقوق الملكية الفكرية',
+nav_devices:'مكتبة المعدات',nav_input:'إدخال المستخدم',nav_diagrams:'إنشاء الرسوم',nav_cases:'حالات الاستخدام',
+sidebar_ai_title:'التكوين التلقائي بواسطة وكيل الذكاء الاصطناعي',
+sidebar_ai_desc:'أدخل متطلباتك، يقوم وكيل الذكاء الاصطناعي بتوليد حل كامل تلقائياً: اختيار المعدات، مخطط النظام، مخطط التوصيل، مخطط الطوبولوجيا، قائمة المواد، استراتيجية الشحن/التفريغ، التحليل الاقتصادي',
+method1_title:'الطريقة الأولى: وصف اللغة الطبيعية',
+method1_desc:'صف متطلباتك باللغة الطبيعية، يتعرف الذكاء الاصطناعي تلقائياً على المعلمات ويولد الحل',
+ai_detect_btn:'تعرف الذكاء الاصطناعي والتكوين',
+method2_title:'الطريقة الثانية: الإدخال التفصيلي',
+method2_desc:'املأ معلمات الموقع شيئاً فشيئاً، كون حل التخزين يدوياً',
+site_info:'معلومات الموقع الأساسية',proj_name:'اسم المشروع',proj_addr:'عنوان المشروع',region:'المحافظة/المدينة',
+tx_config:'تكوين المحول',tx_cap:'السعة لكل وحدة (kVA)',tx_count:'عدد المحولات',tx_hv:'جانب الجهد العالي (kV)',tx_lv:'جانب الجهد المنخفض (V)',tx_vector:'مجموعة التوصيل',tx_zk:'معاوقة القصر (%)',
+has_hv_room:'هل توجد غرفة توزيع 10kV؟',hv_room_yes:'نعم (يُوصى بالوصول 10kV)',hv_room_no:'لا (سيتم استخدام الوصول 0.4kV)',
+load_title:'الحمل الكهربائي',load_month_high:'الاستهلاك الشهري-ذروة (10k kWh)',load_month_low:'الاستهلاك الشهري-خامل (10k kWh)',load_max:'الحمل الأقصى (kW)',pf:'معامل القدرة',work_days:'أيام العمل/السنة',
+price_title:'تسعير الوقت من الاستخدام',price_peak:'ذروة (يوان/kWh)',price_valley:'وادي (يوان/kWh)',price_flat:'مسطح (يوان/kWh)',hours_peak:'مدة الذروة (h)',special_note:'ملاحظات خاصة',special_note_ph:'مثال: يتطلب حماية ثلاثية من التدفق العكسي، يجب اتصال 10kV، الميزانية أقل من 3 مليون...',
+generate_btn:'توليد الحل',
+device_library_title:'مكتبة منتجات معدات التخزين',
+diagram_arch:'هيكل النظام',diagram_wiring:'مخطط التوصيل الكهربائي أحادي الخط',diagram_topo:'طوبولوجيا كهربائية',diagram_bom:'قائمة المواد (BOM)',diagram_ref:'تصميم مرجعي (مشروع داتشينغ 5MWh)',
+download_svg:'تحميل SVG',cases_title:'حالات الاستخدام',
+llm_provider:'نموذج AI',llm_local:'نموذج محلي صغير',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1',llm_bailian:'Qwen3.7-Max'
+}
+};
+
+function switchLang(lang){
+  const dict=I18N[lang];if(!dict)return;
+  document.documentElement.lang=lang==='ar'?'ar':'zh-CN';
+  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(dict[key]!==undefined)el.textContent=dict[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key=el.getAttribute('data-i18n-placeholder');
+    if(dict[key]!==undefined)el.placeholder=dict[key];
+  });
+  document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.remove('active'));
+  const btns=document.querySelectorAll('.lang-btn');
+  const idx={zh:0,en:1,ar:2}[lang];
+  if(btns[idx])btns[idx].classList.add('active');
+  localStorage.setItem('lang',lang);
+}
+
+const PRODUCTS=[
+  {id:'GRID-20M',name:'GOTION GRID 20MWh',cat:'集装箱储能',model:'ESD1331-025P20060',cap:20060,power:10031,volt:1331.2,cell:'LFP-314Ah',size:'5m×10m×4.6m',weight:'170t',cool:'风液一体',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-20M_product.jpeg',features:['PACK级消防','20MWh超大容量','风液一体温控']},
+  {id:'GRID-7M-588',name:'GOTION GRID 7MWh (588Ah)',cat:'集装箱储能',model:'ESD1331-025P7044',cap:7045,power:1761,volt:1331.2,cell:'LFP-588Ah',size:'6.1m×2.4m×2.9m',weight:'≤54t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-7M_product.jpeg',features:['588Ah大电芯','液冷温控','PACK级消防']},
+  {id:'GRID-7M-330',name:'GOTION GRID 7MWh (330Ah)',cat:'集装箱储能',model:'ESD1331-05P6261',cap:6262,power:3131,volt:1331.2,cell:'LFP-330Ah',size:'6.1m×2.4m×2.9m',weight:'≤50t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-7M_product.jpeg',features:['330Ah电芯','3.1MW高功率','液冷温控']},
+  {id:'GRID-5M-314',name:'GOTION GRID 5MWh (314Ah)',cat:'集装箱储能',model:'ESD1331-05P5015',cap:5016,power:2508,volt:1331.2,cell:'LFP-314Ah',size:'6.1m×2.4m×2.9m',weight:'≈44t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-5M_product.jpeg',features:['5MWh标准柜','液冷温控','PACK级消防']},
+  {id:'GRID-5M-330',name:'GOTION GRID 5MWh (330Ah)',cat:'集装箱储能',model:'ESD1280-05P5068',cap:5069,power:2534,volt:1280,cell:'LFP-330Ah',size:'6.1m×2.4m×2.9m',weight:'≈44t',cool:'液冷',fire:'PACK浸没+气体+水',ip:'IP55',temp:'-30~55°C',pcs:false,img:'GRID-5M_product.jpeg',features:['330Ah电芯','1280V平台','液冷温控']},
+  {id:'X-836',name:'乾元载道 X-836',cat:'乾元载道',model:'X-836',cap:836,power:418,volt:1331.2,cell:'LFP-314Ah',size:'1.4m×2.4m×2.4m',weight:'8t',cool:'液冷',fire:'气溶胶+泄爆',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:6,img:'X-836_X950_product.jpeg',features:['PCS+升压一体','即插即用','最大6并','分期投资']},
+  {id:'X-950',name:'乾元载道 X-950',cat:'乾元载道',model:'X-950',cap:948,power:474,volt:1152,cell:'LFP-91.5Ah×3',size:'2.1m×2.3m×2.7m',weight:'9.5t',cool:'液冷',fire:'气溶胶+泄爆',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:4,img:'X-836_X950_product.jpeg',features:['PCS+升压一体','高能量密度','最大4并']},
+  {id:'X-522',name:'乾元载道 X-522',cat:'乾元载道',model:'X-522',cap:522,power:250,volt:832,cell:'LFP-314Ah',size:'2.4m×1.4m×2.4m',weight:'8t',cool:'风冷+液冷',fire:'PACK气溶胶+舱气溶胶',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:6,img:'X-522_X261_product.jpeg',features:['PCS内置','风冷+液冷','最大6并','50Hz版']},
+  {id:'X-261',name:'乾元载道 X-261',cat:'乾元载道',model:'X-261',cap:261,power:125,volt:832,cell:'LFP-314Ah',size:'1.1m×1.4m×2.4m',weight:'3.5t',cool:'全液冷',fire:'PACK气溶胶+舱气溶胶',ip:'IP55',temp:'-30~50°C',pcs:true,maxP:6,img:'X-522_X261_product.jpeg',features:['PCS内置','全液冷','轻量3.5t','最大6并']},
+  {id:'EPD-104',name:'电池包 104.4kWh',cat:'电池包/簇',model:'EPD332-05P104',cap:104,power:52,volt:332.8,cell:'LFP-314Ah',size:'0.8m×2.2m×0.2m',weight:'660kg',cool:'液冷',fire:'-',ip:'IP67',temp:'-30~60°C',pcs:false,img:'EPD_battery_pack_img0.png',features:['IP67高防护','液冷温控','314Ah电芯']},
+  {id:'EPD-106',name:'电池包 105.6kWh',cat:'电池包/簇',model:'EPD320-05P106',cap:106,power:53,volt:320,cell:'LFP-330Ah',size:'0.8m×2.3m×0.2m',weight:'700kg',cool:'液冷',fire:'-',ip:'IP67',temp:'-30~60°C',pcs:false,img:'EPD_battery_pack_img1.png',features:['IP67高防护','液冷温控','330Ah电芯']},
+  {id:'EPD-195',name:'电池包 195.6kWh',cat:'电池包/簇',model:'EPD332-05P195',cap:196,power:98,volt:332.8,cell:'LFP-588Ah',size:'1.2m×2.2m×0.2m',weight:'12000kg',cool:'液冷',fire:'-',ip:'IP67',temp:'-30~60°C',pcs:false,img:'EPD_battery_pack_img2.png',features:['588Ah大电芯','IP67','液冷温控']},
+  {id:'Home3',name:'Home 3.0',cat:'户用/便携',model:'HSD51.2-05P16L',cap:16,power:8,volt:51.2,cell:'LFP-314Ah',size:'0.7m×0.2m×0.7m',weight:'125kg',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-20~45°C',pcs:false,img:'Home3_product.jpeg',features:['户用储能','自然冷却','IP65']},
+  {id:'Gendome',name:'Gendome Power 30kWh',cat:'户用/便携',model:'Gendome Power',cap:31,power:24,volt:307.2,cell:'LFP-100Ah',size:'0.7m×0.8m×1.1m',weight:'390kg',cool:'风冷',fire:'-',ip:'IP65',temp:'-20~58°C',pcs:false,img:'Gendome_product.jpeg',features:['便携式','风冷','IP65']},
+  {id:'YJN-A209',name:'易加能 A系列 自动驾驶充电桩',cat:'易加能-移动充',model:'A-Series',cap:209,power:100,volt:665.6,cell:'LFP',size:'0.99m×2.27m×1.38m',weight:'2300kg',cool:'自然散热/液冷',fire:'-',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_A_series.png',features:['无人驾驶','100kW快充','209kWh储能','自动寻车避障']},
+  {id:'YJN-G209',name:'易加能 G系列 智能移动充电桩G3',cat:'易加能-移动充',model:'G-Series G3',cap:209,power:60,volt:665.6,cell:'LFP',size:'2.27m×0.99m×1.38m',weight:'2300kg',cool:'自然散热/液冷',fire:'-',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_G_D_series.png',features:['移动充电','60kW输出','V2L放电','扫码即充']},
+  {id:'YJN-D184',name:'易加能 D系列 轻量移动充电桩',cat:'易加能-移动充',model:'D-Series',cap:184,power:60,volt:614.4,cell:'LFP',size:'2.1m×1.06m×1.45m',weight:'2100kg',cool:'自然散热/液冷',fire:'-',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_G_D_series.png',features:['轻量化','60kW快充','适配商用车','免基建']},
+  {id:'YJN-C120',name:'易加能 C系列 固定储充120kW/209kWh',cat:'易加能-固定储充',model:'C-Series 120kW',cap:209,power:120,volt:704,cell:'LFP',size:'1.59m×0.995m×1.43m',weight:'-',cool:'自然散热/选配液冷',fire:'-',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_C_series.png',features:['固定储充','120kW快充','V2G 30kW','交直流双补电']},
+  {id:'YJN-C320',name:'易加能 C系列 固定储充320kW/844kWh',cat:'易加能-固定储充',model:'C-Series 320kW/844kWh',cap:844,power:320,volt:704,cell:'LFP',size:'4.0m×2.44m×2.9m',weight:'14000kg',cool:'自然散热/选配液冷',fire:'七氟丙烷/气溶胶',ip:'IP54',temp:'-20~45°C',pcs:false,img:'yijianeng_C_series.png',features:['1000V直流平台','320kW双枪','V2G 30kW','交直流双补电']},
+  {id:'YJN-C522',name:'易加能 C系列 固定储充360kW/522kWh',cat:'易加能-固定储充',model:'C-Series 360kW/522kWh',cap:522,power:360,volt:704,cell:'LFP',size:'2.53m×2.36m×1.45m',weight:'5000kg',cool:'液冷',fire:'-',ip:'IP54',temp:'-25~45°C',pcs:false,img:'yijianeng_C522_120inverter.png',features:['液冷温控','360kW峰值','522kWh储能','5枪输出']},
+  {id:'YJN-INV120',name:'易加能 120kW交流逆变装置',cat:'易加能-固定储充',model:'120kW AC Inverter',cap:0,power:120,volt:400,cell:'-',size:'-',weight:'-',cool:'-',fire:'-',ip:'-',temp:'-20~45°C',pcs:true,img:'yijianeng_C522_120inverter.png',features:['并网/离网双模式','120kW输出','PF≥0.99','THDi≤3%']},
+  {id:'DLL-YCS283',name:'电拉拉 驮龙送电车 六工位',cat:'电拉拉-移动储充换',model:'YCS283',cap:1800,power:572,volt:750,cell:'LFP',size:'12m×2.55m×3.7m',weight:'-',cool:'液冷',fire:'-',ip:'IP67',temp:'-20~55°C',pcs:true,maxP:6,img:'dianlala_p6.png',features:['绿电搬运','移动充放电','移动换电','846-1800kWh']},
+  {id:'DLL-YCS146',name:'电拉拉 驮龙送电车 八工位',cat:'电拉拉-移动储充换',model:'YCS146',cap:4800,power:1250,volt:750,cell:'LFP',size:'13.95m×2.55m×1.5m',weight:'-',cool:'液冷',fire:'-',ip:'IP67',temp:'-20~55°C',pcs:true,maxP:8,img:'dianlala_p6.png',features:['八工位','2256-4800kWh','1250kW输出','移动充换一体']},
+  {id:'DLL-HYZ452',name:'电拉拉 混元珠 452kWh电池包',cat:'电拉拉-电池/底托',model:'混元珠-452',cap:452,power:600,volt:700.8,cell:'LFP',size:'2.37m×0.824m×1.73m',weight:'-',cool:'液冷液热',fire:'-',ip:'IP68',temp:'-20~55°C',pcs:false,img:'dianlala_p7.png',features:['动储一体','可充可换','IP68','液冷液热']},
+  {id:'DLL-HYZ600',name:'电拉拉 混元珠 600kWh电池包',cat:'电拉拉-电池/底托',model:'混元珠-600',cap:600,power:600,volt:744.6,cell:'LFP',size:'2.37m×0.824m×1.82m',weight:'-',cool:'液冷+电加热',fire:'-',ip:'IP67',temp:'-20~55°C',pcs:false,img:'dianlala_p7.png',features:['大容量600kWh','5层电池','液冷+电加热','IP67']},
+  {id:'DLL-LT-GD',name:'电拉拉 莲台 电动底托',cat:'电拉拉-电池/底托',model:'YCTZ-GD120/240',cap:0,power:240,volt:750,cell:'-',size:'2.32m×0.985m×1.5m',weight:'620kg',cool:'-',fire:'-',ip:'-',temp:'-20~55°C',pcs:false,img:'dianlala_p7.png',features:['电动移动','承载282-600kWh','DC-DC 200-1000V','无需叉车']},
+  {id:'DLL-PCS750',name:'电拉拉 PCS充放一体机 750kW',cat:'电拉拉-移动储充换',model:'PCS-750kW',cap:0,power:750,volt:400,cell:'-',size:'-',weight:'-',cool:'液冷',fire:'-',ip:'IP55',temp:'-25~55°C',pcs:true,img:'dll_s11_5.png',features:['充放一体','750kW','双向PCS','离网无缝切换']},
+  {id:'DLL-DCL750',name:'电拉拉 750kW直流变换器',cat:'电拉拉-移动储充换',model:'DC-DC-750kW',cap:0,power:750,volt:1500,cell:'-',size:'-',weight:'-',cool:'液冷',fire:'-',ip:'IP55',temp:'-25~55°C',pcs:false,img:'dll_s13_4.png',features:['DC-DC变换','750kW','1500Vdc输入','高效']},
+  {id:'GD-MPB15',name:'Gendome Micro Power Bank 15000mAh',cat:'Gendome-便携',model:'MPB-15000mAh',cap:0.056,power:0.065,volt:3.7,cell:'LFP',size:'-',weight:'-',cool:'自然冷却',fire:'-',ip:'-',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p8_5dc80e24.jpg',features:['超便携','15000mAh','USB-C PD65W','多口输出']},
+  {id:'GD-StarGrid',name:'Gendome StarGrid',cat:'Gendome-便携',model:'StarGrid',cap:0.268,power:0.3,volt:25.6,cell:'LFP-314Ah',size:'-',weight:'-',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p10_0b8b1e3a.jpg',features:['268Wh便携电站','300W输出','USB-C PD100W','PV充电']},
+  {id:'GD-Go300',name:'Gendome Go 300',cat:'Gendome-便携',model:'Go300',cap:0.307,power:0.3,volt:25.6,cell:'LFP-314Ah',size:'-',weight:'-',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p11_f07a8b5f.jpg',features:['307Wh','300W纯正弦波','UPS 10ms','PV+DC双充']},
+  {id:'GD-Go1000',name:'Gendome Go 1000',cat:'Gendome-便携',model:'Go1000',cap:1,power:1,volt:25.6,cell:'LFP-314Ah',size:'-',weight:'-',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p12_8b3ed8b3.jpg',features:['1004.8Wh','1000W输出','USB-C PD140W','PV 200W充']},
+  {id:'GD-Go2000',name:'Gendome Go 2000',cat:'Gendome-便携',model:'Go2000',cap:2,power:2,volt:25.6,cell:'LFP-314Ah',size:'-',weight:'-',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p13_76e1c4b5.jpg',features:['2048Wh','2000W输出','UPS 10ms','PV+DC双充']},
+  {id:'GD-Go1000SE',name:'Gendome Go 1000SE',cat:'Gendome-便携',model:'Go1000SE',cap:1,power:1.1,volt:25.6,cell:'LFP-314Ah',size:'168×320×266mm',weight:'8kg',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p14_ee36c8f8.jpg',features:['1004.8Wh','USB-C 140W+30W','PV 200W充','单电芯低故障']},
+  {id:'GD-Go1000SE-AC',name:'Gendome Go 1000SE AC版',cat:'Gendome-便携',model:'Go1000SE-AC',cap:1,power:0.5,volt:230,cell:'LFP-314Ah',size:'284×186×270mm',weight:'9kg',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p15_38a35e97.jpg',features:['1004.8Wh','AC 500W 230V','UPS 10ms','PV 350W充']},
+  {id:'GD-Go2000SE',name:'Gendome Go 2000SE',cat:'Gendome-便携',model:'Go2000SE',cap:2,power:2,volt:25.6,cell:'LFP-314Ah',size:'-',weight:'-',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p16_7b4e8e8c.jpg',features:['2048Wh','2000W输出','UPS快响应','PV+DC双充']},
+  {id:'GD-Home3000SE',name:'Gendome Home 3000SE',cat:'Gendome-户用',model:'Home3000SE',cap:3,power:3,volt:48,cell:'LFP-314Ah',size:'-',weight:'-',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p17_a37b8c4d.jpg',features:['3072Wh','3000W输出','户用储能','UPS快响应']},
+  {id:'GD-Home3000',name:'Gendome Home 3000',cat:'Gendome-户用',model:'Home3000',cap:3,power:3,volt:48,cell:'LFP-314Ah',size:'-',weight:'-',cool:'自然冷却',fire:'-',ip:'IP65',temp:'-10~45°C',pcs:false,img:'gendome2026/gendome_p18_b48c9d5e.jpg',features:['户用储能','3000W输出','APP智控','PV兼容']},
+];
+
+const CASES=[
+  {title:'黑龙江大庆管业 5MWh',desc:'2×1250kVA变压器，月用电35万kWh，10kV侧接入，峰谷套利年省55万+',tags:['10kV','5MWh','工商业'],color:'var(--blue)',img:'transformer.png',detailId:'daqing'},
+  {title:'美国Fremont光储充 1.4MWh',desc:'1.4MWh储能+1MW光伏+1.6MW直流快充，自给自足',tags:['光储充','1.4MWh','海外'],color:'var(--orange)',img:'page11_img2.png',detailId:'fremont'},
+  {title:'上海邑东 2.5MWh储能站',desc:'集装箱储能充电桩一体化，2.5MWh配套充电场站',tags:['2.5MWh','充换电'],color:'var(--purple)',img:'page1_img0.png',detailId:'yidong'},
+  {title:'西部钻探油田钻井平台 5MWh',desc:'国轩高科×西部钻探×沃德石油，国内首创大型油改电项目，5MWh储能仓替代柴油发电',tags:['油改电','5MWh','钻井'],color:'var(--brown)',img:'dll_s15_4.jpg',detailId:'xibuzt'},
+];
+
+let LAST_RESULT=null;let currentDiagramIdx=0;
+let currentFilter='全部';
+
+function showPage(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-tab')[['devices','config','diagrams','cases'].indexOf(id)].classList.add('active');
+  const mainEl = document.querySelector('main.content');
+  if(mainEl) mainEl.style.display = id==='config' ? 'none' : 'block';
+  if(id==='devices')renderDeviceLibrary(currentFilter);
+  if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);}
+  if(id==='cases')renderCases();
+}
+
+function v(id){return document.getElementById(id).value}
+function n(id){return parseFloat(v(id))}
+
+function getParams(){
+  return{
+    projName:v('projName'),projAddr:v('projAddr'),region:v('region'),
+    txCount:n('txCount'),txCap:n('txCap'),txHv:n('txHv'),txLv:n('txLv'),
+    txVector:v('txVector'),txZk:n('txZk'),hasHvRoom:v('hasHvRoom')==='1',use10kV:v('hasHvRoom')==='1',
+    loadMonthHigh:n('loadMonthHigh')*10000,loadMonthLow:n('loadMonthLow')*10000,
+    loadMax:n('loadMax'),pf:n('pf'),workDays:n('workDays'),
+    pricePeak:n('pricePeak'),priceValley:n('priceValley'),priceFlat:n('priceFlat'),
+    hoursPeak:n('hoursPeak'),hoursValley:24-n('hoursPeak')*2>0?8:8
+  };
+}
+
+function selectEquipment(P){
+  const totalTxKVA=P.txCount*P.txCap;const totalTxKW=totalTxKVA*P.pf;
+  const dailyHigh=P.loadMonthHigh/30;const dailyLow=P.loadMonthLow/30;
+  const peakKwhHigh=dailyHigh*P.hoursPeak/24*1.1;const peakKwhLow=dailyLow*P.hoursPeak/24*1.1;
+  const use10kV=P.hasHvRoom;const candidates=[];
+  PRODUCTS.filter(p=>p.cat==='集装箱储能').forEach(p=>{
+    const usable=p.cap*0.95;const pcsKW=Math.min(p.power*0.5,usable/8*1.2);
+    if(use10kV)candidates.push({product:p,qty:1,totalCap:p.cap,totalPower:pcsKW,usable,invest:p.cap>=20000?800:p.cap>=7000?550:p.cap>=5000?420:350,needPCS:!p.pcs,needStepUp:true,access:'10kV',pcsKW});
+  });
+  const x836=PRODUCTS.find(p=>p.id==='X-836');
+  if(x836&&use10kV)for(let q=1;q<=(x836.maxP||6);q++)candidates.push({product:x836,qty:q,totalCap:x836.cap*q,totalPower:x836.power*q,usable:x836.cap*q*0.95,invest:q*55,needPCS:false,needStepUp:false,access:'10kV',pcsKW:x836.power*q});
+  const x522=PRODUCTS.find(p=>p.id==='X-522');
+  if(x522&&use10kV)for(let q=1;q<=(x522.maxP||6);q++)candidates.push({product:x522,qty:q,totalCap:x522.cap*q,totalPower:x522.power*q,usable:x522.cap*q*0.95,invest:q*35,needPCS:false,needStepUp:false,access:'10kV',pcsKW:x522.power*q});
+  if(!use10kV){
+    if(x522)for(let q=2;q<=6;q+=2)candidates.push({product:x522,qty:q,totalCap:x522.cap*q,totalPower:x522.power*q,usable:x522.cap*q*0.95,invest:q*35,needPCS:false,needStepUp:false,access:'0.4kV',pcsKW:x522.power*q});
+    if(x836)for(let q=2;q<=4;q+=2){const pKW=Math.min(x836.power*q,totalTxKW*0.4);candidates.push({product:x836,qty:q,totalCap:x836.cap*q,totalPower:pKW,usable:x836.cap*q*0.95,invest:q*55,needPCS:false,needStepUp:false,access:'0.4kV',pcsKW:pKW});}
+  }
+  candidates.forEach(c=>{
+    const dH=Math.min(c.usable,peakKwhHigh);const dL=Math.min(c.usable,peakKwhLow);
+    const cH=dH/peakKwhHigh;const cL=Math.min(dL/peakKwhLow,1);
+    const uH=dH/c.usable;const uL=dL/c.usable;
+    const daysH=P.workDays*0.58;const daysL=P.workDays*0.42;
+    const utilAnn=(uH*daysH+uL*daysL)/P.workDays;const eff=0.92;
+    const sH=(dH*P.pricePeak-dH/eff*P.priceValley)*daysH;const sL=(dL*P.pricePeak-dL/eff*P.priceValley)*daysL;
+    const demandS=Math.min(c.pcsKW,800)*0.4*36.8/10000*12;const annS=(sH+sL)/10000+demandS;
+    const extraInv=c.needPCS?(c.pcsKW*0.028+18):0;const stepInv=c.needStepUp?18:0;
+    const hvCab=use10kV?12:0;const install=25+c.qty*3;const totalInv=c.invest+extraInv+stepInv+hvCab+install;
+    const payback=totalInv/annS;
+    c.coverageHigh=cH;c.coverageLow=cL;c.utilAnnual=utilAnn;c.annualSaving=annS;c.totalInvest=totalInv;c.payback=payback;
+    c.score=cH*0.4+utilAnn*0.3+(1/Math.max(payback,1))*0.3;c.dischargeHigh=dH;c.dischargeLow=dL;
+  });
+  candidates.sort((a,b)=>b.score-a.score);
+  return{candidates,params:{...P,totalTxKVA,dailyHigh,dailyLow,peakKwhHigh,peakKwhLow,use10kV}};
+}
+
+const ESS_DRAWING_RULES = `
+# ═══════════════════════════════════════════════════════════
+# 储能系统图纸绘制规则（强制遵守，违反将导致图纸不可用）
+# 参照：大庆管业5MWh储能项目SVG设计 + 国标电气制图规则
+# ═══════════════════════════════════════════════════════════
+
+## 一、层级坐标规则（系统架构图，viewBox 0 0 1100 700）
+
+你必须在archDiagram的nodes中给出每个节点的x/y坐标。坐标必须遵循以下层级规则：
+
+| 层级 | Y坐标 | 允许的设备type | 方框尺寸 | 说明 |
+|------|--------|---------------|----------|------|
+| 第1层 | y=55 | source | 220×44 | 国网10kV电源，x=550 |
+| 第2层 | y=120 | meter | 220×44 | PCC计量点，x=550 |
+| 第3层 | y=185 | busbar | 340×44 | 厂内10kV母线，x=550 |
+| 第4层 | y=270 | transformer, switch | 180×44 | 变压器/并网柜，x按支路分配 |
+| 第5层 | y=340 | transformer(升压变), pcs | 180×44 | 升压变/PCS，x与第4层储能支路对齐 |
+| 第6层 | y=410 | battery | 280×56 | BESS电池，x与第5层PCS对齐 |
+| 左侧 | y=340 | controller(EMS) | 130×120虚线框 | x=80，不得与任何设备方框重叠 |
+| 右侧 | y=340 | load | 180×44 | 负荷，x在变压器正下方 |
+
+### X坐标分配规则（严禁重叠！）
+- 同一层有多个节点时，X必须均匀分布，中心x=550
+- 典型10kV双变压器方案X分配：
+  - 第4层：1#变压器 x=250, 储能并网柜 x=550, 2#变压器 x=850
+  - 第5层：0.4kV负荷1 x=250, 升压变 x=550, PCS x=550, 0.4kV负荷2 x=850
+  - 第6层：储能电池 x=550
+  - EMS控制器 x=80（最左侧，不得侵入其他方框区域）
+- 任意两个节点的X间距必须≥180（方框宽度180+间隙）
+
+## 二、防重叠硬约束（必须满足！）
+
+1. 任意两个type!=controller的节点，|x1-x2|必须≥180 或 |y1-y2|必须≥60
+2. controller(EMS)必须放在图纸最左侧(x≤100)，y范围覆盖它控制的设备(pcs~battery)
+3. busbar只能有1个，x=550，y=185
+4. source只能有1个，x=550，y=55
+5. meter只能有1个，x=550，y=120
+6. battery的y必须大于pcs的y（电池在PCS下方）
+7. load的x必须与其parent transformer的x对齐
+
+## 三、电气符号与连接规则
+
+### archDiagram必须包含的连接拓扑
+source → meter → busbar
+busbar → transformer1 (左侧支路)
+busbar → switch (储能并网柜，中间支路)
+busbar → transformer2 (右侧支路，如果有)
+transformer1 → load1 (变压器下接负荷)
+transformer2 → load2
+switch → transformer_stepup (升压变)
+transformer_stepup → pcs
+pcs → battery
+controller(ems) → pcs (dashed=true, 控制信号线)
+
+### wiringDiagram必须包含的元件
+按从电网到电池的顺序：
+breaker(QF并网断路器) → transformer(升压变) → pcs → switch(直流隔离开关) → battery
+加protection数组：["并网柜:过流+方向+防孤岛","升压变:差动+瓦斯+温度","PCS:过流+过压+欠压+频偏","电池:BMS三级+温烟感+气溶胶"]
+
+### topoDiagram必须包含的节点和连接
+节点: source, transformer, pcs, battery, load, controller(ems)
+连接: source→transformer, transformer→load, transformer→pcs, pcs→battery, ems→pcs(dashed)
+
+## 四、电气制图国标规则
+
+1. 所有图纸必须有标题和副标题(设计人+国标号)
+2. 能量流向从上到下、从左到右
+3. 母线用宽矩形表示(不是窄方框)
+4. 断路器用小矩形+内部横线表示
+5. 变压器用方框+接线组别Dyn11/Yyn0表示
+6. 控制信号用虚线(dashed=true)，电力连接用实线
+7. 保护配置用虚线框包围
+8. 接地符号用三级递减横线表示
+9. 颜色编码：10kV回路用蓝色系，0.4kV/储能用绿色系，PCS/直流用紫色系，变压器用橙色系，控制线用棕色虚线
+
+## 五、节点JSON格式要求
+
+每个节点必须包含：
+- id: 唯一标识符(如"grid","pcc","busbar","tx1","switch","stepup","pcs","bess","ems","load1")
+- label: 设备名称(如"国网10kV","PCC计量","10kV母线","1#变压器","储能并网柜","升压变","PCS","储能电池","EMS","0.4kV负荷1")
+- type: 设备类型(source/meter/busbar/transformer/pcs/battery/controller/load/switch/breaker)
+- sub: 副标题含实际参数(如"黑龙江大庆供电公司","电表+PT/CT","S9-1250/10 10/0.4kV","1600kVA 0.4/10kV","1.25MW AC/DC","5MWh 314Ah液冷","能量管理","电机/加热器 ~500kW")
+- x: X坐标(必须遵守层级坐标规则)
+- y: Y坐标(必须遵守层级坐标规则)
+
+## 六、SVG精确布局工程规范（解决重叠/错位/文字溢出，参照储能电气图绘制SKILL_lu）
+
+> 核心原则：SVG中所有元素坐标必须通过计算推导，禁止凭感觉估算！
+
+### 6.1 箭头精确对齐规则
+- 箭头线段终点必须偏移 markerHeight+2px，让箭头尖端恰好触达目标框边缘
+- 垂直连线：起点=上方元素下边缘(cx, cy+h/2)，终点=下方元素上边缘(cx, cy-h/2-8)
+- 水平连线：起点=左框右边缘(cx+w/2, cy)，终点=右框左边缘(cx-w/2-8, cy)
+- 双向箭头(充放电)：线段两端都放marker，起点偏移+8，终点偏移-8
+
+### 6.2 文字不溢出框的计算规则
+- 中文字符宽度 = font-size × 1.0，英文 = font-size × 0.6，数字 = font-size × 0.7
+- 矩形最小宽度 = 最长一行文字总宽度 + 左右各16px内边距
+- 矩形最小高度 = 行数 × (font-size + 行距6px) + 上下各10px内边距
+- 双行文字定位：主标题 y=矩形cy-8px，副标题 y=矩形cy+14px
+- 所有文字必须text-anchor=middle dominant-baseline=central
+
+### 6.3 旁注标注精确定位
+- 右侧标注：x = 元素右边缘 + 12px
+- 左侧标注：x = 元素左边缘 - 12px - 标注文字宽度
+- 上方标注：y = 元素上边缘 - 8px
+- 下方标注：y = 元素下边缘 + 16px
+- 带引线的旁注：引线从元素边缘出发，4px间距后跟标注文字
+
+### 6.4 多列布局防重叠公式
+设 viewBox宽度=W，列数=N，每列元素宽度=ew
+列间距(gap) = (W - N×ew) / (N+1)
+第i列中心X = gap + (i-1)×(ew+gap) + ew/2
+
+示例(W=1100, N=3, ew=180): gap=(1100-540)/4=140, X1=230, X2=550, X3=870
+验证：最右边元素右边缘=870+90=960 < 1100 ✓
+
+### 6.5 EMS/BMS虚线控制框的精确位置
+虚线框坐标从被包含元素推导(不是估算！)：
+- 包含元素最左X - 16px = 虚线框左边
+- 包含元素最上Y - 12px = 虚线框上边
+- 宽度 = 最右X+16px - 左边，高度 = 最下Y+12px - 上边
+
+### 6.6 SVG绘制Z轴顺序（从底到顶）
+1. 画布背景(全屏底色)
+2. 分区背景色块(高压区/储能区半透明)
+3. 母线(粗实线)
+4. 连接线和箭头
+5. 元素框(rect)
+6. 元素文字(text)
+7. 标注引线和旁注文字、图例框
+
+### 6.7 绘图完成自查清单
+□ 每个元素的cx/cy是否从坐标规划表读取(非估算)？
+□ 箭头线段终点是否偏移了markerHeight+2px？
+□ 文字宽度是否做了字符数×字号估算？
+□ 矩形宽度 ≥ 最长文字宽度 + 32px？
+□ 双行文字y坐标差值合理(18-22px)？
+□ 旁注标注x坐标是否从被注释元素边缘推导？
+□ 三列布局是否用防重叠公式计算每列中心X？
+□ 母线宽度是否覆盖最左列到最右列？
+□ SVG绘制顺序是否：背景→色块→母线→连线→框→文字→标注→图例？
+□ 虚线控制框是否从被包含元素坐标推导？
+□ viewBox高度 ≥ 最底层元素下边缘 + 120px(图例+底边距)？
+
+## 七、电气标准图形符号（GB/T 4728，一次接线图必须使用）
+
+断路器(QF): 矩形框内画一条斜线 ─[/]─
+隔离开关(QS): 矩形框无斜线 ─[  ]─
+熔断器(FU): 矩形内S形符号
+变压器(TM): 双圆圈，一次侧标△，二次侧标Y0，标注接线组别Dyn11
+电流互感器(CT): 圆圈穿过主回路导线
+电压互感器(PT): 两个圆圈符号
+避雷器(F): 三角形+接地符号
+接地(PE): 三条渐短平行线
+电能表(Wh): 圆圈内写Wh
+
+## 八、元件编号规范（GB/T 6988）
+- Q: 断路器(QF)、隔离开关(QS)
+- K: 接触器(KM)
+- F: 熔断器(FU)、避雷器
+- T: 变压器(TM)
+- 编号规则：类型字母+数字，从左到右、从上到下编号
+
+## 九、一次接线图必须标注的参数
+- 每条线路：电缆型号规格+截面积(如YJV-3×185mm²)
+- 断路器：额定电流(如QF1 3200A)
+- 变压器：容量/变比/接线组别(如1250kVA, 10/0.4kV, Dyn11)
+- 储能系统：电压/容量(如1331.2V DC, 5MWh)
+- 母线：截面积和电流(如TMY-120×10 铜排)
+- 高低压分区：虚线分界线标注电压等级`;
+
+const ESS_SYSTEM_PROMPT = `你是一个工商业储能系统解决方案AI智能体，由华为云码道CodeArts驱动。
+
+## 你的职责
+根据用户提供的场地信息（变压器参数、用电负荷、电价等），给出完整的储能系统配置方案。
+
+## 可选设备产品库（GOTION储能手册2025Q4）
+- 集装箱储能：GRID 20MWh(20060kWh), GRID 7MWh(7045kWh/588Ah), GRID 7MWh(6262kWh/330Ah), GRID 5MWh(5016kWh/314Ah), GRID 5MWh(5069kWh/330Ah)
+- 乾元载道：X-836(836kWh,PCS一体,最大6并), X-950(948kWh,最大4并), X-522(522kWh,最大6并), X-261(261kWh,最大6并)
+- ACC一体柜：ACC-480-P750(480kWh/750kW内置PCS)
+- 760kWh液冷柜：EDGE676(760kWh,最大8并)
+- 户用：Home 3.0(16kWh), Gendome Power(31kWh)
+
+## 设计遵循规范
+- 系统级：GB/T 36558-2023
+- 电气接线设计层：GB 50055
+- 并网层：GB/T 34120、GB/T 34131
+- 储能电站层：GB/T 42288
+
+## 关键设计原则
+1. 10kV侧接入为主方案（电表后、变压器前），0.4kV为备选
+2. 0.4kV低压方案必须降功率（2×500kW PCS），不可硬上2.5MW
+3. 防逆流核心：P_discharge = min(P_load - 50kW, P_pcs, P_soc_limit)
+4. 防逆流三重保障：EMS软件(1s) + 逆功率继电器(200ms) + 并网柜保护
+5. 峰谷套利：谷段充电→峰段放电，保留50kW市电流入确保不逆流
+6. PCS并网P/Q模式运行，离网V/F需供电公司审批
+
+## 输出格式要求
+你必须返回严格的JSON（不要markdown代码块），包含以下字段：
+{
+  "summary": "方案概述文字",
+  "access": "10kV或0.4kV",
+  "products": [{"name":"X-836","qty":4,"totalCap":3344,"pcsKW":1672}],
+  "strategy": {"charge":"谷段23:30-05:30","discharge":"峰段7:00-8:00,9:00-11:30,15:30-20:00","formula":"P_discharge=min(P_load-50kW, P_pcs, P_soc_limit)"},
+  "economics": {"annualSaving":37.3,"totalInvest":260,"payback":5.0,"dailyKWh":500},
+  "protection": ["EMS软件防逆流","逆功率继电器","并网柜方向保护"],
+  "bom": [{"item":"电池舱X-836","qty":4,"unit":"台","price":65,"total":260},{"item":"PCS 1.25MW","qty":1,"unit":"台","price":30,"total":30},{"item":"升压变1600kVA","qty":1,"unit":"台","price":18,"total":18},{"item":"10kV并网柜","qty":1,"unit":"台","price":8,"total":8}],
+  "archDiagram": {"bus":"10kV","nodes":[{"id":"grid","label":"国网10kV","sub":"黑龙江大庆供电公司","x":550,"y":80,"type":"source"},{"id":"pcc","label":"PCC计量","sub":"电表+PT/CT","x":550,"y":155,"type":"meter"},{"id":"busbar","label":"10kV母线","sub":"用户侧","x":550,"y":230,"type":"busbar"},{"id":"tx1","label":"1#变压器","sub":"S9-1250/10 10/0.4kV","x":300,"y":320,"type":"transformer"},{"id":"tx2","label":"2#变压器","sub":"S9-1250/10 10/0.4kV","x":480,"y":320,"type":"transformer"},{"id":"stepup","label":"升压变","sub":"1600kVA 0.4/10kV","x":660,"y":320,"type":"transformer"},{"id":"pcs","label":"PCS","sub":"1.25MW AC/DC","x":660,"y":320,"type":"pcs"},{"id":"bess","label":"储能电池","sub":"X-836×4 3.3MWh","x":840,"y":320,"type":"battery"},{"id":"ems","label":"EMS","sub":"能量管理","x":950,"y":320,"type":"controller"}],"links":[{"from":"grid","to":"pcc"},{"from":"pcc","to":"busbar"},{"from":"busbar","to":"tx1"},{"from":"busbar","to":"tx2"},{"from":"busbar","to":"stepup"},{"from":"stepup","to":"pcs"},{"from":"pcs","to":"bess"},{"from":"ems","to":"pcs","dashed":true}],"loads":[{"parent":"tx1","label":"0.4kV负荷1","sub":"电机/加热器 ~500kW"},{"parent":"tx2","label":"0.4kV负荷2","sub":"辅助/产线 ~300kW"}]},
+  "wiringDiagram": {"voltage":"10kV","components":[{"id":"QF1","label":"QF并网断路器","type":"breaker"},{"id":"T1","label":"升压变1600kVA 10/0.4kV Dyn11","type":"transformer"},{"id":"PCS1","label":"PCS 1.25MW","type":"pcs"},{"id":"DS1","label":"直流隔离开关","type":"switch"},{"id":"BAT1","label":"电池簇X-836×4","type":"battery"}],"connections":[{"from":"QF1","to":"T1","cable":"YJV22-10-3×70"},{"from":"T1","to":"PCS1","cable":"低压母排"},{"from":"PCS1","to":"DS1","cable":"DC1500V"},{"from":"DS1","to":"BAT1","cable":"DC1500V"}],"protection":["并网柜：过流+方向+防孤岛","升压变：差动+瓦斯+温度","PCS：过流+过压+欠压+频偏","电池：BMS三级保护+温烟感+气溶胶"]},
+  "topoDiagram": {"nodes":[{"id":"grid","label":"电网10kV","sub":"电源","type":"source"},{"id":"tx","label":"变压器","sub":"1250kVA","type":"transformer"},{"id":"pcs","label":"PCS","sub":"1.25MW","type":"pcs"},{"id":"bat","label":"储能电池","sub":"3.3MWh","type":"battery"},{"id":"load","label":"负荷","sub":"~800kW","type":"load"},{"id":"ems","label":"EMS","sub":"控制","type":"controller"}],"links":[{"from":"grid","to":"tx","label":"PCC"},{"from":"tx","to":"load","label":"供电"},{"from":"tx","to":"pcs","label":"PCS接口"},{"from":"pcs","to":"bat","label":"DC"},{"from":"ems","to":"pcs","label":"控制","dashed":true}]}
+}
+
+archDiagram, wiringDiagram, topoDiagram 中的节点和连接定义了图纸元素。前端会按国标电气制图规则渲染SVG。
+
+${ESS_DRAWING_RULES}
+`;
+
+async function callLLM(messages, useStream) {
+  const provider = document.getElementById('llmProvider').value;
+  const resp = await fetch('/api/ess-config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ provider, messages, stream: false })
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: 'Network error' }));
+    throw new Error(err.error || 'LLM API call failed');
+  }
+  return await resp.json();
+}
+
+function buildUserPrompt() {
+  const P = getParams();
+  const sn = document.getElementById('specialNote').value.trim();
+  let prompt = `## 场地信息\n`;
+  prompt += `- 项目名称: ${P.projName}\n- 地址: ${P.projAddr}\n- 区域: ${P.region}\n`;
+  prompt += `## 变压器配置\n- 单台容量: ${P.txCap}kVA\n- 数量: ${P.txCount}台\n- 电压: ${P.txHv}kV/${P.txLv}V\n- 联结组别: ${P.txVector}\n- 短路阻抗: ${P.txZk}%\n- 有10kV配电室: ${P.use10kV ? '是' : '否'}\n`;
+  prompt += `## 用电负荷\n- 月用电旺季: ${P.loadMonthHigh}万kWh\n- 月用电淡季: ${P.loadMonthLow}万kWh\n- 最大负荷: ${P.loadMax}kW\n- 功率因数: ${P.pf}\n- 年工作天数: ${P.workDays}\n`;
+  prompt += `## 峰谷电价\n- 峰段: ${P.pricePeak}元/kWh (${P.hoursPeak}h)\n- 谷段: ${P.priceValley}元/kWh\n- 平段: ${P.priceFlat}元/kWh\n- 峰谷差: ${(P.pricePeak - P.priceValley).toFixed(3)}元/kWh\n`;
+  if (sn) prompt += `## 特别说明\n${sn}\n`;
+  prompt += `\n请根据以上信息，给出完整的储能系统配置方案。`;
+  return prompt;
+}
+
+async function generateSolution() {
+  const btn = document.querySelector('[onclick="generateSolution()"]');
+  const origText = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span> 分析中...';
+  btn.disabled = true;
+  const logEl = document.getElementById('analysisLog');
+  if (logEl) { logEl.innerHTML = ''; logEl.style.display = 'block'; }
+  const addLog = (msg, type) => {
+    if (!logEl) return;
+    const d = document.createElement('div');
+    d.style.cssText = `font-size:12px;padding:2px 0;color:${type==='step'?'#80b0e0':type==='ok'?'#50c878':type==='warn'?'#e8a838':'#C2C0B6'};word-break:break-all;`;
+    d.textContent = msg;
+    logEl.appendChild(d);
+    logEl.scrollTop = logEl.scrollHeight;
+  };
+  try {
+    const provider = document.getElementById('llmProvider').value;
+    const P = getParams();
+    if (provider === 'local') {
+      addLog('[本地小模型] 启动规则引擎...', 'step');
+      addLog(`参数: ${P.txCount}×${P.txCap}kVA, ${P.use10kV?'10kV':'0.4kV'}接入, 最大负荷${P.loadMax}kW`, 'step');
+      const result = selectEquipment(P);
+      addLog('规则引擎匹配完成 ✓', 'ok');
+      result._llmSource = false;
+      LAST_RESULT = result;
+      document.getElementById('successMsg').classList.add('show');
+      renderRecommendation(result);
+      renderSelectionTable(result);
+      renderDocOutput(result);
+      renderDiagramTabs(result);
+      renderArchSvg(result);
+      renderWiringSvg(result);
+      renderTopoSvg(result);
+      renderBOM(result);
+      showPage('config');
+      return;
+    }
+    addLog(`[${provider.toUpperCase()}] 构建储能领域Prompt...`, 'step');
+    const userPrompt = buildUserPrompt();
+    addLog('─── 发送给LLM的完整输入 ───', 'step');
+    userPrompt.split('\n').forEach(line => { if(line.trim()) addLog(line, ''); });
+    addLog('─── 输入结束 ───', 'step');
+    addLog('画图规则: ' + ESS_DRAWING_RULES.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).length + '条已注入system prompt', 'step');
+    addLog(`调用${provider.toUpperCase()} API...`, 'step');
+    const messages = [
+      { role: 'system', content: ESS_SYSTEM_PROMPT },
+      { role: 'user', content: userPrompt }
+    ];
+    const data = await callLLM(messages);
+    addLog(`API响应成功, tokens: ${data.usage?.total_tokens || '?'}`, 'ok');
+    const msg = data.choices?.[0]?.message;
+    const reasoningContent = msg?.reasoning_content || '';
+    const content = msg?.content || '';
+    if (reasoningContent) {
+      addLog('─── AI思考过程 ───', 'step');
+      const lines = reasoningContent.split('\n');
+      lines.forEach(line => { if(line.trim()) addLog(line, ''); });
+      addLog('─── 思考结束 ───', 'step');
+    }
+    addLog('解析LLM输出JSON...', 'step');
+    let result;
+    try {
+      let jsonStr = content.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+      if (!jsonStr.startsWith('{')) {
+        const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+        if (jsonMatch) jsonStr = jsonMatch[0];
+      }
+      addLog('JSON长度: ' + jsonStr.length + '字符', 'step');
+      result = JSON.parse(jsonStr);
+      addLog('JSON解析成功 ✓', 'ok');
+    } catch (e) {
+      addLog('LLM输出非标准JSON, fallback到规则引擎', 'warn');
+      result = selectEquipment(P);
+      result._llmRaw = content;
+    }
+    result._llmSource = true;
+    LAST_RESULT = result;
+    document.getElementById('successMsg').classList.add('show');
+    renderLLMResult(result);
+    showPage('config');
+  } catch (e) {
+    console.error('LLM error:', e);
+    addLog('LLM调用失败: ' + e.message, 'warn');
+    addLog('Fallback到本地规则引擎...', 'warn');
+    const P = getParams();
+    const result = selectEquipment(P);
+    LAST_RESULT = result;
+    document.getElementById('successMsg').classList.add('show');
+    renderRecommendation(result);
+    renderSelectionTable(result);
+    renderDocOutput(result);
+    renderDiagramTabs(result);
+    renderArchSvg(result);
+    renderWiringSvg(result);
+    renderTopoSvg(result);
+    renderBOM(result);
+    showPage('config');
+  } finally {
+    btn.innerHTML = origText;
+    btn.disabled = false;
+  }
+}
+
+async function parseNaturalInput(){
+  const raw=document.getElementById('naturalInput').value.trim();
+  if(!raw){alert('请输入需求描述');return;}
+  const provider=document.getElementById('llmProvider').value;
+  const tip=document.createElement('div');
+  tip.style.cssText='position:fixed;top:20px;right:20px;background:#185FA5;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:999';
+  tip.textContent=provider==='local'?'本地小模型识别参数...':'AI正在识别参数...';
+  document.body.appendChild(tip);
+  try{
+    let params;
+    if(provider==='local'){
+      const s=raw;
+      params={};
+      const capM=s.match(/(\d+)\s*kVA/i);if(capM)params.txCap=parseInt(capM[1]);
+      const cntM=s.match(/(\d+)\s*台/);if(cntM)params.txCount=parseInt(cntM[1]);
+      const hvM=s.match(/(\d+\.?\d*)\s*kV/i);if(hvM){const kv=parseFloat(hvM[1]);if(kv>=6){params.txHv=kv;params.hasHvRoom=kv>=10?1:0;}}
+      const mhM=s.match(/月[电用]*\s*(\d+\.?\d*)\s*万/);if(mhM)params.loadMonthHigh=parseFloat(mhM[1]);
+      if(s.includes('大庆')||s.includes('油田'))params.region='黑龙江大庆';
+      const pcM=s.match(/峰[价段]*\s*(\d+\.?\d*)/);if(pcM)params.pricePeak=parseFloat(pcM[1]);
+      const vcM=s.match(/谷[价段]*\s*(\d+\.?\d*)/);if(vcM)params.priceValley=parseFloat(vcM[1]);
+    }else{
+      const messages=[
+        {role:'system',content:'你是储能系统参数提取助手。从用户自然语言描述中提取参数，返回JSON：{"txCap":1250,"txCount":2,"txHv":10,"loadMonthHigh":35,"pricePeak":0.833,"priceValley":0.441,"priceFlat":0.637,"region":"黑龙江大庆","hasHvRoom":1}。无法识别的字段不返回。'},
+        {role:'user',content:raw}
+      ];
+      const data=await callLLM(messages);
+      const content=data.choices?.[0]?.message?.content||'';
+      const jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+      params=JSON.parse(jsonStr);
+    }
+    let found=0;
+    function sv(id,val){const el=document.getElementById(id);if(el&&val!=null){el.value=val;found++;}}
+    if(params.txCap)sv('txCap',params.txCap);
+    if(params.txCount)sv('txCount',params.txCount);
+    if(params.txHv){sv('txHv',params.txHv);sv('hasHvRoom',params.txHv>=10?'1':'0');}
+    if(params.loadMonthHigh)sv('loadMonthHigh',params.loadMonthHigh);
+    if(params.pricePeak)sv('pricePeak',params.pricePeak);
+    if(params.priceValley)sv('priceValley',params.priceValley);
+    if(params.priceFlat)sv('priceFlat',params.priceFlat);
+    if(params.region)sv('region',params.region);
+    if(params.hasHvRoom!=null)sv('hasHvRoom',params.hasHvRoom?'1':'0');
+    tip.textContent=(provider==='local'?'正则':'AI')+'识别完成，填充了'+found+'个参数，正在生成方案...';
+    tip.style.background='#0F6E56';
+    setTimeout(()=>generateSolution(),500);
+  }catch(e){
+    console.warn('Parse failed, using regex fallback',e);
+    const s=raw;
+    function sv(id,val){const el=document.getElementById(id);if(el&&val!=null)el.value=val;}
+    let found=0;
+    const capM=s.match(/(\d+)\s*kVA/i);if(capM){sv('txCap',capM[1]);found++;}
+    const cntM=s.match(/(\d+)\s*台/);if(cntM){sv('txCount',cntM[1]);found++;}
+    const hvM=s.match(/(\d+\.?\d*)\s*kV/i);if(hvM){const kv=parseFloat(hvM[1]);if(kv>=6){sv('txHv',kv);sv('hasHvRoom',kv>=10?'1':'0');found++;}}
+    const mhM=s.match(/月[电用]*\s*(\d+\.?\d*)\s*万/);if(mhM){sv('loadMonthHigh',mhM[1]);found++;}
+    if(s.includes('大庆')||s.includes('油田')){sv('region','黑龙江大庆');found++;}
+    tip.textContent='识别失败，正则提取'+found+'个参数';
+    tip.style.background='#D4A017';
+    setTimeout(()=>generateSolution(),500);
+  }
+  setTimeout(()=>tip.remove(),4000);
+}
+
+function devCardHTML(p,isSelected){
+  const capStr=p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh';
+  const badgeCls=p.cat==='集装箱储能'?'badge-green':p.cat==='乾元载道'?'badge-blue':p.cat==='户用/便携'?'badge-purple':'badge-orange';
+  return`<div class="device-card${isSelected?' selected':''}" onclick="showDetail('${p.id}')">
+    ${p.img?`<div class="dev-img-wrap"><img src="images/products/${p.img}" alt="${p.name}" onerror="this.style.display='none'"></div>`:''}
+    <div class="dev-header"><div><div class="dev-name">${p.name}</div><div class="dev-model">${p.model}</div></div><span class="dev-badge ${badgeCls}">${capStr}</span></div>
+    <div class="dev-specs">
+      <span class="spec-item">${p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW'}</span>
+      <span class="spec-item">${p.volt}V</span>
+      <span class="spec-item">${p.cell}</span>
+      <span class="spec-item">${p.cool}</span>
+      <span class="spec-item">${p.ip}</span>
+      ${p.pcs?'<span class="spec-item">PCS一体</span>':''}
+      ${p.maxP?`<span class="spec-item">最大${p.maxP}并</span>`:''}
+    </div>
+    <div class="dev-features">${(p.features||[]).slice(0,3).map(f=>`<span class="feature-tag">${f}</span>`).join('')}</div>
+  </div>`;
+}
+
+function renderRecommendation(R){
+  const top=R.candidates.slice(0,4);
+  const el=document.getElementById('deviceRecommendation');
+  el.innerHTML=`<div style="grid-column:1/-1;margin-bottom:8px"><h3 style="font-size:16px;color:var(--blue)">推荐配置排序</h3><p style="font-size:11px;color:var(--text2)">评分=覆盖率×0.4+利用率×0.3+1/回收期×0.3</p></div>`+
+    top.map((c,i)=>`<div class="device-card fade-in${i===0?' selected':''}" style="animation-delay:${i*0.08}s">
+      ${c.product.img?`<div class="dev-img-wrap"><img src="images/products/${c.product.img}" alt="${c.product.name}" onerror="this.style.display='none'"></div>`:''}
+      <div class="dev-header"><div><div class="dev-name">${i===0?'★ ':''}${c.product.name}${c.qty>1?' ×'+c.qty:''}</div><div class="dev-model">${c.product.model} | ${c.access}接入</div></div><span class="dev-badge ${i===0?'badge-green':'badge-blue'}">${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'}</span></div>
+      <div class="dev-specs">
+        <span class="spec-item">PCS ${(c.pcsKW/1000).toFixed(2)}MW</span>
+        <span class="spec-item">覆盖${(c.coverageHigh*100).toFixed(0)}%</span>
+        <span class="spec-item">利用${(c.utilAnnual*100).toFixed(0)}%</span>
+        <span class="spec-item">年收益${c.annualSaving.toFixed(1)}万</span>
+        <span class="spec-item">投资${c.totalInvest.toFixed(0)}万</span>
+      </div>
+      <div class="dev-features"><span class="feature-tag">回收${c.payback.toFixed(1)}年</span>${c.product.pcs?'<span class="feature-tag">PCS一体</span>':'<span class="feature-tag">需另配PCS</span>'}</div>
+    </div>`).join('');
+}
+
+function renderSelectionTable(R){
+  const P=R.params;const top=R.candidates.slice(0,8);
+  let html=`<h3>方案对比明细</h3><table class="result-table"><tr><th>配置</th><th>容量</th><th>PCS</th><th>接入</th><th>旺季覆盖</th><th>利用率</th><th>年收益</th><th>总投资</th><th>回收期</th></tr>`;
+  top.forEach((c,i)=>{const mark=i===0?' style="background:rgba(15,110,86,.06)"':'';
+    html+=`<tr${mark}><td><b>${i===0?'★ ':''}${c.product.name}${c.qty>1?' ×'+c.qty:''}</b></td><td>${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'}</td><td>${(c.pcsKW/1000).toFixed(2)}MW</td><td>${c.access}</td><td>${(c.coverageHigh*100).toFixed(0)}%</td><td>${(c.utilAnnual*100).toFixed(0)}%</td><td>${c.annualSaving.toFixed(1)}万</td><td>${c.totalInvest.toFixed(0)}万</td><td><b>${c.payback.toFixed(1)}年</b></td></tr>`;
+  });
+  html+=`</table>`;document.getElementById('selectionPanel').innerHTML=html;document.getElementById('selectionPanel').style.display='block';
+}
+
+function renderDocOutput(R){
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];const d=new Date();
+  const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+  const pcsStr=(c.pcsKW/1000).toFixed(2)+'MW';
+  let doc=`═══════════════════════════════════════════════════════════\n`;
+  doc+=`       ${P.region} 工商业储能系统完整解决方案\n`;
+  doc+=`═══════════════════════════════════════════════════════════\n\n`;
+  doc+=`一、配电现状\n────────────────────────────────────────\n`;
+  doc+=`  变压器: ${P.txCount}×${P.txCap}kVA  ${P.txHv}kV/${P.txLv}V  ${P.txVector}  Zk=${P.txZk}%\n`;
+  doc+=`  总可用有功: ${(P.txCount*P.txCap*P.pf/1000).toFixed(1)}MW\n`;
+  doc+=`  月用电(旺季): ${(P.loadMonthHigh/10000).toFixed(0)}万kWh\n`;
+  doc+=`  接入方式: ${P.use10kV?'10kV母线侧(电表后、变压器前)':'0.4kV低压侧'}\n\n`;
+  doc+=`二、电价参数\n────────────────────────────────────────\n`;
+  doc+=`  峰段: ${P.pricePeak}元/kWh (${P.hoursPeak}h)  谷段: ${P.priceValley}元/kWh\n`;
+  doc+=`  峰谷差: ${(P.pricePeak-P.priceValley).toFixed(3)}元/kWh\n\n`;
+  doc+=`三、储能设备选型\n────────────────────────────────────────\n`;
+  doc+=`  推荐配置: ${c.product.name}${c.qty>1?' ×'+c.qty+'并联':''}\n`;
+  doc+=`  总容量: ${capStr}  PCS: ${pcsStr}\n`;
+  doc+=`  电芯: ${c.product.cell}  温控: ${c.product.cool}  防护: ${c.product.ip}\n\n`;
+  doc+=`四、充放电策略\n────────────────────────────────────────\n`;
+  doc+=`  谷段充电: 23:30-05:30, 功率≤${pcsStr}\n`;
+  doc+=`  峰段放电: 7:00-8:00, 9:00-11:30, 15:30-20:00\n`;
+  doc+=`  PCC控制: P_discharge = min(P_load-50kW, P_pcs, P_soc_limit)\n`;
+  doc+=`  防逆流: EMS软件限功率 + 逆功率继电器 + 并网柜保护\n\n`;
+  const sn=document.getElementById('specialNote').value.trim();
+  if(sn){
+    doc+=`六、特别说明\n────────────────────────────────────────\n`;
+    doc+=`  ${sn}\n\n`;
+  }
+  doc+=`五、经济性分析\n────────────────────────────────────────\n`;
+  doc+=`  年收益: ≈${c.annualSaving.toFixed(1)}万元\n`;
+  doc+=`  总投资: ≈${c.totalInvest.toFixed(0)}万元\n`;
+  doc+=`  回收期: ≈${c.payback.toFixed(1)}年\n\n`;
+  doc+=`═══════════════════════════════════════════════════════════\n`;
+  doc+=`  日期: ${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}\n`;
+  doc+=`  数据来源: GOTION储能手册2025Q4\n`;
+  doc+=`═══════════════════════════════════════════════════════════\n`;
+  document.getElementById('docPanel').innerHTML=`<h3>完整方案文档</h3><div class="doc-output">${doc}</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn btn-primary" style="width:auto" onclick="downloadTxt()">下载 .txt</button><button class="btn btn-success" style="width:auto" onclick="downloadMD()">下载 .md</button></div>`;
+  document.getElementById('docPanel').style.display='block';
+}
+
+function renderLLMResult(R) {
+  const recEl = document.getElementById('deviceRecommendation');
+  if (R.summary) {
+    recEl.innerHTML = '<h3>AI推荐方案</h3><div style="font-size:13px;line-height:1.7;background:var(--bg3);padding:12px;border-radius:8px;border:1px solid var(--border)">' + R.summary.replace(/\n/g, '<br>') + '</div>';
+    recEl.style.display = 'block';
+  }
+  if (R.products && R.products.length > 0) {
+    let html = '<h3>设备选型</h3><table class="result-table"><tr><th>设备</th><th>数量</th><th>总容量</th><th>PCS功率</th></tr>';
+    R.products.forEach(p => {
+      const capStr = p.totalCap >= 1000 ? (p.totalCap / 1000).toFixed(1) + 'MWh' : p.totalCap + 'kWh';
+      html += '<tr><td><b>' + p.name + '</b></td><td>' + p.qty + '</td><td>' + capStr + '</td><td>' + (p.pcsKW ? (p.pcsKW / 1000).toFixed(2) + 'MW' : '-') + '</td></tr>';
+    });
+    html += '</table>';
+    document.getElementById('selectionPanel').innerHTML = html;
+    document.getElementById('selectionPanel').style.display = 'block';
+  }
+  let doc = '';
+  if (R.summary) doc += R.summary + '\n\n';
+  if (R.strategy) {
+    doc += '充放电策略:\n  充电: ' + R.strategy.charge + '\n  放电: ' + R.strategy.discharge + '\n  公式: ' + R.strategy.formula + '\n\n';
+  }
+  if (R.economics) {
+    doc += '经济性分析:\n  年收益: ≈' + R.economics.annualSaving + '万元\n  总投资: ≈' + R.economics.totalInvest + '万元\n  回收期: ≈' + R.economics.payback + '年\n\n';
+  }
+  if (R.protection) {
+    doc += '防逆流保障:\n  ' + R.protection.join('\n  ') + '\n\n';
+  }
+  const sn = document.getElementById('specialNote').value.trim();
+  if (sn) doc += '特别说明:\n  ' + sn + '\n\n';
+  const docEl = document.getElementById('docPanel');
+  docEl.innerHTML = '<h3>完整方案文档</h3><div class="doc-output">' + doc + '</div>';
+  docEl.style.display = 'block';
+  if (R.archDiagram) renderArchDiagramFromJSON(R.archDiagram);
+  if (R.wiringDiagram) renderWiringDiagramFromJSON(R.wiringDiagram);
+  if (R.topoDiagram) renderTopoDiagramFromJSON(R.topoDiagram);
+  if (R.bom && R.bom.length > 0) {
+    let html = '<h3>物料清单(BOM)</h3><table class="result-table"><tr><th>项目</th><th>数量</th><th>单位</th><th>单价(万)</th><th>小计(万)</th></tr>';
+    let total = 0;
+    R.bom.forEach(b => {
+      html += '<tr><td>' + b.item + '</td><td>' + b.qty + '</td><td>' + (b.unit || '台') + '</td><td>' + b.price + '</td><td>' + b.total + '</td></tr>';
+      total += b.total;
+    });
+    html += '<tr style="font-weight:bold"><td colspan="4">合计</td><td>' + total + '</td></tr></table>';
+    const bomEl = document.getElementById('bomContent');
+    bomEl.innerHTML = html;
+    document.getElementById('bomSection').style.display = 'block';
+  }
+}
+
+const DIAGRAM_DEFS=`<defs>
+<linearGradient id="gGrid" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#185FA5"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient>
+<linearGradient id="gTrans" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#633806"/><stop offset="100%" style="stop-color:#4A2804"/></linearGradient>
+<linearGradient id="gESS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#085041"/><stop offset="100%" style="stop-color:#063828"/></linearGradient>
+<linearGradient id="gPCS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#3C3489"/><stop offset="100%" style="stop-color:#2A2466"/></linearGradient>
+<linearGradient id="gLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#444441"/><stop offset="100%" style="stop-color:#333330"/></linearGradient>
+<linearGradient id="gBus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#085041"/><stop offset="50%" style="stop-color:#0F6E56"/><stop offset="100%" style="stop-color:#085041"/></linearGradient>
+<linearGradient id="gCtrl" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#854F0B"/><stop offset="100%" style="stop-color:#6A3D08"/></linearGradient>
+<linearGradient id="gSwitch" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#712B13"/><stop offset="100%" style="stop-color:#5A2210"/></linearGradient>
+<filter id="sh"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.2"/></filter>
+<marker id="aB" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aO" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#EF9F27" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aG" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aR" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aP" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aY" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="aX" markerWidth="6" markerHeight="6" refX="8" refY="5" orient="auto" viewBox="0 0 10 10"><path d="M2 1L8 5L2 9" fill="none" stroke="#9C9A92" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>`;
+
+const DIAGRAM_ICONS = {
+  source: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="url(#gGrid)" stroke="#85B7EB" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#B5D4F4" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#85B7EB" font-size="12">${sub}</text>`:''}`,
+  meter: (x,y,label,sub) => `<rect x="${x-110}" y="${y-22}" width="220" height="44" rx="8" fill="#444441" stroke="#B4B2A9" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#D3D1C7" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}`,
+  busbar: (x,y,label) => `<rect x="${x-170}" y="${y-4}" width="340" height="8" rx="2" fill="#185FA5" opacity="0.85" filter="url(#sh)"/><text x="${x}" y="${y+20}" text-anchor="middle" fill="#9FE1CB" font-size="12" font-weight="500">${label}</text>`,
+  transformer: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gTrans)" stroke="#EF9F27" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#FAC775" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#EF9F27" font-size="12">${sub}</text>`:''}`,
+  pcs: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gPCS)" stroke="#AFA9EC" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#CECBF6" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#AFA9EC" font-size="12">${sub}</text>`:''}`,
+  battery: (x,y,label,sub) => `<rect x="${x-140}" y="${y-28}" width="280" height="56" rx="8" fill="url(#gESS)" stroke="#5DCAA5" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-4}" text-anchor="middle" dominant-baseline="central" fill="#9FE1CB" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#5DCAA5" font-size="12">${sub}</text>`:''}`,
+  controller: (x,y,label,sub) => `<rect x="${x-65}" y="${y-60}" width="130" height="120" rx="8" fill="none" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="4 3"/><text x="${x}" y="${y-40}" text-anchor="middle" fill="#FAF9F5" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y-20}" text-anchor="middle" fill="#854F0B" font-size="12">${sub}</text>`:''}`,
+  breaker: (x,y,label) => `<rect x="${x-15}" y="${y-7}" width="30" height="14" rx="3" fill="#B5D4F4" stroke="#185FA5" stroke-width="1.2"/><line x1="${x-10}" y1="${y}" x2="${x+10}" y2="${y}" stroke="#185FA5" stroke-width="1.2"/><text x="${x}" y="${y+18}" text-anchor="middle" fill="#185FA5" font-size="12">${label}</text>`,
+  switch: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gSwitch)" stroke="#F0997B" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#F5C4B3" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#F0997B" font-size="12">${sub}</text>`:''}`,
+  load: (x,y,label,sub) => `<rect x="${x-90}" y="${y-22}" width="180" height="44" rx="8" fill="url(#gLoad)" stroke="#B4B2A9" stroke-width="0.5" filter="url(#sh)"/><text x="${x}" y="${y-2}" text-anchor="middle" dominant-baseline="central" fill="#D3D1C7" font-size="14" font-weight="500">${label}</text>${sub?`<text x="${x}" y="${y+16}" text-anchor="middle" dominant-baseline="central" fill="#B4B2A9" font-size="12">${sub}</text>`:''}`
+};
+
+function getArrowForLink(l){
+  if(l.dashed) return 'aY';
+  const toType=l._toType||'';
+  if(toType==='transformer') return 'aO';
+  if(toType==='pcs') return 'aR';
+  if(toType==='battery') return 'aG';
+  if(toType==='load') return 'aP';
+  if(toType==='switch') return 'aB';
+  return 'aX';
+}
+
+function autoLayoutNodes(nodes, svgW, svgH) {
+  if (!nodes || !nodes.length) return nodes;
+  const LAYER_ORDER = ['source','meter','busbar','breaker','switch','transformer','pcs','battery','controller','load'];
+  const LAYER_Y = [80, 155, 230, 260, 260, 330, 330, 330, 330, 450];
+  const byLayer = {};
+  nodes.forEach(n => { const ly = getLayerIndex(n.type, LAYER_ORDER); byLayer[ly] = byLayer[ly] || []; byLayer[ly].push(n); });
+  Object.entries(byLayer).forEach(([ly, layer]) => {
+    const yBase = LAYER_Y[parseInt(ly)] || 400;
+    layer.forEach(n => { n.y = yBase; });
+    layer.sort((a, b) => (a.x || 0) - (b.x || 0));
+    const count = layer.length;
+    const hasX = layer.every(n => typeof n.x === 'number' && n.x > 0);
+    if (hasX) {
+      const xs = layer.map(n => n.x);
+      const xOverlap = layer.some((a, i) => layer.some((b, j) => i !== j && Math.abs(a.x - b.x) < 140));
+      if (xOverlap) {
+        const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
+        const startX = svgW / 2 - (count - 1) * spacing / 2;
+        layer.forEach((n, i) => { n.x = Math.round(startX + i * spacing); });
+      }
+    } else {
+      const spacing = Math.min((svgW - 200) / Math.max(count, 1), 250);
+      const startX = svgW / 2 - (count - 1) * spacing / 2;
+      layer.forEach((n, i) => { n.x = Math.round(startX + i * spacing); });
+    }
+  });
+  return nodes;
+}
+function getLayerIndex(type, layerOrder) {
+  const idx = layerOrder.indexOf(type);
+  return idx >= 0 ? idx : layerOrder.length - 1;
+}
+
+function renderDiagramFromJSON(containerId, diagramData, title) {
+  const svgW = 1100, svgH = 700;
+  if (diagramData.nodes) autoLayoutNodes(diagramData.nodes, svgW, svgH);
+  let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">`;
+  svg += DIAGRAM_DEFS;
+  svg += `<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern><rect width="${svgW}" height="${svgH}" fill="url(#dot)"/>`;
+  svg += `<text x="${svgW/2}" y="28" text-anchor="middle" fill="#e0e0ff" font-size="16" font-weight="bold">${title}</text>`;
+  svg += `<text x="${svgW/2}" y="46" text-anchor="middle" fill="#8888cc" font-size="11">${diagramData.bus||''} | 设计人：卢继雄 | GB/T 36558-2023</text>`;
+  if (diagramData.nodes) {
+    diagramData.nodes.forEach(n => {
+      const iconFn = DIAGRAM_ICONS[n.type] || DIAGRAM_ICONS.source;
+      svg += iconFn(n.x, n.y + 60, n.label, n.sub);
+    });
+  }
+  if (diagramData.links) {
+    diagramData.links.forEach(l => {
+      const from = diagramData.nodes?.find(n => n.id === l.from);
+      const to = diagramData.nodes?.find(n => n.id === l.to);
+      if (from && to) {
+        l._toType = to.type;
+        const dash = l.dashed ? ' stroke-dasharray="4,3"' : '';
+        let color;
+        if (l.dashed) { color = '#854F0B'; }
+        else {
+          const toT = to.type;
+          if (toT==='transformer'||toT==='switch') color='#185FA5';
+          else if (toT==='pcs') color='#534AB7';
+          else if (toT==='battery') color='#0F6E56';
+          else if (toT==='load') color='#0F6E56';
+          else color='#9C9A92';
+        }
+        const arrow = getArrowForLink(l);
+        const sw = l.dashed ? '1' : '1.5';
+        let x1=from.x, y1, x2=to.x, y2;
+        const fromH = from.type==='busbar'?8:(from.type==='controller'?120:44);
+        const toH = to.type==='busbar'?8:(to.type==='controller'?120:44);
+        const fromW = from.type==='source'||from.type==='meter'?220:(from.type==='busbar'?340:(from.type==='battery'?280:180));
+        const toW = to.type==='source'||to.type==='meter'?220:(to.type==='busbar'?340:(to.type==='battery'?280:180));
+        if (Math.abs(from.x - to.x) < 30 && from.type !== 'controller' && to.type !== 'controller') {
+          y1 = from.y + 60 + fromH/2;
+          y2 = to.y + 60 - toH/2 - 8;
+        } else {
+          y1 = from.y + 60;
+          y2 = to.y + 60;
+          if (from.x < to.x) { x1 = from.x + fromW/2; x2 = to.x - toW/2 - 8; }
+          else { x1 = from.x - fromW/2; x2 = to.x + toW/2 + 8; }
+        }
+        svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw}"${dash} marker-end="url(#${arrow})"/>`;
+        if (l.label) {
+          svg += `<text x="${(from.x + to.x) / 2 + 6}" y="${(from.y + to.y) / 2 + 58}" text-anchor="start" fill="#C2C0B6" font-size="9" transform="rotate(${Math.atan2(to.y-from.y,to.x-from.x)*180/Math.PI},${(from.x+to.x)/2},${(from.y+to.y)/2+58})">${l.label}</text>`;
+        }
+      }
+    });
+  }
+  if (diagramData.loads) {
+    diagramData.loads.forEach((ld, i) => {
+      const parent = diagramData.nodes?.find(n => n.id === ld.parent);
+      if (parent) {
+        const lx = parent.x, ly = parent.y + 160 + i * 60;
+        svg += DIAGRAM_ICONS.load(lx, ly, ld.label, ld.sub || '');
+        svg += `<line x1="${parent.x}" y1="${parent.y + 60 + 30}" x2="${lx}" y2="${ly - 22}" stroke="#a070d0" stroke-width="2" marker-end="url(#aP)"/>`;
+      }
+    });
+  }
+  if (diagramData.components) {
+    diagramData.components.forEach((c, i) => {
+      const y = 80 + i * 65;
+      const iconFn = DIAGRAM_ICONS[c.type] || DIAGRAM_ICONS.source;
+      svg += iconFn(250, y, c.label, c.sub || '');
+      if (i > 0) svg += `<line x1="250" y1="${y - 30}" x2="250" y2="${y - 25}" stroke="#4a90d9" stroke-width="2" marker-end="url(#aB)"/>`;
+    });
+  }
+  if (diagramData.connections) {
+    diagramData.connections.forEach((c, i) => {
+      const y = 100 + i * 65;
+      svg += `<text x="450" y="${y}" fill="#80b0e0" font-size="10">${c.cable || ''}</text>`;
+    });
+  }
+  if (diagramData.protection) {
+    svg += `<rect x="700" y="70" width="380" height="${20 + diagramData.protection.length * 20}" rx="6" fill="none" stroke="#534AB7" stroke-width="1" stroke-dasharray="4,2"/>`;
+    svg += `<text x="890" y="86" text-anchor="middle" fill="#534AB7" font-size="10" font-weight="bold">保护配置</text>`;
+    diagramData.protection.forEach((p, i) => {
+      svg += `<text x="715" y="${105 + i * 20}" fill="#AFA9EC" font-size="9">\u25CF ${p}</text>`;
+    });
+  }
+  svg += '</svg>';
+  document.getElementById(containerId).innerHTML = svg;
+}
+
+function renderArchDiagramFromJSON(d) { renderDiagramFromJSON('archSvg', d, '系统架构图 (AI生成)'); }
+function renderWiringDiagramFromJSON(d) { renderDiagramFromJSON('wiringSvg', d, '电气一次接线图 (AI生成)'); }
+function renderTopoDiagramFromJSON(d) { renderDiagramFromJSON('topoSvg', d, '电气拓扑图 (AI生成)'); }
+
+function renderDeviceLibrary(filter){
+  currentFilter=filter;
+  const cats=['全部',...new Set(PRODUCTS.map(p=>p.cat))];
+  const fb=document.getElementById('equipFilter');
+  fb.innerHTML=cats.map(c=>`<button class="filter-btn${c===filter?' active':''}" onclick="renderDeviceLibrary('${c}')">${c}</button>`).join('');
+  const items=filter==='全部'?PRODUCTS:PRODUCTS.filter(p=>p.cat===filter);
+  document.getElementById('deviceLibrary').innerHTML=items.map(p=>devCardHTML(p,false)).join('');
+}
+
+const DEVICE_SPECS={
+'GRID-20M':`型号: GOTION GRID 20MWh (ESD1331-025P20060)
+
+电气参数:
+  电芯容量: LFP-314Ah
+  标称能量: 20.06MWh
+  标称电压: 1331.2V
+  推荐使用电压范围: 1164.8V-1497.6V
+  最大充放电倍率: 0.5P@25°C
+  最大充电功率: 1003.1kW(0.5P)
+  最大放电功率: 1003.1kW(0.5P)
+
+环境参数:
+  工作温度范围: -30°C - +55°C
+  存储温度范围: -30°C - +60°C
+  工作湿度范围: ≤95%RH(无凝露)
+  最高工作海拔: 4000m
+
+系统参数:
+  防护等级: IP55
+  防腐等级: C5
+  消防方式: PACK级浸没抑制+全淹没气体灭火+整舱消防水喷淋
+  温控方式: 风液一体
+
+尺寸与重量:
+  尺寸(WxDxH): 6058mm x 2438mm x 2896mm (5m×10m×4.6m 双20ft)
+  重量: ≈170t`,
+
+'GRID-7M-588':`型号: GOTION GRID 7MWh (ESD1331-025P7044) - 588Ah版
+
+电气参数:
+  电芯容量: LFP-588Ah
+  标称能量: 7.04MWh
+  标称电压: 1331.2V
+  最大充放电倍率: 0.25P@25°C
+  最大充电功率: 1761kW(0.25P)
+  最大放电功率: 1761kW(0.25P)
+
+产品优势:
+  PACK级抑制+全淹没气体灭火+整舱消防水喷淋
+  隔舱设计+舱壁耐火2h，防止热失控蔓延
+  单舱容量7.04MWh，占地面积节约25%
+  能量密度提升40%
+
+系统参数:
+  防护等级: IP55 (整舱), IP67 (PACK级)
+  消防方式: PACK级浸没+全淹没气体+整舱消防水
+  尺寸: 6.1m×2.4m×2.9m (20ft)
+  重量: ≤54t`,
+
+'GRID-5M-314':`型号: GOTION GRID 5MWh (ESD1331-05P5015) - 314Ah版
+
+电气参数:
+  电芯容量: LFP-314Ah
+  标称能量: 5015.9kWh
+  标称电压: 1331.2V
+  推荐使用电压范围: 1164.8V-1497.6V
+  最大充放电倍率: 0.5P@25°C
+  最大充电功率: 2508kW(0.5P)
+  最大放电功率: 2508kW(0.5P)
+
+产品优势:
+  PACK级浸没抑制+全淹没气体灭火+整舱消防水喷淋
+  电芯级温度监测+电芯级热阻隔
+  单舱达5MWh，能量密度再提升45%
+  A,B舱单开门设计，优化空间利用
+
+系统参数:
+  防护等级: IP55 (整舱), IP67 (PACK级)
+  消防: PACK浸没+气体+水
+  尺寸: 6.1m×2.4m×2.9m (20ft)
+  重量: ≈44t`,
+
+'GRID-5M-330':`型号: GOTION GRID 5MWh (ESD1280-05P5068) - 330Ah版
+
+电气参数:
+  电芯容量: LFP-330Ah
+  标称能量: 5068.8kWh
+  标称电压: 1280V
+  最大充放电倍率: 0.5P@25°C
+  最大充电功率: 2534kW(0.5P)
+
+系统参数:
+  防护等级: IP55
+  消防: PACK浸没+气体+水
+  尺寸: 6.1m×2.4m×2.9m (20ft)
+  重量: ≈44t`,
+
+'X-836':`型号: 乾元载道 X-836
+
+直流侧参数:
+  电芯类型: LFP 3.2V/314Ah
+  电池容量: 836kWh
+  额定电压: 1331.2V
+  电池电压范围: 1164.6-1497.6V
+  额定功率: 418kW(0.5P@25°C)
+  额定电流: 314A
+
+系统参数:
+  防护等级: IP55
+  工作温度范围: -30°C - +50°C
+  工作湿度范围: ≤95%
+  消防: 气溶胶+泄爆
+
+交流侧参数 (内置PCS+升压变):
+  PCS额定功率: 418kW
+  交流输出电压: 10kV/0.69kV (经升压变)
+  最大并联数: 6台 → 5.0MWh/2.5MW
+
+产品优势:
+  二簇一柜设计，独立防火区
+  三级消防安全设计
+  支持多机无缝并联
+  支持预安装，减少现场调试时间
+  PCS+升压变一体化，即插即用
+
+尺寸: 1.4m×2.4m×2.4m
+重量: 8t`,
+
+'X-950':`型号: 乾元载道 X-950
+
+直流侧参数:
+  电芯类型: LFP 3.2V/91.5Ah×3
+  电池容量: 948kWh
+  额定电压: 1152V
+  电池电压范围: 900-1368V
+  额定功率: 474kW(0.5P@25°C)
+
+系统参数:
+  防护等级: IP55
+  工作温度: -30°C - +50°C
+  消防: 气溶胶+泄爆
+  最大并联: 4台 → 3.8MWh/1.9MW
+
+尺寸: 2.1m×2.3m×2.7m
+重量: 9.5t`,
+
+'X-522':`型号: 乾元载道 X-522
+
+直流侧参数:
+  电芯类型: LFP 3.2V/314Ah
+  标称电压: 832V
+  电池电压范围: 728V-936V
+  电池容量: 522kWh
+
+交流侧参数 (内置PCS):
+  额定功率: 250kW
+  最大并联: 6台 → 3.1MWh/1.5MW
+
+系统参数:
+  防护等级: IP55
+  工作温度: -30°C - +50°C
+  消防: PACK气溶胶+舱气溶胶
+  温控: 风冷+液冷
+
+产品优势:
+  ALL IN ONE，降低现场安装难度
+  模块化设计，提高运维效率
+  柜内汇流，整站LCOS降低2%
+  高效率液冷散热，损耗降低30%
+
+尺寸: 2.4m×1.4m×2.4m
+重量: 8t`,
+
+'X-261':`型号: 乾元载道 X-261
+
+直流侧参数:
+  电芯类型: LFP 3.2V/314Ah
+  标称电压: 832V
+  电池电压范围: 728V-936V
+  电池容量: 261kWh
+
+交流侧参数 (内置PCS):
+  额定功率: 125kW
+  最大并联: 6台 → 1.6MWh/750kW
+
+系统参数:
+  防护等级: IP55
+  工作温度: -30°C - +50°C
+  消防: PACK气溶胶+舱气溶胶
+  温控: 全液冷
+
+尺寸: 1.1m×1.4m×2.4m
+重量: 3.5t`,
+
+'EPD-104':`型号: EPD332-05P104 标准化电池包
+
+电气参数:
+  电芯容量: LFP-314Ah
+  标称能量: 104.4kWh
+  标称电压: 332.8V
+  最大充放电功率: 52kW
+
+系统参数:
+  防护等级: IP67
+  工作温度(放电): -30°C - +60°C
+  温控: 液冷
+
+尺寸: 0.8m×2.2m×0.2m
+重量: 660kg`,
+
+'EPD-106':`型号: EPD320-05P106 标准化电池包
+
+电气参数:
+  电芯容量: LFP-330Ah
+  标称能量: 105.6kWh
+  标称电压: 320V
+  最大充放电功率: 53kW
+
+系统参数:
+  防护等级: IP67
+  温控: 液冷
+
+尺寸: 0.8m×2.3m×0.2m
+重量: 700kg`,
+
+'EPD-195':`型号: EPD332-05P195 标准化电池包
+
+电气参数:
+  电芯容量: LFP-588Ah
+  标称能量: 195.6kWh
+  标称电压: 332.8V
+  最大充放电功率: 98kW
+
+系统参数:
+  防护等级: IP67
+  温控: 液冷
+
+尺寸: 1.2m×2.2m×0.2m
+重量: 12000kg`,
+
+'Home3':`型号: HSD51.2-05P16L GOTION HOME 3.0
+
+电气参数:
+  电芯容量: LFP-314Ah
+  标称能量: 16kWh
+  标称电压: 51.2V
+  推荐使用电压范围: 43.2V-57.6V
+  最大充放电功率: 8kW
+
+产品优势:
+  持久性能: 超过10,000次充电循环
+  高功率输出: 最大8kW
+  安全可靠: LFP电池+三重保护
+  高兼容性: 与主流PCS通信协议无缝集成
+  IP65高防护，支持室外安装
+
+环境参数:
+  工作温度: -20°C - +45°C
+  防护等级: IP65
+
+尺寸: 0.7m×0.2m×0.7m
+重量: 125kg`,
+
+'Gendome':`型号: Gendome Power 户用储能系统
+
+电气参数:
+  电芯容量: LFP-100Ah
+  标称能量: 30.72kWh
+  交流电压: 120V/240V
+  标称电压: 307.2Vdc
+  运行电压范围: 259.2V-345.6Vdc
+  标准充电电流: 50A
+  最大充放电功率: 24kW
+
+产品优势:
+  长寿命: 6000次长循环磷酸铁锂电池
+  模块化: 30kWh模块化设计
+  一体化: 用户友好
+  灵活化: 高效发电
+
+环境参数:
+  工作温度: -20°C - +58°C
+  防护等级: IP65
+  温控: 风冷
+
+尺寸: 0.7m×0.8m×1.1m
+重量: 390kg`,
+'YJN-A209':`型号: 易加能 A系列 自动驾驶充电桩
+来源: 易加能产品手册
+
+产品参数:
+  设备尺寸: 990L×2270W×1380H mm
+  整机重量: 2300kg
+  最大越障高度: 70mm
+  额定电量: 209kWh
+  环境温度: -20~+45°C
+  电池额定电压: 665.6V
+  防护等级: IP54
+
+核心特性:
+  可选配无人驾驶模块，满足封闭场所内无人驾驶功能
+  降低运维成本，增加产品利用率
+  SIC技术，损耗更低，大功率快速充电
+  精准充放电控制，提升能量效率
+  多级热管理方案，延长储能寿命
+  运行数据实时传输，故障提前预警
+  系统OTA远程更新`,
+'YJN-G209':`型号: 易加能 G系列 智能移动充电桩G3
+来源: 易加能产品手册
+
+产品参数:
+  设备尺寸: 2270L×990W×1380H mm
+  整机重量: 2300kg
+  最大越障高度: 70mm
+  额定电量: 209kWh
+  环境温度: -20~+45°C
+  电池额定电压: 665.6V
+  防护等级: IP54
+  额定输出功率: 60kW
+  直流输出: 200-750Vdc
+  最大充电电流: 150A
+  最大速度: 4km/h
+  电芯体系: LFP
+
+核心特性:
+  从车找电→电找车，颠覆充电时空观
+  部署灵活，操作便捷
+  削峰填谷，小型储能站
+  多重保护措施，运行稳定主动防护`,
+'YJN-D184':`型号: 易加能 D系列 轻量移动充电桩
+来源: 易加能产品手册
+
+产品参数:
+  设备尺寸: 2100L×1060W×1445H mm
+  整机重量: 2100kg
+  最大越障高度: 70mm
+  额定电量: 184kWh
+  环境温度: -20~+45°C
+  电池额定电压: 614.4V
+  防护等级: IP54
+  额定输出功率: 60kW
+
+核心特性:
+  轻量紧凑，90kW快充，157kWh储能
+  适配商用车/物流车货箱
+  免基建安装，灵活部署
+  多重保护措施，运行稳定主动防护
+  标配工业标准插座
+  支持交/直流补电、直流充电`,
+'YJN-C120':`型号: 易加能 C系列 固定储充120kW/209kWh
+来源: 易加能产品手册
+
+产品参数:
+  设备尺寸: 1590L×995W×1430H mm
+  额定电量: 209kWh
+  标称电压: 704Vdc
+  环境温度: -20~45°C
+  额定功率: 100kW
+  额定输出功率: 120kW
+  V2G功率: 30kW
+  防护等级: IP54
+  交流补电输入功率: 30kW
+  直流补电输入功率: 100kW
+  充电输出电压: 200~1000Vdc
+  充电输出电流: 0~250A
+  冷却方式: 自然散热，选配液冷
+  通讯方式: CAN、RS485、Ethernet、4G
+
+核心特性:
+  即投即用，无需场地改造
+  电网扩容，降低投入，支持V2G
+  参与电网调峰、应急供电
+  兼容主流充电服务平台
+  交直流放电/充电，适配800V未来平台`,
+'YJN-C320':`型号: 易加能 C系列 固定储充320kW/844kWh
+来源: 易加能产品手册
+
+产品参数:
+  额定电量: 844kWh
+  标称电压: 704Vdc
+  环境温度: -20~45°C
+  直流放电功率: 320kW（双枪）
+  V2G功率: 30kW
+  放电电压范围: 200~1000Vdc
+  直流充电功率: 2×180kW
+  充电电压范围: 616~792Vdc
+  交流额定电压: 400Vac
+  交流额定电流: 144A
+  交流制式: 三相四线+地线
+  防护等级: IP54
+  消防系统: 七氟丙烷/气溶胶
+  尺寸: 4000L×2438W×2896H mm
+  重量: 14000kg
+  冷却方式: 自然散热，选配液冷
+  通讯方式: CAN、RS485、Ethernet、4G
+
+核心特性:
+  1000V直流平台，适配800V未来平台
+  320kW双枪快充
+  交直流放电/充电
+  覆盖乘用车、重卡、工程机械
+  运输部署简便`,
+'YJN-C522':`型号: 易加能 C系列 固定储充360kW/522kWh
+来源: 易加能产品手册
+
+产品参数:
+  直流输出功率: 360kW CCS2
+  直流输入电压范围: 650~1000Vdc
+  直流输入功率: 120kW
+  输出电压: 直流200~1000Vdc / 交流400Vac
+  直流最大输入电流: 220A
+  交流输入: Max 110kW 160A 3ph (50Hz)
+  交流输出: 63A cee-3ph
+  充电枪输出: MAX 380A CCS2×5m×2
+  标准电量: 522kWh
+  冷却方式: 液冷
+  工作温度范围: -25~45°C
+  海拔: <2000m
+  外壳防护等级: IP54
+
+核心特性:
+  多能互补融合，交直流+光伏多能源接入
+  522kWh储能、峰值360kW
+  电网动态增容，降低变压器负载
+  集成削峰填谷、虚拟电厂、后备电源
+  充电10分钟续航百公里
+  多级测温、多层熔断、多重消防`,
+'YJN-INV120':`型号: 易加能 120kW交流逆变装置
+来源: 易加能产品手册
+
+产品参数:
+  直流输入电压范围: 650~1000Vdc
+  直流输入功率: 120kW
+  输入路数: 1路
+  交流输出电压: 380Vac
+  交流输出电流: 190A
+  交流输出电压频率: 50/60Hz
+  功率因素: ≥0.99 @50%~100%输出功率
+  总电流波形畸变率: ≤3% @50%~100%满载输出功率
+  环境温度: -20~45°C
+  操作界面: 10.1寸
+  显示方式: 7寸触摸屏
+  设计标准: IEC62619、IEC61851
+
+核心特性:
+  依托交流电高效转换特性，能量利用率高
+  支持并网/离网双模式
+  内置过压、过流保护
+  兼容各类负载，满足多场景供电
+  结构简洁、故障率低、维护成本低
+  高效节能，绿色环保`,
+'DLL-YCS283':`型号: 电拉拉 驮龙送电车 六工位 (YCS283)
+
+产品参数:
+  标称能量: 846~1800kWh
+  额定功率: 572kW
+  标称电压: 750Vdc
+  电芯体系: LFP
+  尺寸: 12m×2.55m×3.7m
+  防护等级: IP67
+  温控: 液冷
+  工作温度: -20~55°C
+
+核心特性:
+  绿电搬运，移动充放电，移动换电
+  六工位设计，846-1800kWh灵活配置
+  内置PCS，即插即用`,
+'DLL-YCS146':`型号: 电拉拉 驮龙送电车 八工位 (YCS146)
+
+产品参数:
+  标称能量: 2256~4800kWh
+  额定功率: 1250kW
+  标称电压: 750Vdc
+  电芯体系: LFP
+  尺寸: 13.95m×2.55m×1.5m
+  防护等级: IP67
+  温控: 液冷
+  工作温度: -20~55°C
+
+核心特性:
+  八工位设计，2256-4800kWh超大容量
+  1250kW大功率输出
+  移动充换一体`,
+'DLL-HYZ452':`型号: 电拉拉 混元珠 452kWh电池包
+
+产品参数:
+  标称能量: 452kWh
+  最大功率: 600kW
+  标称电压: 700.8Vdc
+  电芯体系: LFP
+  尺寸: 2.37m×0.824m×1.73m
+  防护等级: IP68
+  温控: 液冷液热
+  工作温度: -20~55°C
+
+核心特性:
+  动储一体，可充可换
+  IP68最高防护等级
+  液冷液热双温控`,
+'DLL-HYZ600':`型号: 电拉拉 混元珠 600kWh电池包
+
+产品参数:
+  标称能量: 600kWh
+  最大功率: 600kW
+  标称电压: 744.6Vdc
+  电芯体系: LFP
+  尺寸: 2.37m×0.824m×1.82m
+  防护等级: IP67
+  温控: 液冷+电加热
+  工作温度: -20~55°C
+
+核心特性:
+  大容量600kWh，5层电池架构
+  液冷+电加热双温控
+  IP67高防护`,
+'DLL-LT-GD':`型号: 电拉拉 莱台 电动底托 (YCTZ-GD120/240)
+
+产品参数:
+  额定功率: 240kW
+  标称电压: 750Vdc
+  DC-DC范围: 200-1000V
+  尺寸: 2.32m×0.985m×1.5m
+  重量: 620kg
+  工作温度: -20~55°C
+
+核心特性:
+  电动移动，无需叉车
+  承载282-600kWh电池包
+  DC-DC 200-1000V宽范围适配`,
+'DLL-PCS750':`型号: 电拉拉 PCS充放一体机 750kW
+
+产品参数:
+  额定功率: 750kW
+  交流电压: 400Vac
+  温控: 液冷
+  防护等级: IP55
+  工作温度: -25~55°C
+
+核心特性:
+  充放一体，双向PCS
+  750kW大功率
+  离网无缝切换`,
+'DLL-DCL750':`型号: 电拉拉 750kW直流变换器 (DC-DC-750kW)
+
+产品参数:
+  额定功率: 750kW
+  输入电压: 1500Vdc
+  温控: 液冷
+  防护等级: IP55
+  工作温度: -25~55°C
+
+核心特性:
+  DC-DC变换，1500Vdc输入
+  750kW高效率
+  液冷温控`,
+};
+
+function showDetail(productId){
+  const p=PRODUCTS.find(x=>x.id===productId);
+  if(!p)return;
+  const modal=document.getElementById('detailModal');
+  const img=document.getElementById('detailImg');
+  const name=document.getElementById('detailName');
+  const model=document.getElementById('detailModel');
+  const specs=document.getElementById('detailSpecs');
+  img.src=p.img?`images/products/${p.img}`:'';
+  img.style.display=p.img?'block':'none';
+  img.onerror=function(){this.style.display='none'};
+  name.textContent=p.name;
+  model.textContent=p.model;
+  const specText=DEVICE_SPECS[productId]||`型号: ${p.model}\n\n基本参数:\n  标称能量: ${p.cap>=1000?(p.cap/1000).toFixed(1)+'MWh':p.cap+'kWh'}\n  额定功率: ${p.power>=1000?(p.power/1000).toFixed(2)+'MW':p.power+'kW'}\n  标称电压: ${p.volt}V\n  电芯: ${p.cell}\n  尺寸: ${p.size}\n  重量: ${p.weight}\n  温控: ${p.cool}\n  防护: ${p.ip}\n  消防: ${p.fire}\n  工作温度: ${p.temp}\n  ${p.pcs?'PCS+升压变一体化':'需另配PCS+升压变'}\n  ${p.maxP?'最大'+p.maxP+'台并联':''}`;
+  specs.textContent=specText;
+  modal.classList.add('show');
+}
+
+function closeDetail(){
+  document.getElementById('detailModal').classList.remove('show');
+}
+
+function showDocDetail(detailKey,title){
+  const detailMap={ACC_DETAIL,LL760_DETAIL};
+  const text=detailMap[detailKey];
+  if(!text)return;
+  const modal=document.getElementById('detailModal');
+  const img=document.getElementById('detailImg');
+  const name=document.getElementById('detailName');
+  const model=document.getElementById('detailModel');
+  const specs=document.getElementById('detailSpecs');
+  img.style.display='none';
+  name.textContent=title;
+  model.textContent=detailKey==='ACC_DETAIL'?'安装指导手册':'技术规格书';
+  specs.textContent=text;
+  modal.classList.add('show');
+}
+
+document.getElementById('detailModal').addEventListener('click',function(e){
+  if(e.target===this)closeDetail();
+});
+
+const CASE_DETAILS={
+yidong:`<div style="font-size:13px;line-height:1.7">
+<h3 style="color:#185FA5;margin:0 0 8px">上海邑东 2.5MWh储能充电站</h3>
+<p style="color:#C2C0B6">来源：充电桩+储能运行方案（邑东场地20201125） | 设计人：卢继雄</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">1. 背景及拓扑图</h4>
+<h4 style="color:#534AB7;margin:8px 0 4px">1.1 应用场景现场图</h4>
+<img src="images/products/yidong/yidong_p2_img0_5ca72dd1.jpg" style="max-width:48%;border-radius:6px;margin:4px 2px" onerror="this.style.display='none'">
+<img src="images/products/yidong/yidong_p2_img1_f0dba265.jpg" style="max-width:48%;border-radius:6px;margin:4px 2px" onerror="this.style.display='none'">
+<h4 style="color:#534AB7;margin:8px 0 4px">1.2 系统拓扑图</h4>
+<img src="images/products/yidong/yidong_p2_img2_e22915a6.jpg" style="max-width:48%;border-radius:6px;margin:4px 2px" onerror="this.style.display='none'">
+<img src="images/products/yidong/yidong_p2_img3_6f92470a.jpg" style="max-width:48%;border-radius:6px;margin:4px 2px" onerror="this.style.display='none'">
+<p>系统拓扑：储能集装箱 + PCS + 充电桩 + EMU能量管理</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">2. 集装箱储能</h4>
+<h4 style="color:#534AB7;margin:8px 0 4px">2.1 储能系统组成</h4>
+<p>20尺标准储能系统舱是由舱体（含配电）、自动消防系统、视频监控系统、温控系统等组成，电池储能系统（含机架，电池组，直流汇流柜）组成。</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li><b>舱体：</b>包含箱体及内部辅助系统。整体内部机架承重设计，散热设计，照明功能，保温隔热功能，具备逃生门，可防尘、防水、防虫鼠符合IP20防护等级，具备门禁功能等</li>
+<li><b>自动消防系统：</b>采用七氟丙烷为主要材料的自动灭火系统，安装自动报警装置，检测到火灾时及时断开电气连接，启动灭火装置并上传告警，具备联动功能</li>
+<li><b>视频监控系统（选配）：</b>包含网络摄像机、数据硬盘、网络交换器等，通过4G网卡接入互联网，可通过PC/手机客户端控制和监控</li>
+<li><b>电池储能系统：</b>电池包采用3.2V 105Ah磷酸铁锂电芯，每簇7个模组（210S20P为一簇），共12簇，采用3级BMS控制架构</li>
+</ul>
+
+<h4 style="color:#534AB7;margin:8px 0 4px">2.2 参数</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">序号</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">项目</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">参数</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">备注</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电芯及数量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">105Ah电芯，7560只</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称能量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2.53MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称容量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3780Ah</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">直流侧标称电压</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">672V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">直流电压范围</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">567~766.5Vdc</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">6</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称充放电电流</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">945A</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.25C充放电</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">7</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">循环次数</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">&gt;6000次</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.25C@80%DOD</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">8</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">自放电率/月</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">&lt;3%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">9</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">使用寿命</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">&gt;10年</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.5C@80%DOD</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">运行温度</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">-20\u2103~60\u2103</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">11</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">运行湿度</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5%~90%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">12</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">外形尺寸</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">6058\u00D72500\u00D72896mm</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">13</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">总重量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">约28T</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">14</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">绝缘电阻</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">&gt;0.1k\u03A9/V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+</table>
+
+<h4 style="color:#534AB7;margin:8px 0 4px">2.3 布局</h4>
+<img src="images/products/yidong/yidong_p4_img0_1fdfefa3.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>舱体布置要求：</b></p>
+<ol style="padding-left:18px;margin:4px 0">
+<li>舱体设备总重约28吨，安装基础应采用钢筋混凝土结构，单个舱基础安装面平整度误差不大于20mm</li>
+<li>两个电池舱可在无门侧背靠背排布（间距大于50mm即可）；有门侧舱体间距不小于4米，保证维护空间</li>
+<li>电池舱布置时，舱体间道路、通道应做硬化处理，保证维护车辆正常作业</li>
+<li>电池舱基础上表面应高于周边道路，高出部分不小于300mm</li>
+<li>使用环境：气温-30/45\u2103，海拔&lt;2000米，非强风沙、沙尘区域，非强盐雾区域</li>
+</ol>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">3. PCS需求</h4>
+<img src="images/products/yidong/yidong_p5_img0_d0d229f9.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>充电条件：</b>优先保证场地固定充电桩的用电功率，动态调整PCS充电功率：</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li><b>平电价时：</b>将变压器富余全部用起来给储能集装箱充电</li>
+<li><b>谷电价时：</b>有3个小时变压器可提供1300kVA功率给储能集装箱充电，需要PCS尽可能在此时间段快速充满电</li>
+</ul>
+<p><b>放电条件：</b>非充电时间段，PCS系统处于待机或放电状态，变压器保持功率为0kVA状态。</p>
+<p><b>配置：</b>630kW储能变流器、630kVA隔离变压器、能量管理单元EMU、功率采集装置、Goos板卡及防逆流装置。</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">4. 实现方案</h4>
+<img src="images/products/yidong/yidong_p6_img0_fd5faf82.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p>为完成PCS的动态调整功率的功能，需要加装以下装置：</p>
+<ol style="padding-left:18px;margin:4px 0">
+<li>能量管理控制器EMU</li>
+<li>三套功率采集装置A/B/C，能够采集采样点的有功功率值和视在功率值</li>
+</ol>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">5. 控制策略</h4>
+<ol style="padding-left:18px;margin:4px 0">
+<li><b>平价时间段：</b>EMU将电网侧允许功率调整为最大允许值1000kVA，当Pb+Pa功率增加或减少时，依据 Pc=Ppcs+Pb+Pa，动态调节Ppcs</li>
+<li><b>谷价时间段：</b>EMU将电网侧允许功率调整为最大功率值1300kVA，即Pc=1300，以最大的功率给PCS充电</li>
+<li><b>其余时间段：</b>EMU将电网侧允许功率调整为0，即Pc=0。如Pb+Pa为0时，Ppcs则为0；当Pb+Pa为-500kW时，Ppcs放电功率为500kW</li>
+</ol>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">6. 通信与计费</h4>
+<img src="images/products/yidong/yidong_p7_img0_44aa975e.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>通信：</b>采用Modbus RTU协议将PCS的实时数据解析通过工控机+4G网推送到云平台。</p>
+<p><b>电量统计：</b>集装箱充电电量、放电电量实时统计在云平台端，用于计费。平台可以登录查询实时电量、分时费用设定。</p>
+</div>`,
+
+fremont:`<div style="font-size:13px;line-height:1.7">
+<h3 style="color:#185FA5;margin:0 0 8px">AI赋能的集成光伏-储能-充电项目</h3>
+<p style="color:#C2C0B6">国轩高科美国硅谷项目 | 设计人：卢继雄</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">系统架构图</h4>
+<img src="images/products/fremont/fremont_img0_119c434b.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">2. 产品体系与系统架构概述</h4>
+<p>作为光储充一体化应用场景，国轩高科在美国实际部署"Autel MaxiEdge Controller Integration with Gotion Liquid BESS 760 for Hybrid Application"项目，构建<b>"光伏发电 + 储能（BESS）+ PCS双向变换 + 高功率充电 + EMS调度"</b>的微电网系统，为AI驱动的智能能源系统提供硬件基础。</p>
+
+<h4 style="color:#534AB7;margin:12px 0 6px">2.1 光伏板及并网系统 (PVs)</h4>
+<p>作为纯能量输入源的光伏系统PVs自带独立的DC-AC逆变器，将直流电直接转换为交流电并入480V交流母线。逆变器下方挂载了智能电表（Meter），通过RS485总线将实时发电功率、电压、电流等电气特征量上报给MaxiEdge控制器。在EMS的策略下，光伏发电会优先供给本地交流负载（Mobile Charger/HPC），余电再通过PCS给BESS充电，实现"光伏自发自用"最大化。</p>
+
+<h4 style="color:#534AB7;margin:12px 0 6px">2.2 MaxiEdge Controller (边缘微网控制器)</h4>
+<p>MaxiEdge Controller是整个场站的"边缘大脑"（Site EMS），负责收集所有节点的遥测数据，并下发实时调度指令。通信通过内置Router（路由器）对接外网Internet（与云端通信），内置Switch（交换机）聚合PCS、HPC的局域网IP通信，内置RS485模块采集电表和底层传感器数据。控制器同时接入了480V市电（经AC-DC降压）、220V备电（来自PCS UPS）以及24V DRR（直流导轨电源），<b>多重供电冗余</b>，确保了在电网波动、PCS故障等各种工况下，EMS控制逻辑绝对不会掉线。</p>
+<p>控制器EMS系统通过AI技术，可处理毫秒级到秒级的策略计算，包括：光伏曲线预测、削峰填谷（Peak Shaving）、防逆流控制、大功率超充接入时的电网容量动态保护，以及消防级别的硬件级联动断电。</p>
+
+<h4 style="color:#534AB7;margin:12px 0 6px">2.3 Mobile Charger 智能移动充电机器人</h4>
+<p>该产品将储能单元与直流快充功能集成于移动式平台中，内置<b>184kWh锂离子电池系统</b>（1P192S架构，额定电压614.4V），最大直流输出功率可达60kW。设备支持交直流双向充电，并具备远程操控和灵活部署能力，适用于临时场站、应急补能和高峰补电场景。在AI技术支持下，该系统可根据实时负载需求和电池状态动态调整充放电策略，实现智能调度与预测性维护。</p>
+
+<h4 style="color:#534AB7;margin:12px 0 6px">2.4 Gotion BESS 760 (国轩液冷储能系统)</h4>
+<p>储能系统物理与电气参数：<b>标称能量760kWh</b>，系统标称电压DC 1267.2V（运行电压范围1069.2V~1425.6V）。该系统采用高压直流架构，能有效降低线损并提升PCS的转换效率。</p>
+<p><b>内部架构：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li><b>2簇架构 & BMS：</b>物理上分为两个电池簇，每簇包含9个电池包（单包44S1P结构），配备完善的BMS监控功能，实时检测单体电压、温度及系统状态</li>
+<li><b>高压箱 (High Voltage Box)：</b>负责1267.2V强电的汇流、接触器控制及电气安全防护</li>
+<li><b>TMS (热管理系统)：</b>采用12kW功率的智能液冷机组，通过50%乙二醇水溶液作为介质进行制冷或制热，内部温差控制在5\u00B12\u2103范围内</li>
+<li><b>FSS (消防系统) & Env (环控传感器)：</b>采用多级安全防护体系，包含温烟感探测、STAT-X气溶胶灭火装置、PACK级灭火以及DN25管道水消防</li>
+<li><b>控制接口：</b>支持CAN、RS485及Ethernet多种通讯方式</li>
+</ul>
+
+<h4 style="color:#534AB7;margin:12px 0 6px">2.5 PCS AC Blocks (储能变流器系统)</h4>
+<p><b>核心功能：</b>连接480V交流母线与1000V直流电池簇的双向能量通道，负责AC-DC（充电）和DC-AC（放电）的逆变与整流。</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li><b>模块化设计：</b>由两组125kW模块并联，组成250kW的总功率（3P3W 480V接入）。多模块并联设计提高了系统的冗余度</li>
+<li><b>辅电与离网支撑：</b>PCS内部包含一个125kW的变压器，并引出一条220V UPS备用供电回路。在市电断电的极端工况下，PCS可利用电池的直流电逆变出220V交流电，优先保障EMS大脑和BMS/液冷系统的存活，具备<b>黑启动（Black Start）和孤岛运行</b>的硬件基础</li>
+</ul>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">3. 核心AI技术</h4>
+<p><b>规划设计层(天-月级)：</b>NSGA-II/MOROA \u2192 充电站布局+储能容量+系统拓扑</p>
+<p><b>短期调度层(分钟-小时级)：</b>LSTM-Attention \u2192 光伏/负荷预测(含置信区间)</p>
+<p><b>实时控制层(秒-分钟级)：</b>SAC \u2192 最优充放电功率指令 (推理&lt;10ms)</p>
+<p><b>AI-BMS健康管理：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>SOH预测：LSTM网络基于充电曲线+EIS阻抗特征</li>
+<li>循环寿命优化：SAC自动发现"浅充浅放"策略</li>
+<li>故障预警：小波变换+CNN识别热失控</li>
+</ul>
+</div>`,
+
+xibuzt:`<div style="font-size:13px;line-height:1.7">
+<h3 style="color:#185FA5;margin:0 0 8px">西部钻探油田钻井平台 5MWh储能仓项目</h3>
+<p style="color:#C2C0B6">国轩高科\u00D7西部钻探\u00D7沃德石油 — 国内首创大型油改电项目</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">1. 项目概述</h4>
+<img src="images/products/dll_slides/dll_s15_img2_28f72703.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<img src="images/products/dll_slides/dll_s15_img3_588c1006.jpg" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p>国轩高科携手西部钻探、沃德石油，正式启动国内首创大型油改电项目储能仓试验。项目聚焦绿色勘探，将传统燃油钻井设备改造为电力驱动并配套储能系统，依托国轩高科储能技术优势，大幅降低钻井作业碳排放，为能源行业低碳转型提供可复制示范样本。</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">2. 充电系统拓扑图</h4>
+<img src="images/products/dll_slides/dll_s16_img3_68aa57b0.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<img src="images/products/dll_slides/dll_s16_img5_ececd021.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>10kV电网</b> \u2192 <b>10/0.4变压器</b> \u2192 <b>PCS一体机3.45MW\u00D72</b> \u2192 <b>储能电池系统\u00D72</b> \u2192 1500Vdc \u2192 400Vac \u2192 井口负荷</p>
+<p>站级EMS通过以太网通讯统一调度，PCS并网/离网双模式运行</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">3. PCS离网无缝切换策略</h4>
+<img src="images/products/dll_slides/dll_s17_img2_fca4d411.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>运行策略：</b>离网模式控制4台PCS功率，按照PCS预设的下垂特性，动态切载时功率波动在PCS允许范围之内，保证现场电池舱换电情况下，负荷实现无扰切换。</p>
+<ol style="padding-left:18px;margin:4px 0">
+<li>1#、2#PCS接入1号电池仓，3#、4#PCS接入2号电池仓</li>
+<li>EMS控制1#、2#PCS离网开机建立母线电压供负荷用电，控制3#、4#PCS离网待机</li>
+<li>EMS通过和BMS通讯获取各堆电池SOC状态，当1号电池仓任意堆低于10%，EMS控制3#、4#开机用2号电池舱为负载供电，等待1min后控制1#、2#PCS停机，提示更换电池仓</li>
+<li>等待10min系统残余电荷泄放完毕，对1号电池仓进行拆除更换</li>
+<li>1号电池仓更换完毕，EMS控制1#、2#PCS离网待机，准备随时带载切换</li>
+<li>EMS持续检测2号电池仓SOC，按步骤3条件进行带载切换</li>
+</ol>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">4. 储能系统配置清单</h4>
+<img src="images/products/dll_slides/dll_s18_img2_470c60a8.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">项目</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">规格</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">产品编号</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">CN2476</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电芯型号</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">314Ah</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">储能舱容量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5015kWh（2堆）</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">系统组合方式</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">12P416S（长包）</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCS配置</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4\u00D71725kW+3150kVA隔离变压器</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">EMS配置</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">厂家自制</td></tr>
+</table>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">5. 运行数据 — BMS1数据簇电流及堆数据分析</h4>
+<img src="images/products/dll_slides/dll_s19_img2_dcde9e44.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>1#舱BMS1数据：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>8月20日 1堆放电（15:00-17:30），"甩钻下钻"工序，电流120A，功率160kW，主要设备：绞车及空压机</li>
+<li>8月21日 1堆放电（16:30-19:30），"三开钻进"工序，电流250A，平均功率330kW，主要设备：空压机、泥浆泵、绞车、顶驱系统</li>
+</ul>
+<p><b>结论：</b>各簇充放电过程中具有较好电流一致性，能够有效降低电池簇间总压差异；系统可承受放电过程中的功率冲击。</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">6. 运行数据 — BMS2数据簇电流及堆数据分析</h4>
+<img src="images/products/dll_slides/dll_s20_img2_6daca7e1.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>2#舱BMS2数据：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>8月18日15:14-16:43 2堆放电，电流100A，功率130kW（生活负载+工业用电）</li>
+<li>8月20日 2堆放电（15:00-17:30），"甩钻下钻"工序，电流120A，功率160kW</li>
+<li>8月21日 2堆放电（16:30-19:30），"三开钻进"工序，电流250A，平均功率330kW</li>
+</ul>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">7. 5MWh储能仓产品参数</h4>
+<img src="images/products/dll_slides/dll_s21_img2_6151eeb6.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<img src="images/products/dll_slides/dll_s21_img3_abc4d1a7.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">序号</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">项目</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">规格</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">产品型号</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">ESD1331-05P5015</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">产品配置</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2堆\u00D76簇\u00D74包\u00D71P104S</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电芯容量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">314Ah</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称能量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5015.9kWh</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">标称电压</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1331.2Vdc</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">6</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">工作电压范围</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1164.8-1497.6Vdc</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">7</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">充放电倍率</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">\u22640.5P</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">8</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">辅助用电</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">AC380V 50Hz 三相四线制</td></tr>
+</table>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">8. PCS一体机产品参数</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">参数</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">1375kW</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">1725kW</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">DC电压范围</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">800-1500V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1000-1500V</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">额定AC电压</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">550V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">690V</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">额定AC功率</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1375kVA@45\u2103</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1725kVA@45\u2103</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">额定功率因数</td><td colspan="2" style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.99（大于20%负载）</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">AC电压范围(离网)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">465-605V</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">586-759V</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">AC电压谐波(离网)</td><td colspan="2" style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">小于3%</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">MV额定功率</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2900kVA（2台并机）</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3650kVA（2台并机）</td></tr>
+</table>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">9. 投资测算分析</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">序号</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">产品名称</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">规格</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">数量</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">单价(万元)</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">小计(万元)</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">送电直板车</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">9.5米</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3套</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">35</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">105</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">储能系统</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5MW</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3套</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">300</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">900</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCS一体机</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3450kW</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2套</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">72</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">144</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">EMS</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">/</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1套</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10</td></tr>
+<tr style="font-weight:bold"><td colspan="5" style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">费用共计</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1159</td></tr>
+</table>
+<p><b>投资回报测算：</b></p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>油田钻井平台日用电3.6万度，年工作200天，年总用电约720万度</li>
+<li>1套送电系统成本1159万元，售电3元/度，取电0.4元/度，盈利差价2.6元/度</li>
+<li>年营收1872万元 = 720万度\u00D72.6元/度，回本周期约0.62年</li>
+<li>原柴油发电约5元/度，改造后单度电降低成本2元</li>
+</ul>
+</div>`,
+
+daqing:`<div style="font-size:13px;line-height:1.7">
+<h3 style="color:#185FA5;margin:0 0 8px">大庆管业 5MWh 客户侧储能配置方案</h3>
+<p style="color:#C2C0B6">来源：大庆管业5MWh储能配置方案_优化版 | 设计人：卢继雄</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">1. 方案概述</h4>
+<p>建议采用 <b>1套 GOTION GRID 5MWh</b>，接入厂内<b>10kV用户侧母线</b>，先做峰谷套利与需量削峰。不是低压侧外挂电池柜，而是10kV母线侧一体化储能支路。这样能同时覆盖两台1250kVA变压器下游负荷，避免0.4kV侧数千安培大电流接入，也便于统一做防孤岛、逆功率、需量控制和消防联动。</p>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">项目</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">规格</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">说明</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电池容量</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">覆盖多数高峰电量</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">推荐PCS</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1.25MW</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">可扩展到2.5MW</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">推荐并网点</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10kV</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">电表后、变压器前</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">控制边界</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0反送</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCC保持正向取电</td></tr>
+</table>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">2. 电气一次系统</h4>
+<img src="images/products/daqing/daqing_s3_e6e91c84.png" style="max-width:100%;border-radius:8px;margin:8px 0" onerror="this.style.display='none'">
+<p><b>10kV侧接入</b>：储能支路经升压变压器接入10kV用户母线，PCC点设于电表后。</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>国网10kV架空线/电缆引入</li>
+<li>用户10kV母线 \u2192 计量点 \u2192 并网柜 \u2192 升压变1600kVA \u2192 PCS 1.25MW \u2192 电池舱5MWh</li>
+<li>两台1250kVA变压器各自供0.4kV低压侧负荷</li>
+<li>储能支路与变压器并联于10kV母线</li>
+</ul>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">3. 0.4kV低压备选方案</h4>
+<p>若厂内无10kV配电室，则0.4kV侧接入（<b>必须降功率</b>，2\u00D7500kW PCS，不可硬上2.5MW）：</p>
+<ul style="padding-left:18px;margin:4px 0">
+<li>0.4kV母排接入，最大电流约3600A（需大容量母排）</li>
+<li>PCS降至2\u00D7500kW = 1MW，电池可配3.3MWh（X-836\u00D74）</li>
+<li>仅覆盖单台变压器负荷，无法同时覆盖两台</li>
+<li>防逆流仅靠PCC侧软件控制，硬件保护较弱</li>
+</ul>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">4. 容量优化分析</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">配置</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">容量</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">投资(万)</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">回本(年)</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">利用率</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">备注</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">X-836\u00D74</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3.3MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">260</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">94%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">推荐最优性价比</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">X-950\u00D74</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3.8MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">280</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5.2</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">88%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px"></td></tr>
+<tr style="font-weight:bold"><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">GRID 5MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">350</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">6.3</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">82%</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">初设推荐</td></tr>
+</table>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">5. 充放电策略</h4>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">时段</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">动作</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">逻辑</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">峰段(8h)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">放电</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">P_discharge=min(P_load-50kW, 1250kW, P_soc_limit)</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">平段(8h)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">待机</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCC=负荷，储能不动作</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">谷段(8h)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">充电</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCS满功率充电，5h充满</td></tr>
+</table>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">6. 防逆流三重保障</h4>
+<p><b>并网放电(P/Q模式)：</b>储能与市电同时供电，PCC=负荷-储能放电，市电方向始终正向流入，不会逆流。这是正常运行模式。</p>
+<p><b>PCC实时闭环控制（每1秒执行）：</b></p>
+<ol style="padding-left:18px;margin:4px 0">
+<li>读取P_pcc(PCC实时功率)、P_load(总负荷)、SOC</li>
+<li><b>P_discharge = min(P_load - 50kW, 1250kW, P_soc_limit)</b> \u2190 核心公式</li>
+<li>若P_pcc &lt; 50kW \u2192 降功率(1s内)；若P_pcc &lt; 0 \u2192 紧急停机(200ms内)</li>
+</ol>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">保障层级</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">机制</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">动作</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">第1道</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">EMS软件防逆流(主动)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">实时采集PCC功率，动态调整PCS放电功率，目标PCC\u226550kW正向，负荷突降1s内跟踪</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">第2道</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">逆功率继电器(硬保护)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">PCC有功&lt;0时动作：先强制PCS降功率到0(\u2264200ms)；持续逆流&gt;2s则跳并网柜</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">第3道</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">并网柜保护(最后防线)</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">方向保护检测功率异常跳闸；防孤岛保护国网断电&lt;2s跳开；过流保护短路/过载时跳闸</td></tr>
+</table>
+<p><b>实际运行效果(峰段)：</b>负荷800kW = 储能放750kW + 市电供50kW \u2192 覆盖93.75%，PCC=50kW正向，零逆流</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">7. 经济性分析</h4>
+<p>按2026年5月黑龙江10kV两部制电价，峰谷差约<b>0.3009元/kWh</b>；考虑90%效率后，每放1kWh约节省<b>0.2485元</b>。</p>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">电价口径</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">元/kWh</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">高峰</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.7719</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">平段</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.6215</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">低谷</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.4711</td></tr>
+<tr style="font-weight:bold"><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">峰谷差</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">0.3009</td></tr>
+</table>
+<p><b>每日放电量敏感性</b>（按300个生产日估算）：</p>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">容量</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">年节约(万元)</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">22.4</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3.5MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">26.1</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">29.8</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4.5MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">33.6</td></tr>
+<tr style="font-weight:bold"><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">5.0MWh</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">37.3</td></tr>
+</table>
+<p><b>两部制电费复核重点：</b>容量电价约23元/kVA\u00B7月；最大需量约36.8元/kW\u00B7月。若改按需量计费，临界值约1560kW。下一步必须拿到12个月电费单确认。</p>
+
+<h4 style="color:#0F6E56;margin:16px 0 8px;border-bottom:1px solid rgba(222,220,209,.15);padding-bottom:4px">8. 落地路径</h4>
+<p>先锁定10kV并网和1.25MW经济型配置，再用账单数据复核收益。</p>
+<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+<tr style="background:rgba(24,95,165,.15)"><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">步骤</th><th style="border:1px solid rgba(222,220,209,.15);padding:5px 8px;text-align:left">内容</th></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">1. 资料核准</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">12个月电费单、15min负荷曲线、现有一次图、合同容量/需量计费方式</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">2. 电气深化</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">10kV柜位、升压变容量、继保定值、接地、通讯点表和防反送边界</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">3. 经济复算</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">按实际峰谷电价、运行天数、需量削峰、运维和可用率做现金流模型</td></tr>
+<tr><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">4. 实施验收</td><td style="border:1px solid rgba(222,220,209,.15);padding:5px 8px">土建基础、消防报审、并网联调、EMS策略试运行和应急预案</td></tr>
+</table>
+<p><b>初设推荐BOM：</b>5MWh电池舱\u00D71；PCS 1.25MW\u00D71；升压变1600kVA\u00D71；10kV并网柜/计量保护/EMS/消防/通讯。</p>
+<p><b>保守结论：</b>5MWh容量合适；投资收益是否达标，关键看最大需量削峰、生产天数和是否能稳定4MWh/天以上放电。</p>
+</div>`,
+};
+
+const ACC_DETAIL=`ACC-480-P750-UL AC一体柜 安装指导手册
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 适用产品
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  型号: ACC-480-P750-UL
+  适用人员: 具备电气知识的操作/维护人员
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. 安装注意事项
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. 放置在水平地面上，确保平稳无晃动无倾斜
+  2. 考虑安装地面/楼板的承载荷重能力
+  3. 勿遮盖通风孔，保持散热通畅
+  4. 保持通风良好，远离水/可燃气体/腐蚀剂/发热源
+  5. 避免阳光直射，进出风口无灰尘
+  6. 避免粉尘/挥发性气体/腐蚀性气体/盐分过高环境
+  7. 周围勿放易燃易爆物品
+  8. 墙壁/天花板/地板使用防火材料
+  9. 配备手提式干粉灭火器
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. 部件清单
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  AC一体柜体(L×W×H): 1650×1200×2350mm ×1
+  PCS模块: BCS125K-B-HM-US ×6
+  直流线缆总成: 6组(Ⅰ~Ⅵ)
+  交流线缆总成: 6组(Ⅰ~Ⅵ)
+  通讯线缆: 6组(Ⅰ~Ⅵ)
+  配电柜总成: 1(铜排+断路器+端子+线缆+开关电源+变压器+UPS+EMU)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. 内部配置
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PCS模块(125kW): 6个
+  交流断路器: 6个
+  配电开关: 辅电输入总开关1个+其他断路器11个
+  UPS(2kVA): 1个
+  EMU: 1个
+  急停及指示灯: 1急停+2指示灯
+  变压器(2kVA): 1个
+  交流输出铜排: U、V、W
+  直流输入铜排: 6正6负
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. 安装步骤
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  步骤1: 清点部件
+  步骤2: 安装配电系统(交流断路器+铜排组装)
+  步骤3: 安装预置线缆(直流+交流+通讯总成)
+  步骤4: 安装PCS模块(推入PCS槽→固定→接线)
+  步骤5: 配电部分布线(按配电原理图现场布线)`;
+
+const LL760_DETAIL=`高集成度工商业液冷储能产品 技术规格书 (760kWh)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 产品应用范围
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+由标准液冷电池包+高压箱+液冷机组+消防系统组成。
+应用：工商业、城市园区、楼宇、社区、低压台区等。
+户外柜形式，两簇一柜设计，独立防火区。
+支持与集中式/组串式PCS配套使用。
+"小而美，重安全，易安装、易扩展"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. 产品性能特点
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  - 柜体满足IP54、C3防护等级，支持户外工况
+  - 液冷机组制冷/制热模式+温度控制
+  - 电池管理系统：CAN/RS485接口，多层次保护策略
+  - 消防：温烟感+气溶胶+PACK级灭火+水消防(预防为主、防消结合)
+  - 运行状态实时监控+故障诊断+自我保护
+  - 智能液冷温差5±2℃，延长使用寿命
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. 电芯参数 (IFP81175200-300Ah)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  标称容量: 300Ah (25±2℃，100%DOD)
+  标称电压: 3.2V
+  标称能量: 960Wh
+  循环寿命: 8000次 (25±2℃，0.5P/0.5P 90%DOD 70%EOL)
+  日历寿命: 15年 (25±2℃，50%SOC 70%EOL)
+  工作电压: 2.5~3.65V (T>0℃)
+  工作温度: 15℃~45℃ (充电≤0.5P)
+  存储温度: -30~60℃ (最佳15℃~35℃)
+  尺寸: 81.2×175.4×202.6mm (含极柱)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. 电池包参数 (EPD140-05P42)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  模组方案: 140.8V300Ah (1P44S)
+  标称能量: 42.24kWh
+  标称电压: 140.8V (范围118.8V~158.4V)
+  最大充放电功率: 21.1kW (0.5P)
+  防护等级: IP67
+  尺寸: 1088×787×235mm
+  重量: ≈313.8±5kg
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. 系统参数
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  标称能量: 760kWh (0.5P 100%DOD 25±2℃)
+  运行电压范围: 1069.2~1425.6Vdc (2.7-3.6V)
+  标称电压: 1267.2Vdc
+  最大充放电倍率: 0.5P (@25℃)
+  最大充放电功率: 380kW
+  循环寿命: 7000次 (0.5P/0.5P 95%DOD 70%EOL)
+  日历寿命: 15年 (50%SOC 70%EOL)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. 环境参数
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  工作环境温度: -20~50℃
+  工作湿度: 0~95%
+  防护等级: IP55
+  冷却方式: 智能液冷
+  消防系统: 气溶胶+水消防+PACK级灭火
+  海拔: ≤2000m
+  通讯: CAN、RS485、Ethernet
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. 结构参数
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  尺寸(W×D×H): 1400×2400×2500mm
+  重量: ≈8t
+  内部: 高压箱×2 + 电池包×18 + 液冷机组×1 + 温烟感×2 + 气溶胶×2
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. 并机应用
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  支持≥2户外柜并联，系统总容量最大6.01MWh
+  集中式/组串式PCS均可配套
+  柜体布置：有门侧间距≥4m，基础上表面高于周边道路≥300mm
+  使用环境：-35/45℃，海拔<2000m，非强风沙/盐雾区域`;
+
+function renderCases(){
+  const el=document.getElementById('caseGrid');
+  el.innerHTML=CASES.map((c,i)=>`<div class="case-card fade-in" style="animation-delay:${i*0.1}s;cursor:pointer" data-detail="${c.detailId||''}" data-title="${c.title}">
+    <div class="case-img" style="background:linear-gradient(135deg,${c.color}33,${c.color}11)">
+      ${c.img?`<img src="images/products/${c.img}" alt="${c.title}" onerror="this.parentElement.innerHTML='<span style=color:var(--text2)>⚡</span>'">`:'<span style="color:var(--text2)">⚡</span>'}
+    </div>
+    <div class="case-body"><div class="case-title">${c.title}${c.detailId?' ↗':''}</div><div class="case-desc">${c.desc}</div>
+    <div class="case-tags">${c.tags.map(t=>`<span class="case-tag" style="background:${c.color}22;color:${c.color}">${t}</span>`).join('')}</div>
+    </div></div>`).join('');
+  el.querySelectorAll('.case-card').forEach(card=>{
+    card.addEventListener('click',function(){
+      const d=this.getAttribute('data-detail');
+      const t=this.getAttribute('data-title');
+      if(d)showCaseDetail(d,t);
+    });
+  });
+}
+
+function showCaseDetail(detailId,title){
+  const content=CASE_DETAILS[detailId];
+  if(!content)return;
+  const modal=document.getElementById('detailModal');
+  document.getElementById('detailImg').style.display='none';
+  document.getElementById('detailName').textContent=title;
+  document.getElementById('detailModel').textContent='';
+  const specs=document.getElementById('detailSpecs');
+  if(content.startsWith('<')){specs.innerHTML=content;}else{specs.textContent=content;}
+  modal.classList.add('show');
+}
+
+function renderDiagramTabs(R){
+  if(!R||!R.candidates||R.candidates.length<=1){document.getElementById('diagramTabs').style.display='none';return;}
+  const N=Math.min(R.candidates.length,4);
+  let html='';
+  for(let i=0;i<N;i++){
+    const c=R.candidates[i];
+    const active=i===(currentDiagramIdx||0)?'background:var(--blue);color:white;':'background:var(--bg3);color:var(--text2);';
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    html+=`<button onclick="currentDiagramIdx=${i};renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderBOM(LAST_RESULT);" style="${active}border:1px solid var(--border);border-radius:6px;padding:8px 16px;margin-right:8px;cursor:pointer;font-size:12px;">方案${i+1}: ${c.product.name} ${capStr} (${c.payback.toFixed(1)}年)</button>`;
+  }
+  document.getElementById('diagramTabs').innerHTML=html;
+  document.getElementById('diagramTabs').style.display='block';
+}
+
+function renderArchSvg(R){
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];const is10kV=P.use10kV;
+  const W=1100;let s=`<svg viewBox="0 0 ${W} 100" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<defs>`;
+  s+=`<linearGradient id="gGrid" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4a90d9"/><stop offset="100%" stop-color="#2a50a0"/></linearGradient>`;
+  s+=`<linearGradient id="gTrans" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#e8a838"/><stop offset="100%" stop-color="#c07820"/></linearGradient>`;
+  s+=`<linearGradient id="gESS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#50c878"/><stop offset="100%" stop-color="#309858"/></linearGradient>`;
+  s+=`<linearGradient id="gPCS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#e06070"/><stop offset="100%" stop-color="#b04050"/></linearGradient>`;
+  s+=`<linearGradient id="gLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#a070d0"/><stop offset="100%" stop-color="#7040a0"/></linearGradient>`;
+  s+=`<linearGradient id="gBus" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#606080"/><stop offset="50%" stop-color="#8080a0"/><stop offset="100%" stop-color="#606080"/></linearGradient>`;
+  s+=`<filter id="sh"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/></filter>`;
+  s+=`<marker id="aB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#4a90d9"/></marker>`;
+  s+=`<marker id="aO" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e8a838"/></marker>`;
+  s+=`<marker id="aG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#50c878"/></marker>`;
+  s+=`<marker id="aR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#e06070"/></marker>`;
+  s+=`</defs>`;
+  s+=`<pattern id="dot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
+  let Y=0;
+  const addRect=(x,y,w,h,fill,stroke,extra='')=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${fill}" filter="url(#sh)" ${stroke?'stroke="'+stroke+'" stroke-width="1.5"':''} ${extra}/>`;};
+  s+=`<rect width="${W}" height="10" fill="url(#dot)"/>`;
+  Y=20;
+  s+=`<rect x="350" y="${Y}" width="400" height="50" rx="8" fill="url(#gGrid)" filter="url(#sh)"/>`;
+  s+=`<text x="550" y="${Y+20}" text-anchor="middle" fill="white" font-size="14" font-weight="bold">国网${P.txHv}kV电源</text>`;
+  s+=`<text x="550" y="${Y+38}" text-anchor="middle" fill="#c0d0ff" font-size="10">国网${P.region||'黑龙江大庆'}供电公司</text>`;
+  Y+=60;
+  s+=`<line x1="550" y1="${Y-10}" x2="550" y2="${Y}" stroke="#4a90d9" stroke-width="3" marker-end="url(#aB)"/>`;
+  s+=`<rect x="420" y="${Y}" width="260" height="48" rx="8" fill="#1a2a4a" filter="url(#sh)" stroke="#4a90d9" stroke-width="1.5"/>`;
+  s+=`<text x="550" y="${Y+20}" text-anchor="middle" fill="#80b0e0" font-size="12" font-weight="bold">计量 / PCC</text>`;
+  s+=`<text x="550" y="${Y+37}" text-anchor="middle" fill="#6090c0" font-size="9">电表+PT/CT(电力局资产)</text>`;
+  s+=`<rect x="300" y="${Y-8}" width="600" height="64" rx="6" fill="none" stroke="#e8a838" stroke-width="1.5" stroke-dasharray="6,3"/>`;
+  s+=`<text x="610" y="${Y-10}" fill="#e8a838" font-size="9">防反送电边界：PCC功率&gt;50~100kW时限功率</text>`;
+  Y+=58;
+  s+=`<line x1="550" y1="${Y-10}" x2="550" y2="${Y}" stroke="#4a90d9" stroke-width="3" marker-end="url(#aB)"/>`;
+  const busY=Y;
+  s+=`<rect x="100" y="${busY}" width="900" height="36" rx="4" fill="url(#gBus)" filter="url(#sh)"/>`;
+  s+=`<text x="550" y="${busY+23}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">厂内${P.txHv}kV母线（用户侧）</text>`;
+  Y=busY+56;
+  const txY=Y;
+  const txSpacing=Math.min(170,500/(P.txCount+1));
+  let loadBottomY=txY;
+  for(let i=0;i<P.txCount;i++){const x=180+i*txSpacing;
+    s+=`<line x1="${x}" y1="${busY+36}" x2="${x}" y2="${txY}" stroke="#e8a838" stroke-width="3" marker-end="url(#aO)"/>`;
+    s+=`<rect x="${x-90}" y="${txY}" width="180" height="60" rx="8" fill="url(#gTrans)" filter="url(#sh)"/>`;
+    s+=`<text x="${x}" y="${txY+20}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">${i+1}#变压器</text>`;
+    s+=`<text x="${x}" y="${txY+36}" text-anchor="middle" fill="#fff0d0" font-size="9">S9-${P.txCap}/10</text>`;
+    s+=`<text x="${x}" y="${txY+50}" text-anchor="middle" fill="#fff0d0" font-size="8">${P.txCap}kVA ${P.txHv}/${(P.txLv/1000).toFixed(1)}kV ${P.txVector}</text>`;
+    s+=`<line x1="${x}" y1="${txY+60}" x2="${x}" y2="${txY+85}" stroke="#a070d0" stroke-width="3" marker-end="url(#aB)"/>`;
+    s+=`<rect x="${x-80}" y="${txY+85}" width="160" height="55" rx="8" fill="url(#gLoad)" filter="url(#sh)"/>`;
+    const loadKW=Math.round(P.txCap*P.pf*0.6);
+    s+=`<text x="${x}" y="${txY+105}" text-anchor="middle" fill="white" font-size="10" font-weight="bold">${(P.txLv/1000).toFixed(1)}kV负荷${i+1}</text>`;
+    s+=`<text x="${x}" y="${txY+120}" text-anchor="middle" fill="#e0c0ff" font-size="9">~${loadKW}kW | ${P.workDays}天/月</text>`;
+    loadBottomY=Math.max(loadBottomY,txY+85+55);
+  }
+  const ex=660;
+  s+=`<line x1="${ex}" y1="${busY+36}" x2="${ex}" y2="${txY}" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>`;
+  s+=`<text x="${ex}" y="${busY+48}" text-anchor="middle" fill="#50c878" font-size="9" font-weight="bold">储能支路</text>`;
+  let essBottomY=txY;
+  if(is10kV){
+    s+=`<rect x="${ex-95}" y="${txY}" width="190" height="48" rx="8" fill="#1a2a1a" filter="url(#sh)" stroke="#50c878" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${txY+20}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能${P.txHv}kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${txY+38}" text-anchor="middle" fill="#60a060" font-size="9">断路器+继保</text>`;
+    let curY=txY+48+20;
+    s+=`<line x1="${ex}" y1="${txY+48}" x2="${ex}" y2="${curY}" stroke="#50c878" stroke-width="3" marker-end="url(#aG)"/>`;
+    if(c.needStepUp){
+      s+=`<rect x="${ex-95}" y="${curY}" width="190" height="48" rx="8" fill="#2a3020" filter="url(#sh)" stroke="#e8a838" stroke-width="1.5"/>`;
+      s+=`<text x="${ex}" y="${curY+20}" text-anchor="middle" fill="#e8a838" font-size="11" font-weight="bold">升压变压器</text>`;
+      const stepKVA=Math.round(c.pcsKW*1.2);
+      s+=`<text x="${ex}" y="${curY+38}" text-anchor="middle" fill="#c09030" font-size="9">0.69/${P.txHv}kV 干式~${stepKVA}kVA</text>`;
+      curY+=48+15;s+=`<line x1="${ex}" y1="${curY-15}" x2="${ex}" y2="${curY}" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>`;
+    }
+    s+=`<rect x="${ex-80}" y="${curY}" width="160" height="36" rx="6" fill="#2a2020" filter="url(#sh)" stroke="#e06070" stroke-width="1"/>`;
+    s+=`<text x="${ex}" y="${curY+16}" text-anchor="middle" fill="#ff8090" font-size="10" font-weight="bold">AC柜(计量/隔离)</text>`;
+    s+=`<text x="${ex}" y="${curY+30}" text-anchor="middle" fill="#c06070" font-size="8">0.69kV侧</text>`;
+    curY+=36+15;s+=`<line x1="${ex}" y1="${curY-15}" x2="${ex}" y2="${curY}" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>`;
+    s+=`<rect x="${ex-100}" y="${curY}" width="200" height="55" rx="8" fill="url(#gPCS)" filter="url(#sh)"/>`;
+    s+=`<text x="${ex}" y="${curY+18}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PCS功率变换</text>`;
+    s+=`<text x="${ex}" y="${curY+34}" text-anchor="middle" fill="#ffc0c0" font-size="10">${(c.pcsKW/1000).toFixed(2)}MW ${c.qty>1?'分布式':'集中式'}</text>`;
+    const dcV=c.product.volt;
+    s+=`<text x="${ex}" y="${curY+48}" text-anchor="middle" fill="#ffc0c0" font-size="9">AC690V↔DC${dcV}V P/Q+V/F</text>`;
+    curY+=55+15;s+=`<line x1="${ex}" y1="${curY-15}" x2="${ex}" y2="${curY}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3" marker-end="url(#aG)"/>`;
+    s+=`<text x="${ex+50}" y="${curY-8}" fill="#50c878" font-size="8">DC${dcV}V</text>`;
+    s+=`<rect x="${ex-110}" y="${curY}" width="220" height="75" rx="8" fill="url(#gESS)" filter="url(#sh)"/>`;
+    s+=`<text x="${ex}" y="${curY+18}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
+    s+=`<text x="${ex}" y="${curY+34}" text-anchor="middle" fill="#c0ffc0" font-size="10">${c.product.model}</text>`;
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    s+=`<text x="${ex}" y="${curY+48}" text-anchor="middle" fill="#c0ffc0" font-size="9">${capStr} / ${dcV}V / ${c.product.cell}</text>`;
+    s+=`<text x="${ex}" y="${curY+62}" text-anchor="middle" fill="#90d090" font-size="8">${c.product.cool}/${c.product.ip} BMS+${c.product.fire}</text>`;
+    essBottomY=curY+75;
+  }else{
+    s+=`<rect x="${ex-95}" y="${txY}" width="190" height="40" rx="8" fill="#1a2a1a" filter="url(#sh)" stroke="#50c878" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${txY+16}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能0.4kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${txY+34}" text-anchor="middle" fill="#60a060" font-size="9">断路器+逆功率保护</text>`;
+    let curY=txY+40+15;s+=`<line x1="${ex}" y1="${txY+40}" x2="${ex}" y2="${curY}" stroke="#e06070" stroke-width="3" marker-end="url(#aR)"/>`;
+    s+=`<rect x="${ex-100}" y="${curY}" width="200" height="48" rx="8" fill="url(#gPCS)" filter="url(#sh)"/>`;
+    s+=`<text x="${ex}" y="${curY+18}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
+    s+=`<text x="${ex}" y="${curY+38}" text-anchor="middle" fill="#ffc0c0" font-size="9">AC400V↔DC${c.product.volt}V P/Q</text>`;
+    curY+=48+15;s+=`<line x1="${ex}" y1="${curY-15}" x2="${ex}" y2="${curY}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3" marker-end="url(#aG)"/>`;
+    s+=`<rect x="${ex-110}" y="${curY}" width="220" height="60" rx="8" fill="url(#gESS)" filter="url(#sh)"/>`;
+    s+=`<text x="${ex}" y="${curY+18}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    s+=`<text x="${ex}" y="${curY+35}" text-anchor="middle" fill="#c0ffc0" font-size="9">${capStr} / ${c.product.volt}V</text>`;
+    s+=`<text x="${ex}" y="${curY+50}" text-anchor="middle" fill="#90d090" font-size="8">BMS+${c.product.fire}</text>`;
+    essBottomY=curY+60;
+  }
+  const emsY=busY+40;
+  s+=`<rect x="920" y="${emsY}" width="155" height="170" rx="8" fill="#151530" filter="url(#sh)" stroke="#6060a0" stroke-width="1.5"/>`;
+  s+=`<text x="997" y="${emsY+22}" text-anchor="middle" fill="#a0a0ff" font-size="11" font-weight="bold">EMS能量管理</text>`;
+  s+=`<line x1="930" y1="${emsY+30}" x2="1065" y2="${emsY+30}" stroke="#3a3a5e" stroke-width="1"/>`;
+  const emsItems=['● 峰谷时段调度','● 防逆流双闭环','● PCC功率监测','● SOC保护管理','● 防孤岛保护','● 远程监控+告警','● 软限功率+硬兜底'];
+  emsItems.forEach((t,i)=>{s+=`<text x="997" y="${emsY+48+i*18}" text-anchor="middle" fill="#8080c0" font-size="9">${t}</text>`;});
+  s+=`<line x1="920" y1="${emsY+85}" x2="${ex+100}" y2="${emsY+30}" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<line x1="920" y1="${emsY+120}" x2="${ex+100}" y2="${emsY+80}" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<line x1="920" y1="${emsY+60}" x2="680" y2="127" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<text x="820" y="${emsY+50}" fill="#6060a0" font-size="7" transform="rotate(-25,820,${emsY+50})">PCC功率采集</text>`;
+  const infoY=Math.max(loadBottomY,essBottomY)+20;
+  s+=`<rect x="60" y="${infoY}" width="500" height="155" rx="8" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="310" y="${infoY+20}" text-anchor="middle" fill="#a0a0ff" font-size="11" font-weight="bold">充放电策略与经济性</text>`;
+  s+=`<line x1="70" y1="${infoY+28}" x2="550" y2="${infoY+28}" stroke="#2a2a3e" stroke-width="1"/>`;
+  s+=`<text x="75" y="${infoY+46}" fill="#50c878" font-size="10" font-weight="bold">谷段充电: 23:30-05:30</text>`;
+  s+=`<text x="75" y="${infoY+62}" fill="#50c878" font-size="9">  PCS整流 ${(c.pcsKW/1000).toFixed(2)}MW×6h≈满(DoD95%) 电价≈${P.priceValley.toFixed(3)}元</text>`;
+  s+=`<text x="75" y="${infoY+80}" fill="#e06070" font-size="10" font-weight="bold">峰段放电: 7-8,9-11:30,15:30-20</text>`;
+  s+=`<text x="75" y="${infoY+96}" fill="#e06070" font-size="9">  PCS逆变≤${(c.pcsKW/1000).toFixed(2)}MW 电价≈${P.pricePeak.toFixed(3)}元 峰谷差≈${(P.pricePeak-P.priceValley).toFixed(3)}元</text>`;
+  const chH=(c.totalCap*0.95/c.pcsKW).toFixed(1);
+  s+=`<text x="75" y="${infoY+114}" fill="#e8a838" font-size="9">容量/功率比: ${(c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh')}/${(c.pcsKW/1000).toFixed(2)}MW = ${chH}C·h</text>`;
+  s+=`<text x="75" y="${infoY+134}" fill="#a0a0ff" font-size="10" font-weight="bold">年节省≈${c.annualSaving.toFixed(0)}万 | 回收期≈${c.payback.toFixed(1)}年 | 投资≈${c.totalInvest.toFixed(0)}万</text>`;
+  s+=`<text x="75" y="${infoY+148}" fill="#666" font-size="8">防逆流: EMS软限功率 + 逆功率继电器 + 并网柜保护</text>`;
+  if(is10kV){
+    s+=`<rect x="580" y="${infoY}" width="130" height="95" rx="6" fill="#0d1a10" stroke="#50c878" stroke-width="1"/>`;
+    s+=`<text x="645" y="${infoY+18}" text-anchor="middle" fill="#80e080" font-size="10" font-weight="bold">${P.txHv}kV优势</text>`;
+    s+=`<text x="590" y="${infoY+36}" fill="#60c060" font-size="9">✓ 不占变压器容量</text>`;
+    s+=`<text x="590" y="${infoY+51}" fill="#60c060" font-size="9">✓ 充电不经变压器</text>`;
+    s+=`<text x="590" y="${infoY+66}" fill="#60c060" font-size="9">✓ 全厂削峰覆盖</text>`;
+    s+=`<text x="590" y="${infoY+81}" fill="#60c060" font-size="9">✓ 谐波隔离</text>`;
+  }
+  const totalH=infoY+165;
+  s=s.replace(`<svg viewBox="0 0 ${W} 100"`,`<svg viewBox="0 0 ${W} ${totalH}"`);
+  s=s.replace(`<rect width="${W}" height="10"`,`<rect width="${W}" height="${totalH}"`);
+  s+=`</svg>`;
+  document.getElementById('archSvg').innerHTML=s;
+}
+
+function renderWiringSvg(R){
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];const W=1200,H=950;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<defs>`;
+  s+=`<linearGradient id="bus10w" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2a50a0"/><stop offset="50%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>`;
+  s+=`</defs>`;
+  s+=`<rect width="${W}" height="${H}" fill="#0d1117"/>`;
+  s+=`<pattern id="dw" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
+  s+=`<rect width="${W}" height="${H}" fill="url(#dw)"/>`;
+  const hv=P.txHv;const lvKv=(P.txLv/1000).toFixed(1);
+  s+=`<text x="200" y="30" fill="#4a90d9" font-size="11" font-weight="bold" text-anchor="middle">国网${hv}kV</text>`;
+  s+=`<line x1="200" y1="38" x2="200" y2="65" stroke="#4a90d9" stroke-width="2.5"/>`;
+  s+=`<rect x="140" y="65" width="120" height="35" rx="4" fill="#1a2a4a" stroke="#4a90d9" stroke-width="1.5"/>`;
+  s+=`<text x="200" y="85" text-anchor="middle" fill="#80b0e0" font-size="9">计量/PCC</text>`;
+  s+=`<text x="200" y="95" text-anchor="middle" fill="#6090c0" font-size="7">PT+CT(电力局资产)</text>`;
+  s+=`<line x1="200" y1="100" x2="200" y2="130" stroke="#4a90d9" stroke-width="2"/>`;
+  const boundaryW=Math.min(580,200+P.txCount*150+80);
+  s+=`<rect x="120" y="55" width="${boundaryW}" height="90" rx="4" fill="none" stroke="#e8a838" stroke-width="1" stroke-dasharray="5,3"/>`;
+  s+=`<text x="${120+boundaryW/2}" y="52" fill="#e8a838" font-size="8">防反送电控制边界：PCC实时功率 &gt; 50~100kW时触发限功率</text>`;
+  const busY=130;
+  s+=`<line x1="80" y1="${busY}" x2="700" y2="${busY}" stroke="url(#bus10w)" stroke-width="7" stroke-linecap="round"/>`;
+  s+=`<text x="390" y="${busY-8}" text-anchor="middle" fill="#80b0e0" font-size="11" font-weight="bold">厂内${hv}kV母线</text>`;
+  const txSpacing=Math.min(150,400/Math.max(P.txCount,1));
+  for(let i=0;i<P.txCount;i++){const x=250+i*txSpacing;
+    s+=`<line x1="${x}" y1="${busY}" x2="${x}" y2="${busY+40}" stroke="#e8a838" stroke-width="2"/>`;
+    s+=`<rect x="${x-10}" y="${busY+40}" width="20" height="30" fill="#2a3050" stroke="#e8a838" stroke-width="1.5" rx="2"/>`;
+    s+=`<text x="${x}" y="${busY+60}" text-anchor="middle" fill="#e0c060" font-size="8">QF${i*2+1}</text>`;
+    s+=`<line x1="${x}" y1="${busY+70}" x2="${x}" y2="${busY+100}" stroke="#e8a838" stroke-width="2"/>`;
+    s+=`<circle cx="${x}" cy="${busY+120}" r="20" fill="#2a3050" stroke="#e8a838" stroke-width="2"/>`;
+    s+=`<circle cx="${x}" cy="${busY+120}" r="13" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+    s+=`<text x="${x}" y="${busY+123}" text-anchor="middle" fill="#e8a838" font-size="8">${P.txVector||'Y/Δ'}</text>`;
+    s+=`<text x="${x+30}" y="${busY+112}" fill="#e8a838" font-size="9">${i+1}#T: S9-${P.txCap}/${hv}</text>`;
+    s+=`<text x="${x+30}" y="${busY+126}" fill="#c09030" font-size="8">${P.txCap}kVA ${hv}/${lvKv}kV Zk=${P.txZk||4.3}%</text>`;
+    s+=`<line x1="${x}" y1="${busY+140}" x2="${x}" y2="${busY+170}" stroke="#a070d0" stroke-width="2"/>`;
+    s+=`<rect x="${x-10}" y="${busY+170}" width="20" height="20" fill="#2a3050" stroke="#a070d0" stroke-width="1.5" rx="2"/>`;
+    s+=`<text x="${x}" y="${busY+185}" text-anchor="middle" fill="#c090e0" font-size="8">QF${i*2+2}</text>`;
+    s+=`<line x1="${x}" y1="${busY+190}" x2="${x}" y2="${busY+220}" stroke="#a070d0" stroke-width="2"/>`;
+    const loadKW=Math.round(P.txCap*P.pf*0.6);
+    s+=`<rect x="${x-65}" y="${busY+220}" width="130" height="50" rx="6" fill="#1a1530" stroke="#a070d0" stroke-width="1.5"/>`;
+    s+=`<text x="${x}" y="${busY+240}" text-anchor="middle" fill="#c090e0" font-size="10" font-weight="bold">${lvKv}kV负荷${i+1}</text>`;
+    s+=`<text x="${x}" y="${busY+258}" text-anchor="middle" fill="#8060a0" font-size="8">电机/产线 ~${loadKW}kW</text>`;
+  }
+  const ex=580;
+  s+=`<line x1="${ex}" y1="${busY}" x2="${ex}" y2="${busY+35}" stroke="#50c878" stroke-width="2.5"/>`;
+  if(P.use10kV){
+    s+=`<rect x="${ex-70}" y="${busY+35}" width="140" height="55" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${busY+55}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能${hv}kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${busY+70}" text-anchor="middle" fill="#60a060" font-size="8">断路器+继保</text>`;
+    s+=`<text x="${ex}" y="${busY+83}" text-anchor="middle" fill="#508050" font-size="7">过流/速断/接地/防孤岛</text>`;
+    s+=`<rect x="${ex+80}" y="${busY+35}" width="130" height="50" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+    s+=`<text x="${ex+145}" y="${busY+52}" text-anchor="middle" fill="#a0a0ff" font-size="9" font-weight="bold">继保要求</text>`;
+    s+=`<text x="${ex+145}" y="${busY+66}" text-anchor="middle" fill="#8080c0" font-size="8">并网柜必须可见可断</text>`;
+    s+=`<text x="${ex+145}" y="${busY+78}" text-anchor="middle" fill="#8080c0" font-size="8">逆功率+EMS双闭环</text>`;
+    s+=`<line x1="${ex+80}" y1="${busY+60}" x2="${ex+70}" y2="${busY+60}" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+    s+=`<line x1="${ex}" y1="${busY+90}" x2="${ex}" y2="${busY+130}" stroke="#50c878" stroke-width="2.5"/>`;
+    let nextY=busY+130;
+    if(c.needStepUp){
+      s+=`<circle cx="${ex}" cy="${nextY+20}" r="22" fill="#2a3020" stroke="#e8a838" stroke-width="2"/>`;
+      s+=`<circle cx="${ex}" cy="${nextY+20}" r="14" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+      s+=`<text x="${ex}" y="${nextY+23}" text-anchor="middle" fill="#e8a838" font-size="8">0.69/${hv}</text>`;
+      const stepKVA=Math.round(c.pcsKW*1.2);
+      s+=`<text x="${ex+30}" y="${nextY+12}" fill="#e8a838" font-size="9">升压变</text>`;
+      s+=`<text x="${ex+30}" y="${nextY+26}" fill="#c09030" font-size="8">干式 ~${stepKVA}kVA</text>`;
+      s+=`<text x="${ex+30}" y="${nextY+38}" fill="#c09030" font-size="7">独立配置(谐波隔离)</text>`;
+      s+=`<line x1="${ex}" y1="${nextY+42}" x2="${ex}" y2="${nextY+70}" stroke="#e8a838" stroke-width="2"/>`;
+      nextY=nextY+70;
+    }
+    s+=`<rect x="${ex-60}" y="${nextY}" width="120" height="35" rx="4" fill="#2a2020" stroke="#e06070" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${nextY+18}" text-anchor="middle" fill="#ff8090" font-size="10" font-weight="bold">AC柜(0.69kV)</text>`;
+    s+=`<text x="${ex}" y="${nextY+30}" text-anchor="middle" fill="#c06070" font-size="8">计量/隔离</text>`;
+    s+=`<line x1="${ex}" y1="${nextY+35}" x2="${ex}" y2="${nextY+65}" stroke="#e06070" stroke-width="2"/>`;
+    nextY=nextY+65;
+    s+=`<rect x="${ex-90}" y="${nextY}" width="180" height="65" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+23}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PCS</text>`;
+    s+=`<text x="${ex}" y="${nextY+41}" text-anchor="middle" fill="#ffc0c0" font-size="10">${(c.pcsKW/1000).toFixed(2)}MW ${c.qty>1?'分布式':'集中式'}</text>`;
+    s+=`<text x="${ex}" y="${nextY+55}" text-anchor="middle" fill="#c06070" font-size="9">AC690V↔DC${c.product.volt}V ≥97%</text>`;
+    s+=`<rect x="${ex+100}" y="${nextY+5}" width="120" height="45" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+    s+=`<text x="${ex+160}" y="${nextY+23}" text-anchor="middle" fill="#a0a0ff" font-size="9" font-weight="bold">直流安全</text>`;
+    s+=`<text x="${ex+160}" y="${nextY+37}" text-anchor="middle" fill="#8080c0" font-size="8">绝缘监测</text>`;
+    s+=`<text x="${ex+160}" y="${nextY+48}" text-anchor="middle" fill="#8080c0" font-size="7">接触器+BMS联动</text>`;
+    s+=`<line x1="${ex+100}" y1="${nextY+30}" x2="${ex+90}" y2="${nextY+30}" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+    nextY=nextY+65;
+    s+=`<line x1="${ex}" y1="${nextY}" x2="${ex}" y2="${nextY+40}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+    s+=`<text x="${ex+40}" y="${nextY+25}" fill="#50c878" font-size="8">YJV-1.5kV DC${c.product.volt}V</text>`;
+    nextY=nextY+40;
+    s+=`<rect x="${ex-10}" y="${nextY}" width="20" height="18" fill="#2a2a50" stroke="#50c878" stroke-width="1.5" rx="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+13}" text-anchor="middle" fill="#80e080" font-size="8">DS</text>`;
+    s+=`<line x1="${ex}" y1="${nextY+18}" x2="${ex}" y2="${nextY+45}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+    nextY=nextY+45;
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    s+=`<rect x="${ex-120}" y="${nextY}" width="240" height="100" rx="8" fill="#0d2a15" stroke="#50c878" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+25}" text-anchor="middle" fill="#80e080" font-size="13" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
+    s+=`<text x="${ex}" y="${nextY+45}" text-anchor="middle" fill="#60c060" font-size="10">${c.product.model}</text>`;
+    s+=`<text x="${ex}" y="${nextY+62}" text-anchor="middle" fill="#408040" font-size="8">${capStr} / ${c.product.volt}V / ${c.product.cell}</text>`;
+    s+=`<text x="${ex}" y="${nextY+77}" text-anchor="middle" fill="#408040" font-size="8">${c.product.cool}/${c.product.ip}/${c.product.size}/${c.product.weight}</text>`;
+    s+=`<text x="${ex}" y="${nextY+92}" text-anchor="middle" fill="#308030" font-size="7">BMS三级+${c.product.fire}</text>`;
+    s+=`<rect x="${ex+130}" y="${nextY+25}" width="90" height="40" rx="4" fill="#1a1a30" stroke="#6060a0" stroke-width="1"/>`;
+    s+=`<text x="${ex+175}" y="${nextY+43}" text-anchor="middle" fill="#8080c0" font-size="8">BMS三级</text>`;
+    s+=`<text x="${ex+175}" y="${nextY+58}" text-anchor="middle" fill="#6060a0" font-size="7">电芯→簇→系统</text>`;
+    s+=`<line x1="${ex+120}" y1="${nextY+45}" x2="${ex+130}" y2="${nextY+45}" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  }else{
+    s+=`<rect x="${ex-70}" y="${busY+35}" width="140" height="45" rx="6" fill="#1a2a1a" stroke="#50c878" stroke-width="1.5"/>`;
+    s+=`<text x="${ex}" y="${busY+53}" text-anchor="middle" fill="#80e080" font-size="11" font-weight="bold">储能${lvKv}kV并网柜</text>`;
+    s+=`<text x="${ex}" y="${busY+71}" text-anchor="middle" fill="#60a060" font-size="9">断路器+逆功率保护</text>`;
+    s+=`<line x1="${ex}" y1="${busY+80}" x2="${ex}" y2="${busY+115}" stroke="#e06070" stroke-width="2"/>`;
+    let nextY=busY+115;
+    s+=`<rect x="${ex-90}" y="${nextY}" width="180" height="55" rx="8" fill="#2a1520" stroke="#e06070" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+20}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PCS ${(c.pcsKW/1000).toFixed(2)}MW</text>`;
+    s+=`<text x="${ex}" y="${nextY+40}" text-anchor="middle" fill="#ffc0c0" font-size="10">AC400V↔DC${c.product.volt}V | 并网P/Q</text>`;
+    s+=`<line x1="${ex}" y1="${nextY+55}" x2="${ex}" y2="${nextY+85}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+    nextY=nextY+85;
+    const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+    s+=`<rect x="${ex-120}" y="${nextY}" width="240" height="70" rx="8" fill="#0d2a15" stroke="#50c878" stroke-width="2"/>`;
+    s+=`<text x="${ex}" y="${nextY+18}" text-anchor="middle" fill="#80e080" font-size="13" font-weight="bold">${c.product.name}${c.qty>1?' ×'+c.qty:''}</text>`;
+    s+=`<text x="${ex}" y="${nextY+35}" text-anchor="middle" fill="#60c060" font-size="10">${capStr} / ${c.product.volt}V / ${c.product.cell}</text>`;
+    s+=`<text x="${ex}" y="${nextY+50}" text-anchor="middle" fill="#408040" font-size="9">${c.product.cool}/${c.product.ip} | ${c.product.fire}</text>`;
+    s+=`<text x="${ex}" y="${nextY+63}" text-anchor="middle" fill="#408040" font-size="9">BMS三级保护</text>`;
+  }
+  s+=`<rect x="850" y="165" width="160" height="180" rx="8" fill="#151530" stroke="#6060a0" stroke-width="1.5"/>`;
+  s+=`<text x="930" y="190" text-anchor="middle" fill="#a0a0ff" font-size="11" font-weight="bold">EMS能量管理</text>`;
+  s+=`<line x1="865" y1="200" x2="995" y2="200" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="930" y="220" text-anchor="middle" fill="#8080c0" font-size="9">● 峰谷自动调度</text>`;
+  s+=`<text x="930" y="240" text-anchor="middle" fill="#8080c0" font-size="9">● PCC功率实时监测</text>`;
+  s+=`<text x="930" y="260" text-anchor="middle" fill="#8080c0" font-size="9">● 防逆流双闭环</text>`;
+  s+=`<text x="930" y="280" text-anchor="middle" fill="#8080c0" font-size="8">  软件限功率+硬件兜底</text>`;
+  s+=`<text x="930" y="300" text-anchor="middle" fill="#8080c0" font-size="9">● SOC保护管理</text>`;
+  s+=`<text x="930" y="320" text-anchor="middle" fill="#8080c0" font-size="9">● 防孤岛保护联锁</text>`;
+  s+=`<text x="930" y="340" text-anchor="middle" fill="#8080c0" font-size="9">● 远程监控+告警</text>`;
+  s+=`<line x1="850" y1="230" x2="650" y2="185" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<line x1="850" y1="270" x2="670" y2="280" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<line x1="850" y1="300" x2="700" y2="580" stroke="#6060a0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<text x="770" y="240" fill="#6060a0" font-size="7" transform="rotate(-20,770,240)">PCC功率采集</text>`;
+  s+=`<text x="775" y="285" fill="#6060a0" font-size="7" transform="rotate(-5,775,285)">RS485/CAN</text>`;
+  s+=`<rect x="60" y="430" width="380" height="220" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="250" y="455" text-anchor="middle" fill="#a0a0ff" font-size="11" font-weight="bold">电缆与设备清单</text>`;
+  s+=`<line x1="70" y1="465" x2="430" y2="465" stroke="#2a2a3e" stroke-width="1"/>`;
+  const cabY=475;
+  s+=`<text x="75" y="${cabY+10}" fill="#e8a838" font-size="9">${hv}kV并网柜:</text>`;
+  s+=`<text x="180" y="${cabY+10}" fill="#c0c0d0" font-size="9">KYN28A-12 ${hv}kV真空断路器柜</text>`;
+  if(c.needStepUp){s+=`<text x="75" y="${cabY+30}" fill="#e8a838" font-size="9">升压变:</text>`;s+=`<text x="180" y="${cabY+30}" fill="#c0c0d0" font-size="9">SC10-${Math.round(c.pcsKW*1.2)}/10 0.69/${hv}kV 干式</text>`;}
+  const pcsRowY=cabY+(c.needStepUp?30:10);
+  s+=`<text x="75" y="${pcsRowY+20}" fill="#e06070" font-size="9">PCS:</text>`;
+  s+=`<text x="180" y="${pcsRowY+20}" fill="#c0c0d0" font-size="9">${(c.pcsKW/1000).toFixed(2)}MW 集中式 AC${P.use10kV?'690':'400'}V</text>`;
+  s+=`<text x="75" y="${pcsRowY+40}" fill="#50c878" font-size="9">AC电缆:</text>`;
+  s+=`<text x="180" y="${pcsRowY+40}" fill="#c0c0d0" font-size="9">YJV-0.6/1kV-3×185+1×95 PCS至${c.needStepUp?'升压变':'并网柜'}</text>`;
+  s+=`<text x="75" y="${pcsRowY+60}" fill="#50c878" font-size="9">DC电缆:</text>`;
+  s+=`<text x="180" y="${pcsRowY+60}" fill="#c0c0d0" font-size="9">YJV-1.5kV-1×400 PCS至电池舱</text>`;
+  if(P.use10kV){s+=`<text x="75" y="${pcsRowY+80}" fill="#50c878" font-size="9">${hv}kV电缆:</text>`;s+=`<text x="180" y="${pcsRowY+80}" fill="#c0c0d0" font-size="9">YJV22-8.7/15kV-3×50 并网柜至母线</text>`;}
+  const comRowY=pcsRowY+(P.use10kV?80:60);
+  s+=`<text x="75" y="${comRowY+20}" fill="#6060a0" font-size="9">通讯:</text>`;
+  s+=`<text x="180" y="${comRowY+20}" fill="#c0c0d0" font-size="9">光缆4芯+RS485屏蔽电缆</text>`;
+  s+=`<text x="75" y="${comRowY+40}" fill="#6060a0" font-size="9">接地:</text>`;
+  s+=`<text x="180" y="${comRowY+40}" fill="#c0c0d0" font-size="9">TN-S系统 铜排独立PE</text>`;
+  s+=`<text x="75" y="${comRowY+60}" fill="#d0d040" font-size="9">计量:</text>`;
+  s+=`<text x="180" y="${comRowY+60}" fill="#c0c0d0" font-size="9">PCC处0.5S级双向表+储能侧计量</text>`;
+  s+=`<rect x="60" y="670" width="380" height="140" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="250" y="695" text-anchor="middle" fill="#e06060" font-size="11" font-weight="bold">保护配置</text>`;
+  s+=`<line x1="70" y1="705" x2="430" y2="705" stroke="#2a2a3e" stroke-width="1"/>`;
+  s+=`<text x="75" y="725" fill="#e06060" font-size="9">● 并网柜: 过流/速断/接地/防孤岛保护</text>`;
+  s+=`<text x="75" y="745" fill="#e06060" font-size="9">● 升压变独立配置: 谐波隔离,减少故障耦合</text>`;
+  s+=`<text x="75" y="765" fill="#e06060" font-size="9">● 逆功率保护: PCC功率&gt;阈值时限功率/停机</text>`;
+  s+=`<text x="75" y="785" fill="#e06060" font-size="9">● EMS双闭环: 软件限功率+硬件保护兜底</text>`;
+  s+=`<text x="75" y="805" fill="#e06060" font-size="9">● BMS: SOC&lt;5%强制断开/温度保护/绝缘监测</text>`;
+  if(P.use10kV){
+    s+=`<rect x="850" y="400" width="160" height="155" rx="6" fill="#0d1a10" stroke="#50c878" stroke-width="1"/>`;
+    s+=`<text x="930" y="420" text-anchor="middle" fill="#80e080" font-size="10" font-weight="bold">${hv}kV方案关键优势</text>`;
+    s+=`<line x1="860" y1="428" x2="1000" y2="428" stroke="#205020" stroke-width="1"/>`;
+    s+=`<text x="865" y="448" fill="#60c060" font-size="9">✓ 不占用变压器容量</text>`;
+    s+=`<text x="865" y="468" fill="#60c060" font-size="9">✓ 充电不经变压器</text>`;
+    s+=`<text x="865" y="488" fill="#60c060" font-size="9">✓ 全厂削峰覆盖</text>`;
+    s+=`<text x="865" y="508" fill="#60c060" font-size="9">✓ 容量校核简单</text>`;
+    s+=`<text x="865" y="528" fill="#60c060" font-size="9">✓ 保护配置清晰</text>`;
+    s+=`<text x="865" y="548" fill="#60c060" font-size="9">✓ 谐波隔离(升压变)</text>`;
+  }
+  s+=`<rect x="60" y="860" width="1080" height="55" rx="4" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="580" y="882" text-anchor="middle" fill="#8888cc" font-size="10" font-weight="bold">电压等级</text>`;
+  s+=`<text x="160" y="905" text-anchor="middle" fill="#4a90d9" font-size="9">${hv}kV (并网/母线)</text>`;
+  s+=`<text x="380" y="905" text-anchor="middle" fill="#e8a838" font-size="9">${lvKv}kV (负荷侧)</text>`;
+  s+=`<text x="600" y="905" text-anchor="middle" fill="#e06070" font-size="9">${P.use10kV?'0.69kV (PCS交流侧)':'0.4kV (PCS交流侧)'}</text>`;
+  s+=`<text x="820" y="905" text-anchor="middle" fill="#50c878" font-size="9">DC${c.product.volt}V (电池侧)</text>`;
+  s+=`<text x="1020" y="905" text-anchor="middle" fill="#6060a0" font-size="9">通讯(RS485/CAN)</text>`;
+  s+=`<text x="600" y="840" text-anchor="middle" fill="#606080" font-size="8">一次接线为方案级示意；保护定值、接地方式、柜型与二次回路需由有资质设计单位出图</text>`;
+  s+=`</svg>`;
+  document.getElementById('wiringSvg').innerHTML=s;
+}
+
+function renderTopoSvg(R){
+  const W=1100,H=700;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<defs>`;
+  s+=`<linearGradient id="topoGrid" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2a50a0"/><stop offset="50%" style="stop-color:#4a90d9"/><stop offset="100%" style="stop-color:#2a50a0"/></linearGradient>`;
+  s+=`<linearGradient id="topoPcs" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#e06070"/><stop offset="100%" style="stop-color:#a03040"/></linearGradient>`;
+  s+=`<linearGradient id="topoBat" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#50c878"/><stop offset="100%" style="stop-color:#208040"/></linearGradient>`;
+  s+=`<linearGradient id="topoLoad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#e8a838"/><stop offset="100%" style="stop-color:#a07020"/></linearGradient>`;
+  s+=`<linearGradient id="topoEms" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#6060a0"/><stop offset="100%" style="stop-color:#303060"/></linearGradient>`;
+  s+=`<filter id="topoGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  s+=`</defs>`;
+  s+=`<rect width="${W}" height="${H}" fill="#0d1117"/>`;
+  s+=`<pattern id="topoDot" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="7.5" cy="7.5" r="0.5" fill="#1a1f2e"/></pattern>`;
+  s+=`<rect width="${W}" height="${H}" fill="url(#topoDot)"/>`;
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#4a90d9" font-size="14" font-weight="bold">油田矿区充放电电气拓扑图</text>`;
+  const emsX=W/2,emsY=75;
+  s+=`<rect x="${emsX-80}" y="${emsY-20}" width="160" height="40" rx="8" fill="url(#topoEms)" stroke="#8080c0" stroke-width="2" filter="url(#topoGlow)"/>`;
+  s+=`<text x="${emsX}" y="${emsY}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">站级EMS</text>`;
+  s+=`<text x="${emsX}" y="${emsY+13}" text-anchor="middle" fill="#b0b0e0" font-size="8">以太网通讯</text>`;
+  const gridX=100,gridY=320;
+  s+=`<rect x="${gridX-70}" y="${gridY-30}" width="140" height="60" rx="8" fill="#1a2a4a" stroke="#4a90d9" stroke-width="2"/>`;
+  s+=`<text x="${gridX}" y="${gridY-8}" text-anchor="middle" fill="#80b0e0" font-size="12" font-weight="bold">10kV电网</text>`;
+  s+=`<text x="${gridX}" y="${gridY+10}" text-anchor="middle" fill="#6090c0" font-size="9">并网取电</text>`;
+  const txX=230,txY=320;
+  s+=`<line x1="${gridX+70}" y1="${gridY}" x2="${txX-35}" y2="${txY}" stroke="#4a90d9" stroke-width="2.5"/>`;
+  s+=`<text x="${(gridX+70+txX-35)/2}" y="${gridY-8}" text-anchor="middle" fill="#4a90d9" font-size="8">10kV ac</text>`;
+  s+=`<circle cx="${txX}" cy="${txY}" r="30" fill="#2a3050" stroke="#e8a838" stroke-width="2"/>`;
+  s+=`<circle cx="${txX}" cy="${txY}" r="20" fill="none" stroke="#e8a838" stroke-width="1.5"/>`;
+  s+=`<text x="${txX}" y="${txY+4}" text-anchor="middle" fill="#e8a838" font-size="9">Y/Δ</text>`;
+  s+=`<text x="${txX}" y="${txY+45}" text-anchor="middle" fill="#e0c060" font-size="10" font-weight="bold">10/0.4变压器</text>`;
+  const pcs1X=420,pcs2X=620,pcsY=280;
+  s+=`<line x1="${txX+30}" y1="${txY}" x2="${pcs1X-60}" y2="${pcsY+20}" stroke="#e06070" stroke-width="2"/>`;
+  s+=`<line x1="${txX+30}" y1="${txY}" x2="${pcs2X-60}" y2="${pcsY+20}" stroke="#e06070" stroke-width="2"/>`;
+  s+=`<text x="${(txX+30+pcs1X-60)/2}" y="${(txY+pcsY+20)/2-10}" text-anchor="middle" fill="#e06070" font-size="8">400V ac</text>`;
+  for(let i=0;i<2;i++){
+    const px=i===0?pcs1X:pcs2X;
+    s+=`<rect x="${px-60}" y="${pcsY-25}" width="120" height="90" rx="8" fill="url(#topoPcs)" stroke="#ff8090" stroke-width="2" filter="url(#topoGlow)"/>`;
+    s+=`<text x="${px}" y="${pcsY}" text-anchor="middle" fill="white" font-size="11" font-weight="bold">PCS一体机</text>`;
+    s+=`<text x="${px}" y="${pcsY+16}" text-anchor="middle" fill="#ffc0c0" font-size="10">3.45MW</text>`;
+    s+=`<text x="${px}" y="${pcsY+32}" text-anchor="middle" fill="#c06070" font-size="8">${i===0?'1#/2#':'3#/4#'} PCS</text>`;
+    s+=`<text x="${px}" y="${pcsY+48}" text-anchor="middle" fill="#c06070" font-size="8">并网P/Q | 离网V/F</text>`;
+    s+=`<line x1="${px}" y1="${emsY+20}" x2="${px}" y2="${pcsY-25}" stroke="#8080c0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  }
+  const bat1X=pcs1X,bat2X=pcs2X,batY=440;
+  s+=`<line x1="${pcs1X}" y1="${pcsY+65}" x2="${bat1X}" y2="${batY-35}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+  s+=`<text x="${pcs1X+25}" y="${(pcsY+65+batY-35)/2}" fill="#50c878" font-size="8">1500V dc</text>`;
+  s+=`<line x1="${pcs2X}" y1="${pcsY+65}" x2="${bat2X}" y2="${batY-35}" stroke="#50c878" stroke-width="2.5" stroke-dasharray="8,3"/>`;
+  s+=`<text x="${pcs2X+25}" y="${(pcsY+65+batY-35)/2}" fill="#50c878" font-size="8">1500V dc</text>`;
+  for(let i=0;i<2;i++){
+    const bx=i===0?bat1X:bat2X;
+    s+=`<rect x="${bx-70}" y="${batY-35}" width="140" height="80" rx="8" fill="url(#topoBat)" stroke="#80e080" stroke-width="2" filter="url(#topoGlow)"/>`;
+    s+=`<text x="${bx}" y="${batY-10}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">储能电池系统</text>`;
+    s+=`<text x="${bx}" y="${batY+8}" text-anchor="middle" fill="#c0ffc0" font-size="10">5MWh (${i+1}号仓)</text>`;
+    s+=`<text x="${bx}" y="${batY+24}" text-anchor="middle" fill="#60a060" font-size="8">LFP / 液冷 / IP55</text>`;
+    s+=`<text x="${bx}" y="${batY+38}" text-anchor="middle" fill="#408040" font-size="8">1500Vdc / BMS三级</text>`;
+  }
+  const loadX=880,loadY=350;
+  s+=`<line x1="${pcs2X+60}" y1="${pcsY+20}" x2="${loadX-70}" y2="${loadY-30}" stroke="#e8a838" stroke-width="2.5"/>`;
+  s+=`<text x="${(pcs2X+60+loadX-70)/2}" y="${(pcsY+20+loadY-30)/2-8}" text-anchor="middle" fill="#e8a838" font-size="8">400V ac</text>`;
+  s+=`<rect x="${loadX-70}" y="${loadY-80}" width="140" height="180" rx="8" fill="url(#topoLoad)" stroke="#e0c060" stroke-width="2" filter="url(#topoGlow)"/>`;
+  s+=`<text x="${loadX}" y="${loadY-58}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">井口负荷</text>`;
+  s+=`<line x1="${loadX-55}" y1="${loadY-42}" x2="${loadX+55}" y2="${loadY-42}" stroke="#a07020" stroke-width="1"/>`;
+  s+=`<text x="${loadX}" y="${loadY-25}" text-anchor="middle" fill="#ffe080" font-size="10">绞车</text>`;
+  s+=`<text x="${loadX}" y="${loadY-8}" text-anchor="middle" fill="#ffe080" font-size="10">泥浆泵</text>`;
+  s+=`<text x="${loadX}" y="${loadY+9}" text-anchor="middle" fill="#ffe080" font-size="10">顶驱</text>`;
+  s+=`<text x="${loadX}" y="${loadY+26}" text-anchor="middle" fill="#ffe080" font-size="10">空压机</text>`;
+  s+=`<text x="${loadX}" y="${loadY+43}" text-anchor="middle" fill="#ffe080" font-size="10">固控系统</text>`;
+  s+=`<text x="${loadX}" y="${loadY+60}" text-anchor="middle" fill="#ffe080" font-size="10">照明/生活</text>`;
+  s+=`<text x="${loadX}" y="${loadY+80}" text-anchor="middle" fill="#c09030" font-size="8">~690kW峰值</text>`;
+  s+=`<line x1="${emsX+80}" y1="${emsY}" x2="${loadX}" y2="${loadY-70}" stroke="#8080c0" stroke-width="1" stroke-dasharray="4,2"/>`;
+  s+=`<rect x="60" y="570" width="980" height="55" rx="6" fill="#0d1520" stroke="#3a3a5e" stroke-width="1"/>`;
+  s+=`<text x="${W/2}" y="590" text-anchor="middle" fill="#8888cc" font-size="11" font-weight="bold">PCS离网无缝切换策略</text>`;
+  s+=`<text x="80" y="612" fill="#8080c0" font-size="9">1#/2# PCS → 接1号电池仓(5MWh)　　3#/4# PCS → 接2号电池仓(5MWh)　　EMS统一控制切换时序　　切换时间 &lt; 10ms</text>`;
+  s+=`<rect x="60" y="640" width="980" height="45" rx="6" fill="#0d1520" stroke="#50c878" stroke-width="1"/>`;
+  s+=`<text x="${W/2}" y="660" text-anchor="middle" fill="#50c878" font-size="11" font-weight="bold">双运行模式</text>`;
+  s+=`<text x="200" y="678" text-anchor="middle" fill="#60c060" font-size="9">并网取电: 10kV电网→变压器→PCS→电池充电</text>`;
+  s+=`<text x="600" y="678" text-anchor="middle" fill="#60c060" font-size="9">离网运行: 电池放电→PCS(V/F)→井口负荷</text>`;
+  s+=`<text x="950" y="678" text-anchor="middle" fill="#c09030" font-size="9">回本3.3年</text>`;
+  s+=`</svg>`;
+  document.getElementById('topoSvg').innerHTML=s;
+}
+
+function renderBOM(R){
+  if(!R||!R.candidates||!R.candidates.length)return;
+  const P=R.params;const c=R.candidates[currentDiagramIdx||0];
+  const bom=[];
+  let idx=1;
+  bom.push({no:idx,name:'并网柜',spec:P.use10kV?`KYN28A-12 ${P.txHv}kV真空断路器柜`:`MNS ${((P.txLv/1000).toFixed(1))}kV抽出式开关柜`,qty:1,unit:'面',note:P.use10kV?'含过流/速断/接地/防孤岛保护':'含逆功率保护'});
+  idx++;
+  if(c.needStepUp){
+    const stepKVA=Math.round(c.pcsKW*1.2);
+    bom.push({no:idx,name:'升压变压器',spec:`SC10-${stepKVA}/10 0.69/${P.txHv}kV 干式`,qty:1,unit:'台',note:'独立配置,谐波隔离'});
+    idx++;
+  }
+  bom.push({no:idx,name:'PCS功率变换系统',spec:`${(c.pcsKW/1000).toFixed(2)}MW ${c.qty>1?'分布式':'集中式'} AC${P.use10kV?'690':'400'}V`,qty:c.needPCS?c.qty:1,unit:'台',note:'并网P/Q+离网V/F'});
+  idx++;
+  bom.push({no:idx,name:'电池舱',spec:`${c.product.name} ${c.product.model}`,qty:c.qty,unit:'套',note:`${c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh'} ${c.product.cool} ${c.product.fire}`});
+  idx++;
+  bom.push({no:idx,name:'AC电缆',spec:'YJV-0.6/1kV-3×185+1×95',qty:1,unit:'批',note:'PCS至'+(c.needStepUp?'升压变':'并网柜')});
+  idx++;
+  bom.push({no:idx,name:'DC电缆',spec:'YJV-1.5kV-1×400',qty:1,unit:'批',note:'PCS至电池舱'});
+  idx++;
+  if(P.use10kV){
+    bom.push({no:idx,name:'高压电缆',spec:'YJV22-8.7/15kV-3×50',qty:1,unit:'批',note:'并网柜至母线'});
+    idx++;
+  }
+  bom.push({no:idx,name:'通讯电缆',spec:'光缆4芯+RS485屏蔽电缆',qty:1,unit:'批',note:'CAN/RS485/Ethernet'});
+  idx++;
+  bom.push({no:idx,name:'EMS控制柜',spec:'能量管理系统',qty:1,unit:'套',note:'峰谷调度+防逆流+远程监控'});
+  idx++;
+  bom.push({no:idx,name:'消防系统',spec:c.product.fire,qty:c.qty,unit:'套',note:'含探测+灭火+联动'});
+  let html=`<table style="width:100%;border-collapse:collapse;font-size:13px">`;
+  html+=`<thead><tr style="background:var(--bg3);color:var(--text1);font-weight:600">`;
+  html+=`<th style="padding:10px 12px;text-align:center;border-bottom:1px solid var(--border)">序号</th>`;
+  html+=`<th style="padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)">设备名称</th>`;
+  html+=`<th style="padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)">型号/规格</th>`;
+  html+=`<th style="padding:10px 12px;text-align:center;border-bottom:1px solid var(--border)">数量</th>`;
+  html+=`<th style="padding:10px 12px;text-align:center;border-bottom:1px solid var(--border)">单位</th>`;
+  html+=`<th style="padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)">备注</th>`;
+  html+=`</tr></thead><tbody>`;
+  bom.forEach((item,i)=>{
+    const bg=i%2===0?'var(--bg2)':'var(--bg1)';
+    html+=`<tr style="background:${bg}">`;
+    html+=`<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--text2)">${item.no}</td>`;
+    html+=`<td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text1);font-weight:500">${item.name}</td>`;
+    html+=`<td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2)">${item.spec}</td>`;
+    html+=`<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--text1)">${item.qty}</td>`;
+    html+=`<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--text2)">${item.unit}</td>`;
+    html+=`<td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);font-size:12px">${item.note}</td>`;
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table>`;
+  const sec=document.getElementById('bomSection');
+  if(sec){sec.style.display='block';document.getElementById('bomContent').innerHTML=html;}
+}
+
+function showRefDiagrams(){
+  const sec=document.getElementById('refSection');sec.style.display='block';
+  const af=document.getElementById('refArchFrame');const wf=document.getElementById('refWiringFrame');
+  if(!af.src.endsWith('系统架构图_v11_10kV.html'))af.src='系统架构图_v11_10kV.html';
+  if(!wf.src.endsWith('电气接线图_v11_10kV.html'))wf.src='电气接线图_v11_10kV.html';
+}
+
+function downloadSVG(containerId,filename){
+  const svgEl=document.getElementById(containerId).querySelector('svg');
+  if(!svgEl)return;const svgData=new XMLSerializer().serializeToString(svgEl);
+  const blob=new Blob([svgData],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+}
+
+function downloadTxt(){
+  const el=document.querySelector('.doc-output');if(!el)return;
+  const blob=new Blob([el.textContent],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='储能系统解决方案.txt';a.click();URL.revokeObjectURL(url);
+}
+
+function downloadMD(){
+  if(!LAST_RESULT)return;const P=LAST_RESULT.params;const c=LAST_RESULT.candidates[currentDiagramIdx||0];const d=new Date();
+  const capStr=c.totalCap>=1000?(c.totalCap/1000).toFixed(1)+'MWh':c.totalCap+'kWh';
+  const pcsStr=(c.pcsKW/1000).toFixed(2)+'MW';
+  let md=`# ${P.region} 工商业储能系统解决方案\n\n`;
+  md+=`> 生成日期: ${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}  \n`;
+  md+=`> 数据来源: GOTION储能手册2025Q4\n\n`;
+  md+=`## 一、配电现状\n\n| 参数 | 数值 |\n|------|------|\n`;
+  md+=`| 变压器 | ${P.txCount}×${P.txCap}kVA ${P.txHv}kV/${P.txLv}V ${P.txVector} |\n`;
+  md+=`| 接入方式 | ${P.use10kV?'10kV母线侧':'0.4kV低压侧'} |\n\n`;
+  md+=`## 二、储能选型\n\n**${c.product.name}${c.qty>1?' ×'+c.qty:''}** ${capStr} / ${pcsStr}\n\n`;
+  md+=`## 三、经济性\n\n| 项目 | 数值 |\n|------|------|\n`;
+  md+=`| 年收益 | ${c.annualSaving.toFixed(1)}万元 |\n| 总投资 | ${c.totalInvest.toFixed(0)}万元 |\n| 回收期 | ${c.payback.toFixed(1)}年 |\n`;
+  const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='储能系统解决方案.md';a.click();URL.revokeObjectURL(url);
+}
+
+switchLang(localStorage.getItem('lang')||'zh');
+showPage('devices');

@@ -1,0 +1,36 @@
+fix: Skill 卡片点击无反应 — 全局 window.* + 事件委托 + z-index
+
+# 之前 2 次修复都漏了根本问题
+1. `14a0ce6`: 加 `mgRenderSkillCards()` 到 `mgShowWiki` — 但数据没真生效
+2. `b09df72`: const → var — 但 onload 时机不对, var 也不一定真全局
+
+# 这次彻底重写 (3 处全方位加固)
+
+## 1. 数据 + 函数全部挂到 `window` 上 (避免作用域/全局/时机的所有歧义)
+- `var MG_SKILLS` → `window.MG_SKILLS = [...]`
+- `function mgShowSkillDetail()` → `window.mgShowSkillDetail = function()`
+- `function mgRenderSkillCards()` → `window.mgRenderSkillCards = function()`
+- `function mgCloseSkillModal()` → `window.mgCloseSkillModal = function()`
+- onclick="..." 改成 onclick="window.xxx()" (避免 inline 调用时找不到全局)
+
+## 2. 事件委托 (主绑定, 取代不可靠的 inline onclick)
+- 去掉所有 inline onclick
+- 改为 `addEventListener('click', e => ...closest('.mg-skill-card[data-skill-key]'))`
+- 即使 inline onclick 莫名丢失, 事件委托一定生效
+
+## 3. z-index 冲突 (这是隐藏的 bug!)
+- `.footer` z-index: 2147483647 (MAX_SAFE_INTEGER, JS protectFooter 强行设置)
+- 旧 `.skill-modal` z-index: 10000
+- 同 z-index 但 footer 后注入, 所以 footer 总在 modal 上方, 盖住 modal
+- 修复: modal z-index → 2147483647 + 打开时临时把 footer z-index 降到 5 + 关闭时恢复
+
+## 4. try/catch + console.error
+- 所有函数包 try/catch, 错误不再静默, 浏览器 Console 会显示
+- 即使某个步骤失败, 之前成功的步骤也会保留
+
+## 5. ESC 关闭 + 背景点击关闭也同步到 window.xxx
+- onclick="window.mgCloseSkillModal()"
+- addEventListener('keydown', e => e.key==='Escape' && window.mgCloseSkillModal())
+
+# 同步
+root/index.html → dist/index.html (Vercel 实际服务目录)

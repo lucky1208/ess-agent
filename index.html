@@ -230,7 +230,7 @@ select.form-input{appearance:auto}
 <div class="sub-tab" onclick="showMicroPage('mg-deploy')">一键部署</div>
 <div class="sub-tab" onclick="showMicroPage('mg-trading')">电力交易</div>
 <div class="sub-tab" onclick="showMicroPage('mg-twin')">数字孪生</div>
-<div class="sub-tab" onclick="showMicroPage('mg-wiki')">微网百科</div>
+<div class="sub-tab" onclick="showMicroPage('mg-wiki')">核心Skill</div>
 </nav>
 </div>
 
@@ -682,27 +682,16 @@ ACC AC一体柜专题
 </div>
 </div>
 
-<!-- Agent 6: 微网百科(原知识库) -->
+<!-- Agent 6: 核心Skill(原知识库) -->
 <div id="page-mg-wiki" class="micro-content" style="display:none;padding:24px 32px">
 <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px">
-<div class="sec-title" style="margin-bottom:0">微网知识百科</div>
-<div style="font-size:11px;color:var(--text2)">微网技术参考资料：架构、EMS、调度优化、软件平台</div>
+<div class="sec-title" style="margin-bottom:0">核心技术</div>
+<div style="font-size:11px;color:var(--text2)">5年项目实战沉淀的16项微网核心技术 | 点击卡片查看技术核心、关键解决问题与商用价值</div>
 </div>
-<div style="padding:16px;background:linear-gradient(135deg,rgba(24,95,165,.08),rgba(15,110,86,.08));border:1px solid var(--border);border-radius:8px;margin-bottom:16px">
-<div style="font-size:14px;font-weight:bold;color:var(--text1);margin-bottom:4px">5年项目实战训练出的10项核心Skill</div>
-<div style="font-size:11px;color:var(--text2);margin-bottom:12px">设计人：卢继雄 | 每项Skill均经多个微网项目验证迭代</div>
-<div class="mg-grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">
-<div class="mg-skill-card" style="border-left:3px solid #185FA5"><b style="color:#4a90d9">微网拓扑选择 Skill</b><p>交流微网、直流微网、交直流混合、光储充、柴储、孤岛黑启动方案自动选择</p></div>
-<div class="mg-skill-card" style="border-left:3px solid #0F6E56"><b style="color:#50c878">一次图审图 Skill</b><p>检查PCC、CT/PT、断路器、接地、防孤岛、防逆流、保护分区是否缺失</p></div>
-<div class="mg-skill-card" style="border-left:3px solid var(--orange)"><b style="color:var(--orange)">通信点表生成 Skill</b><p>设备清单 → Modbus/IEC104/MQTT/OCPP点表Excel + EMS配置</p></div>
-<div class="mg-skill-card" style="border-left:3px solid #a070a0"><b style="color:#c090d0">EMS策略编译 Skill</b><p>自然语言目标 → 可执行策略配置：削峰填谷、防逆流、需量控制、SOC边界、充电桩限功率</p></div>
-<div class="mg-skill-card" style="border-left:3px solid #e06070"><b style="color:#e06070">一键部署 Skill</b><p>服务器预检 → Docker/TDengine/EMQX/Postgres/EMS服务部署 → 健康检查 → 交付报告</p></div>
-<div class="mg-skill-card" style="border-left:3px solid #50c878"><b style="color:#50c878">调试验收 Skill</b><p>自动生成FAT/SAT测试项、遥测遥信核对表、告警联动测试表、充放电测试记录</p></div>
-<div class="mg-skill-card" style="border-left:3px solid #4a90d9"><b style="color:#4a90d9">电价收益 Skill</b><p>各地电价/需量/容量电费 → IRR、NPV、回收期、敏感性分析</p></div>
-<div class="mg-skill-card" style="border-left:3px solid var(--orange)"><b style="color:var(--orange)">故障复盘 Skill</b><p>BMS/PCS/EMS告警日志 → 根因分析、处置建议、备件建议</p></div>
-<div class="mg-skill-card" style="border-left:3px solid #185FA5"><b style="color:#4a90d9">投标文件 Skill</b><p>客户需求书 → 技术方案、配置清单、偏离表、实施计划、验收标准</p></div>
-<div class="mg-skill-card" style="border-left:3px solid #0F6E56"><b style="color:#50c878">网络安全加固 Skill</b><p>站端EMS的SSH、证书、端口、VPN、日志审计、账号权限自动检查</p></div>
-</div>
+<div id="mgSkillCardsSection" style="padding:16px;background:linear-gradient(135deg,rgba(24,95,165,.08),rgba(15,110,86,.08));border:1px solid var(--border);border-radius:8px;margin-bottom:16px">
+<div style="font-size:14px;font-weight:bold;color:var(--text1);margin-bottom:4px">5年项目实战训练出的16项核心技术 Skill</div>
+<div style="font-size:11px;color:var(--text2);margin-bottom:12px">设计人：卢继雄 | 10项工程流Skill + 6项微网深度技术Skill | 每项均经多个微网项目验证迭代</div>
+<div id="mgSkillCardsGrid" class="mg-grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px"></div>
 </div>
 <div class="sw-tabs" style="margin-bottom:16px">
 <div class="sw-tab active" onclick="mgShowWiki('arch')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>微网架构</div>
@@ -2559,7 +2548,84 @@ function mgShowWiki(id){
     subEl.querySelectorAll('[id^="mm-"]').forEach(el=>{delete el.dataset.rendered;el.innerHTML='';});
   }
   setTimeout(()=>renderMermaid('page-mg-'+id),300);
+  if(typeof window.mgRenderSkillCards==='function') setTimeout(window.mgRenderSkillCards,100);
 }
+
+window.MG_SKILLS=[
+  {key:'topo',title:'微网拓扑选择',color:'#4a90d9',tag:'工程流',brief:'根据场景参数/客户需求自动匹配最优微网拓扑,避免上错技术路线导致方案重做。',core:['6大拓扑决策树: 交流微网/直流微网/交直流混合/光储充/柴储/孤岛黑启动,每种拓扑对应典型功率/电压/容量边界','参数→拓扑映射引擎: 负荷类型/容量比/可靠性要求/并离网需求/场景约束→ 唯一推荐拓扑+备选拓扑','IEEE 1547/IEC 62933/GB/T 33589 等并网标准合规校验,自动标注拓扑选择的法规约束','拓扑经济性对比: 同容量下6种拓扑的初投资/线损/效率/运维成本 5年 TCO 对比'],problems:['客户描述模糊时如何精准推荐拓扑(避免销售自吹/工程师默认)','过度设计(用A类交流方案套到C类场景,初投资虚高30%)','欠设计(用B类直流方案承担10kV大容量场景,后期扩容受限)','不同场景下拓扑经济性差异(化工vs数据中心vs充电站)难以量化'],value:['缩短选型周期2-3周(从多次技术澄清到方案自动生成)','规避"上错技术路线"导致重做,单项目节省≥50万','统一团队(销售/方案/工程)技术语言,减少内耗']},
+  {key:'audit',title:'一次图审图',color:'#50c878',tag:'工程流',brief:'AI审单线图合规性,提前拦截并网审批驳回风险。',core:['国标GB 50059/IEC 60617/DL 5028电气符号库,200+设备符号识别','PCC/CT/PT/断路器/隔离开关/接地/防孤岛8大必查项规则库','保护分区完整性校验: 主保护/后备保护/异常保护三级时序配合图自动生成','AFD防孤岛合规校验: 频偏51.5/49.5Hz+压偏±10%+2s跳闸时间'],problems:['审图缺项漏项被客户/审图中心驳回,修改周期2-4周','并网审批被电力公司(国网/南网/PG&E/SCE等)打回','保护分区不完整导致设备烧毁(差动+后备+异常必须三级齐全)','不同省份/国家对符号/标注规范要求差异'],value:['减少90%审图返工','通过CEC/PG&E/南网等并网审批一次过,项目验收周期↓50%','规避因图纸错误导致的设备烧毁事故(单次损失百万级)']},
+  {key:'point',title:'通信点表生成',color:'#e8a838',tag:'工程流',brief:'设备清单→多协议点表Excel+EMS配置,人工翻译易错。',core:['Modbus RTU/TCP、IEC 60870-104、MQTT、OCPP 1.6J、CAN 2.0B五大协议寄存器映射规则库','EMS点表模板: 100+主流设备型号(华为/阳光/比亚迪/宁德/特斯拉/Wattman)的寄存器→点号自动转换','点表→EMS配置: 点表Excel一键导入SCADA/EMS,自动生成测点/告警/遥控绑定','协议网关配置: 多协议转换(MLOG/BM380/Moxa)通道表自动生成'],problems:['设备型号多协议适配(同一厂家不同型号寄存器定义差异)','人工翻译200+测点易错(地址/类型/字节序错一位就通信失败)','不同厂家寄存器定义差异,新设备需要重新建库','现场调试"对不上点"反复拉通,工期延误30-50%'],value:['调试周期缩短50%(从5天到2.5天)','避免现场反复调试,单项目节省≥10万调试费','建立企业内部设备协议库,资产复用']},
+  {key:'ems',title:'EMS策略编译',color:'#c090d0',tag:'工程流',brief:'自然语言目标→可执行策略配置,客户需求当天交付。',core:['自然语言NLP→策略规则编译器: "削峰+防逆流+需量控制+充电桩限功率"复合需求1句话→30+参数配置','PQ/Vf/Droop控制模式自适应: 并网/孤岛/混合模式自动切换,无需人工干预','SOC边界保护+功率边界保护+告警边界保护三重保护,任何越限自动降级','策略模板库: 30+行业最佳实践(峰谷套利/需量控制/微网协调/VPP响应等)开箱即用'],problems:['客户"削峰填谷+防逆流+需量控制"复合需求落地,人工编程2-3周','孤岛到并网无缝切换时PCS模式切换冲击大,关键负荷闪断','不同省份/不同时段电价政策变化,策略需频繁调整','策略边界设置不合理导致储能过充过放,加速衰减'],value:['替代人工编程2-3周,客户需求当天交付可执行策略','避免策略缺陷导致的设备损坏或客户罚款','策略可版本化管理,支持A/B测试和回滚']},
+  {key:'deploy',title:'一键部署',color:'#e06070',tag:'工程流',brief:'站端9模块自动化部署,4小时替代3天人工。',core:['9大模块编排: SCADA/EMS/调度/交易/告警/可视化/优化器/AI故障/数字孪生','Docker Compose/K3s模板,支持x86/ARM64,Ubuntu/CentOS/Debian','健康检查30+指标: 进程/端口/数据接入/历史库/告警链路全维度自检','交付报告自动生成: 部署日志/健康报告/账号清单/拓扑图/参数表'],problems:['站端环境异构(ARM/x86/Ubuntu/CentOS),人工部署易漏配','现场实施人员水平参差,服务起不来/端口冲突/数据没通','部署完成没有健康报告,客户不知道系统是不是真的正常','现场服务交付时间长,差旅成本高'],value:['部署时间从3天压到4小时,人工成本↓70%','健康报告100%覆盖,交付质量可量化','支持远程部署,减少50%现场差旅']},
+  {key:'test',title:'调试验收',color:'#50c878',tag:'工程流',brief:'FAT/SAT自动生成,验收一次通过率↑80%。',core:['GB/T 36558/IEEE 1547/UL 9540A测试用例库,500+标准测试项','遥测/遥信/遥控/遥调四遥测试矩阵自动生成','充放电性能测试: 0.5C/1C/2C倍率+不同SOC区间的容量/效率测试','并网性能测试: 电压电流谐波/闪变/功率因数/三相不平衡度全项目测试'],problems:['验收资料不全被客户扣款5-10%','充放电性能不达标争议(客户认为达不到承诺值)','并网测试周期长,影响项目并网日期','测试项遗漏导致后期运行出问题'],value:['验收一次通过率提升80%,客户满意度↑','完整测试记录可作为后续运维参考','避免项目验收延期导致的财务成本']},
+  {key:'price',title:'电价收益',color:'#4a90d9',tag:'工程流',brief:'多省/多区域电价建模,IRR/NPV/敏感性精准测算。',core:['多省/多区域电价库: 30+省份分时电价/阶梯电价/需量电费/容量电费季度更新','需量/容量/分时/阶梯电费四要素建模,避免ROI测算失真','IRR/NPV/回收期财务指标自动计算,支持多场景敏感性分析','政策风险评估: 电价调整/补贴退坡/并网政策变化对项目收益的敏感度'],problems:['客户ROI测算失真(忽略需量电费导致实际收益低于测算30%)','政策变化风险不可见(补贴退坡/电价调整导致IRR大幅下降)','不同区域电价差异巨大,需要精准建模','投资决策缺乏数据支撑,项目上马/不上马难判断'],value:['投资决策精准,项目取舍有据','报价中标率↑(精准测算让报价更可信)','政策风险提前识别,规避项目烂尾']},
+  {key:'fault',title:'故障复盘',color:'#e8a838',tag:'工程流',brief:'BMS/PCS/EMS告警知识图谱+根因分析,MTTR↓60%。',core:['BMS/PCS/EMS告警知识图谱: 5000+告警代码↔故障原因↔处置方案三元映射','SOE时序关联分析: 多设备告警时间序列自动关联,定位根因','备件库智能匹配: 故障→备件→采购周期→替代方案闭环','故障复盘报告: 根因/处置/预防/责任四段式标准化输出'],problems:['故障定位靠经验,新人上手慢,服务效率低','备件库存积压(什么型号都备,资金占用大)','重复故障不收敛(同类问题反复出现,客户投诉)','故障复盘不规范,知识无法沉淀'],value:['平均故障修复时间MTTR降低60%','备件周转率↑30%,库存资金占用↓','故障知识沉淀,新员工上手时间从6月到1月']},
+  {key:'bid',title:'投标文件',color:'#4a90d9',tag:'工程流',brief:'客户需求书→技术方案+配置清单+偏离表 7天→2天。',core:['招投标范本库: 央企/国企/民营/外企4大类招标范本适配','配置清单自动生成: 设备型号/数量/单价/总价/技术参数Excel一键导出','偏离表智能生成: 客户技术要求→我方响应→偏离项自动标黄','技术方案模板库: 不同行业(化工/IDC/医院/钢铁)开箱即用'],problems:['投标响应慢(7-10天),错过最佳投标窗口','偏离表漏项导致废标','技术方案与商务脱节,评委质疑','同一项目多版本投标管理混乱'],value:['投标周期7天→2天,响应速度↑3x','废标率↓50%','技术方案与商务一致性↑,评委评分↑']},
+  {key:'security',title:'网络安全加固',color:'#50c878',tag:'工程流',brief:'等保2.0三级合规检查+自动化巡检,合规风险清零。',core:['等保2.0三级合规检查表: 物理/网络/主机/应用/数据五层200+检查项','SSH/证书/防火墙/VPN/账号权限自动化巡检,周报/月报自动生成','漏洞扫描: Nessus/OpenVAS集成,工单/修复/复测闭环','安全事件溯源: 日志聚合(ELK)+异常检测(AI),实时告警'],problems:['等保测评不通过,项目无法验收/无法拿补贴','站端被攻击(勒索病毒/挖矿木马),业务停摆','账号权限滥用(离职员工/第三方人员账号未清理)','安全事件无法溯源,责任不清'],value:['通过等保三级,合规风险清零','避免被攻击造成的业务停摆损失(单次百万级)','安全运维自动化,人工成本↓60%']},
+  {key:'protect',title:'保护整定配合',color:'#e06070',tag:'微网深度技术',brief:'过流三段+差动+距离+储能并网逆变器LVRT/HVRT整定,事故不再扩大。',core:['过流三段整定: I段速断(0s)/II段限时速断(0.3-0.5s)/III段过负荷(反时限),配合级差0.3s时序图','变压器差动保护: 比率制动特性(K1=0.5/K2=0.75)+二次谐波制动(15%)防励磁涌流误动','储能并网逆变器LVRT/HVRT: 故障穿越曲线(0-1.5s电压跌落0%/20%/80%不脱网)','频率适应: 49.5-50.5Hz连续运行,49.5-47Hz/50.5-52Hz短时运行'],problems:['保护定值过灵敏导致频繁跳闸,影响生产(化工/IDC损失10万/小时)','保护定值过松烧毁设备(变压器/BESS烧毁单次百万级)','上下级保护失配,事故扩大化(本级不跳,越级跳上级)','储能逆变器LVRT不达标,电网故障时大面积脱网'],value:['通过IEC 60255/GB/T 14285认证','避免一次事故损失百万级','保护配合精准,设备故障率↓40%']},
+  {key:'switch',title:'并离网无缝切换',color:'#4a90d9',tag:'微网深度技术',brief:'STS<20ms切换+同期检测+V/f↔PQ模式自适应,关键负荷0中断。',core:['STS静态开关: 切换时间<20ms(晶闸管反并联+过零检测),关键负荷0中断','同期检测算法: 幅值差<5%/频率差<0.2Hz/相位差<10°,并网冲击电流<1.2倍额定','V/f↔PQ模式自适应: 孤岛时PCS V/f建压带载,并网时PQ恒功率,PCC检测后无缝切换','AFD主动孤岛检测: 频偏法+阻抗注入法+功率扰动法三选一,2s内必检出'],problems:['关键负荷供电中断超过50ms触发PLC复位(化工产线停机损失10万/小时)','模式切换时电机/变频器冲击电流导致绝缘击穿','并网逆功率触发电网考核(罚款5-20万/次)','AFD失效导致电网检修人员触电风险'],value:['关键负荷0中断(医院/数据中心/化工)','通过IEEE 1547.1/IEEE 929认证','并网考核零罚款,设备寿命延长']},
+  {key:'quality',title:'电能质量治理',color:'#c090d0',tag:'微网深度技术',brief:'谐波/闪变/三相不平衡/暂降全维度治理,通过电网电能质量评估。',core:['谐波治理: THDi<5%(IEEE 519),5/7/11/13次特征谐波APF滤除,容量按变压器30%配置','闪变治理: Pst<1.0/Plt<0.8(GB/T 12326),SVG动态无功补偿,响应<5ms','三相不平衡: <2%(GB/T 15543),分相调节+不平衡度告警','电压暂降/骤升: 检测<10ms/持续时间分级(0.05-0.5s/0.5-3s/3-60s),DVR动态电压恢复'],problems:['充电桩/变频器引起电网谐波超标被罚(月罚1-5万)','电能质量不达标被电网拒绝并网(项目延期3-6月)','敏感设备(PLC/医疗/精密制造)误动作损失','线损增加3-8%浪费电量'],value:['避免电网罚款(年省12-60万)','扩大接入容量(同变压器可多接20-30%负荷)','通过电能质量评估,项目顺利并网']},
+  {key:'dcmicro',title:'直流微网DC耦合',color:'#e8a838',tag:'微网深度技术',brief:'750V/1500V DC母线+光储直挂,系统效率↑4-6%,省一级逆变。',core:['DC母线设计: 750V(中小型)/1500V(大型),纹波<3%,电压偏差±10%','光储直挂DC/DC变换器: 效率>98.5%,MPPT+DC/DC一体化,省去一级逆变','双向PCS拓扑: ILC串联(中压)/并联(低压),单机1.25MW,可并联扩容至5MW','直流保护: 直流断路器/DC熔断器/隔离开关,正负极双极保护,分断能力>25kA'],problems:['光储多次AC/DC转换损耗高(传统方案8-12%损耗,DC耦合可降至4-6%)','DC母线电压波动大(光伏出力波动+负荷突变),需要超级电容/储能稳压','直流保护器件选型难(灭弧/分断能力不同于AC保护)','DC母线短路电流极大(无自然过零点,分断困难)'],value:['系统效率↑4-6%(年省电费5-8%,1000kW规模年省30万+)','设备成本↓8-12%(省一级逆变器,省AC开关柜)','占地↓15-20%(无逆变房),适合空间受限场景']},
+  {key:'blackstart',title:'黑启动与多MG协同',color:'#e06070',tag:'微网深度技术',brief:'柴发/储能协同黑启动+多MG集群P2P互供,2h→30min恢复。',core:['黑启动策略: 储能V/f建压→逐级加载柴发→同期并网→加载非关键负荷,总时长<30min','多微网集群P2P互供: MG-MG联络线功率控制,某MG故障时邻居MG紧急供电','分层控制架构: 主从(中央调度)/对等(下垂控制)两种模式,自适应切换','集群调度算法: 基于纳什均衡的功率分配,避免单MG过载,全局最优'],problems:['全黑后恢复时间长(传统>2h),客户断电损失大(化工/IDC)','多MG能量调度冲突(主从模式单点故障,对等模式难以协调)','主电源故障后系统崩溃,无黑启动能力','多MG集群无法聚合参与电力市场'],value:['黑启动<30min(从2h缩短),客户断电损失↓90%','多MG集群聚合参与调频/备用市场,IRR↑3-5%','系统可靠性↑99.99%→99.999%(4个9到5个9)']},
+  {key:'vpp',title:'虚拟电厂VPP',color:'#50c878',tag:'微网深度技术',brief:'分布式资源聚合+调度接口+基线计算,解锁电力市场+碳交易+绿证。',core:['分布式资源聚合: MG/储能/可调负荷/充电桩V2G多类型资源统一建模,容量/响应时间/爬坡速率','调度接口标准: OpenADR 2.0b/IEEE 2030.5/IEC 61850-7-420,支持PJM/CAISO/国网/南网调度','基线负荷计算: 10种算法(高斯混合/同类用户/历史同期/回归等),误差<5%,满足市场要求','可调度容量评估: 实时上报(响应<10s),日前申报(精度95%),日内滚动修正'],problems:['分布式资源单体小无法参与电力市场(单个MG<1MW不达市场门槛)','海量资源聚合调度响应慢(传统SCADA分钟级,市场要求秒级)','收益分配不公平(谁出力多谁分少,缺乏基线和量化)','多市场协调复杂(电能量/调频/备用/峰荷/碳交易同时参与)'],value:['进入调频/备用/峰荷市场获取额外收益,IRR↑3-5%','解锁碳交易/绿证收入(年百万级)','分布式资源变现,提升项目财务可行性']}
+];
+
+window.mgRenderSkillCards=function(){
+  try{
+    const grid=document.getElementById('mgSkillCardsGrid');
+    if(!grid||!window.MG_SKILLS)return;
+    grid.innerHTML=window.MG_SKILLS.map(s=>{
+      return '<div class="mg-skill-card" data-skill-key="'+s.key+'" style="border-left:3px solid '+s.color+';cursor:pointer;position:relative;z-index:1">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+          +'<b style="color:'+s.color+'">'+s.title+'</b>'
+          +'<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:'+s.color+'22;color:'+s.color+'">'+s.tag+'</span>'
+        +'</div>'
+        +'<p>'+s.brief+'</p>'
+        +'<div style="font-size:10px;color:var(--text3);margin-top:4px">▸ 点击查看技术核心/解决问题/商用价值</div>'
+      +'</div>';
+    }).join('');
+    const sec=document.getElementById('mgSkillCardsSection');
+    if(sec)sec.style.pointerEvents='auto';
+    grid.style.pointerEvents='auto';
+  }catch(err){console.error('mgRenderSkillCards error:',err);}
+};
+
+window.mgShowSkillDetail=function(key){
+  try{
+    const s=window.MG_SKILLS.find(x=>x.key===key);
+    if(!s)return;
+    const $=id=>document.getElementById(id);
+    $('skillModalTitle').innerHTML='<span style="color:'+s.color+'">'+s.title+'</span><span style="font-size:11px;padding:2px 8px;border-radius:8px;background:'+s.color+'22;color:'+s.color+';margin-left:8px">'+s.tag+'</span>';
+    $('skillModalBrief').textContent=s.brief;
+    $('skillModalCore').innerHTML=s.core.map(c=>'<li style="padding:4px 0;border-bottom:1px dashed var(--border);font-size:12px;line-height:1.6">'+c+'</li>').join('');
+    $('skillModalProblems').innerHTML=s.problems.map(p=>'<li style="padding:4px 0;border-bottom:1px dashed var(--border);font-size:12px;line-height:1.6">'+p+'</li>').join('');
+    $('skillModalValue').innerHTML=s.value.map(v=>'<li style="padding:4px 0;border-bottom:1px dashed var(--border);font-size:12px;line-height:1.6">'+v+'</li>').join('');
+    const modal=$('skillDetailModal');
+    if(!modal)return;
+    if(modal.parentNode!==document.body)document.body.appendChild(modal);
+    modal.classList.add('show');
+    modal.style.cssText='display:flex!important;position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;z-index:2147483647!important;background:rgba(0,0,0,.75)!important;backdrop-filter:blur(6px)!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:0 0 60px 0!important;box-sizing:border-box!important;overflow:auto!important;';
+  }catch(err){console.error('mgShowSkillDetail error:',err);}
+};
+
+window.mgCloseSkillModal=function(){
+  const modal=document.getElementById('skillDetailModal');
+  if(modal){
+    modal.classList.remove('show');
+    modal.style.cssText='display:none!important;position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;z-index:2147483647!important;';
+  }
+};
+
+document.addEventListener('keydown',function(e){if(e.key==='Escape')window.mgCloseSkillModal();});
+
+document.addEventListener('click',function(e){
+  const card=e.target&&e.target.closest&&e.target.closest('.mg-skill-card[data-skill-key]');
+  if(card&&typeof window.mgShowSkillDetail==='function'){
+    e.preventDefault();
+    e.stopPropagation();
+    window.mgShowSkillDetail(card.dataset.skillKey);
+  }
+},true);
 
 function showAidcPage(id){
   document.querySelectorAll('#aidcNav .sub-tab').forEach(t=>t.classList.remove('active'));
@@ -8603,5 +8669,26 @@ function downloadMGDiagram(containerId,filename){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
 }
 </script>
+
+<div class="skill-modal" id="skillDetailModal" onclick="if(event.target===this)window.mgCloseSkillModal()" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483647;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding-bottom:60px;margin:0;box-sizing:border-box;overflow:auto">
+  <div style="position:relative;background:linear-gradient(135deg,var(--bg2),var(--bg1));border:1px solid var(--border);border-radius:12px;width:92%;max-width:820px;max-height:88vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.5);margin:auto">
+    <button onclick="window.mgCloseSkillModal()" title="关闭(ESC)" style="position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center">✕</button>
+    <div id="skillModalTitle" style="font-size:18px;font-weight:bold;margin-bottom:6px;display:flex;align-items:center;gap:10px"></div>
+    <div id="skillModalBrief" style="font-size:12px;color:var(--text2);line-height:1.7;padding:10px 12px;background:rgba(24,95,165,.06);border-left:3px solid var(--blue);border-radius:0 6px 6px 0;margin-bottom:18px"></div>
+    <div style="margin-bottom:18px">
+      <div style="color:#4a90d9;font-size:12px;font-weight:bold;margin-bottom:8px;display:flex;align-items:center;gap:6px;padding-bottom:6px;border-bottom:1px dashed var(--border)"><span style="width:10px;height:10px;border-radius:50%;background:#4a90d9"></span>技术核心</div>
+      <ul id="skillModalCore" style="list-style:none;padding:0;margin:0"></ul>
+    </div>
+    <div style="margin-bottom:18px">
+      <div style="color:#e8a838;font-size:12px;font-weight:bold;margin-bottom:8px;display:flex;align-items:center;gap:6px;padding-bottom:6px;border-bottom:1px dashed var(--border)"><span style="width:10px;height:10px;border-radius:50%;background:#e8a838"></span>关键解决问题</div>
+      <ul id="skillModalProblems" style="list-style:none;padding:0;margin:0"></ul>
+    </div>
+    <div style="margin-bottom:18px">
+      <div style="color:#50c878;font-size:12px;font-weight:bold;margin-bottom:8px;display:flex;align-items:center;gap:6px;padding-bottom:6px;border-bottom:1px dashed var(--border)"><span style="width:10px;height:10px;border-radius:50%;background:#50c878"></span>商用价值</div>
+      <ul id="skillModalValue" style="list-style:none;padding:0;margin:0"></ul>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
