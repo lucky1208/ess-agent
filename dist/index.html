@@ -207,15 +207,15 @@ select.form-input{appearance:auto}
 </header>
 
 <nav class="category-tabs">
-<div class="category-tab active" onclick="switchCategory('ess')">储能方案智能体</div>
-<div class="category-tab" onclick="switchCategory('microgrid')">微网交付智能体</div>
-<div class="category-tab" onclick="switchCategory('aidc')">AIDC方案智能体</div>
+<div class="category-tab active" onclick="switchCategory('ess')" data-i18n="cat_ess">储能方案智能体</div>
+<div class="category-tab" onclick="switchCategory('microgrid')" data-i18n="cat_mg">微网交付智能体</div>
+<div class="category-tab" onclick="switchCategory('aidc')" data-i18n="cat_aidc">AIDC方案智能体</div>
 </nav>
 
 <div id="essNav">
 <nav class="nav-tabs">
 <div class="nav-tab active" onclick="showPage('devices')" data-i18n="nav_devices">设备库</div>
-<div class="nav-tab" onclick="showPage('config')" data-i18n="nav_input">用户输入</div>
+<div class="nav-tab" onclick="showPage('config')" data-i18n="nav_input">方案设计</div>
 <div class="nav-tab" onclick="showPage('diagrams')" data-i18n="nav_diagrams">生成图纸</div>
 <div class="nav-tab" onclick="showPage('cases')" data-i18n="nav_cases">应用案例</div>
 </nav>
@@ -223,26 +223,26 @@ select.form-input{appearance:auto}
 
 <div id="microgridNav" style="display:none">
 <nav class="sub-tabs">
-<div class="sub-tab active" onclick="showMicroPage('mg-design')">方案设计</div>
-<div class="sub-tab" onclick="showMicroPage('mg-drawings')">电气图纸</div>
-<div class="sub-tab" onclick="showMicroPage('mg-protocol')">协议调试</div>
-<div class="sub-tab" onclick="showMicroPage('mg-energy')">能源管理</div>
-<div class="sub-tab" onclick="showMicroPage('mg-deploy')">一键部署</div>
-<div class="sub-tab" onclick="showMicroPage('mg-trading')">电力交易</div>
-<div class="sub-tab" onclick="showMicroPage('mg-twin')">数字孪生</div>
-<div class="sub-tab" onclick="showMicroPage('mg-wiki')">核心Skill</div>
+<div class="sub-tab active" onclick="showMicroPage('mg-design')" data-i18n="mg_design">方案设计</div>
+<div class="sub-tab" onclick="showMicroPage('mg-drawings')" data-i18n="mg_drawings">电气图纸</div>
+<div class="sub-tab" onclick="showMicroPage('mg-protocol')" data-i18n="mg_protocol">协议调试</div>
+<div class="sub-tab" onclick="showMicroPage('mg-energy')" data-i18n="mg_energy">能源管理</div>
+<div class="sub-tab" onclick="showMicroPage('mg-deploy')" data-i18n="mg_deploy">一键部署</div>
+<div class="sub-tab" onclick="showMicroPage('mg-trading')" data-i18n="mg_trading">电力交易</div>
+<div class="sub-tab" onclick="showMicroPage('mg-twin')" data-i18n="mg_twin">数字孪生</div>
+<div class="sub-tab" onclick="showMicroPage('mg-wiki')" data-i18n="mg_skill">核心Skill</div>
 </nav>
 </div>
 
 <div id="aidcNav" style="display:none">
 <nav class="sub-tabs">
-<div class="sub-tab active" onclick="showAidcPage('aidc-design')">方案设计</div>
-<div class="sub-tab" onclick="showAidcPage('aidc-power')">供电架构</div>
-<div class="sub-tab" onclick="showAidcPage('aidc-cooling')">液冷散热</div>
-<div class="sub-tab" onclick="showAidcPage('aidc-pue')">PUE优化</div>
-<div class="sub-tab" onclick="showAidcPage('aidc-layout')">机柜布局</div>
-<div class="sub-tab" onclick="showAidcPage('aidc-bom')">BOM清单</div>
-<div class="sub-tab" onclick="showAidcPage('aidc-drawings')">图纸</div>
+<div class="sub-tab active" onclick="showAidcPage('aidc-design')" data-i18n="aidc_design">方案设计</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-power')" data-i18n="aidc_power">供电架构</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-cooling')" data-i18n="aidc_cooling">液冷散热</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-pue')" data-i18n="aidc_pue">PUE优化</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-layout')" data-i18n="aidc_layout">机柜布局</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-bom')" data-i18n="aidc_bom">BOM清单</div>
+<div class="sub-tab" onclick="showAidcPage('aidc-drawings')" data-i18n="aidc_drawings">图纸</div>
 </nav>
 </div>
 
@@ -2325,7 +2325,10 @@ zh:{
 header_title:'Open ESS Agent — 开源储能系统解决方案AI智能体',
 header_spec:'设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905',
 footer_text:'版权所有@卢继雄  请尊重知识产权',
+cat_ess:'储能方案智能体',cat_mg:'微网交付智能体',cat_aidc:'AIDC方案智能体',
 nav_devices:'设备库',nav_input:'方案设计',nav_diagrams:'生成图纸',nav_cases:'应用案例',
+mg_design:'方案设计',mg_drawings:'电气图纸',mg_protocol:'协议调试',mg_energy:'能源管理',mg_deploy:'一键部署',mg_trading:'电力交易',mg_twin:'数字孪生',mg_skill:'核心Skill',
+aidc_design:'方案设计',aidc_power:'供电架构',aidc_cooling:'液冷散热',aidc_pue:'PUE优化',aidc_layout:'机柜布局',aidc_bom:'BOM清单',aidc_drawings:'图纸',
 sidebar_ai_title:'AI智能体自动配置',
 sidebar_ai_desc:'输入需求信息，智能体自动生成完整解决方案：设备选型、系统架构图、电气一次接线图、系统拓扑图、BOM清单、充放电策略、经济性分析',
 method1_title:'方式一：自然语言描述',
@@ -2342,14 +2345,88 @@ generate_btn:'生成解决方案',
 device_library_title:'储能设备产品库',
 diagram_arch:'系统架构图',diagram_wiring:'电气一次接线图',diagram_topo:'系统拓扑图',diagram_bom:'物料清单(BOM)',diagram_ref:'参考设计图（大庆管业5MWh项目）',
 download_svg:'下载 SVG',export_csv:'导出 CSV',export_excel:'导出 Excel',cases_title:'应用案例',
-llm_provider:'AI模型',llm_local:'本地小模型',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen3.7-Max (阿里百炼)',
-ranking_title:'推荐配置排序',ranking_formula:'评分 = 覆盖率×0.4 + 利用率×0.3 + 1/回收期×0.3'
+llm_provider:'AI模型',llm_local:'本地模型引擎',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (智谱)',llm_bailian:'Qwen3.7-Max (阿里百炼)',
+ranking_title:'推荐配置排序',ranking_formula:'评分 = 覆盖率×0.4 + 利用率×0.3 + 1/回收期×0.3',
+success_msg:'解决方案已生成！请查看推荐设备和系统图纸。',
+mg_success_msg:'方案已生成！请切换到其他标签查看图纸、点表、部署方案',
+aidc_success_msg:'方案已生成！请切换到其他标签查看供电架构、液冷散热、PUE优化等详情',
+mg_design_title:'微网方案设计 Agent',
+mg_design_desc:'输入场景参数，AI自动生成微网拓扑、设备选型、BOM清单、经济性分析',
+mg_design_agent:'AI 微网方案设计智能体',
+mg_design_agent_desc:'从同一份方案JSON同源输出：系统架构图、一次接线图、通信拓扑图、保护分区图、BOM清单、经济性报告。AI自动识别场景特征推荐最佳拓扑方案',
+mg_nl_label:'自然语言描述',
+mg_nl_ph:'例：苏州工业园区2MW负荷，光伏1.5MWp+储能5MWh，10kV接入，需并/离网双模切换，预留充电桩1.2MW',
+mg_ai_btn:'AI识别参数并生成方案',
+mg_proj_name:'项目名称',mg_region:'所在区域',mg_scene:'场景类型',
+mg_scene_park:'工商业园区',mg_scene_solar:'光储充一体化',mg_scene_oil:'油田矿区',mg_scene_remote:'偏远离网',mg_scene_dc:'数据中心',
+mg_peak_load:'峰值负荷 (kW)',mg_pv_cap:'光伏容量 (kWp)',mg_bess_cap:'储能容量 (kWh)',
+mg_diesel:'柴发容量 (kW)',mg_ev:'充电桩 (kW)',mg_voltage:'接入电压 (kV)',mg_voltage_480:'480V(美标)',
+mg_mode:'运行模式',mg_mode_grid:'并网运行',mg_mode_dual:'并/离网双模',mg_mode_island:'纯离网',
+mg_critical:'关键负荷占比(%)',mg_budget:'预算上限(万美元)',
+mg_price_peak:'峰段电价($/kWh)',mg_price_valley:'谷段电价($/kWh)',
+mg_gen_btn:'生成微网方案',
+mg_drawings_title:'电气图纸 Agent',
+mg_drawings_desc:'从方案JSON同源生成：系统架构图、一次接线图、通信拓扑图、保护分区图。遵循GB/T 4728电气符号标准',
+mg_no_result:'请先在「方案设计」中生成微网方案',
+mg_arch_title:'微网系统架构图',mg_wiring_title:'微网电气一次接线图',mg_comm_title:'微网通信拓扑图',
+mg_protect_title:'微网保护配置图',mg_logic_title:'微网控制逻辑图',mg_bom_title:'BOM设备清单',mg_econ_title:'经济性分析报告',
+mg_protocol_title:'协议与调试 Agent',
+mg_protocol_desc:'根据设备类型自动生成Modbus/IEC104/IEC61850/OCPP/MQTT通信点表，含寄存器地址、数据类型、调试检查项',
+mg_pt_pcs:'PCS点表',mg_pt_bms:'BMS点表',mg_pt_meter:'关口表',mg_pt_pv:'光伏逆变器',mg_pt_ev:'充电桩',mg_pt_diesel:'柴发',mg_pt_fire:'消防/环境',mg_pt_mqtt:'MQTT主题',mg_pt_debug:'调试检查清单',
+mg_energy_title:'能源管理 Agent',
+mg_energy_desc:'调试期 · 运营期 · 验收期 — 三期共用一入口，交付闭环',
+mg_em_startup:'系统启动',mg_em_monitor:'实时监控',mg_em_control:'设备控制',mg_em_strategy:'策略配置',mg_em_dispatch:'功率调度',mg_em_mode:'模式切换',mg_em_alarm:'告警管理',mg_em_analysis:'运营分析',mg_em_accept:'交付验收',mg_em_config:'系统配置',
+mg_deploy_title:'EMS 一键部署 Agent',
+mg_deploy_desc:'站端服务器/边缘网关自动化部署：预检→安装→配置注入→服务启动→健康检查→交付报告',
+mg_deploy_target:'目标服务器',mg_deploy_ip:'服务器 IP',mg_deploy_ssh:'SSH 端口',mg_deploy_user:'用户名',mg_deploy_key:'认证密钥备注',mg_deploy_key_ph:'部署时提供 (不存盘)',
+mg_deploy_spec:'服务器规格要求',mg_deploy_min:'最小配置:',mg_deploy_rec:'推荐配置:',mg_deploy_os:'操作系统:',mg_deploy_port:'开放端口:',
+mg_deploy_modules:'部署模块',
+mg_mod_scada:'SCADA 实时监控',mg_mod_ems:'EMS 能量管理',mg_mod_gw:'协议网关(Modbus/CAN/IEC104)',mg_mod_alarm:'告警推送(分级+声光+短信)',mg_mod_screen:'可视化大屏',mg_mod_opt:'调度优化引擎(MILP)',mg_mod_trade:'电力交易助手',mg_mod_ai:'AI 故障预测',mg_mod_twin:'数字孪生3D',
+mg_deploy_log:'部署流水线日志',mg_deploy_log_ph:'等待执行。选择部署模块后点击「模拟部署」查看完整部署过程。',
+mg_deploy_btn:'模拟部署流水线',mg_deploy_export:'导出部署脚本',mg_deploy_plan:'Ansible部署计划',mg_deploy_plan_ph:'请先运行部署模拟',
+mg_trading_title:'电力交易策略 Agent',
+mg_trading_desc:'接入当地电价/辅助服务政策，AI自动推荐最优充放电策略，预估额外收益',
+mg_trading_price:'分时电价配置',mg_trading_peak:'峰段(元/kWh)',mg_trading_flat:'平段(元/kWh)',mg_trading_valley:'谷段(元/kWh)',mg_trading_pv:'光伏上网电价(元)',mg_trading_lc:'储能度电成本(元)',
+mg_trading_market:'参与市场类型',mg_mk_arb:'峰谷价差套利',mg_mk_demand:'需量管理',mg_mk_spot:'电力现货市场',mg_mk_aux:'辅助服务(调频/备用)',mg_mk_dr:'需求响应(削峰补偿)',mg_mk_carbon:'碳交易/绿证',
+mg_trading_btn:'生成交易策略',mg_trading_strategy:'策略建议',mg_trading_revenue:'收益测算',mg_trading_schedule:'24h典型调度计划',
+mg_twin_no:'尚未生成微网方案',mg_twin_go:'请先在「方案设计」中填写项目参数并点击"生成微网方案"...',mg_twin_btn:'→ 前往方案设计',
+mg_wiki_title:'核心技术',mg_wiki_desc:'5年项目实战沉淀的16项微网核心技术 | 点击卡片查看技术核心、关键解决问题与商用价值',
+mg_wiki_skill_title:'5年项目实战训练出的16项核心技术 Skill',mg_wiki_skill_author:'设计人：卢继雄 | 10项工程流Skill + 6项微网深度技术Skill | 每项均经多个微网项目验证迭代',
+mg_wiki_arch:'微网架构',mg_wiki_ems:'能量管理',mg_wiki_schedule:'调度优化',mg_wiki_software:'软件平台',
+aidc_design_title:'AIDC方案设计 Agent',
+aidc_design_desc:'输入数据中心参数，AI自动生成算力规划、供电架构、液冷散热、PUE优化方案',
+aidc_design_agent:'AI 数据中心方案智能体',
+aidc_design_agent_desc:'从同一份方案JSON同源输出：算力规划、供电架构、液冷散热、PUE优化、机柜布局、BOM清单、经济性分析。AI自动识别算力需求推荐最佳供电与散热方案',
+aidc_nl_label:'自然语言描述',
+aidc_nl_ph:'例：上海张江AI算力中心，GPU集群800卡H100，总IT负荷12MW，10kV双路接入，要求PUE<1.25，液冷散热',
+aidc_ai_btn:'AI识别参数并生成方案',
+aidc_proj_name:'项目名称',aidc_region:'所在区域',aidc_tier:'数据中心等级',
+aidc_gpu_model:'GPU型号',aidc_gpu_qty:'GPU数量(卡)',aidc_it_load:'总IT负荷(kW)',
+aidc_voltage:'接入电压(kV)',aidc_redundancy:'供电冗余',
+aidc_cooling:'散热方式',aidc_cooling_liquid:'液冷',aidc_cooling_air:'风冷',aidc_cooling_hybrid:'液冷+风冷混合',
+aidc_pue_target:'PUE目标',aidc_rack_density:'机柜功率密度(kW/柜)',aidc_budget:'预算(万元)',
+aidc_price_peak:'峰电价(元/kWh)',aidc_price_valley:'谷电价(元/kWh)',
+aidc_gen_btn:'生成AIDC方案',
+aidc_power_title:'供电架构 Agent',aidc_power_desc:'从方案JSON同源生成：供电单线图、UPS配置、配电架构、冗余方案。遵循GB 50174/GB 50052标准',
+aidc_power_diagram:'AIDC供电单线图',
+aidc_cooling_title:'液冷散热 Agent',aidc_cooling_desc:'从方案JSON同源生成：冷板设计、CDU配置、管路布局、散热能力评估',
+aidc_cooling_diagram:'液冷管路拓扑图',
+aidc_pue_title2:'PUE优化 Agent',aidc_pue_desc:'PUE目标分解、节能策略推荐、自然冷却潜力评估、经济性分析',
+aidc_layout_title:'机柜布局 Agent',aidc_layout_desc:'机柜功率密度规划、冷热通道设计、设备平面布置图',
+aidc_layout_diagram:'设备平面布置图',
+aidc_bom_title2:'BOM清单 Agent',aidc_bom_desc:'完整设备清单、型号规格、数量、价格汇总',
+aidc_dw_title:'图纸汇总 Agent',aidc_dw_desc:'所有AIDC图纸集中展示与下载',
+aidc_dw_arch:'AIDC系统架构图',aidc_dw_wiring:'AIDC电气一次接线图',aidc_dw_dual:'AIDC双路供电拓扑图',aidc_dw_liquid:'AIDC液冷管路图',
+ess_layout:'平面布置图',ess_cable:'电缆走向图',ess_principle:'PCS-BESS电气原理图'
 },
 en:{
 header_title:'Open ESS Agent — Open-source ESS Solution AI Agent',
 header_spec:'Design Standards: System-level GB/T 36558-2023 | Wiring GB 50055 | Grid-connection GB/T 34120, GB/T 34131 | Station GB/T 42288 | Designer: Lu Jixiong | Tel: 15026953905',
 footer_text:'Copyright @ Lu Jixiong. Please respect intellectual property rights',
+cat_ess:'ESS Solution Agent',cat_mg:'Microgrid Delivery Agent',cat_aidc:'AIDC Solution Agent',
 nav_devices:'Device Library',nav_input:'Solution Design',nav_diagrams:'Generate Diagrams',nav_cases:'Use Cases',
+mg_design:'Design',mg_drawings:'Electrical DWG',mg_protocol:'Protocol & Debug',mg_energy:'Energy Mgmt',mg_deploy:'One-Click Deploy',mg_trading:'Power Trading',mg_twin:'Digital Twin',mg_skill:'Core Skills',
+aidc_design:'Design',aidc_power:'Power Arch',aidc_cooling:'Liquid Cooling',aidc_pue:'PUE Optimize',aidc_layout:'Rack Layout',aidc_bom:'BOM',aidc_drawings:'Drawings',
 sidebar_ai_title:'AI Agent Auto Configuration',
 sidebar_ai_desc:'Input your requirements, the AI agent auto-generates a complete solution: equipment selection, system architecture, wiring diagram, BOM, charge/discharge strategy, economic analysis',
 method1_title:'Method 1: Natural Language',
@@ -2366,16 +2443,90 @@ generate_btn:'Generate Solution',
 device_library_title:'ESS Device Product Library',
 diagram_arch:'System Architecture',diagram_wiring:'Electrical Single-line Diagram',diagram_topo:'System Topology Diagram',diagram_bom:'Bill of Materials (BOM)',diagram_ref:'Reference Design (Daqing 5MWh Project)',
 download_svg:'Download SVG',export_csv:'Export CSV',export_excel:'Export Excel',cases_title:'Use Cases',
-llm_provider:'AI Model',llm_local:'Local Mini Model',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen3.7-Max (Alibaba)',
-ranking_title:'Recommended Configuration Ranking',ranking_formula:'Score = Coverage×0.4 + Utilization×0.3 + 1/Payback×0.3'
+llm_provider:'AI Model',llm_local:'Local Model Engine',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1 (Zhipu)',llm_bailian:'Qwen3.7-Max (Alibaba)',
+ranking_title:'Recommended Configuration Ranking',ranking_formula:'Score = Coverage×0.4 + Utilization×0.3 + 1/Payback×0.3',
+success_msg:'Solution generated! Please check recommended devices and diagrams.',
+mg_success_msg:'Solution generated! Switch to other tabs for diagrams, point tables, deployment',
+aidc_success_msg:'Solution generated! Switch to other tabs for power arch, cooling, PUE details',
+mg_design_title:'Microgrid Design Agent',
+mg_design_desc:'Input scenario parameters, AI auto-generates microgrid topology, equipment selection, BOM, economic analysis',
+mg_design_agent:'AI Microgrid Design Agent',
+mg_design_agent_desc:'Single-source JSON output: system architecture, single-line diagram, comm topology, protection diagram, BOM, economic report. AI auto-identifies scenario for optimal topology',
+mg_nl_label:'Natural Language Description',
+mg_nl_ph:'e.g. Suzhou Industrial Park 2MW load, PV 1.5MWp+ESS 5MWh, 10kV connection, grid/island dual-mode, EV 1.2MW reserved',
+mg_ai_btn:'AI Detect & Generate',
+mg_proj_name:'Project Name',mg_region:'Region',mg_scene:'Scene Type',
+mg_scene_park:'Industrial/Commercial Park',mg_scene_solar:'Solar-Storage-EV Integration',mg_scene_oil:'Oilfield/Mining',mg_scene_remote:'Remote Off-grid',mg_scene_dc:'Data Center',
+mg_peak_load:'Peak Load (kW)',mg_pv_cap:'PV Capacity (kWp)',mg_bess_cap:'ESS Capacity (kWh)',
+mg_diesel:'Diesel Gen (kW)',mg_ev:'EV Charger (kW)',mg_voltage:'Grid Voltage (kV)',mg_voltage_480:'480V (US Std)',
+mg_mode:'Operation Mode',mg_mode_grid:'Grid-connected',mg_mode_dual:'Grid/Island Dual-mode',mg_mode_island:'Pure Island',
+mg_critical:'Critical Load Ratio (%)',mg_budget:'Budget Limit (10k USD)',
+mg_price_peak:'Peak Price ($/kWh)',mg_price_valley:'Valley Price ($/kWh)',
+mg_gen_btn:'Generate Microgrid Solution',
+mg_drawings_title:'Electrical Diagram Agent',
+mg_drawings_desc:'Single-source JSON: system architecture, single-line diagram, comm topology, protection diagram. GB/T 4728 compliant',
+mg_no_result:'Please generate a microgrid solution in "Design" first',
+mg_arch_title:'Microgrid System Architecture',mg_wiring_title:'Microgrid Single-line Diagram',mg_comm_title:'Microgrid Comm Topology',
+mg_protect_title:'Microgrid Protection Diagram',mg_logic_title:'Microgrid Control Logic',mg_bom_title:'BOM Equipment List',mg_econ_title:'Economic Analysis Report',
+mg_protocol_title:'Protocol & Debug Agent',
+mg_protocol_desc:'Auto-generate Modbus/IEC104/IEC61850/OCPP/MQTT point tables with register addresses, data types, debug checklist',
+mg_pt_pcs:'PCS Points',mg_pt_bms:'BMS Points',mg_pt_meter:'Meter Points',mg_pt_pv:'PV Inverter',mg_pt_ev:'EV Charger',mg_pt_diesel:'Diesel Gen',mg_pt_fire:'Fire/Environment',mg_pt_mqtt:'MQTT Topics',mg_pt_debug:'Debug Checklist',
+mg_energy_title:'Energy Management Agent',
+mg_energy_desc:'Commissioning · Operation · Acceptance — Three phases, one entry, delivery closed-loop',
+mg_em_startup:'System Startup',mg_em_monitor:'Real-time Monitor',mg_em_control:'Device Control',mg_em_strategy:'Strategy Config',mg_em_dispatch:'Power Dispatch',mg_em_mode:'Mode Switch',mg_em_alarm:'Alarm Mgmt',mg_em_analysis:'Operation Analysis',mg_em_accept:'Delivery Acceptance',mg_em_config:'System Config',
+mg_deploy_title:'EMS One-Click Deploy Agent',
+mg_deploy_desc:'Automated deployment: pre-check→install→config inject→service start→health check→delivery report',
+mg_deploy_target:'Target Server',mg_deploy_ip:'Server IP',mg_deploy_ssh:'SSH Port',mg_deploy_user:'Username',mg_deploy_key:'Auth Key Note',mg_deploy_key_ph:'Provide at deploy time (not stored)',
+mg_deploy_spec:'Server Requirements',mg_deploy_min:'Min Config:',mg_deploy_rec:'Recommended:',mg_deploy_os:'OS:',mg_deploy_port:'Open Ports:',
+mg_deploy_modules:'Deploy Modules',
+mg_mod_scada:'SCADA Real-time Monitor',mg_mod_ems:'EMS Energy Mgmt',mg_mod_gw:'Protocol Gateway (Modbus/CAN/IEC104)',mg_mod_alarm:'Alarm Push (graded+sound+SMS)',mg_mod_screen:'Visualization Dashboard',mg_mod_opt:'Dispatch Optimizer (MILP)',mg_mod_trade:'Power Trading Assistant',mg_mod_ai:'AI Fault Prediction',mg_mod_twin:'Digital Twin 3D',
+mg_deploy_log:'Deploy Pipeline Log',mg_deploy_log_ph:'Waiting. Select modules and click "Simulate Deploy" to view process.',
+mg_deploy_btn:'Simulate Deploy Pipeline',mg_deploy_export:'Export Deploy Script',mg_deploy_plan:'Ansible Deploy Plan',mg_deploy_plan_ph:'Please run deploy simulation first',
+mg_trading_title:'Power Trading Strategy Agent',
+mg_trading_desc:'Connect to local pricing/ancillary service policies, AI recommends optimal charge/discharge strategy, estimates extra revenue',
+mg_trading_price:'Time-of-Use Pricing Config',mg_trading_peak:'Peak (CNY/kWh)',mg_trading_flat:'Flat (CNY/kWh)',mg_trading_valley:'Valley (CNY/kWh)',mg_trading_pv:'PV Feed-in Price (CNY)',mg_trading_lc:'ESS LCOS (CNY)',
+mg_trading_market:'Market Participation',mg_mk_arb:'Peak-Valley Arbitrage',mg_mk_demand:'Demand Management',mg_mk_spot:'Spot Market',mg_mk_aux:'Ancillary Services (Freq/Reserve)',mg_mk_dr:'Demand Response (Peak Shaving)',mg_mk_carbon:'Carbon Trading/Green Cert',
+mg_trading_btn:'Generate Trading Strategy',mg_trading_strategy:'Strategy Recommendation',mg_trading_revenue:'Revenue Estimate',mg_trading_schedule:'24h Typical Dispatch Schedule',
+mg_twin_no:'No microgrid solution generated yet',mg_twin_go:'Please fill in project parameters in "Design" and click "Generate"...',mg_twin_btn:'→ Go to Design',
+mg_wiki_title:'Core Technology',mg_wiki_desc:'16 microgrid core technologies from 5 years of project practice | Click cards for technical core, key problems & commercial value',
+mg_wiki_skill_title:'16 Core Technology Skills from 5 Years of Project Practice',mg_wiki_skill_author:'Designer: Lu Jixiong | 10 Engineering Skills + 6 Deep Tech Skills | All validated across multiple microgrid projects',
+mg_wiki_arch:'Architecture',mg_wiki_ems:'Energy Mgmt',mg_wiki_schedule:'Dispatch Optimize',mg_wiki_software:'Software Platform',
+aidc_design_title:'AIDC Design Agent',
+aidc_design_desc:'Input data center parameters, AI auto-generates compute planning, power arch, liquid cooling, PUE optimization',
+aidc_design_agent:'AI Data Center Solution Agent',
+aidc_design_agent_desc:'Single-source JSON: compute planning, power arch, liquid cooling, PUE optimization, rack layout, BOM, economic analysis. AI recommends optimal power & cooling solutions',
+aidc_nl_label:'Natural Language Description',
+aidc_nl_ph:'e.g. Shanghai Zhangjiang AI Compute Center, 800x H100 GPU cluster, 12MW IT load, 10kV dual-feed, PUE<1.25, liquid cooling',
+aidc_ai_btn:'AI Detect & Generate',
+aidc_proj_name:'Project Name',aidc_region:'Region',aidc_tier:'Data Center Tier',
+aidc_gpu_model:'GPU Model',aidc_gpu_qty:'GPU Quantity',aidc_it_load:'Total IT Load (kW)',
+aidc_voltage:'Grid Voltage (kV)',aidc_redundancy:'Power Redundancy',
+aidc_cooling:'Cooling Method',aidc_cooling_liquid:'Liquid Cooling',aidc_cooling_air:'Air Cooling',aidc_cooling_hybrid:'Liquid+Air Hybrid',
+aidc_pue_target:'PUE Target',aidc_rack_density:'Rack Power Density (kW/rack)',aidc_budget:'Budget (10k CNY)',
+aidc_price_peak:'Peak Price (CNY/kWh)',aidc_price_valley:'Valley Price (CNY/kWh)',
+aidc_gen_btn:'Generate AIDC Solution',
+aidc_power_title:'Power Architecture Agent',aidc_power_desc:'Single-source JSON: power single-line diagram, UPS config, distribution arch, redundancy scheme. GB 50174/GB 50052 compliant',
+aidc_power_diagram:'AIDC Power Single-line Diagram',
+aidc_cooling_title:'Liquid Cooling Agent',aidc_cooling_desc:'Single-source JSON: cold plate design, CDU config, piping layout, cooling capacity assessment',
+aidc_cooling_diagram:'Liquid Cooling Piping Topology',
+aidc_pue_title2:'PUE Optimization Agent',aidc_pue_desc:'PUE target decomposition, energy-saving strategy, free cooling potential, economic analysis',
+aidc_layout_title:'Rack Layout Agent',aidc_layout_desc:'Rack power density planning, hot/cold aisle design, equipment floor plan',
+aidc_layout_diagram:'Equipment Floor Plan',
+aidc_bom_title2:'BOM Agent',aidc_bom_desc:'Complete equipment list, model specs, quantities, price summary',
+aidc_dw_title:'Drawing Summary Agent',aidc_dw_desc:'All AIDC drawings centralized display and download',
+aidc_dw_arch:'AIDC System Architecture',aidc_dw_wiring:'AIDC Single-line Diagram',aidc_dw_dual:'AIDC Dual-feed Power Topology',aidc_dw_liquid:'AIDC Liquid Cooling Diagram',
+ess_layout:'Floor Plan',ess_cable:'Cable Routing',ess_principle:'PCS-BESS Schematic'
 },
 ar:{
 header_title:'Open ESS Agent — وكيل الذكاء الاصطناعي لحلول أنظمة تخزين الطاقة مفتوحة المصدر',
 header_spec:'معايير التصميم: مستوى النظام GB/T 36558-2023 | التوصيل GB 50055 | ربط الشبكة GB/T 34120, GB/T 34131 | المحطة GB/T 42288 | المصمم: لو جيشيونغ | هاتف: 15026953905',
 footer_text:'حقوق النشر @ لو جيشيونغ. يرجى احترام حقوق الملكية الفكرية',
+cat_ess:'وكيل حلول التخزين',cat_mg:'وكيل تسليم الشبكة المصغرة',cat_aidc:'وكيل حلول AIDC',
 nav_devices:'مكتبة المعدات',nav_input:'تصميم الحل',nav_diagrams:'إنشاء الرسوم',nav_cases:'حالات الاستخدام',
+mg_design:'التصميم',mg_drawings:'الرسوم الكهربائية',mg_protocol:'البروتوكول والتصحيح',mg_energy:'إدارة الطاقة',mg_deploy:'نشر بنقرة واحدة',mg_trading:'تداول الطاقة',mg_twin:'التوأم الرقمي',mg_skill:'المهارات الأساسية',
+aidc_design:'التصميم',aidc_power:'بنية الطاقة',aidc_cooling:'التبريد السائل',aidc_pue:'تحسين PUE',aidc_layout:'تخطيط الخزائن',aidc_bom:'قائمة المواد',aidc_drawings:'الرسوم',
 sidebar_ai_title:'التكوين التلقائي بواسطة وكيل الذكاء الاصطناعي',
-sidebar_ai_desc:'أدخل متطلباتك، يقوم وكيل الذكاء الاصطناعي بتوليد حل كامل تلقائياً: اختيار المعدات، مخطط النظام، مخطط التوصيل، مخطط الطوبولوجيا، قائمة المواد، استراتيجية الشحن/التفريغ، التحليل الاقتصادي',
+sidebar_ai_desc:'أدخل متطلباتك، يقوم وكيل الذكاء الاصطناعي بتوليد حل كامل تلقائياً: اختيار المعدات، مخطط النظام، مخطط التوصيل، قائمة المواد، استراتيجية الشحن/التفريغ، التحليل الاقتصادي',
 method1_title:'الطريقة الأولى: وصف اللغة الطبيعية',
 method1_desc:'صف متطلباتك باللغة الطبيعية، يتعرف الذكاء الاصطناعي تلقائياً على المعلمات ويولد الحل',
 ai_detect_btn:'تعرف الذكاء الاصطناعي والتكوين',
@@ -2390,8 +2541,79 @@ generate_btn:'توليد الحل',
 device_library_title:'مكتبة منتجات معدات التخزين',
 diagram_arch:'هيكل النظام',diagram_wiring:'مخطط التوصيل الكهربائي أحادي الخط',diagram_topo:'مخطط طوبولوجيا النظام',diagram_bom:'قائمة المواد (BOM)',diagram_ref:'تصميم مرجعي (مشروع داتشينغ 5MWh)',
 download_svg:'تحميل SVG',export_csv:'تصدير CSV',export_excel:'تصدير Excel',cases_title:'حالات الاستخدام',
-llm_provider:'نموذج AI',llm_local:'نموذج محلي صغير',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1',llm_bailian:'Qwen3.7-Max',
-ranking_title:'ترتيب التكوين الموصى به',ranking_formula:'النتيجة = التغطية×0.4 + الاستخدام×0.3 + 1/فترة الاسترداد×0.3'
+llm_provider:'نموذج AI',llm_local:'محرك النموذج المحلي',llm_deepseek:'DeepSeek V4',llm_glm:'GLM-5.1',llm_bailian:'Qwen3.7-Max',
+ranking_title:'ترتيب التكوين الموصى به',ranking_formula:'النتيجة = التغطية×0.4 + الاستخدام×0.3 + 1/فترة الاسترداد×0.3',
+success_msg:'تم توليد الحل! يرجى التحقق من المعدات والرسوم الموصى بها.',
+mg_success_msg:'تم توليد الحل! انتقل إلى علامات التبويب الأخرى للرسوم وجداول النقاط والنشر',
+aidc_success_msg:'تم توليد الحل! انتقل إلى علامات التبويب الأخرى لتفاصيل بنية الطاقة والتبريد وتحسين PUE',
+mg_design_title:'وكيل تصميم الشبكة المصغرة',
+mg_design_desc:'أدخل معلمات السيناريو، يقوم الذكاء الاصطناعي بتوليد طوبولوجيا الشبكة المصغرة واختيار المعدات وقائمة المواد والتحليل الاقتصادي تلقائياً',
+mg_design_agent:'وكيل تصميم الشبكة المصغرة بالذكاء الاصطناعي',
+mg_design_agent_desc:'إخراج من مصدر JSON واحد: مخطط النظام، مخطط التوصيل، طوبولوجيا الاتصال، مخطط الحماية، قائمة المواد، التقرير الاقتصادي',
+mg_nl_label:'وصف اللغة الطبيعية',
+mg_nl_ph:'مثال: حديقة صناعية سوتشو حمل 2MW، طاقة شمسية 1.5MWp+تخزين 5MWh، اتصال 10kV، وضع مزدوج شبكة/جزيرة',
+mg_ai_btn:'تعرف الذكاء الاصطناعي والتوليد',
+mg_proj_name:'اسم المشروع',mg_region:'المنطقة',mg_scene:'نوع السيناريو',
+mg_scene_park:'حديقة صناعية/تجارية',mg_scene_solar:'تكامل شمسي-تخزين-شحن',mg_scene_oil:'حقل نفط/منجم',mg_scene_remote:'منطقة نائية خارج الشبكة',mg_scene_dc:'مركز بيانات',
+mg_peak_load:'الحمل الذروي (kW)',mg_pv_cap:'سعة الطاقة الشمسية (kWp)',mg_bess_cap:'سعة التخزين (kWh)',
+mg_diesel:'مولد ديزل (kW)',mg_ev:'شاحن سيارة كهربائية (kW)',mg_voltage:'جهد الشبكة (kV)',mg_voltage_480:'480V (معيار أمريكي)',
+mg_mode:'وضع التشغيل',mg_mode_grid:'متصل بالشبكة',mg_mode_dual:'مزدوج شبكة/جزيرة',mg_mode_island:'جزيرة فقط',
+mg_critical:'نسبة الحمل الحرج (%)',mg_budget:'حد الميزانية (10k دولار)',
+mg_price_peak:'سعر الذروة ($/kWh)',mg_price_valley:'سعر الوادي ($/kWh)',
+mg_gen_btn:'توليد حل الشبكة المصغرة',
+mg_drawings_title:'وكيل الرسوم الكهربائية',
+mg_drawings_desc:'إخراج من مصدر JSON واحد: مخطط النظام، مخطط التوصيل، طوبولوجيا الاتصال، مخطط الحماية. متوافق مع GB/T 4728',
+mg_no_result:'يرجى توليد حل الشبكة المصغرة في "التصميم" أولاً',
+mg_arch_title:'هيكل نظام الشبكة المصغرة',mg_wiring_title:'مخطط التوصيل أحادي الخط',mg_comm_title:'طوبولوجيا اتصال الشبكة المصغرة',
+mg_protect_title:'مخطط حماية الشبكة المصغرة',mg_logic_title:'مخطط المنطق التحكمي',mg_bom_title:'قائمة معدات BOM',mg_econ_title:'تقرير التحليل الاقتصادي',
+mg_protocol_title:'وكيل البروتوكول والتصحيح',
+mg_protocol_desc:'توليد تلقائي لجداول نقاط Modbus/IEC104/IEC61850/OCPP/MQTT مع عناوين السجلات وأنواع البيانات وقائمة التحقق',
+mg_pt_pcs:'نقاط PCS',mg_pt_bms:'نقاط BMS',mg_pt_meter:'نقاط العداد',mg_pt_pv:'عكس الطاقة الشمسية',mg_pt_ev:'شاحن EV',mg_pt_diesel:'مولد ديزل',mg_pt_fire:'حريق/بيئة',mg_pt_mqtt:'مواضيع MQTT',mg_pt_debug:'قائمة التحقق',
+mg_energy_title:'وكيل إدارة الطاقة',
+mg_energy_desc:'التشغيل · التشغيل · القبول — ثلاث مراحل، مدخل واحد، تسليم حلقة مغلقة',
+mg_em_startup:'بدء النظام',mg_em_monitor:'المراقبة الفورية',mg_em_control:'التحكم في الأجهزة',mg_em_strategy:'تكوين الاستراتيجية',mg_em_dispatch:'توزيع الطاقة',mg_em_mode:'تبديل الوضع',mg_em_alarm:'إدارة الإنذارات',mg_em_analysis:'تحليل التشغيل',mg_em_accept:'قبول التسليم',mg_em_config:'تكوين النظام',
+mg_deploy_title:'وكيل نشر EMS بنقرة واحدة',
+mg_deploy_desc:'النشر الآلي: فحص مسبق→تثبيت→حقن التكوين→بدء الخدمة→فحص الصحة→تقرير التسليم',
+mg_deploy_target:'الخادم المستهدف',mg_deploy_ip:'IP الخادم',mg_deploy_ssh:'منفذ SSH',mg_deploy_user:'اسم المستخدم',mg_deploy_key:'ملاحظة مفتاح المصادقة',mg_deploy_key_ph:'تقديم وقت النشر (غير مخزن)',
+mg_deploy_spec:'متطلبات الخادم',mg_deploy_min:'الحد الأدنى:',mg_deploy_rec:'الموصى به:',mg_deploy_os:'نظام التشغيل:',mg_deploy_port:'المنافذ المفتوحة:',
+mg_deploy_modules:'وحدات النشر',
+mg_mod_scada:'مراقبة SCADA الفورية',mg_mod_ems:'إدارة طاقة EMS',mg_mod_gw:'بوابة البروتوكول',mg_mod_alarm:'دفع الإنذارات',mg_mod_screen:'لوحة التصور',mg_mod_opt:'محسن التوزيع (MILP)',mg_mod_trade:'مساعد تداول الطاقة',mg_mod_ai:'التنبؤ بالأعطال AI',mg_mod_twin:'التوأم الرقمي 3D',
+mg_deploy_log:'سجل خط النشر',mg_deploy_log_ph:'في الانتظار. حدد الوحدات وانقر "محاكاة النشر".',
+mg_deploy_btn:'محاكاة خط النشر',mg_deploy_export:'تصدير برنامج النشر',mg_deploy_plan:'خطة نشر Ansible',mg_deploy_plan_ph:'يرجى تشغيل محاكاة النشر أولاً',
+mg_trading_title:'وكيل استراتيجية تداول الطاقة',
+mg_trading_desc:'الاتصال بسياسات التسعير/الخدمات المساعدة المحلية، يوصي الذكاء الاصطناعي باستراتيجية الشحن/التفريغ المثلى',
+mg_trading_price:'تكوين تسعير الوقت من الاستخدام',mg_trading_peak:'ذروة (يوان/kWh)',mg_trading_flat:'مسطح (يوان/kWh)',mg_trading_valley:'وادي (يوان/kWh)',mg_trading_pv:'سعر تغذية PV (يوان)',mg_trading_lc:'تكلفة تخزين الطاقة (يوان)',
+mg_trading_market:'المشاركة في السوق',mg_mk_arb:'مراجحة الذروة-الوادي',mg_mk_demand:'إدارة الطلب',mg_mk_spot:'سوق الفوري',mg_mk_aux:'الخدمات المساعدة',mg_mk_dr:'استجابة الطلب',mg_mk_carbon:'تداول الكربون/الشهادات الخضراء',
+mg_trading_btn:'توليد استراتيجية التداول',mg_trading_strategy:'توصية الاستراتيجية',mg_trading_revenue:'تقدير الإيرادات',mg_trading_schedule:'جدول التوزيع النموذجي 24 ساعة',
+mg_twin_no:'لم يتم توليد حل الشبكة المصغرة بعد',mg_twin_go:'يرجى ملء معلمات المشروع في "التصميم" أولاً...',mg_twin_btn:'→ الذهاب إلى التصميم',
+mg_wiki_title:'التقنية الأساسية',mg_wiki_desc:'16 تقنية أساسية للشبكة المصغرة من 5 سنوات من الممارسة | انقر البطاقات لل核心技术',
+mg_wiki_skill_title:'16 مهارة تقنية أساسية من 5 سنوات من الممارسة',mg_wiki_skill_author:'المصمم: لو جيشيونغ | 10 مهارات هندسية + 6 مهارات تقنية عميقة',
+mg_wiki_arch:'البنية',mg_wiki_ems:'إدارة الطاقة',mg_wiki_schedule:'تحسين التوزيع',mg_wiki_software:'منصة البرمجيات',
+aidc_design_title:'وكيل تصميم AIDC',
+aidc_design_desc:'أدخل معلمات مركز البيانات، يقوم الذكاء الاصطناعي بتوليد تخطيط الحوسبة وبنية الطاقة والتبريد السائل وتحسين PUE تلقائياً',
+aidc_design_agent:'وكيل حلول مركز بيانات AI',
+aidc_design_agent_desc:'إخراج من مصدر JSON واحد: تخطيط الحوسبة، بنية الطاقة، التبريد السائل، تحسين PUE، تخطيط الخزائن، قائمة المواد، التحليل الاقتصادي',
+aidc_nl_label:'وصف اللغة الطبيعية',
+aidc_nl_ph:'مثال: مركز حوسبة AI شنغهاي، 800 بطاقة H100، حمل IT 12MW، 10kV مزدوج، PUE<1.25، تبريد سائل',
+aidc_ai_btn:'تعرف الذكاء الاصطناعي والتوليد',
+aidc_proj_name:'اسم المشروع',aidc_region:'المنطقة',aidc_tier:'مستوى مركز البيانات',
+aidc_gpu_model:'طراز GPU',aidc_gpu_qty:'عدد GPU',aidc_it_load:'حمل IT الإجمالي (kW)',
+aidc_voltage:'جهد الشبكة (kV)',aidc_redundancy:'تكرار الطاقة',
+aidc_cooling:'طريقة التبريد',aidc_cooling_liquid:'تبريد سائل',aidc_cooling_air:'تبريد هوائي',aidc_cooling_hybrid:'سائل+هوائي هجين',
+aidc_pue_target:'هدف PUE',aidc_rack_density:'كثافة طاقة الخزانة (kW/خزانة)',aidc_budget:'الميزانية (10k يوان)',
+aidc_price_peak:'سعر الذروة (يوان/kWh)',aidc_price_valley:'سعر الوادي (يوان/kWh)',
+aidc_gen_btn:'توليد حل AIDC',
+aidc_power_title:'وكيل بنية الطاقة',aidc_power_desc:'إخراج من مصدر JSON واحد: مخطط الطاقة أحادي الخط، تكوين UPS، بنية التوزيع، مخطط التكرار',
+aidc_power_diagram:'مخطط الطاقة أحادي الخط AIDC',
+aidc_cooling_title:'وكيل التبريد السائل',aidc_cooling_desc:'إخراج من مصدر JSON واحد: تصميم اللوحة الباردة، تكوين CDU، تخطيط الأنابيب',
+aidc_cooling_diagram:'طوبولوجيا أنابيب التبريد السائل',
+aidc_pue_title2:'وكيل تحسين PUE',aidc_pue_desc:'تحلل هدف PUE، استراتيجية توفير الطاقة، تقييم التبريد المجاني، التحليل الاقتصادي',
+aidc_layout_title:'وكيل تخطيط الخزائن',aidc_layout_desc:'تخطيط كثافة طاقة الخزائن، تصميم الممرات الساخنة/الباردة، مخطط أرضية المعدات',
+aidc_layout_diagram:'مخطط أرضية المعدات',
+aidc_bom_title2:'وكيل قائمة المواد',aidc_bom_desc:'قائمة معدات كاملة، مواصفات الطراز، الكميات، ملخص الأسعار',
+aidc_dw_title:'وكيل ملخص الرسوم',aidc_dw_desc:'عرض وتحميل جميع رسوم AIDC مركزياً',
+aidc_dw_arch:'هيكل نظام AIDC',aidc_dw_wiring:'مخطط التوصيل أحادي الخط AIDC',aidc_dw_dual:'طوبولوجيا الطاقة المزدوجة AIDC',aidc_dw_liquid:'مخطط التبريد السائل AIDC',
+ess_layout:'مخطط الأرضية',ess_cable:'توجيه الكابلات',ess_principle:'مخطط PCS-BESS'
 }
 };
 
@@ -2407,11 +2629,39 @@ function switchLang(lang){
     const key=el.getAttribute('data-i18n-placeholder');
     if(dict[key]!==undefined)el.placeholder=dict[key];
   });
+  if(lang!=='zh'){
+    const zhDict=I18N.zh;
+    const reverseMap={};
+    for(const k in zhDict){reverseMap[zhDict[k]]=k;}
+    document.querySelectorAll('.sec-title,.diagram-title,.form-label,.sw-tab,.sw-section-title,.sub-tab,.category-tab,button,.success-msg,h3,.mg-mini,p,.mg-log').forEach(el=>{
+      if(el.getAttribute('data-i18n'))return;
+      const txt=el.textContent.trim();
+      const key=reverseMap[txt];
+      if(key&&dict[key]!==undefined)el.textContent=dict[key];
+    });
+    document.querySelectorAll('textarea[input],input[placeholder]').forEach(el=>{
+      if(el.getAttribute('data-i18n-placeholder'))return;
+      const ph=el.getAttribute('placeholder');
+      if(!ph)return;
+      const key=reverseMap[ph];
+      if(key&&dict[key]!==undefined)el.placeholder=dict[key];
+    });
+    document.querySelectorAll('select option').forEach(el=>{
+      const txt=el.textContent.trim();
+      const key=reverseMap[txt];
+      if(key&&dict[key]!==undefined)el.textContent=dict[key];
+    });
+  }
   document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.remove('active'));
   const btns=document.querySelectorAll('.lang-btn');
   const idx={zh:0,en:1,ar:2}[lang];
   if(btns[idx])btns[idx].classList.add('active');
   localStorage.setItem('lang',lang);
+  const langBox=document.querySelector('.lang-btn')?.parentElement;
+  if(langBox){
+    if(lang==='ar'){langBox.style.right='auto';langBox.style.left='32px';}
+    else{langBox.style.left='auto';langBox.style.right='32px';}
+  }
 }
 
 
@@ -7165,8 +7415,8 @@ function mgDrawArchSvg(R){
   const lvBus=isLV?'480V AC':'0.4kV';
   let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;font-family:'Microsoft YaHei',sans-serif">
 <defs>
-<linearGradient id="gbus" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="#185FA5"/><stop offset="50" stop-color="#4a90d9"/><stop offset="100%" stop-color="#185FA5"/></linearGradient>
-<linearGradient id="glvbus" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="#0F6E56"/><stop offset="50%" stop-color="#50c878"/><stop offset="100%" stop-color="#0F6E56"/></linearGradient>
+<linearGradient id="gbus" x1="0" y1="0" x2="100%" y2="0"><stop offset="0%" stop-color="#185FA5"/><stop offset="50%" stop-color="#4a90d9"/><stop offset="100%" stop-color="#185FA5"/></linearGradient>
+<linearGradient id="glvbus" x1="0" y1="0" x2="100%" y2="0"><stop offset="0%" stop-color="#0F6E56"/><stop offset="50%" stop-color="#50c878"/><stop offset="100%" stop-color="#0F6E56"/></linearGradient>
 <filter id="gsh"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.15"/></filter>
 <marker id="gaB" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#4a90d9"/></marker>
 <marker id="gaG" markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0,0 5,2 0,4" fill="#50c878"/></marker>
