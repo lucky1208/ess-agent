@@ -685,19 +685,19 @@ ACC AC一体柜专题
 <!-- Agent 6: 核心Skill(原知识库) -->
 <div id="page-mg-wiki" class="micro-content" style="display:none;padding:24px 32px">
 <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px">
-<div class="sec-title" style="margin-bottom:0">核心技术</div>
-<div style="font-size:11px;color:var(--text2)">5年项目实战沉淀的16项微网核心技术 | 点击卡片查看技术核心、关键解决问题与商用价值</div>
+<div class="sec-title" style="margin-bottom:0" data-i18n="mg_wiki_title">核心技术</div>
+<div style="font-size:11px;color:var(--text2)" data-i18n="mg_wiki_desc">5年项目实战沉淀的16项微网核心技术 | 点击卡片查看技术核心、关键解决问题与商用价值</div>
 </div>
 <div id="mgSkillCardsSection" style="padding:16px;background:linear-gradient(135deg,rgba(24,95,165,.08),rgba(15,110,86,.08));border:1px solid var(--border);border-radius:8px;margin-bottom:16px">
-<div style="font-size:14px;font-weight:bold;color:var(--text1);margin-bottom:4px">5年项目实战训练出的16项核心技术 Skill</div>
-<div style="font-size:11px;color:var(--text2);margin-bottom:12px">设计人：卢继雄 | 10项工程流Skill + 6项微网深度技术Skill | 每项均经多个微网项目验证迭代</div>
+<div style="font-size:14px;font-weight:bold;color:var(--text1);margin-bottom:4px" data-i18n="mg_wiki_skill_title">5年项目实战训练出的16项核心技术 Skill</div>
+<div style="font-size:11px;color:var(--text2);margin-bottom:12px" data-i18n="mg_wiki_skill_author">设计人：卢继雄 | 10项工程流Skill + 6项微网深度技术Skill | 每项均经多个微网项目验证迭代</div>
 <div id="mgSkillCardsGrid" class="mg-grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px"></div>
 </div>
 <div class="sw-tabs" style="margin-bottom:16px">
-<div class="sw-tab active" onclick="mgShowWiki('arch')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>微网架构</div>
-<div class="sw-tab" onclick="mgShowWiki('ems')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>能量管理</div>
-<div class="sw-tab" onclick="mgShowWiki('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>调度优化</div>
-<div class="sw-tab" onclick="mgShowWiki('software')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>软件平台</div>
+<div class="sw-tab active" onclick="mgShowWiki('arch')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-i18n="mg_wiki_arch">微网架构</span></div>
+<div class="sw-tab" onclick="mgShowWiki('ems')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span data-i18n="mg_wiki_ems">能量管理</span></div>
+<div class="sw-tab" onclick="mgShowWiki('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span data-i18n="mg_wiki_schedule">调度优化</span></div>
+<div class="sw-tab" onclick="mgShowWiki('software')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span data-i18n="mg_wiki_software">软件平台</span></div>
 </div>
 </div>
 
@@ -2662,6 +2662,7 @@ function switchLang(lang){
     if(lang==='ar'){langBox.style.right='auto';langBox.style.left='32px';}
     else{langBox.style.left='auto';langBox.style.right='32px';}
   }
+  if(typeof window.mgRenderSkillCards==='function') window.mgRenderSkillCards();
 }
 
 
@@ -2820,18 +2821,69 @@ window.MG_SKILLS=[
   {key:'vpp',title:'虚拟电厂VPP',color:'#50c878',tag:'微网深度技术',brief:'分布式资源聚合+调度接口+基线计算,解锁电力市场+碳交易+绿证。',core:['分布式资源聚合: MG/储能/可调负荷/充电桩V2G多类型资源统一建模,容量/响应时间/爬坡速率','调度接口标准: OpenADR 2.0b/IEEE 2030.5/IEC 61850-7-420,支持PJM/CAISO/国网/南网调度','基线负荷计算: 10种算法(高斯混合/同类用户/历史同期/回归等),误差<5%,满足市场要求','可调度容量评估: 实时上报(响应<10s),日前申报(精度95%),日内滚动修正'],problems:['分布式资源单体小无法参与电力市场(单个MG<1MW不达市场门槛)','海量资源聚合调度响应慢(传统SCADA分钟级,市场要求秒级)','收益分配不公平(谁出力多谁分少,缺乏基线和量化)','多市场协调复杂(电能量/调频/备用/峰荷/碳交易同时参与)'],value:['进入调频/备用/峰荷市场获取额外收益,IRR↑3-5%','解锁碳交易/绿证收入(年百万级)','分布式资源变现,提升项目财务可行性']}
 ];
 
+const MG_SKILLS_I18N={
+en:{
+topo:{title:'Microgrid Topology Selection',tag:'Engineering',brief:'Auto-match optimal microgrid topology based on scenario parameters, avoiding wrong technical routes.'},
+audit:{title:'Single-line Diagram Audit',tag:'Engineering',brief:'AI audit single-line diagram compliance, intercept grid approval rejection risks early.'},
+point:{title:'Communication Point Table',tag:'Engineering',brief:'Device list → multi-protocol point table Excel + EMS config, error-prone manual translation.'},
+ems:{title:'EMS Strategy Compilation',tag:'Engineering',brief:'Natural language goals → executable strategy config, same-day delivery.'},
+deploy:{title:'One-Click Deploy',tag:'Engineering',brief:'Station 9-module automated deployment, 4 hours replaces 3 days manual.'},
+test:{title:'Commissioning & Acceptance',tag:'Engineering',brief:'FAT/SAT auto-generation, 80% improvement in first-pass acceptance rate.'},
+price:{title:'Electricity Pricing & Revenue',tag:'Engineering',brief:'Multi-province/multi-region electricity pricing modeling, precise IRR/NPV/sensitivity calculation.'},
+fault:{title:'Fault Post-mortem',tag:'Engineering',brief:'BMS/PCS/EMS alarm knowledge graph + root cause analysis, MTTR↓60%.'},
+bid:{title:'Bid Documents',tag:'Engineering',brief:'Customer requirements → technical proposal + configuration list + deviation table, 7 days→2 days.'},
+security:{title:'Cybersecurity Hardening',tag:'Engineering',brief:'Level 2.0 compliance check + automated patrol, zero compliance risk.'},
+protect:{title:'Protection Coordination',tag:'Deep Tech',brief:'Overcurrent 3-stage + differential + distance + BESS inverter LVRT/HVRT coordination.'},
+switch:{title:'Seamless Grid/Island Switching',tag:'Deep Tech',brief:'STS<20ms switching + sync detection + V/f↔PQ adaptive, critical load zero interruption.'},
+quality:{title:'Power Quality Management',tag:'Deep Tech',brief:'Harmonics/flicker/phase unbalance/sag full-dimension treatment, pass grid PQ assessment.'},
+dcmicro:{title:'DC Microgrid DC Coupling',tag:'Deep Tech',brief:'750V/1500V DC bus + PV direct coupling, system efficiency↑4-6%, save one inverter stage.'},
+blackstart:{title:'Black Start & Multi-MG Coordination',tag:'Deep Tech',brief:'Diesel/ESS coordinated black start + multi-MG cluster P2P mutual supply, 2h→30min recovery.'},
+vpp:{title:'Virtual Power Plant VPP',tag:'Deep Tech',brief:'Distributed resource aggregation + dispatch interface + baseline calculation, unlock power market + carbon trading.'}
+},
+ar:{
+topo:{title:'اختيار طوبولوجيا الشبكة المصغرة',tag:'هندسي',brief:'مطابقة تلقائية لأمثل طوبولوجيا الشبكة المصغرة بناءً على معلمات السيناريو.'},
+audit:{title:'تدقيق مخطط التوصيل أحادي الخط',tag:'هندسي',brief:'تدقيق الامتثال بالذكاء الاصطناعي، اعتراض مخاطر رفض الموافقة المبكرة.'},
+point:{title:'جدول نقاط الاتصال',tag:'هندسي',brief:'قائمة المعدات → جدول نقاط متعدد البروتوكولات Excel + تكوين EMS.'},
+ems:{title:'تجميع استراتيجية EMS',tag:'هندسي',brief:'أهداف اللغة الطبيعية → تكوين استراتيجية قابلة للتنفيذ، تسليم في نفس اليوم.'},
+deploy:{title:'نشر بنقرة واحدة',tag:'هندسي',brief:'نشر آلي لـ 9 وحدات في المحطة، 4 ساعات بدلاً من 3 أيام.'},
+test:{title:'التشغيل والقبول',tag:'هندسي',brief:'توليد تلقائي لـ FAT/SAT، تحسين نسبة القبول من المحاولة الأولى بنسبة 80%.'},
+price:{title:'تسعير الكهرباء والإيرادات',tag:'هندسي',brief:'نمذجة تسعير الكهرباء متعددة المحافظ/المناطق، حساب دقيق لـ IRR/NPV/الحساسية.'},
+fault:{title:'تحليل ما بعد الخطأ',tag:'هندسي',brief:'رسم بياني معرفي لإنذارات BMS/PCS/EMS + تحليل السبب الجذري، MTTR↓60%.'},
+bid:{title:'وثائق العطاء',tag:'هندسي',brief:'متطلبات العميل → مقترح تقني + قائمة تكوين + جدول الانحراف، 7 أيام→2 يوم.'},
+security:{title:'تعزيز الأمن السيبراني',tag:'هندسي',brief:'فحص امتثال المستوى 2.0 + دورية آلية، مخاطر الامتثال صفر.'},
+protect:{title:'تنسيق الحماية',tag:'تقنية عميقة',brief:'تنسيق ثلاث مراحل التيار الزائد + تفاضلي + مسافة + LVRT/HVRT لعاكس BESS.'},
+switch:{title:'التبديل السلس شبكة/جزيرة',tag:'تقنية عميقة',brief:'STS<20ms + كشف التزامن + V/f↔PQ تكيفي، انقطاع صفر للحمل الحرج.'},
+quality:{title:'إدارة جودة الطاقة',tag:'تقنية عميقة',brief:'معالجة كاملة الأبعاد التوافقيات/الوميض/عدم التوازن/الانخفاض، اجتياز تقييم جودة الطاقة.'},
+dcmicro:{title:'اقتران DC للشبكة المصغرة المستمرة',tag:'تقنية عميقة',brief:'ناقل DC 750V/1500V + اقتران PV مباشر، كفاءة النظام↑4-6%.'},
+blackstart:{title:'البدء الأسود وتنسيق متعدد MG',tag:'تقنية عميقة',brief:'بدء أسود منسق ديزل/تخزين + توريد متبادل P2P لمجموعة متعددة MG، 2h→30min.'},
+vpp:{title:'محطة الطاقة الافتراضية VPP',tag:'تقنية عميقة',brief:'تجميع الموارد الموزعة + واجهة الإرسال + حساب خط الأساس، فتح سوق الطاقة + تداول الكربون.'}
+}
+};
+
+function mgGetSkillText(key,field){
+  const lang=localStorage.getItem('lang')||'zh';
+  if(lang==='zh')return null;
+  const t=MG_SKILLS_I18N[lang]?.[key]?.[field];
+  return t||null;
+}
+
 window.mgRenderSkillCards=function(){
   try{
     const grid=document.getElementById('mgSkillCardsGrid');
     if(!grid||!window.MG_SKILLS)return;
+    const lang=localStorage.getItem('lang')||'zh';
+    const clickHint=lang==='en'?'▸ Click for tech core / problems / value':lang==='ar'?'▸ انقر لل核心技术/المشاكل/القيمة':'▸ 点击查看技术核心/解决问题/商用价值';
     grid.innerHTML=window.MG_SKILLS.map(s=>{
+      const t=mgGetSkillText(s.key,'title');
+      const b=mgGetSkillText(s.key,'brief');
+      const tg=mgGetSkillText(s.key,'tag');
       return '<div class="mg-skill-card" data-skill-key="'+s.key+'" style="border-left:3px solid '+s.color+';cursor:pointer;position:relative;z-index:1">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
-          +'<b style="color:'+s.color+'">'+s.title+'</b>'
-          +'<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:'+s.color+'22;color:'+s.color+'">'+s.tag+'</span>'
+          +'<b style="color:'+s.color+'">'+(t||s.title)+'</b>'
+          +'<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:'+s.color+'22;color:'+s.color+'">'+(tg||s.tag)+'</span>'
         +'</div>'
-        +'<p>'+s.brief+'</p>'
-        +'<div style="font-size:10px;color:var(--text3);margin-top:4px">▸ 点击查看技术核心/解决问题/商用价值</div>'
+        +'<p>'+(b||s.brief)+'</p>'
+        +'<div style="font-size:10px;color:var(--text3);margin-top:4px">'+clickHint+'</div>'
       +'</div>';
     }).join('');
     const sec=document.getElementById('mgSkillCardsSection');
@@ -2844,9 +2896,16 @@ window.mgShowSkillDetail=function(key){
   try{
     const s=window.MG_SKILLS.find(x=>x.key===key);
     if(!s)return;
+    const lang=localStorage.getItem('lang')||'zh';
+    const t=mgGetSkillText(s.key,'title');
+    const b=mgGetSkillText(s.key,'brief');
+    const tg=mgGetSkillText(s.key,'tag');
     const $=id=>document.getElementById(id);
-    $('skillModalTitle').innerHTML='<span style="color:'+s.color+'">'+s.title+'</span><span style="font-size:11px;padding:2px 8px;border-radius:8px;background:'+s.color+'22;color:'+s.color+';margin-left:8px">'+s.tag+'</span>';
-    $('skillModalBrief').textContent=s.brief;
+    $('skillModalTitle').innerHTML='<span style="color:'+s.color+'">'+(t||s.title)+'</span><span style="font-size:11px;padding:2px 8px;border-radius:8px;background:'+s.color+'22;color:'+s.color+';margin-left:8px">'+(tg||s.tag)+'</span>';
+    $('skillModalBrief').textContent=b||s.brief;
+    const coreTitle=lang==='en'?'Technical Core':lang==='ar'?'ال核心技术':'技术核心';
+    const probTitle=lang==='en'?'Key Problems Solved':lang==='ar'?'المشاكل الرئيسية':'关键解决问题';
+    const valTitle=lang==='en'?'Commercial Value':lang==='ar'?'القيمة التجارية':'商用价值';
     $('skillModalCore').innerHTML=s.core.map(c=>'<li style="padding:4px 0;border-bottom:1px dashed var(--border);font-size:12px;line-height:1.6">'+c+'</li>').join('');
     $('skillModalProblems').innerHTML=s.problems.map(p=>'<li style="padding:4px 0;border-bottom:1px dashed var(--border);font-size:12px;line-height:1.6">'+p+'</li>').join('');
     $('skillModalValue').innerHTML=s.value.map(v=>'<li style="padding:4px 0;border-bottom:1px dashed var(--border);font-size:12px;line-height:1.6">'+v+'</li>').join('');
