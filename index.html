@@ -3575,6 +3575,13 @@ ${ESS_DRAWING_RULES}
 ${ESS_DIAGRAM_SKILL_V3}
 `;
 
+function getLangInstruction(){
+  const lang=localStorage.getItem('lang')||'zh';
+  if(lang==='en')return '\n\nIMPORTANT: You MUST respond entirely in English. All text, labels, descriptions, and JSON string values must be in English.';
+  if(lang==='ar')return '\n\nIMPORTANT: You MUST respond entirely in Arabic (العربية). All text, labels, descriptions, and JSON string values must be in Arabic.';
+  return '';
+}
+
 async function callLLM(messages, useStream, providerOverride) {
   const provider = providerOverride || document.getElementById('llmProvider').value;
   const forceNonStream = (provider === 'bailian');
@@ -3763,7 +3770,7 @@ async function generateSolution() {
     _streamLogReasoningEl = null;
     _streamLogContentEl = null;
     const messages = [
-      { role: 'system', content: ESS_SYSTEM_PROMPT },
+      { role: 'system', content: ESS_SYSTEM_PROMPT + getLangInstruction() },
       { role: 'user', content: userPrompt }
     ];
     const data = await callLLM(messages, true);
@@ -3878,7 +3885,7 @@ async function parseNaturalInput(){
       const vcM=s.match(/谷[价段]*\s*(\d+\.?\d*)/);if(vcM)params.priceValley=parseFloat(vcM[1]);
     }else{
       const messages=[
-        {role:'system',content:'你是储能系统参数提取助手。从用户自然语言描述中提取参数，返回JSON：{"txCap":1250,"txCount":2,"txHv":10,"loadMonthHigh":35,"pricePeak":0.833,"priceValley":0.441,"priceFlat":0.637,"region":"黑龙江大庆","hasHvRoom":1}。无法识别的字段不返回。'},
+        {role:'system',content:'你是储能系统参数提取助手。从用户自然语言描述中提取参数，返回JSON：{"txCap":1250,"txCount":2,"txHv":10,"loadMonthHigh":35,"pricePeak":0.833,"priceValley":0.441,"priceFlat":0.637,"region":"黑龙江大庆","hasHvRoom":1}。无法识别的字段不返回。'+getLangInstruction()},
         {role:'user',content:raw}
       ];
       const data=await callLLM(messages);
@@ -6536,7 +6543,7 @@ ${MG_SKILLS_SUMMARY}
 ${ESS_DRAWING_RULES}
 
 ${ESS_DIAGRAM_SKILL_V3}`;
-      const messages=[{role:'system',content:systemMsg},{role:'user',content:userPrompt}];
+      const messages=[{role:'system',content:systemMsg+getLangInstruction()},{role:'user',content:userPrompt}];
       const data=await callLLM(messages,true,provider);
       mgAddLog(`响应完成, tokens: ${data.usage?.total_tokens||'?'}`,'ok');
       const content=data.choices?.[0]?.message?.content||'';
@@ -6562,6 +6569,8 @@ ${ESS_DIAGRAM_SKILL_V3}`;
         if(!ok){
           mgAddLog('修复1失败, 尝试修复2: 补全截断...','step');
           let fixed2=jsonStr;
+          fixed2=fixed2.replace(/"(\w+)"\s*:\s*\[\s*"([^"]*?)$/gm,(m,key,val)=>'"'+key+'":["'+val+'"]');
+          fixed2=fixed2.replace(/"(\w+)"\s*:\s*"([^"]*?)$/gm,(m,key,val)=>'"'+key+'":"'+val+'"');
           let openB=(fixed2.match(/{/g)||[]).length,closeB=(fixed2.match(/}/g)||[]).length;
           let openSq=(fixed2.match(/\[/g)||[]).length,closeSq=(fixed2.match(/]/g)||[]).length;
           if(openB>closeB||openSq>closeSq){
@@ -6933,7 +6942,7 @@ async function aidcGenerateSolution(){
       const skillCount=AIDC_SKILLS_SUMMARY.split('\n').filter(l=>l.trim()&&l.startsWith('-')).length;
       addLog('AIDC Skill: '+skillCount+'条已注入system prompt','step');
       addLog(`调用${provider.toUpperCase()} API (SSE流式)...`,'step');
-      const messages=[{role:'system',content:AIDC_SYSTEM_PROMPT},{role:'user',content:userPrompt}];
+      const messages=[{role:'system',content:AIDC_SYSTEM_PROMPT+getLangInstruction()},{role:'user',content:userPrompt}];
       const data=await callLLM(messages,true,provider);
       addLog(`响应完成, tokens: ${data.usage?.total_tokens||'?'}`,'ok');
       const content=data.choices?.[0]?.message?.content||'';
