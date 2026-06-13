@@ -351,7 +351,7 @@ select.form-input{appearance:auto}
 <!-- TAB: 设备选型 -->
 <div id="page-devices" class="tab-content">
 <div class="sec-title" data-i18n="device_library_title">储能设备产品库</div>
-<p style="color:var(--text2);font-size:12px;margin-bottom:16px">数据来源：GOTION储能手册中文版2025Q4</p>
+
 
 <div class="acc-section">
 <h3>
@@ -430,11 +430,11 @@ ACC AC一体柜专题
 <!-- ========== MICROGRID PAGES ========== -->
 <!-- Agent 1: 方案设计 -->
 <div id="page-mg-design" class="micro-content" style="display:none;padding:24px 32px">
-<div class="sec-title">微网方案设计 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">输入场景参数，AI自动生成微网拓扑、设备选型、BOM清单、经济性分析</div>
+<div class="sec-title" data-i18n="mg_design_title">微网方案设计 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="mg_design_desc">输入场景参数，AI自动生成微网拓扑、设备选型、BOM清单、经济性分析</div>
 <div style="background:linear-gradient(135deg,#534AB7,#0C447C);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
-<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px">AI 微网方案设计智能体</div>
-<div style="font-size:11px;color:#c0d0e0;line-height:1.5">从同一份方案JSON同源输出：系统架构图、一次接线图、通信拓扑图、保护分区图、BOM清单、经济性报告。AI自动识别场景特征推荐最佳拓扑方案</div>
+<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px" data-i18n="mg_design_agent">AI 微网方案设计智能体</div>
+<div style="font-size:11px;color:#c0d0e0;line-height:1.5" data-i18n="mg_design_agent_desc">从同一份方案JSON同源输出：系统架构图、一次接线图、通信拓扑图、保护分区图、BOM清单、经济性报告。AI自动识别场景特征推荐最佳拓扑方案</div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:16px">
 <div style="border-left:3px solid var(--purple);padding-left:14px">
@@ -481,8 +481,8 @@ ACC AC一体柜专题
 
 <!-- Agent 2: 电气图纸 -->
 <div id="page-mg-drawings" class="micro-content" style="display:none;padding:24px 32px">
-<div class="sec-title">电气图纸 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">从方案JSON同源生成：系统架构图、一次接线图、通信拓扑图、保护分区图。遵循GB/T 4728电气符号标准</div>
+<div class="sec-title" data-i18n="mg_drawings_title">电气图纸 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="mg_drawings_desc">从方案JSON同源生成：系统架构图、一次接线图、通信拓扑图、保护分区图。遵循GB/T 4728电气符号标准</div>
 <div id="mgDrawingEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成微网方案</div>
 <div id="mgDrawingContent" style="display:none">
 <div id="mgDrawingLog" class="mg-log" style="display:none;margin-bottom:16px"></div>
@@ -519,8 +519,8 @@ ACC AC一体柜专题
 
 <!-- Agent 3: 协议调试 -->
 <div id="page-mg-protocol" class="micro-content" style="display:none;padding:24px 32px">
-<div class="sec-title">协议与调试 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">根据设备类型自动生成Modbus/IEC104/IEC61850/OCPP/MQTT通信点表，含寄存器地址、数据类型、调试检查项</div>
+<div class="sec-title" data-i18n="mg_protocol_title">协议与调试 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="mg_protocol_desc">根据设备类型自动生成Modbus/IEC104/IEC61850/OCPP/MQTT通信点表，含寄存器地址、数据类型、调试检查项</div>
 <div id="mgProtocolEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成微网方案</div>
 <div id="mgProtocolContent" style="display:none">
 <div class="sw-tabs">
@@ -545,8 +545,8 @@ ACC AC一体柜专题
 <!-- Agent 3.5: 能源管理(调试+运营+验收闭环) -->
 <div id="page-mg-energy" class="micro-content" style="display:none;padding:24px 32px">
 <div style="margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-<div class="sec-title" style="margin-bottom:0">能源管理 Agent</div>
-<div style="font-size:11px;color:var(--text2)">调试期 · 运营期 · 验收期 — 三期共用一入口，交付闭环</div>
+<div class="sec-title" style="margin-bottom:0" data-i18n="mg_energy_title">能源管理 Agent</div>
+<div style="font-size:11px;color:var(--text2)" data-i18n="mg_energy_desc">调试期 · 运营期 · 验收期 — 三期共用一入口，交付闭环</div>
 </div>
 <div style="margin-bottom:12px"><img src="ems_module_design_overview.svg" style="width:100%;max-width:900px;border-radius:8px;border:1px solid var(--border)" onerror="this.style.display='none'"></div>
 <div class="sw-tabs" id="energyTabs" style="margin-bottom:16px;flex-wrap:wrap">
@@ -566,8 +566,8 @@ ACC AC一体柜专题
 
 <!-- Agent 4: 一键部署 -->
 <div id="page-mg-deploy" class="micro-content" style="display:none;padding:24px 32px">
-<div class="sec-title">EMS 一键部署 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">站端服务器/边缘网关自动化部署：预检→安装→配置注入→服务启动→健康检查→交付报告</div>
+<div class="sec-title" data-i18n="mg_deploy_title">EMS 一键部署 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="mg_deploy_desc">站端服务器/边缘网关自动化部署：预检→安装→配置注入→服务启动→健康检查→交付报告</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">
 <div>
 <div class="sw-section"><div class="sw-section-title">目标服务器</div>
@@ -620,9 +620,9 @@ ACC AC一体柜专题
 
 <!-- Agent 5: 电力交易 -->
 <div id="page-mg-trading" class="micro-content" style="display:none;padding:24px 32px">
-<div class="sec-title">电力交易策略 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">接入当地电价/辅助服务政策，AI自动推荐最优充放电策略，预估额外收益</div>
-<div id="mgTradingEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成微网方案</div>
+<div class="sec-title" data-i18n="mg_trading_title">电力交易策略 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="mg_trading_desc">接入当地电价/辅助服务政策，AI自动推荐最优充放电策略，预估额外收益</div>
+<div id="mgTradingEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="mg_no_result">请先在「方案设计」中生成微网方案</div>
 <div id="mgTradingContent" style="display:none">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">
 <div class="sw-section"><div class="sw-section-title">分时电价配置</div>
@@ -1148,11 +1148,11 @@ ACC AC一体柜专题
 
 <!-- ========== AIDC PAGES ========== -->
 <div id="page-aidc-design" class="aidc-content" style="display:none;padding:24px 32px">
-<div class="sec-title">AIDC方案设计 Agent <span style="font-size:10px;color:#888">v2026.06.10</span></div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">输入数据中心参数，AI自动生成算力规划、供电架构、液冷散热、PUE优化方案</div>
+<div class="sec-title" data-i18n="aidc_design_title">AIDC方案设计 Agent <span style="font-size:10px;color:#888">v2026.06.10</span></div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="aidc_design_desc">输入数据中心参数，AI自动生成算力规划、供电架构、液冷散热、PUE优化方案</div>
 <div style="background:linear-gradient(135deg,#8B5CF6,#3B82F6);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
-<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px">AI 数据中心方案智能体</div>
-<div style="font-size:11px;color:#d0d8f0;line-height:1.5">从同一份方案JSON同源输出：算力规划、供电架构、液冷散热、PUE优化、机柜布局、BOM清单、经济性分析。AI自动识别算力需求推荐最佳供电与散热方案</div>
+<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px" data-i18n="aidc_design_agent">AI 数据中心方案智能体</div>
+<div style="font-size:11px;color:#d0d8f0;line-height:1.5" data-i18n="aidc_design_agent_desc">从同一份方案JSON同源输出：算力规划、供电架构、液冷散热、PUE优化、机柜布局、BOM清单、经济性分析。AI自动识别算力需求推荐最佳供电与散热方案</div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:16px">
 <div style="border-left:3px solid #8B5CF6;padding-left:14px">
@@ -1198,12 +1198,12 @@ ACC AC一体柜专题
 </div>
 
 <div id="page-aidc-power" class="aidc-content" style="display:none;padding:24px 32px">
-<div class="sec-title">供电架构 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">从方案JSON同源生成：供电单线图、UPS配置、配电架构、冗余方案。遵循GB 50174/GB 50052标准</div>
-<div id="aidcPowerEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div class="sec-title" data-i18n="aidc_power_title">供电架构 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="aidc_power_desc">从方案JSON同源生成：供电单线图、UPS配置、配电架构、冗余方案。遵循GB 50174/GB 50052标准</div>
+<div id="aidcPowerEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="mg_no_result">请先在「方案设计」中生成AIDC方案</div>
 <div id="aidcPowerContent" style="display:none">
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">AIDC供电单线图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcPowerSvg','AIDC供电单线图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="aidc_power_diagram">AIDC供电单线图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcPowerSvg','AIDC供电单线图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="aidcPowerSvg"></div>
 </div>
 <div id="aidcPowerDetail" style="font-size:12px;line-height:1.8;color:var(--text2)"></div>
@@ -1211,12 +1211,12 @@ ACC AC一体柜专题
 </div>
 
 <div id="page-aidc-cooling" class="aidc-content" style="display:none;padding:24px 32px">
-<div class="sec-title">液冷散热 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">从方案JSON同源生成：冷板设计、CDU配置、管路布局、散热能力评估</div>
-<div id="aidcCoolingEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div class="sec-title" data-i18n="aidc_cooling_title">液冷散热 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="aidc_cooling_desc">从方案JSON同源生成：冷板设计、CDU配置、管路布局、散热能力评估</div>
+<div id="aidcCoolingEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="mg_no_result">请先在「方案设计」中生成AIDC方案</div>
 <div id="aidcCoolingContent" style="display:none">
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">液冷管路拓扑图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcCoolingSvg','液冷管路拓扑图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="aidc_cooling_diagram">液冷管路拓扑图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcCoolingSvg','液冷管路拓扑图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="aidcCoolingSvg"></div>
 </div>
 <div id="aidcCoolingDetail" style="font-size:12px;line-height:1.8;color:var(--text2)"></div>
@@ -1224,21 +1224,21 @@ ACC AC一体柜专题
 </div>
 
 <div id="page-aidc-pue" class="aidc-content" style="display:none;padding:24px 32px">
-<div class="sec-title">PUE优化 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">PUE目标分解、节能策略推荐、自然冷却潜力评估、经济性分析</div>
-<div id="aidcPueEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div class="sec-title" data-i18n="aidc_pue_title2">PUE优化 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="aidc_pue_desc">PUE目标分解、节能策略推荐、自然冷却潜力评估、经济性分析</div>
+<div id="aidcPueEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="mg_no_result">请先在「方案设计」中生成AIDC方案</div>
 <div id="aidcPueContent" style="display:none">
 <div id="aidcPueDetail" style="font-size:12px;line-height:1.8;color:var(--text2)"></div>
 </div>
 </div>
 
 <div id="page-aidc-layout" class="aidc-content" style="display:none;padding:24px 32px">
-<div class="sec-title">机柜布局 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">机柜功率密度规划、冷热通道设计、设备平面布置图</div>
-<div id="aidcLayoutEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div class="sec-title" data-i18n="aidc_layout_title">机柜布局 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="aidc_layout_desc">机柜功率密度规划、冷热通道设计、设备平面布置图</div>
+<div id="aidcLayoutEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="mg_no_result">请先在「方案设计」中生成AIDC方案</div>
 <div id="aidcLayoutContent" style="display:none">
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">设备平面布置图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcLayoutSvg','设备平面布置图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="aidc_layout_diagram">设备平面布置图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcLayoutSvg','设备平面布置图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="aidcLayoutSvg"></div>
 </div>
 <div id="aidcLayoutDetail" style="font-size:12px;line-height:1.8;color:var(--text2)"></div>
@@ -1246,9 +1246,9 @@ ACC AC一体柜专题
 </div>
 
 <div id="page-aidc-bom" class="aidc-content" style="display:none;padding:24px 32px">
-<div class="sec-title">BOM清单 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">完整设备清单、型号规格、数量、价格汇总</div>
-<div id="aidcBomEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div class="sec-title" data-i18n="aidc_bom_title2">BOM清单 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="aidc_bom_desc">完整设备清单、型号规格、数量、价格汇总</div>
+<div id="aidcBomEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="mg_no_result">请先在「方案设计」中生成AIDC方案</div>
 <div id="aidcBomContent" style="display:none">
 <div id="aidcBomTable"></div>
 <div id="aidcEconTable"></div>
@@ -1256,24 +1256,24 @@ ACC AC一体柜专题
 </div>
 
 <div id="page-aidc-drawings" class="aidc-content" style="display:none;padding:24px 32px">
-<div class="sec-title">图纸汇总 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">所有AIDC图纸集中展示与下载</div>
-<div id="aidcDrawingsEmpty" style="text-align:center;padding:60px;color:var(--text2)">请先在「方案设计」中生成AIDC方案</div>
+<div class="sec-title" data-i18n="aidc_dw_title">图纸汇总 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="aidc_dw_desc">所有AIDC图纸集中展示与下载</div>
+<div id="aidcDrawingsEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="mg_no_result">请先在「方案设计」中生成AIDC方案</div>
 <div id="aidcDrawingsContent" style="display:none">
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">AIDC系统架构图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcArchSvg','AIDC系统架构图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="aidc_dw_arch">AIDC系统架构图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcArchSvg','AIDC系统架构图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="aidcArchSvg"></div>
 </div>
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">AIDC电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcWiringSvg','AIDC电气一次接线图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="aidc_dw_wiring">AIDC电气一次接线图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcWiringSvg','AIDC电气一次接线图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="aidcWiringSvg"></div>
 </div>
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">AIDC双路供电拓扑图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcDualPowerSvg','AIDC双路供电拓扑图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="aidc_dw_dual">AIDC双路供电拓扑图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcDualPowerSvg','AIDC双路供电拓扑图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="aidcDualPowerSvg"></div>
 </div>
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">AIDC液冷管路图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcLiquidSvg','AIDC液冷管路图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title" data-i18n="aidc_dw_liquid">AIDC液冷管路图</h3><div class="diagram-actions"><button onclick="downloadAidcDiagram('aidcLiquidSvg','AIDC液冷管路图.svg')" data-i18n="download_svg">下载 SVG</button></div></div>
 <div class="diagram-svg" id="aidcLiquidSvg"></div>
 </div>
 </div>
