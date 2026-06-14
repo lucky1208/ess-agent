@@ -200,9 +200,9 @@ select.form-input{appearance:auto}
 <h1 data-i18n="header_title">Open ESS Agent — 开源储能系统解决方案AI智能体</h1>
 <p data-i18n="header_spec">设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905</p>
 <div style="position:absolute;top:20px;right:32px;display:flex;gap:6px">
-  <button class="lang-btn active" onclick="switchLang('zh')">中</button>
-  <button class="lang-btn" onclick="switchLang('en')">EN</button>
-  <button class="lang-btn" onclick="switchLang('ar')">عربي</button>
+  <button class="lang-btn active" onclick="switchLang('zh')" data-i18n="lang_btn_zh">中文</button>
+  <button class="lang-btn" onclick="switchLang('en')" data-i18n="lang_btn_en">English</button>
+  <button class="lang-btn" onclick="switchLang('ar')" data-i18n="lang_btn_ar">العربية</button>
 </div>
 </header>
 
@@ -703,10 +703,10 @@ ACC AC一体柜专题
 
 <!-- (保留原知识库内容页) -->
 <div id="page-mg-arch" class="micro-content" style="display:none;padding:24px 32px">
-<div class="sec-title">微网(Microgrid) 架构全景图</div>
+<div class="sec-title" data-i18n="mg_arch_panorama">微网(Microgrid) 架构全景图</div>
 <div style="font-size:12px;color:var(--text2);margin-bottom:16px">基于Microgrid_Architecture.md | 设计人：卢继雄</div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 一、微网电力拓扑总览（交流微网）</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_ac_topo"></span>一、微网电力拓扑总览（交流微网）</span></h3>
 <div class="mermaid-wrap" id="mm-1"></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">⚡ 大电网</b> → <b style="color:var(--orange)">🔌 PCC并网开关柜(断路器QF01) + 双向关口表(0.2S级)</b> → <b style="color:var(--orange)">🔽 主变压器 10kV/0.4kV 2000kVA Dyn11</b> → <b style="color:var(--text1)">🔹 AC 400V母线(三相四线+PE)</b></p>
@@ -718,7 +718,7 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 二、交直流混合微网架构（推荐方案）</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_hybrid"></span>二、交直流混合微网架构（推荐方案）</span></h3>
 <div class="mermaid-wrap" id="mm-2"></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">市电侧</b> → 10kV电网 → 主变 → PCC开关 → <b style="color:var(--orange)">AC 400V子网</b>(电机/照明等交流负荷)</p>
@@ -727,7 +727,7 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 三、四种典型微网拓扑对比</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_topo_compare"></span>三、四种典型微网拓扑对比</span></h3>
 <div class="mermaid-wrap" id="mm-3"></div>
 <table class="result-table" style="font-size:12px"><tr><th>方案</th><th>拓扑</th><th>优点</th><th>缺点</th><th>适用场景</th></tr>
 <tr><td><b>A: 交流微网</b></td><td>电网→变压器→AC Bus→负荷</td><td>技术成熟、设备可选多</td><td>多次AC/DC变换损耗</td><td>最常见，工商业</td></tr>
@@ -737,7 +737,7 @@ ACC AC一体柜专题
 </table>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 四、微网运行模式切换</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_mode_switch"></span>四、微网运行模式切换</span></h3>
 <div class="mermaid-wrap" id="mm-4"></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">并网运行</b>(PQ控制): 削峰填谷 + 需量管理 + 光伏MPPT</p>
@@ -748,15 +748,15 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 五、微网保护配置</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_protection"></span>五、微网保护配置</span></h3>
 <div class="mermaid-wrap" id="mm-5"></div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 六、通信控制网络</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_comm">六、通信控制网络</span></h3>
 <div class="mermaid-wrap" id="mm-6"></div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 七、关键参数速查</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_params"></span>七、关键参数速查</span></h3>
 <table class="result-table" style="font-size:11px"><tr><th>类别</th><th>参数</th><th>典型值</th><th>说明</th></tr>
 <tr><td>电网侧</td><td>并网电压</td><td>10kV/35kV</td><td>视项目容量</td></tr>
 <tr><td></td><td>关口表精度</td><td>0.2S级</td><td>双向计量</td></tr>
@@ -770,10 +770,10 @@ ACC AC一体柜专题
 </div>
 
 <div id="page-mg-ems" class="micro-content" style="display:none;padding:24px 32px">
-<div class="sec-title">eBlock 微网能量管理系统(EMS)架构</div>
+<div class="sec-title" data-i18n="mg_ems_arch_title">eBlock 微网能量管理系统(EMS)架构</div>
 <div style="font-size:12px;color:var(--text2);margin-bottom:16px">基于eBlock_EMS_Architecture.md | 设计人：卢继雄</div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 一、总体架构（四层）</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_ems_overview"></span>一、总体架构（四层）</span></h3>
 <div class="mermaid-wrap" id="mm-7"></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">☁️ 云平台层:</b> 数据中台 + AI引擎(LSTM预测/异常检测) + 运维管理 + 电力交易(现货/辅助服务/碳交易) + 大屏可视化</p>
@@ -783,7 +783,7 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 二、通信协议 & 连接总线</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_ems_protocol"></span>二、通信协议 & 连接总线</span></h3>
 <div class="mermaid-wrap" id="mm-8"></div>
 <table class="result-table" style="font-size:11px"><tr><th>连接</th><th>协议</th><th>物理介质</th><th>实时性</th><th>用途</th></tr>
 <tr><td>云↔站控</td><td>MQTT/HTTPs</td><td>光纤/4G</td><td>秒级</td><td>数据上报/指令下发</td></tr>
@@ -796,7 +796,7 @@ ACC AC一体柜专题
 </table>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 三、单台eBlock内部架构</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_ems_eblock"></span>三、单台eBlock内部架构</span></h3>
 <div class="mermaid-wrap" id="mm-9"></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:#50c878">🔋 电池PACK:</b> LFP 280Ah, 1P240S, 额定768V/215kWh → BMS从控(电压/温度采集/被动均衡) → BMS主控(SOC/SOH卡尔曼滤波/故障诊断)</p>
@@ -805,7 +805,7 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 四、关键通信时延（时序图）</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_ems_delay"></span>四、关键通信时延（时序图）</span></h3>
 <div class="mermaid-wrap" id="mm-10"></div>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b>正常调度:</b> 云→站控(MQTT日前计划15min) → 边缘(IEC104 5s) → PCS(Modbus TCP写入功率) → 回读 → 上送 ≈ 秒级</p>
@@ -814,23 +814,23 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 五、网络拓扑</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_ems_network"></span>五、网络拓扑</span></h3>
 <div class="mermaid-wrap" id="mm-11"></div>
 </div>
 </div>
 
 <div id="page-mg-schedule" class="micro-content" style="display:none;padding:24px 32px">
-<div class="sec-title">微网调度优化</div>
+<div class="sec-title" data-i18n="mg_schedule_title">微网调度优化</div>
 <div style="font-size:12px;color:var(--text2);margin-bottom:16px">设计人：卢继雄 | 联系电话：15026953905</div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 一、优化目标函数</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_schedule_obj"></span>一、优化目标函数</span></h3>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:13px;line-height:2;color:var(--text1)">
 <p>min Σ<t=1~T> [ C_grid(t)·P_grid(t) + C_diesel(t)·P_diesel(t) + C_deg·|ΔSOC(t)| ]</p>
 <p style="font-size:11px;color:var(--text2)">其中: C_grid=电网电价, P_grid=购电功率, C_diesel=柴发成本, C_deg=电池退化成本</p>
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 二、约束条件</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_schedule_constraints"></span>二、约束条件</span></h3>
 <table class="result-table" style="font-size:11px"><tr><th>约束</th><th>公式</th><th>说明</th></tr>
 <tr><td>功率平衡</td><td>P_grid+P_pv+P_bess+P_diesel = P_load</td><td>供需实时平衡</td></tr>
 <tr><td>SOC限制</td><td>SOC_min ≤ SOC(t) ≤ SOC_max</td><td>10% ≤ SOC ≤ 90%</td></tr>
@@ -841,7 +841,7 @@ ACC AC一体柜专题
 </table>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 三、调度策略层级</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_schedule_layers"></span>三、调度策略层级</span></h3>
 <div style="background:var(--bg3);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:12px;line-height:1.8;color:var(--text2)">
 <p><b style="color:var(--blue)">Layer 1 - 日前调度(MILP):</b> 24h经济调度计划，15min粒度，考虑负荷/光伏预测</p>
 <p><b style="color:var(--orange)">Layer 2 - 日内滚动(MPC):</b> 1~4h滚动优化，修正预测偏差，5min粒度</p>
@@ -850,7 +850,7 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 四、典型调度场景</h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_schedule_scenarios"></span>四、典型调度场景</span></h3>
 <table class="result-table" style="font-size:11px"><tr><th>场景</th><th>策略</th><th>储能动作</th><th>柴发</th></tr>
 <tr><td>白天峰段+光伏充足</td><td>光伏优先+储能放电</td><td>放电削峰</td><td>停机</td></tr>
 <tr><td>夜间谷段</td><td>谷电充电</td><td>充电填谷</td><td>停机</td></tr>
@@ -864,31 +864,31 @@ ACC AC一体柜专题
 <div id="page-mg-software" class="micro-content mg-page" style="display:none">
 <section class="mg-hero">
 <div>
-<div class="mg-pills"><span class="mg-pill hot">Software Platform</span><span class="mg-pill">SCADA</span><span class="mg-pill">EMS</span><span class="mg-pill">调度</span><span class="mg-pill">交易</span><span class="mg-pill">数据中台</span></div>
-<h2>微网软件平台配置</h2>
-<p>面向微网项目的5大核心软件子平台配置：SCADA监控、EMS能量管理、调度优化、电力交易和数据中台。每个子平台包含技术栈选型、核心功能模块、部署架构和交付清单，支持一键生成项目级配置文件。</p>
+<div class="mg-pills"><span class="mg-pill hot">Software Platform</span><span class="mg-pill">SCADA</span><span class="mg-pill">EMS</span><span class="mg-pill" data-i18n="mg_sw_pill_dispatch">调度</span><span class="mg-pill" data-i18n="mg_sw_pill_trading">交易</span><span class="mg-pill" data-i18n="mg_sw_pill_datacenter">数据中台</span></div>
+<h2 data-i18n="mg_sw_config_title">微网软件平台配置</h2>
+<p data-i18n="mg_sw_config_desc">面向微网项目的5大核心软件子平台配置：SCADA监控、EMS能量管理、调度优化、电力交易和数据中台。每个子平台包含技术栈选型、核心功能模块、部署架构和交付清单，支持一键生成项目级配置文件。</p>
 <div class="mg-actions">
-<button class="btn btn-primary" onclick="generateSoftwareConfig()">生成平台配置方案</button>
-<button class="btn btn-secondary" onclick="exportSoftwareConfig()">导出配置清单</button>
+<button class="btn btn-primary" onclick="generateSoftwareConfig()" data-i18n="mg_sw_gen_btn">生成平台配置方案</button>
+<button class="btn btn-secondary" onclick="exportSoftwareConfig()" data-i18n="mg_sw_export_btn">导出配置清单</button>
 </div>
 </div>
 <div class="mg-kpis">
-<div class="mg-kpi"><b>5</b><span>核心软件子平台</span></div>
-<div class="mg-kpi"><b>Go+React</b><span>后端Go微服务+前端React</span></div>
-<div class="mg-kpi"><b>50+</b><span>可配置功能模块</span></div>
-<div class="mg-kpi"><b>Docker</b><span>容器化一键部署</span></div>
+<div class="mg-kpi"><b>5</b><span data-i18n="mg_sw_kpi_platforms">核心软件子平台</span></div>
+<div class="mg-kpi"><b>Go+React</b><span data-i18n="mg_sw_kpi_tech">后端Go微服务+前端React</span></div>
+<div class="mg-kpi"><b>50+</b><span data-i18n="mg_sw_kpi_modules">可配置功能模块</span></div>
+<div class="mg-kpi"><b>Docker</b><span data-i18n="mg_sw_kpi_docker">容器化一键部署</span></div>
 </div>
 </section>
 
 <div class="mg-grid">
 <div class="mg-card mg-col-12">
-<h3>子平台选择</h3>
+<h3 data-i18n="mg_sw_sub_select">子平台选择</h3>
 <div class="sw-tabs">
-<div class="sw-tab active" onclick="showSwSub('scada')" id="swTab-scada"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>SCADA监控</div>
-<div class="sw-tab" onclick="showSwSub('ems')" id="swTab-ems"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>EMS能量管理</div>
-<div class="sw-tab" onclick="showSwSub('dispatch')" id="swTab-dispatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>调度优化</div>
-<div class="sw-tab" onclick="showSwSub('trading')" id="swTab-trading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>电力交易</div>
-<div class="sw-tab" onclick="showSwSub('datacenter')" id="swTab-datacenter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 5v6c0 1.66-4 3-9 3s-9-1.34-9-3V5"/><path d="M21 11v6c0 1.66-4 3-9 3s-9-1.34-9-3v-6"/></svg>数据中台</div>
+<div class="sw-tab active" onclick="showSwSub('scada')" id="swTab-scada"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span data-i18n="mg_sw_tab_scada"></span>SCADA监控</span></div>
+<div class="sw-tab" onclick="showSwSub('ems')" id="swTab-ems"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span data-i18n="mg_sw_tab_ems">EMS能量管理</span></div>
+<div class="sw-tab" onclick="showSwSub('dispatch')" id="swTab-dispatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span data-i18n="mg_sw_tab_dispatch">调度优化</span></div>
+<div class="sw-tab" onclick="showSwSub('trading')" id="swTab-trading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span data-i18n="mg_sw_tab_trading">电力交易</span></div>
+<div class="sw-tab" onclick="showSwSub('datacenter')" id="swTab-datacenter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 5v6c0 1.66-4 3-9 3s-9-1.34-9-3V5"/><path d="M21 11v6c0 1.66-4 3-9 3s-9-1.34-9-3v-6"/></svg><span data-i18n="mg_sw_tab_datacenter">数据中台</span></div>
 </div>
 </div>
 </div>
@@ -896,7 +896,7 @@ ACC AC一体柜专题
 <div id="sw-scada" class="sw-sub-content">
 <div class="mg-grid">
 <div class="mg-card mg-col-6">
-<h3>SCADA监控平台</h3>
+<h3 data-i18n="mg_sw_scada_title">SCADA监控平台</h3>
 <p class="mg-mini">SCADA(Supervisory Control And Data Acquisition)是微网系统的实时监控中枢，负责数据采集、设备监控、遥控操作、告警管理和画面展示。支持IEC 61850/104/Modbus RTU/TCP多协议接入。</p>
 <h4>技术栈</h4>
 <table class="result-table" style="font-size:11px">
@@ -945,7 +945,7 @@ ACC AC一体柜专题
 <div id="sw-ems" class="sw-sub-content" style="display:none">
 <div class="mg-grid">
 <div class="mg-card mg-col-6">
-<h3>EMS能量管理平台</h3>
+<h3 data-i18n="mg_sw_ems_title">EMS能量管理平台</h3>
 <p class="mg-mini">EMS(Energy Management System)是微网的大脑，负责储能SOC管理、充放电策略、防逆流控制、削峰填谷、光伏消纳优化和并离网无缝切换。基于eBlock能量块架构，支持多PCS协调控制。</p>
 <h4>技术栈</h4>
 <table class="result-table" style="font-size:11px">
@@ -993,7 +993,7 @@ ACC AC一体柜专题
 <div id="sw-dispatch" class="sw-sub-content" style="display:none">
 <div class="mg-grid">
 <div class="mg-card mg-col-6">
-<h3>调度优化平台</h3>
+<h3 data-i18n="mg_sw_dispatch_title">调度优化平台</h3>
 <p class="mg-mini">调度优化平台实现微网的多时间尺度优化调度：日前MILP经济调度→日内MPC滚动修正→实时AGC功率跟踪→本地边缘自治。支持需求响应(DR)和虚拟电厂(VPP)接口。</p>
 <h4>技术栈</h4>
 <table class="result-table" style="font-size:11px">
@@ -1020,7 +1020,7 @@ ACC AC一体柜专题
 </div>
 <div class="mg-grid">
 <div class="mg-card mg-col-6">
-<h3>调度层级示意</h3>
+<h3 data-i18n="mg_sw_dispatch_layers">调度层级示意</h3>
 <div class="mermaid-wrap" id="mm-dispatch-arch"></div>
 </div>
 <div class="mg-card mg-col-6">
@@ -1040,7 +1040,7 @@ ACC AC一体柜专题
 <div id="sw-trading" class="sw-sub-content" style="display:none">
 <div class="mg-grid">
 <div class="mg-card mg-col-6">
-<h3>电力交易平台</h3>
+<h3 data-i18n="mg_sw_trading_title">电力交易平台</h3>
 <p class="mg-mini">电力交易平台对接省级/区域电力交易中心，支持现货市场报量报价、辅助服务市场参与、绿证交易和需求响应补偿结算。适用于已获取售电资质或通过聚合商接入的微网项目。</p>
 <h4>技术栈</h4>
 <table class="result-table" style="font-size:11px">
@@ -1065,7 +1065,7 @@ ACC AC一体柜专题
 </div>
 <div class="mg-grid">
 <div class="mg-card mg-col-12">
-<h3>适用条件与准入门槛</h3>
+<h3 data-i18n="mg_sw_trading_conditions">适用条件与准入门槛</h3>
 <table class="result-table" style="font-size:11px">
 <tr><th>市场</th><th>准入条件</th><th>微网适用性</th><th>备注</th></tr>
 <tr><td>现货市场</td><td>≥10MW并网，售电资质</td><td style="color:#e06070">多数微网不满足</td><td>可通过聚合商</td></tr>
@@ -1080,7 +1080,7 @@ ACC AC一体柜专题
 <div id="sw-datacenter" class="sw-sub-content" style="display:none">
 <div class="mg-grid">
 <div class="mg-card mg-col-6">
-<h3>数据中台</h3>
+<h3 data-i18n="mg_sw_datacenter_title">数据中台</h3>
 <p class="mg-mini">数据中台是微网软件平台的数据底座，统一汇聚SCADA遥测、EMS策略日志、调度计划、交易结算等多源数据，提供数据治理、指标计算、报表服务和开放API，支撑上层应用和BI分析。</p>
 <h4>技术栈</h4>
 <table class="result-table" style="font-size:11px">
@@ -1107,7 +1107,7 @@ ACC AC一体柜专题
 </div>
 <div class="mg-grid">
 <div class="mg-card mg-col-6">
-<h3>数据流向架构</h3>
+<h3 data-i18n="mg_sw_data_flow">数据流向架构</h3>
 <div class="mermaid-wrap" id="mm-datacenter-arch"></div>
 </div>
 <div class="mg-card mg-col-6">
@@ -1126,7 +1126,7 @@ ACC AC一体柜专题
 
 <div class="mg-grid" style="margin-top:8px">
 <div class="mg-card mg-col-6">
-<h3>总体技术栈选型</h3>
+<h3 data-i18n="mg_sw_tech_stack">总体技术栈选型</h3>
 <table class="result-table" style="font-size:11px">
 <tr><th>类别</th><th>选型</th><th>理由</th></tr>
 <tr><td>后端语言</td><td style="color:var(--blue)">Go 1.22</td><td>高并发、低延迟、单二进制部署，适合站端</td></tr>
@@ -1139,7 +1139,7 @@ ACC AC一体柜专题
 </table>
 </div>
 <div class="mg-card mg-col-6">
-<h3>项目交付总清单</h3>
+<h3 data-i18n="mg_sw_delivery_list">项目交付总清单</h3>
 <div class="mg-code" id="swDeliveryList" style="max-height:260px">等待生成...</div>
 </div>
 
@@ -1158,41 +1158,41 @@ ACC AC一体柜专题
 <div style="border-left:3px solid #8B5CF6;padding-left:14px">
 <div class="sec-title" style="margin-bottom:8px">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-<span>自然语言描述</span>
+<span data-i18n="aidc_nl_label">自然语言描述</span>
 </div>
-<textarea id="aidcNaturalInput" class="form-input" rows="3" placeholder="例：上海张江AI算力中心，GPU集群800卡H100，总IT负荷12MW，10kV双路接入，要求PUE<1.25，液冷散热" style="resize:vertical;font-size:12px;line-height:1.4"></textarea>
-<button class="btn btn-primary" onclick="aidcParseNatural()" style="margin-top:8px;width:100%;font-size:12px;padding:8px">AI识别参数并生成方案</button>
+<textarea id="aidcNaturalInput" class="form-input" rows="3" data-i18n-placeholder="aidc_nl_ph" placeholder="例：上海张江AI算力中心，GPU集群800卡H100，总IT负荷12MW，10kV双路接入，要求PUE<1.25，液冷散热" style="resize:vertical;font-size:12px;line-height:1.4"></textarea>
+<button class="btn btn-primary" onclick="aidcParseNatural()" data-i18n="aidc_ai_btn" style="margin-top:8px;width:100%;font-size:12px;padding:8px">AI识别参数并生成方案</button>
 </div>
 <div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">项目名称</label><input type="text" class="form-input" id="aidcProjName" value="上海张江AI算力中心"></div>
-<div class="form-group"><label class="form-label">所在区域</label><input type="text" class="form-input" id="aidcRegion" value="上海市浦东新区"></div>
-<div class="form-group"><label class="form-label">数据中心等级</label><select class="form-input" id="aidcTier"><option value="tier3" selected>Tier III</option><option value="tier4">Tier IV</option><option value="tier2">Tier II</option></select></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_proj_name">项目名称</label><input type="text" class="form-input" id="aidcProjName" value="上海张江AI算力中心"></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_region">所在区域</label><input type="text" class="form-input" id="aidcRegion" value="上海市浦东新区"></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_tier">数据中心等级</label><select class="form-input" id="aidcTier"><option value="tier3" selected>Tier III</option><option value="tier4">Tier IV</option><option value="tier2">Tier II</option></select></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">GPU型号</label><select class="form-input" id="aidcGpuType"><option value="h100" selected>NVIDIA H100</option><option value="a100">NVIDIA A100</option><option value="h200">NVIDIA H200</option><option value="b200">NVIDIA B200</option><option value="ascend910b">昇腾910B</option></select></div>
-<div class="form-group"><label class="form-label">GPU数量(卡)</label><input type="number" class="form-input" id="aidcGpuCount" value="800" step="8"></div>
-<div class="form-group"><label class="form-label">总IT负荷(kW)</label><input type="number" class="form-input" id="aidcItLoad" value="12000" step="100"></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_gpu_model">GPU型号</label><select class="form-input" id="aidcGpuType"><option value="h100" selected>NVIDIA H100</option><option value="a100">NVIDIA A100</option><option value="h200">NVIDIA H200</option><option value="b200">NVIDIA B200</option><option value="ascend910b">昇腾910B</option></select></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_gpu_qty">GPU数量(卡)</label><input type="number" class="form-input" id="aidcGpuCount" value="800" step="8"></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_it_load">总IT负荷(kW)</label><input type="number" class="form-input" id="aidcItLoad" value="12000" step="100"></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">接入电压(kV)</label><select class="form-input" id="aidcVoltage"><option value="10" selected>10kV</option><option value="35">35kV</option><option value="110">110kV</option></select></div>
-<div class="form-group"><label class="form-label">供电冗余</label><select class="form-input" id="aidcRedundancy"><option value="2n">2N</option><option value="2n1" selected>2(N+1)</option><option value="n1">N+1</option></select></div>
-<div class="form-group"><label class="form-label">散热方式</label><select class="form-input" id="aidcCooling"><option value="liquid" selected>液冷</option><option value="air">风冷</option><option value="hybrid">液冷+风冷混合</option></select></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_voltage">接入电压(kV)</label><select class="form-input" id="aidcVoltage"><option value="10" selected>10kV</option><option value="35">35kV</option><option value="110">110kV</option></select></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_redundancy">供电冗余</label><select class="form-input" id="aidcRedundancy"><option value="2n">2N</option><option value="2n1" selected>2(N+1)</option><option value="n1">N+1</option></select></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_cooling">散热方式</label><select class="form-input" id="aidcCooling"><option value="liquid" selected>液冷</option><option value="air">风冷</option><option value="hybrid">液冷+风冷混合</option></select></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label class="form-label">PUE目标</label><input type="number" class="form-input" id="aidcPueTarget" value="1.25" step="0.01" min="1.05" max="2.0"></div>
-<div class="form-group"><label class="form-label">机柜功率密度(kW/柜)</label><input type="number" class="form-input" id="aidcRackPower" value="40" step="5"></div>
-<div class="form-group"><label class="form-label">预算(万元)</label><input type="number" class="form-input" id="aidcBudget" value="50000" step="1000"></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_pue_target">PUE目标</label><input type="number" class="form-input" id="aidcPueTarget" value="1.25" step="0.01" min="1.05" max="2.0"></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_rack_density">机柜功率密度(kW/柜)</label><input type="number" class="form-input" id="aidcRackPower" value="40" step="5"></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_budget">预算(万元)</label><input type="number" class="form-input" id="aidcBudget" value="50000" step="1000"></div>
 </div>
 <div class="form-row" style="margin-top:4px">
-<div class="form-group"><label class="form-label">峰电价(元/kWh)</label><input type="number" class="form-input" id="aidcPricePeak" value="1.05" step="0.01"></div>
-<div class="form-group"><label class="form-label">谷电价(元/kWh)</label><input type="number" class="form-input" id="aidcPriceValley" value="0.35" step="0.01"></div>
-<div class="form-group"><label class="form-label">AI模型</label><select class="form-input" id="aidcLlmProvider"><option value="local">本地模型引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option><option value="bailian">Qwen3.7-Max (阿里百炼)</option></select></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_price_peak">峰电价(元/kWh)</label><input type="number" class="form-input" id="aidcPricePeak" value="1.05" step="0.01"></div>
+<div class="form-group"><label class="form-label" data-i18n="aidc_price_valley">谷电价(元/kWh)</label><input type="number" class="form-input" id="aidcPriceValley" value="0.35" step="0.01"></div>
+<div class="form-group"><label class="form-label" data-i18n="llm_provider">AI模型</label><select class="form-input" id="aidcLlmProvider"><option value="local">本地模型引擎</option><option value="deepseek">DeepSeek V4</option><option value="glm">GLM-5.1 (智谱)</option><option value="bailian">Qwen3.7-Max (阿里百炼)</option></select></div>
 </div>
 </div>
 </div>
-<button class="btn btn-primary" onclick="aidcGenerateSolution()" style="width:100%;padding:12px;font-size:14px;margin-bottom:16px">生成AIDC方案</button>
-<div class="success-msg" id="aidcSuccessMsg" style="display:none">方案已生成！请切换到其他标签查看供电架构、液冷散热、PUE优化等详情</div>
+<button class="btn btn-primary" onclick="aidcGenerateSolution()" data-i18n="aidc_gen_btn" style="width:100%;padding:12px;font-size:14px;margin-bottom:16px">生成AIDC方案</button>
+<div class="success-msg" id="aidcSuccessMsg" data-i18n="aidc_success_msg" style="display:none">方案已生成！请切换到其他标签查看供电架构、液冷散热、PUE优化等详情</div>
 <div id="aidcAnalysisLog" class="mg-log" style="display:none;margin-top:12px"></div>
 <div id="aidcSolutionBrief" style="font-size:12px;color:var(--text2);line-height:1.8"></div>
 </div>
@@ -2417,7 +2417,19 @@ aidc_layout_diagram:'设备平面布置图',
 aidc_bom_title2:'BOM清单 Agent',aidc_bom_desc:'完整设备清单、型号规格、数量、价格汇总',
 aidc_dw_title:'图纸汇总 Agent',aidc_dw_desc:'所有AIDC图纸集中展示与下载',
 aidc_dw_arch:'AIDC系统架构图',aidc_dw_wiring:'AIDC电气一次接线图',aidc_dw_dual:'AIDC双路供电拓扑图',aidc_dw_liquid:'AIDC液冷管路图',
-ess_layout:'平面布置图',ess_cable:'电缆走向图',ess_principle:'PCS-BESS电气原理图'
+ess_layout:'平面布置图',ess_cable:'电缆走向图',ess_principle:'PCS-BESS电气原理图',
+lang_btn_zh:'中文',lang_btn_en:'English',lang_btn_ar:'العربية',
+mg_arch_panorama:'微网(Microgrid) 架构全景图',mg_arch_ac_topo:'一、微网电力拓扑总览（交流微网）',mg_arch_hybrid:'二、交直流混合微网架构（推荐方案）',mg_arch_topo_compare:'三、四种典型微网拓扑对比',mg_arch_mode_switch:'四、微网运行模式切换',mg_arch_protection:'五、微网保护配置',mg_arch_comm:'六、通信控制网络',mg_arch_params:'七、关键参数速查',
+mg_ems_arch_title:'eBlock 微网能量管理系统(EMS)架构',mg_ems_overview:'一、总体架构（四层）',mg_ems_protocol:'二、通信协议 & 连接总线',mg_ems_eblock:'三、单台eBlock内部架构',mg_ems_delay:'四、关键通信时延（时序图）',mg_ems_network:'五、网络拓扑',
+mg_schedule_title:'微网调度优化',mg_schedule_obj:'一、优化目标函数',mg_schedule_constraints:'二、约束条件',mg_schedule_layers:'三、调度策略层级',mg_schedule_scenarios:'四、典型调度场景',
+mg_sw_pill_dispatch:'调度',mg_sw_pill_trading:'交易',mg_sw_pill_datacenter:'数据中台',
+mg_sw_config_title:'微网软件平台配置',mg_sw_config_desc:'面向微网项目的5大核心软件子平台配置：SCADA监控、EMS能量管理、调度优化、电力交易和数据中台。每个子平台包含技术栈选型、核心功能模块、部署架构和交付清单，支持一键生成项目级配置文件。',
+mg_sw_gen_btn:'生成平台配置方案',mg_sw_export_btn:'导出配置清单',
+mg_sw_kpi_platforms:'核心软件子平台',mg_sw_kpi_tech:'后端Go微服务+前端React',mg_sw_kpi_modules:'可配置功能模块',mg_sw_kpi_docker:'容器化一键部署',
+mg_sw_sub_select:'子平台选择',
+mg_sw_tab_scada:'SCADA监控',mg_sw_tab_ems:'EMS能量管理',mg_sw_tab_dispatch:'调度优化',mg_sw_tab_trading:'电力交易',mg_sw_tab_datacenter:'数据中台',
+mg_sw_scada_title:'SCADA监控平台',mg_sw_ems_title:'EMS能量管理平台',mg_sw_dispatch_title:'调度优化平台',mg_sw_trading_title:'电力交易平台',mg_sw_datacenter_title:'数据中台',
+mg_sw_dispatch_layers:'调度层级示意',mg_sw_trading_conditions:'适用条件与准入门槛',mg_sw_data_flow:'数据流向架构',mg_sw_tech_stack:'总体技术栈选型',mg_sw_delivery_list:'项目交付总清单'
 },
 en:{
 header_title:'Open ESS Agent — Open-source ESS Solution AI Agent',
@@ -2515,7 +2527,19 @@ aidc_layout_diagram:'Equipment Floor Plan',
 aidc_bom_title2:'BOM Agent',aidc_bom_desc:'Complete equipment list, model specs, quantities, price summary',
 aidc_dw_title:'Drawing Summary Agent',aidc_dw_desc:'All AIDC drawings centralized display and download',
 aidc_dw_arch:'AIDC System Architecture',aidc_dw_wiring:'AIDC Single-line Diagram',aidc_dw_dual:'AIDC Dual-feed Power Topology',aidc_dw_liquid:'AIDC Liquid Cooling Diagram',
-ess_layout:'Floor Plan',ess_cable:'Cable Routing',ess_principle:'PCS-BESS Schematic'
+ess_layout:'Floor Plan',ess_cable:'Cable Routing',ess_principle:'PCS-BESS Schematic',
+lang_btn_zh:'Chinese',lang_btn_en:'English',lang_btn_ar:'Arabic',
+mg_arch_panorama:'Microgrid Architecture Overview',mg_arch_ac_topo:'1. Microgrid Power Topology Overview (AC Microgrid)',mg_arch_hybrid:'2. AC/DC Hybrid Microgrid Architecture (Recommended)',mg_arch_topo_compare:'3. Four Typical Microgrid Topology Comparison',mg_arch_mode_switch:'4. Microgrid Operation Mode Switching',mg_arch_protection:'5. Microgrid Protection Configuration',mg_arch_comm:'6. Communication & Control Network',mg_arch_params:'7. Key Parameters Quick Reference',
+mg_ems_arch_title:'eBlock Microgrid EMS Architecture',mg_ems_overview:'1. Overall Architecture (4 Layers)',mg_ems_protocol:'2. Communication Protocols & Bus',mg_ems_eblock:'3. Single eBlock Internal Architecture',mg_ems_delay:'4. Key Communication Latency (Sequence Diagram)',mg_ems_network:'5. Network Topology',
+mg_schedule_title:'Microgrid Dispatch Optimization',mg_schedule_obj:'1. Optimization Objective Function',mg_schedule_constraints:'2. Constraints',mg_schedule_layers:'3. Dispatch Strategy Hierarchy',mg_schedule_scenarios:'4. Typical Dispatch Scenarios',
+mg_sw_pill_dispatch:'Dispatch',mg_sw_pill_trading:'Trading',mg_sw_pill_datacenter:'Data Platform',
+mg_sw_config_title:'Microgrid Software Platform Configuration',mg_sw_config_desc:'5 core software sub-platforms for microgrid projects: SCADA monitoring, EMS energy management, dispatch optimization, power trading, and data platform. Each sub-platform includes tech stack selection, core modules, deployment architecture, and delivery checklist.',
+mg_sw_gen_btn:'Generate Platform Config',mg_sw_export_btn:'Export Config Checklist',
+mg_sw_kpi_platforms:'Core Software Sub-platforms',mg_sw_kpi_tech:'Backend Go + Frontend React',mg_sw_kpi_modules:'Configurable Modules',mg_sw_kpi_docker:'Containerized One-Click Deploy',
+mg_sw_sub_select:'Sub-platform Selection',
+mg_sw_tab_scada:'SCADA Monitor',mg_sw_tab_ems:'EMS Energy Mgmt',mg_sw_tab_dispatch:'Dispatch Optimize',mg_sw_tab_trading:'Power Trading',mg_sw_tab_datacenter:'Data Platform',
+mg_sw_scada_title:'SCADA Monitoring Platform',mg_sw_ems_title:'EMS Energy Management Platform',mg_sw_dispatch_title:'Dispatch Optimization Platform',mg_sw_trading_title:'Power Trading Platform',mg_sw_datacenter_title:'Data Platform',
+mg_sw_dispatch_layers:'Dispatch Hierarchy',mg_sw_trading_conditions:'Eligibility & Access Requirements',mg_sw_data_flow:'Data Flow Architecture',mg_sw_tech_stack:'Overall Tech Stack Selection',mg_sw_delivery_list:'Project Delivery Checklist'
 },
 ar:{
 header_title:'Open ESS Agent — وكيل الذكاء الاصطناعي لحلول أنظمة تخزين الطاقة مفتوحة المصدر',
@@ -2586,7 +2610,7 @@ mg_trading_price:'تكوين تسعير الوقت من الاستخدام',mg_t
 mg_trading_market:'المشاركة في السوق',mg_mk_arb:'مراجحة الذروة-الوادي',mg_mk_demand:'إدارة الطلب',mg_mk_spot:'سوق الفوري',mg_mk_aux:'الخدمات المساعدة',mg_mk_dr:'استجابة الطلب',mg_mk_carbon:'تداول الكربون/الشهادات الخضراء',
 mg_trading_btn:'توليد استراتيجية التداول',mg_trading_strategy:'توصية الاستراتيجية',mg_trading_revenue:'تقدير الإيرادات',mg_trading_schedule:'جدول التوزيع النموذجي 24 ساعة',
 mg_twin_no:'لم يتم توليد حل الشبكة المصغرة بعد',mg_twin_go:'يرجى ملء معلمات المشروع في "التصميم" أولاً...',mg_twin_btn:'→ الذهاب إلى التصميم',
-mg_wiki_title:'التقنية الأساسية',mg_wiki_desc:'16 تقنية أساسية للشبكة المصغرة من 5 سنوات من الممارسة | انقر البطاقات لل核心技术',
+mg_wiki_title:'التقنية الأساسية',mg_wiki_desc:'16 تقنية أساسية للشبكة المصغرة من 5 سنوات من الممارسة | انقر البطاقات للجوهري التقني',
 mg_wiki_skill_title:'16 مهارة تقنية أساسية من 5 سنوات من الممارسة',mg_wiki_skill_author:'المصمم: لو جيشيونغ | 10 مهارات هندسية + 6 مهارات تقنية عميقة',
 mg_wiki_arch:'البنية',mg_wiki_ems:'إدارة الطاقة',mg_wiki_schedule:'تحسين التوزيع',mg_wiki_software:'منصة البرمجيات',
 aidc_design_title:'وكيل تصميم AIDC',
@@ -2613,7 +2637,19 @@ aidc_layout_diagram:'مخطط أرضية المعدات',
 aidc_bom_title2:'وكيل قائمة المواد',aidc_bom_desc:'قائمة معدات كاملة، مواصفات الطراز، الكميات، ملخص الأسعار',
 aidc_dw_title:'وكيل ملخص الرسوم',aidc_dw_desc:'عرض وتحميل جميع رسوم AIDC مركزياً',
 aidc_dw_arch:'هيكل نظام AIDC',aidc_dw_wiring:'مخطط التوصيل أحادي الخط AIDC',aidc_dw_dual:'طوبولوجيا الطاقة المزدوجة AIDC',aidc_dw_liquid:'مخطط التبريد السائل AIDC',
-ess_layout:'مخطط الأرضية',ess_cable:'توجيه الكابلات',ess_principle:'مخطط PCS-BESS'
+ess_layout:'مخطط الأرضية',ess_cable:'توجيه الكابلات',ess_principle:'مخطط PCS-BESS',
+lang_btn_zh:'الصينية',lang_btn_en:'الإنجليزية',lang_btn_ar:'العربية',
+mg_arch_panorama:'نظرة شاملة على بنية الشبكة المصغرة',mg_arch_ac_topo:'1. نظرة عامة على طوبولوجيا طاقة الشبكة المصغرة (شبكة مصغرة AC)',mg_arch_hybrid:'2. بنية الشبكة المصغرة الهجينة AC/DC (موصى بها)',mg_arch_topo_compare:'3. مقارنة أربع طوبولوجيات نموذجية للشبكة المصغرة',mg_arch_mode_switch:'4. تبديل وضع تشغيل الشبكة المصغرة',mg_arch_protection:'5. تكوين حماية الشبكة المصغرة',mg_arch_comm:'6. شبكة الاتصال والتحكم',mg_arch_params:'7. مرجع سريع للمعلمات الرئيسية',
+mg_ems_arch_title:'بنية نظام إدارة طاقة الشبكة المصغرة eBlock',mg_ems_overview:'1. البنية العامة (4 طبقات)',mg_ems_protocol:'2. بروتوكولات الاتصال وناقل الربط',mg_ems_eblock:'3. البنية الداخلية لوحدة eBlock واحدة',mg_ems_delay:'4. زمن الاتصال الرئيسي (مخطط التسلسل)',mg_ems_network:'5. طوبولوجيا الشبكة',
+mg_schedule_title:'تحسين توزيع الشبكة المصغرة',mg_schedule_obj:'1. دالة الهدف التحسينية',mg_schedule_constraints:'2. القيود',mg_schedule_layers:'3. التسلسل الهرمي لاستراتيجية التوزيع',mg_schedule_scenarios:'4. سيناريوهات التوزيع النموذجية',
+mg_sw_pill_dispatch:'التوزيع',mg_sw_pill_trading:'التداول',mg_sw_pill_datacenter:'منصة البيانات',
+mg_sw_config_title:'تكوين منصة برمجيات الشبكة المصغرة',mg_sw_config_desc:'5 منصات برمجية فرعية أساسية لمشاريع الشبكة المصغرة: مراقبة SCADA، إدارة طاقة EMS، تحسين التوزيع، تداول الطاقة، ومنصة البيانات.',
+mg_sw_gen_btn:'توليد تكوين المنصة',mg_sw_export_btn:'تصدير قائمة التكوين',
+mg_sw_kpi_platforms:'منصات برمجية فرعية أساسية',mg_sw_kpi_tech:'خلفية Go + واجهة React',mg_sw_kpi_modules:'وحدات قابلة للتكوين',mg_sw_kpi_docker:'نشر حاويات بنقرة واحدة',
+mg_sw_sub_select:'اختيار المنصة الفرعية',
+mg_sw_tab_scada:'مراقبة SCADA',mg_sw_tab_ems:'إدارة طاقة EMS',mg_sw_tab_dispatch:'تحسين التوزيع',mg_sw_tab_trading:'تداول الطاقة',mg_sw_tab_datacenter:'منصة البيانات',
+mg_sw_scada_title:'منصة مراقبة SCADA',mg_sw_ems_title:'منصة إدارة طاقة EMS',mg_sw_dispatch_title:'منصة تحسين التوزيع',mg_sw_trading_title:'منصة تداول الطاقة',mg_sw_datacenter_title:'منصة البيانات',
+mg_sw_dispatch_layers:'التسلسل الهرمي للتوزيع',mg_sw_trading_conditions:'شروط الأهلية ومتطلبات الوصول',mg_sw_data_flow:'بنية تدفق البيانات',mg_sw_tech_stack:'اختيار التقنيات العام',mg_sw_delivery_list:'قائمة تسليم المشروع'
 }
 };
 
@@ -2651,6 +2687,33 @@ function switchLang(lang){
       const key=reverseMap[txt];
       if(key&&dict[key]!==undefined)el.textContent=dict[key];
     });
+  }else{
+    const prevLang=localStorage.getItem('lang')||'zh';
+    if(prevLang!=='zh'){
+      const prevDict=I18N[prevLang];
+      if(prevDict){
+        const reverseMap={};
+        for(const k in prevDict){reverseMap[prevDict[k]]=k;}
+        document.querySelectorAll('.sec-title,.diagram-title,.form-label,.sw-tab,.sw-section-title,.sub-tab,.category-tab,button,.success-msg,h3,.mg-mini,p,.mg-log').forEach(el=>{
+          if(el.getAttribute('data-i18n'))return;
+          const txt=el.textContent.trim();
+          const key=reverseMap[txt];
+          if(key&&I18N.zh[key]!==undefined)el.textContent=I18N.zh[key];
+        });
+        document.querySelectorAll('textarea[input],input[placeholder]').forEach(el=>{
+          if(el.getAttribute('data-i18n-placeholder'))return;
+          const ph=el.getAttribute('placeholder');
+          if(!ph)return;
+          const key=reverseMap[ph];
+          if(key&&I18N.zh[key]!==undefined)el.placeholder=I18N.zh[key];
+        });
+        document.querySelectorAll('select option').forEach(el=>{
+          const txt=el.textContent.trim();
+          const key=reverseMap[txt];
+          if(key&&I18N.zh[key]!==undefined)el.textContent=I18N.zh[key];
+        });
+      }
+    }
   }
   document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.remove('active'));
   const btns=document.querySelectorAll('.lang-btn');
@@ -2872,7 +2935,7 @@ window.mgRenderSkillCards=function(){
     const grid=document.getElementById('mgSkillCardsGrid');
     if(!grid||!window.MG_SKILLS)return;
     const lang=localStorage.getItem('lang')||'zh';
-    const clickHint=lang==='en'?'▸ Click for tech core / problems / value':lang==='ar'?'▸ انقر لل核心技术/المشاكل/القيمة':'▸ 点击查看技术核心/解决问题/商用价值';
+    const clickHint=lang==='en'?'▸ Click for tech core / problems / value':lang==='ar'?'▸ انقر للجوهري التقني/المشاكل/القيمة':'▸ 点击查看技术核心/解决问题/商用价值';
     grid.innerHTML=window.MG_SKILLS.map(s=>{
       const t=mgGetSkillText(s.key,'title');
       const b=mgGetSkillText(s.key,'brief');
@@ -2903,7 +2966,7 @@ window.mgShowSkillDetail=function(key){
     const $=id=>document.getElementById(id);
     $('skillModalTitle').innerHTML='<span style="color:'+s.color+'">'+(t||s.title)+'</span><span style="font-size:11px;padding:2px 8px;border-radius:8px;background:'+s.color+'22;color:'+s.color+';margin-left:8px">'+(tg||s.tag)+'</span>';
     $('skillModalBrief').textContent=b||s.brief;
-    const coreTitle=lang==='en'?'Technical Core':lang==='ar'?'ال核心技术':'技术核心';
+    const coreTitle=lang==='en'?'Technical Core':lang==='ar'?'الجوهري التقني':'技术核心';
     const probTitle=lang==='en'?'Key Problems Solved':lang==='ar'?'المشاكل الرئيسية':'关键解决问题';
     const valTitle=lang==='en'?'Commercial Value':lang==='ar'?'القيمة التجارية':'商用价值';
     const coreArr=mgGetSkillText(s.key,'core')||s.core;
