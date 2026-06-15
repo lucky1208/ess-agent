@@ -192,6 +192,26 @@ select.form-input{appearance:auto}
 .lang-btn.active{background:rgba(255,255,255,.35);font-weight:bold}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== 合规检查 (Compliance) ===== */
+.compl-rule-row{padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px;line-height:1.5;display:flex;align-items:center;gap:8px}
+.compl-rule-row:last-child{border-bottom:0}
+.compl-rule-id{font-family:Menlo,Consolas,monospace;font-size:11px;color:var(--text2);min-width:42px}
+.compl-rule-name{font-weight:600;color:var(--text1);min-width:130px}
+.compl-rule-std{font-size:10px;color:var(--text2);min-width:200px;opacity:.85}
+.compl-rule-msg{flex:1;color:var(--text2);font-size:11px}
+.compl-badge{display:inline-block;padding:1px 8px;border-radius:8px;font-size:10px;font-weight:600;min-width:46px;text-align:center}
+.compl-badge-pass{background:rgba(15,110,86,.2);color:var(--green)}
+.compl-badge-err{background:rgba(224,96,112,.15);color:var(--red)}
+.compl-badge-warn{background:rgba(239,159,39,.2);color:var(--orange)}
+.compl-badge-skip{background:var(--bg2);color:var(--text2)}
+.compl-badge-info{background:rgba(24,95,165,.15);color:var(--blue)}
+.compl-status-pass{background:rgba(15,110,86,.2);color:var(--green)}
+.compl-status-warn{background:rgba(239,159,39,.2);color:var(--orange)}
+.compl-status-fail{background:rgba(224,96,112,.18);color:var(--red)}
+.compl-cat-group{margin-bottom:10px;background:var(--bg2);border-radius:6px;padding:8px 10px;border:1px solid var(--border)}
+.compl-cat-title{font-size:11px;font-weight:600;color:var(--text1);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.compl-cat-title::before{content:"";display:inline-block;width:3px;height:12px;background:var(--blue);border-radius:2px}
 </style>
 </head>
 <body>
@@ -218,6 +238,7 @@ select.form-input{appearance:auto}
 <div class="nav-tab" onclick="showPage('config')" data-i18n="nav_input">方案设计</div>
 <div class="nav-tab" onclick="showPage('diagrams')" data-i18n="nav_diagrams">生成图纸</div>
 <div class="nav-tab" onclick="showPage('cases')" data-i18n="nav_cases">应用案例</div>
+<div class="nav-tab" onclick="showPage('compliance')" data-i18n="nav_compliance">规则检查</div>
 </nav>
 </div>
 
@@ -422,6 +443,83 @@ ACC AC一体柜专题
 <div id="page-cases" class="tab-content">
 <div class="sec-title" data-i18n="cases_title">应用案例</div>
 <div class="case-grid" id="caseGrid"></div>
+</div>
+
+<!-- TAB: 规则检查 (compliance) -->
+<div id="page-compliance" class="tab-content">
+<div style="background:linear-gradient(135deg,#185FA5,#EF9F27);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
+<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px" data-i18n="compliance_title">工程合规规则检查</div>
+<div style="font-size:11px;color:#f0e0d0;line-height:1.5" data-i18n="compliance_desc">基于 25 条工程规则 (GB 51048 / GB 50054 / GB 50059 / GB 50060 / GB 50062 / GB 50065 / GB 50016 / GB/T 14549 / GB/T 15543 / GB/T 15945 / GB/T 36276 / IEC 61850 / IEEE 519 / TIA-942) 对 UEM JSON 自动跑合规检查, 输出带标准引用的报告。</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1.5fr;gap:20px">
+  <!-- LEFT: UEM input -->
+  <div>
+    <div class="sec-title" data-i18n="compliance_input_title">UEM JSON 输入</div>
+    <textarea id="complianceUemInput" class="form-input" rows="22" style="font-family:Menlo,Consolas,monospace;font-size:11px;line-height:1.4;resize:vertical" placeholder='{"schema_version":"1.1","project":{"id":"PRJ-001","type":"ess","scenario":"commercial","location":{"country":"CN","altitude_m":50}},"electrical":{"capacity_kwh":2000,"power_kw":1000,"voltage_level":"10kV","grid_mode":"grid_tied","duration_h":2,"frequency_hz":50,"power_factor":0.98,"efficiency":0.92,"soc_min":10,"soc_max":90,"thdi_pct":3},"protection":{"overcurrent":true,"instantaneous":true,"earth_fault":true},"special_requirements":["IEC 61850","TN-S","GB/T 36276"]}'></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-primary" id="btnRunCompliance" onclick="runComplianceCheck()" style="flex:1;font-size:13px;padding:9px" data-i18n="compliance_run_btn">跑合规检查</button>
+      <button class="btn btn-secondary" onclick="loadSampleUem()" style="font-size:12px;padding:9px;width:auto" data-i18n="compliance_sample_btn">加载示例</button>
+      <button class="btn btn-secondary" onclick="clearComplianceResult()" style="font-size:12px;padding:9px;width:auto" data-i18n="compliance_clear_btn">清空</button>
+    </div>
+    <div id="complianceErrMsg" style="display:none;margin-top:10px;padding:10px;background:rgba(224,96,112,.12);border:1px solid var(--red);border-radius:6px;font-size:12px;color:var(--red)"></div>
+  </div>
+
+  <!-- RIGHT: result -->
+  <div>
+    <div class="sec-title" data-i18n="compliance_result_title">检查结果</div>
+    <div id="complianceResult" style="min-height:200px">
+      <div id="complianceEmpty" style="padding:40px 20px;text-align:center;color:var(--text2);font-size:13px;background:var(--bg3);border-radius:8px;border:1px dashed var(--border)" data-i18n="compliance_empty">点击"加载示例"或粘贴 UEM JSON, 然后点"跑合规检查"</div>
+      <div id="complianceLoading" style="display:none;padding:40px 20px;text-align:center;color:var(--text2);font-size:13px">
+        <div style="display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite"></div>
+        <div style="margin-top:12px" data-i18n="compliance_loading">跑 25 条规则中...</div>
+      </div>
+      <div id="complianceReport" style="display:none">
+        <!-- Score card -->
+        <div id="compScoreCard" style="background:var(--bg3);border-radius:8px;padding:18px;margin-bottom:14px;display:flex;align-items:center;gap:18px;border:1px solid var(--border)">
+          <div style="text-align:center;min-width:120px">
+            <div id="compScore" style="font-size:42px;font-weight:700;line-height:1">--</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:4px" data-i18n="compliance_score_label">合规评分 / 100</div>
+          </div>
+          <div style="flex:1;border-left:1px solid var(--border);padding-left:18px">
+            <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text2)">
+              <span><span id="compPass" style="color:var(--green);font-weight:600">0</span> <span data-i18n="compliance_pass_label">通过</span></span>
+              <span><span id="compFail" style="color:var(--red);font-weight:600">0</span> <span data-i18n="compliance_fail_label">失败</span></span>
+              <span><span id="compSkip" style="color:var(--text2);font-weight:600">0</span> <span data-i18n="compliance_skip_label">跳过</span></span>
+              <span><span id="compErr" style="color:var(--red);font-weight:600">0</span> ERR</span>
+              <span><span id="compWarn" style="color:var(--orange);font-weight:600">0</span> WARN</span>
+            </div>
+            <div id="compStatusBadge" style="display:inline-block;margin-top:10px;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:600"></div>
+          </div>
+        </div>
+
+        <!-- Failing rules table -->
+        <div id="compFailingSection" style="margin-bottom:14px">
+          <div class="sec-title" style="font-size:13px;margin-bottom:8px" data-i18n="compliance_failing_title">待解决问题</div>
+          <div id="compFailingTable"></div>
+        </div>
+
+        <!-- Standards referenced -->
+        <details style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px">
+          <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text1);user-select:none" data-i18n="compliance_standards_title">引用标准清单</summary>
+          <div id="compStandardsList" style="margin-top:10px;padding-left:6px;font-size:12px;color:var(--text2);line-height:1.8"></div>
+        </details>
+
+        <!-- Detailed results (collapsible) -->
+        <details style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px">
+          <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text1);user-select:none" data-i18n="compliance_detail_title">25 条规则详细结果</summary>
+          <div id="compDetailTable" style="margin-top:10px"></div>
+        </details>
+
+        <!-- Actions -->
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" onclick="downloadComplianceMd()" style="font-size:12px;padding:8px;width:auto" data-i18n="compliance_download_btn">下载 Markdown 报告</button>
+          <button class="btn btn-secondary" onclick="downloadComplianceJson()" style="font-size:12px;padding:8px;width:auto" data-i18n="compliance_download_json_btn">下载 JSON 报告</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 </main>
@@ -2326,7 +2424,8 @@ header_title:'Open ESS Agent — 开源储能系统解决方案AI智能体',
 header_spec:'设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905',
 footer_text:'版权所有@卢继雄  请尊重知识产权',
 cat_ess:'储能方案智能体',cat_mg:'微网交付智能体',cat_aidc:'AIDC方案智能体',
-nav_devices:'设备库',nav_input:'方案设计',nav_diagrams:'生成图纸',nav_cases:'应用案例',
+  nav_devices:'设备库',nav_input:'方案设计',nav_diagrams:'生成图纸',nav_cases:'应用案例',nav_compliance:'规则检查',
+  compliance_title:'工程合规规则检查',compliance_desc:'基于 25 条工程规则对 UEM JSON 自动跑合规检查, 输出带标准引用的报告。',compliance_input_title:'UEM JSON 输入',compliance_run_btn:'跑合规检查',compliance_sample_btn:'加载示例',compliance_clear_btn:'清空',compliance_result_title:'检查结果',compliance_empty:'点击"加载示例"或粘贴 UEM JSON, 然后点"跑合规检查"',compliance_loading:'跑 25 条规则中...',compliance_score_label:'合规评分 / 100',compliance_pass_label:'通过',compliance_fail_label:'失败',compliance_skip_label:'跳过',compliance_failing_title:'待解决问题',compliance_standards_title:'引用标准清单',compliance_detail_title:'25 条规则详细结果',compliance_download_btn:'下载 Markdown 报告',compliance_download_json_btn:'下载 JSON 报告',
 mg_design:'方案设计',mg_drawings:'电气图纸',mg_protocol:'协议调试',mg_energy:'能源管理',mg_deploy:'一键部署',mg_trading:'电力交易',mg_twin:'数字孪生',mg_skill:'核心Skill',
 aidc_design:'方案设计',aidc_power:'供电架构',aidc_cooling:'液冷散热',aidc_pue:'PUE优化',aidc_layout:'机柜布局',aidc_bom:'BOM清单',aidc_drawings:'图纸',
 sidebar_ai_title:'AI智能体自动配置',
@@ -2436,7 +2535,8 @@ header_title:'Open ESS Agent — Open-source ESS Solution AI Agent',
 header_spec:'Design Standards: System-level GB/T 36558-2023 | Wiring GB 50055 | Grid-connection GB/T 34120, GB/T 34131 | Station GB/T 42288 | Designer: Lu Jixiong | Tel: 15026953905',
 footer_text:'Copyright @ Lu Jixiong. Please respect intellectual property rights',
 cat_ess:'ESS Solution Agent',cat_mg:'Microgrid Delivery Agent',cat_aidc:'AIDC Solution Agent',
-nav_devices:'Device Library',nav_input:'Solution Design',nav_diagrams:'Generate Diagrams',nav_cases:'Use Cases',
+  nav_devices:'Device Library',nav_input:'Solution Design',nav_diagrams:'Generate Diagrams',nav_cases:'Use Cases',nav_compliance:'Compliance Check',
+  compliance_title:'Engineering Compliance Check',compliance_desc:'Run 25 engineering rules against UEM JSON, output reports with standards referenced.',compliance_input_title:'UEM JSON Input',compliance_run_btn:'Run Compliance Check',compliance_sample_btn:'Load Sample',compliance_clear_btn:'Clear',compliance_result_title:'Check Result',compliance_empty:'Click "Load Sample" or paste UEM JSON, then click "Run Compliance Check"',compliance_loading:'Running 25 rules...',compliance_score_label:'Compliance Score / 100',compliance_pass_label:'Pass',compliance_fail_label:'Fail',compliance_skip_label:'Skip',compliance_failing_title:'Issues to Fix',compliance_standards_title:'Standards Referenced',compliance_detail_title:'25 Rules Detail',compliance_download_btn:'Download Markdown',compliance_download_json_btn:'Download JSON',
 mg_design:'Design',mg_drawings:'Electrical DWG',mg_protocol:'Protocol & Debug',mg_energy:'Energy Mgmt',mg_deploy:'One-Click Deploy',mg_trading:'Power Trading',mg_twin:'Digital Twin',mg_skill:'Core Skills',
 aidc_design:'Design',aidc_power:'Power Arch',aidc_cooling:'Liquid Cooling',aidc_pue:'PUE Optimize',aidc_layout:'Rack Layout',aidc_bom:'BOM',aidc_drawings:'Drawings',
 sidebar_ai_title:'AI Agent Auto Configuration',
@@ -2546,7 +2646,8 @@ header_title:'Open ESS Agent — وكيل الذكاء الاصطناعي لحل
 header_spec:'معايير التصميم: مستوى النظام GB/T 36558-2023 | التوصيل GB 50055 | ربط الشبكة GB/T 34120, GB/T 34131 | المحطة GB/T 42288 | المصمم: لو جيشيونغ | هاتف: 15026953905',
 footer_text:'حقوق النشر @ لو جيشيونغ. يرجى احترام حقوق الملكية الفكرية',
 cat_ess:'وكيل حلول التخزين',cat_mg:'وكيل تسليم الشبكة المصغرة',cat_aidc:'وكيل حلول AIDC',
-nav_devices:'مكتبة المعدات',nav_input:'تصميم الحل',nav_diagrams:'إنشاء الرسوم',nav_cases:'حالات الاستخدام',
+  nav_devices:'مكتبة المعدات',nav_input:'تصميم الحل',nav_diagrams:'إنشاء الرسوم',nav_cases:'حالات الاستخدام',nav_compliance:'فحص الامتثال',
+  compliance_title:'فحص الامتثال الهندسي',compliance_desc:'تشغيل 25 قاعدة هندسية على UEM JSON, إنتاج تقرير مع الإشارة إلى المعايير.',compliance_input_title:'إدخال UEM JSON',compliance_run_btn:'تشغيل الفحص',compliance_sample_btn:'تحميل عينة',compliance_clear_btn:'مسح',compliance_result_title:'نتيجة الفحص',compliance_empty:'انقر "تحميل عينة" أو الصق UEM JSON, ثم انقر "تشغيل الفحص"',compliance_loading:'تشغيل 25 قاعدة...',compliance_score_label:'درجة الامتثال / 100',compliance_pass_label:'ناجح',compliance_fail_label:'فشل',compliance_skip_label:'تخطي',compliance_failing_title:'القضايا المطلوب حلها',compliance_standards_title:'المعايير المشار إليها',compliance_detail_title:'تفاصيل 25 قاعدة',compliance_download_btn:'تحميل Markdown',compliance_download_json_btn:'تحميل JSON',
 mg_design:'التصميم',mg_drawings:'الرسوم الكهربائية',mg_protocol:'البروتوكول والتصحيح',mg_energy:'إدارة الطاقة',mg_deploy:'نشر بنقرة واحدة',mg_trading:'تداول الطاقة',mg_twin:'التوأم الرقمي',mg_skill:'المهارات الأساسية',
 aidc_design:'التصميم',aidc_power:'بنية الطاقة',aidc_cooling:'التبريد السائل',aidc_pue:'تحسين PUE',aidc_layout:'تخطيط الخزائن',aidc_bom:'قائمة المواد',aidc_drawings:'الرسوم',
 sidebar_ai_title:'التكوين التلقائي بواسطة وكيل الذكاء الاصطناعي',
@@ -2785,12 +2886,356 @@ function showPage(id){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  document.querySelectorAll('.nav-tab')[['devices','config','diagrams','cases'].indexOf(id)].classList.add('active');
+  const navIdx=['devices','config','diagrams','cases','compliance'].indexOf(id);
+  if(navIdx>=0)document.querySelectorAll('.nav-tab')[navIdx].classList.add('active');
   const mainEl = document.querySelector('main.content');
   if(mainEl) mainEl.style.display = id==='config' ? 'none' : 'block';
   if(id==='devices')renderDeviceLibrary(currentFilter);
   if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderLayoutSvg(LAST_RESULT);renderCableSvg(LAST_RESULT);renderPrincipleSvg(LAST_RESULT);renderBOM(LAST_RESULT);}
   if(id==='cases')renderCases();
+}
+
+/* ========== 合规检查 (Compliance) ========== */
+var LAST_COMPLIANCE_RESULT=null;
+function loadSampleUem(){
+  document.getElementById('complianceUemInput').value=JSON.stringify({
+    schema_version:"1.1",
+    project:{id:"PRJ-2026-DEMO-001",name:"苏州工商业储能 2MWh",type:"ess",scenario:"commercial",location:{country:"CN",province:"江苏",site:"苏州工业园区",altitude_m:50,min_temp_c:-10,max_temp_c:38}},
+    electrical:{capacity_kwh:2000,power_kw:1000,voltage_level:"10kV",phases:3,grid_mode:"grid_tied",duration_h:2,pv_kw:0,frequency_hz:50,power_factor:0.98,efficiency:0.92,soc_min:10,soc_max:90,thdi_pct:3},
+    protection:{overcurrent:true,instantaneous:true,earth_fault:true},
+    special_requirements:["IEC 61850","TN-S","GB/T 36276"]
+  },null,2);
+  document.getElementById('complianceErrMsg').style.display='none';
+}
+function clearComplianceResult(){
+  document.getElementById('complianceUemInput').value='';
+  document.getElementById('complianceErrMsg').style.display='none';
+  document.getElementById('complianceReport').style.display='none';
+  document.getElementById('complianceLoading').style.display='none';
+  document.getElementById('complianceEmpty').style.display='block';
+  LAST_COMPLIANCE_RESULT=null;
+}
+async function runComplianceCheck(){
+  const inp=document.getElementById('complianceUemInput');
+  const errEl=document.getElementById('complianceErrMsg');
+  const emptyEl=document.getElementById('complianceEmpty');
+  const loadingEl=document.getElementById('complianceLoading');
+  const reportEl=document.getElementById('complianceReport');
+  errEl.style.display='none';
+  const raw=inp.value.trim();
+  if(!raw){errEl.textContent='请先粘贴或加载 UEM JSON';errEl.style.display='block';return;}
+  let uem;
+  try{uem=JSON.parse(raw);}
+  catch(e){errEl.textContent='JSON 解析失败: '+e.message;errEl.style.display='block';return;}
+  if(!uem.project||!uem.electrical){errEl.textContent='UEM 必须包含 project 和 electrical 字段';errEl.style.display='block';return;}
+  emptyEl.style.display='none';
+  reportEl.style.display='none';
+  loadingEl.style.display='block';
+  const btn=document.getElementById('btnRunCompliance');
+  if(btn)btn.disabled=true;
+  try{
+    const resp=await fetch('/api/compliance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uem:uem})});
+    if(!resp.ok){
+      const t=await resp.text();
+      throw new Error('HTTP '+resp.status+': '+t.slice(0,200));
+    }
+    const data=await resp.json();
+    if(!data.ok)throw new Error(data.error||'未知错误');
+    LAST_COMPLIANCE_RESULT=data;
+    renderComplianceResult(data);
+  }catch(e){
+    errEl.textContent='合规检查失败: '+e.message+' (本地服务降级到内置引擎)...';
+    errEl.style.display='block';
+    // 降级: 跑本地规则 (与后端同构)
+    const data=runLocalComplianceFallback(uem);
+    if(data){
+      LAST_COMPLIANCE_RESULT=data;
+      renderComplianceResult(data);
+    }
+  }finally{
+    loadingEl.style.display='none';
+    if(btn)btn.disabled=false;
+  }
+}
+function renderComplianceResult(data){
+  const s=data.summary||{};
+  const status=data.compliance_status||'pass';
+  document.getElementById('compScore').textContent=s.compliance_score||0;
+  const color=s.compliance_score>=90?'var(--green)':s.compliance_score>=75?'var(--orange)':'var(--red)';
+  document.getElementById('compScore').style.color=color;
+  document.getElementById('compPass').textContent=s.pass||0;
+  document.getElementById('compFail').textContent=s.fail||0;
+  document.getElementById('compSkip').textContent=s.skip||0;
+  document.getElementById('compErr').textContent=s.errors||0;
+  document.getElementById('compWarn').textContent=s.warnings||0;
+  const badge=document.getElementById('compStatusBadge');
+  if(status==='pass'){badge.textContent='通过';badge.className='compl-status-pass';}
+  else if(status==='pass_with_warnings'){badge.textContent='通过 (有警告)';badge.className='compl-status-warn';}
+  else{badge.textContent='不通过';badge.className='compl-status-fail';}
+  // Failing rules table
+  const failingTbl=document.getElementById('compFailingTable');
+  if(!data.failing_rules||data.failing_rules.length===0){
+    failingTbl.innerHTML='<div style="padding:12px;background:rgba(15,110,86,.1);border:1px solid var(--green);border-radius:6px;font-size:12px;color:var(--green);text-align:center">所有规则均通过, 0 个待解决问题</div>';
+    document.getElementById('compFailingSection').style.display='block';
+  }else{
+    let html='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden">';
+    for(const r of data.failing_rules){
+      const sevBadge=r.severity==='error'?'<span class="compl-badge compl-badge-err">ERROR</span>':'<span class="compl-badge compl-badge-warn">WARN</span>';
+      html+=`<div class="compl-rule-row">
+        ${sevBadge}
+        <span class="compl-rule-id">${r.rule_id}</span>
+        <span class="compl-rule-name">${escapeHtml(r.rule_name)}</span>
+        <span class="compl-rule-std">${escapeHtml(r.standard)}</span>
+        <span class="compl-rule-msg">${escapeHtml(r.message)}</span>
+      </div>`;
+    }
+    html+='</div>';
+    failingTbl.innerHTML=html;
+    document.getElementById('compFailingSection').style.display='block';
+  }
+  // Standards list
+  const stdSet=new Set();
+  (data.rule_results||[]).forEach(r=>stdSet.add(r.standard));
+  document.getElementById('compStandardsList').innerHTML=[...stdSet].sort().map(s=>`<div>• ${escapeHtml(s)}</div>`).join('');
+  // Detail table grouped by category
+  const detailTbl=document.getElementById('compDetailTable');
+  const byCat={};
+  (data.rule_results||[]).forEach(r=>{if(!byCat[r.category])byCat[r.category]=[];byCat[r.category].push(r);});
+  let dhtml='';
+  for(const cat of Object.keys(byCat)){
+    dhtml+=`<div class="compl-cat-group"><div class="compl-cat-title">${escapeHtml(cat)} <span style="font-weight:400;color:var(--text2);font-size:10px">(${byCat[cat].length} 条)</span></div>`;
+    for(const r of byCat[cat]){
+      let bcls='compl-badge-pass',btxt='OK';
+      if(r.result.status==='fail'&&r.result.severity==='error'){bcls='compl-badge-err';btxt='ERR';}
+      else if(r.result.status==='fail'&&r.result.severity==='warning'){bcls='compl-badge-warn';btxt='WARN';}
+      else if(r.result.status==='skip'){bcls='compl-badge-skip';btxt='SKIP';}
+      else if(r.severity==='info'&&r.result.status==='pass'){bcls='compl-badge-info';btxt='INFO';}
+      dhtml+=`<div class="compl-rule-row">
+        <span class="compl-badge ${bcls}">${btxt}</span>
+        <span class="compl-rule-id">${r.rule_id}</span>
+        <span class="compl-rule-name">${escapeHtml(r.rule_name)}</span>
+        <span class="compl-rule-std">${escapeHtml(r.standard)}</span>
+        <span class="compl-rule-msg">${escapeHtml(r.result.message)}</span>
+      </div>`;
+    }
+    dhtml+='</div>';
+  }
+  detailTbl.innerHTML=dhtml;
+  document.getElementById('complianceReport').style.display='block';
+}
+function escapeHtml(s){
+  if(s==null)return '';
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function downloadComplianceMd(){
+  if(!LAST_COMPLIANCE_RESULT){alert('请先跑合规检查');return;}
+  const md=LAST_COMPLIANCE_RESULT.markdown||'# 报告为空';
+  const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`compliance_${LAST_COMPLIANCE_RESULT.project_id||'report'}_${Date.now()}.md`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function downloadComplianceJson(){
+  if(!LAST_COMPLIANCE_RESULT){alert('请先跑合规检查');return;}
+  const data=Object.assign({},LAST_COMPLIANCE_RESULT);
+  delete data.markdown;
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`compliance_${LAST_COMPLIANCE_RESULT.project_id||'report'}_${Date.now()}.json`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+/* 降级: 当后端不可达时,在前端跑精简版 25 条规则 (与 api/compliance.js 同构) */
+function runLocalComplianceFallback(uem){
+  // 加载脚本,执行后调全局函数
+  try{
+    if(typeof window._ESS_COMPLIANCE_READY==='undefined'){
+      // 动态加载内联规则 (避免外部网络依赖)
+      var s=document.createElement('script');
+      s.textContent=getEmbeddedComplianceScript();
+      document.head.appendChild(s);
+    }
+    if(typeof window._ESS_COMPLIANCE_RUN==='function'){
+      return window._ESS_COMPLIANCE_RUN(uem);
+    }
+  }catch(e){console.error('local fallback failed',e);}
+  return null;
+}
+function getEmbeddedComplianceScript(){
+  // 内联精简版规则 (与 api/compliance.js 100% 行为一致, 防止后端不可达)
+  return `
+window._ESS_COMPLIANCE_RUN=function(uem){
+  function pass(m){return{status:'pass',severity:'info',message:m};}
+  function fail(m){return{status:'fail',severity:'error',message:m};}
+  function warn(m){return{status:'fail',severity:'warning',message:m};}
+  function info(m){return{status:'pass',severity:'info',message:m};}
+  function skip(r){return{status:'skip',severity:'info',message:'skipped: '+r};}
+  function comp(c,cat){return c.category===cat;}
+  function byId(c,id){return c.id===id;}
+  function compile(u){
+    var el=u.electrical||{};
+    if(!el.capacity_kwh||!el.power_kw)return{components:[]};
+    var cap=el.capacity_kwh,p=el.power_kw,v=el.voltage_level||'380V';
+    var stringsSeries=Math.ceil(768/3.2);
+    var perPackKwh=stringsSeries*3.2*280/1000;
+    var packsParallel=Math.ceil(cap/perPackKwh);
+    var pcsCount=Math.ceil(p/125)+1;
+    var acCurrent=p*1000/(380*Math.sqrt(3)*0.85);
+    var acCb=Math.ceil(acCurrent*1.25/16)*16;
+    var comps=[];
+    comps.push({id:'BAT',category:'battery_rack',qty:packsParallel,params:{strings_series:stringsSeries,per_pack_kwh:perPackKwh}});
+    comps.push({id:'PCS',category:'pcs',qty:pcsCount,params:{unit_kw:125,total_kw:pcsCount*125,redundancy:'N+1'}});
+    comps.push({id:'DC_BUS',category:'bus',qty:1,params:{voltage_v:768}});
+    comps.push({id:'AC_BUS',category:'bus',qty:1,params:{voltage_v:380}});
+    if(String(v).includes('kV')&&v!=='380V'){
+      var xfR=Math.max(100,Math.ceil(p*1.1/100)*100);
+      comps.push({id:'XF',category:'transformer',qty:1,params:{rating_kva:xfR}});
+    }
+    comps.push({id:'QF',category:'protection',qty:1,params:{rated_current_a:acCb,breaking_capacity_ka:50}});
+    comps.push({id:'FAS',category:'protection',qty:1,params:{function:'消防: 气体灭火 + 温感烟感'}});
+    return {components:comps};
+  }
+  function run(u,c){
+    var bat=c.components.find(function(x){return comp(x,'battery_rack');});
+    var pcs=c.components.find(function(x){return comp(x,'pcs');});
+    var bus=c.components.find(function(x){return byId(x,'DC_BUS');});
+    var xf=c.components.find(function(x){return comp(x,'transformer');});
+    var qf=c.components.find(function(x){return byId(x,'QF');});
+    var fas=c.components.find(function(x){return byId(x,'FAS');});
+    var ptype=(u.project&&u.project.type)||'';
+    var gridMode=(u.electrical&&u.electrical.grid_mode)||'grid_tied';
+    var r=[];
+    function add(id,name,cat,std,sev,result){r.push({rule_id:id,rule_name:name,category:cat,standard:std,severity:sev,result:result});}
+    // R001
+    if(!bat)add('R001','电池串联数范围','电池系统','GB 51048 §6.4','error',skip('无电池配置'));
+    else{var ss=(bat.params&&bat.params.strings_series)||0;add('R001','电池串联数范围','电池系统','GB 51048 §6.4','error',(ss<100||ss>240)?fail('电池串联数 '+ss+' 超出工程范围 100-240'):pass('电池串联数 '+ss+' 在工程范围内'));}
+    // R002
+    if(!bat)add('R002','电池并联包数','电池系统','工程惯例','error',skip('无电池配置'));
+    else{var pp=bat.qty||0;add('R002','电池并联包数','电池系统','工程惯例','error',(pp<1||pp>20)?fail('电池并联包数 '+pp+' 超出工程范围 1-20'):pass('电池并联包数 '+pp+' 合理'));}
+    // R003
+    var d=u.electrical&&u.electrical.duration_h;if(d==null)add('R003','储能时长范围','电池系统','GB 51048 / 工程惯例','error',skip('未指定 duration_h'));
+    else add('R003','储能时长范围','电池系统','GB 51048 / 工程惯例','error',(d<0.25||d>12)?fail('储能时长 '+d+'h 超出工程范围'):pass('储能时长 '+d+'h 合理'));
+    // R004
+    var smin=u.electrical&&u.electrical.soc_min,smax=u.electrical&&u.electrical.soc_max;
+    if(smin==null||smax==null)add('R004','SOC 范围','电池系统','GB 51048 §6.5','warning',skip('未指定 SOC 范围'));
+    else if(smin>=smax)add('R004','SOC 范围','电池系统','GB 51048 §6.5','warning',fail('SOC 范围无效: min='+smin+' >= max='+smax));
+    else add('R004','SOC 范围','电池系统','GB 51048 §6.5','warning',pass('SOC 范围 ['+smin+'%, '+smax+'%] 合理'));
+    // R005
+    var v=u.electrical&&u.electrical.voltage_level;if(!v)add('R005','电压等级合规','电压等级','GB 50059','error',skip('未指定 voltage_level'));
+    else{var valid=['380V','400V','6kV','10kV','35kV'];add('R005','电压等级合规','电压等级','GB 50059','error',valid.indexOf(v)>=0?pass('电压等级 '+v+' 符合 GB 50059'):fail('电压等级 '+v+' 非标准等级'));}
+    // R006
+    if(!bus)add('R006','DC 母线电压 ≤1500V','电压等级','GB 50060 / 工程惯例','error',skip('无直流母线'));
+    else{var dv=(bus.params&&bus.params.voltage_v)||0;add('R006','DC 母线电压 ≤1500V','电压等级','GB 50060 / 工程惯例','error',dv>1500?fail('直流母线电压 '+dv+'V 超过 1500V'):pass('直流母线电压 '+dv+'V 符合 ≤1500V'));}
+    // R007
+    if(!pcs)add('R007','PCS 单台功率','PCS 选型','工程惯例','warning',skip('无 PCS'));
+    else{var uu=(pcs.params&&pcs.params.unit_kw)||0;add('R007','PCS 单台功率','PCS 选型','工程惯例','warning',(uu<50||uu>250)?warn('PCS 单台功率 '+uu+'kW 偏离常见范围'):pass('PCS 单台功率 '+uu+'kW 符合常规'));}
+    // R008
+    if(['ess','aidc','hybrid'].indexOf(ptype)<0)add('R008','PCS N+1 冗余','PCS 选型','GB 51048 / TIA-942','error',skip('微网/海岛项目 PCS 冗余非强制'));
+    else if(!pcs)add('R008','PCS N+1 冗余','PCS 选型','GB 51048 / TIA-942','error',skip('无 PCS'));
+    else if(ptype==='aidc'){var tr=((u.tier&&u.tier.redundancy)||'N+1');add('R008','PCS N+1 冗余','PCS 选型','GB 51048 / TIA-942','error',['N+1','2N+1','2N'].indexOf(tr)>=0?pass('AIDC 冗余 '+tr+' 符合 TIA-942'):fail('AIDC 冗余 '+tr+' 不符合 TIA-942'));}
+    else{var rd=(pcs.params&&pcs.params.redundancy)||'';add('R008','PCS N+1 冗余','PCS 选型','GB 51048 / TIA-942','error',rd==='N+1'?pass('PCS N+1 冗余'):warn('PCS 冗余 '+rd+' 建议 N+1'));}
+    // R009
+    if(!qf)add('R009','断路器整定','保护','GB 50054','error',skip('无断路器'));
+    else{var ia=(qf.params&&qf.params.rated_current_a)||0;var stds=[16,20,25,32,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150];var bk=(qf.params&&qf.params.breaking_capacity_ka)||0;
+      if(stds.indexOf(ia)<0)add('R009','断路器整定','保护','GB 50054','error',fail('断路器整定 '+ia+'A 非标准值'));
+      else if(bk<25)add('R009','断路器整定','保护','GB 50054','error',warn('分断能力 '+bk+'kA < 25kA'));
+      else add('R009','断路器整定','保护','GB 50054','error',pass('断路器 '+ia+'A, 分断 '+bk+'kA'));}
+    // R010
+    if(['ess','aidc'].indexOf(ptype)<0||gridMode!=='grid_tied')add('R010','三段保护','保护','GB 50062','error',skip('非并网项目'));
+    else{var pt=u.protection||{};if(!pt||Object.keys(pt).length===0)add('R010','三段保护','保护','GB 50062','error',warn('未声明 protection 字段'));
+    else{var req=['overcurrent','instantaneous','earth_fault'];var miss=req.filter(function(x){return !pt[x];});
+      add('R010','三段保护','保护','GB 50062','error',miss.length>0?fail('缺少保护段: '+miss.join(', ')):pass('三段保护配置完整'));}}
+    // R011
+    if(!xf)add('R011','变压器容量','保护','工程惯例','error',skip('无升压变压器'));
+    else{var pt2=(pcs&&pcs.params&&pcs.params.total_kw)||0;var xk=(xf.params&&xf.params.rating_kva)||0;
+      add('R011','变压器容量','保护','工程惯例','error',(pt2>0&&xk<pt2*1.1)?fail('变压器 '+xk+'kVA < PCS '+pt2+'kW × 1.1'):pass('变压器 '+xk+'kVA ≥ PCS '+pt2+'kW × 1.1'));}
+    // R012-R015
+    var eff=u.electrical&&u.electrical.efficiency;if(eff==null)add('R012','系统效率','电能质量','工程规范','warning',skip('未指定'));
+    else if(eff<0.8)add('R012','系统效率','电能质量','工程规范','warning',fail('效率 '+(eff*100).toFixed(0)+'% < 80%'));
+    else if(eff<0.85)add('R012','系统效率','电能质量','工程规范','warning',warn('效率 '+(eff*100).toFixed(0)+'% 偏低'));
+    else add('R012','系统效率','电能质量','工程规范','warning',pass('效率 '+(eff*100).toFixed(0)+'% 合规'));
+    var pf=u.electrical&&u.electrical.power_factor;if(pf==null)add('R013','功率因数','电能质量','GB/T 15543','error',skip('未指定'));
+    else{var th=gridMode==='grid_tied'?0.95:0.85;add('R013','功率因数','电能质量','GB/T 15543','error',pf<th?fail('功率因数 '+pf+' < '+th):pass('功率因数 '+pf+' 合规'));}
+    if(gridMode!=='grid_tied')add('R014','谐波','电能质量','GB/T 14549 / IEEE 519','error',skip('离网非强制'));
+    else{var thd=u.electrical&&u.electrical.thdi_pct;if(thd==null)add('R014','谐波','电能质量','GB/T 14549 / IEEE 519','error',skip('未指定 THDi'));
+    else add('R014','谐波','电能质量','GB/T 14549 / IEEE 519','error',thd>5?fail('THDi '+thd+'% > 5%'):pass('THDi '+thd+'% 合规'));}
+    var freq=u.electrical&&u.electrical.frequency_hz;if(freq==null)add('R015','频率合规','电能质量','GB/T 15945','error',skip('未指定'));
+    else{var ctry=((u.project&&u.project.location)&&u.project.location.country)||'CN';
+      if(ctry==='CN'&&freq!==50)add('R015','频率合规','电能质量','GB/T 15945','error',fail('中国频率 '+freq+'Hz 应为 50Hz'));
+      else if(['US','JP','TW'].indexOf(ctry)>=0&&freq!==60)add('R015','频率合规','电能质量','GB/T 15945','error',fail(ctry+' 频率 '+freq+'Hz 应为 60Hz'));
+      else add('R015','频率合规','电能质量','GB/T 15945','error',pass('频率 '+freq+'Hz 合规'));}
+    // R016-R017
+    var loc=(u.project&&u.project.location)||{};var alt=loc.altitude_m;
+    if(alt==null)add('R016','海拔降容','环境','GB 50060','warning',skip('未指定海拔'));
+    else if(alt<=1000)add('R016','海拔降容','环境','GB 50060','warning',pass('海拔 '+alt+'m ≤ 1000m, 无需降容'));
+    else{var dr=1-(alt-1000)/100*0.005;add('R016','海拔降容','环境','GB 50060','warning',pcs?pass('海拔 '+alt+'m 需降容: 系数 '+dr.toFixed(3)):warn('海拔 '+alt+'m 需降容, 无 PCS'));}
+    var tmin=loc.min_temp_c,tmax=loc.max_temp_c;
+    if(tmin==null&&tmax==null)add('R017','温度降容','环境','厂家规范','warning',skip('未指定温度'));
+    else{var msg=[];if(tmin!=null&&tmin<-20)msg.push('低温 '+tmin+'°C < -20°C');if(tmax!=null&&tmax>40)msg.push('高温 '+tmax+'°C > 40°C');
+      add('R017','温度降容','环境','厂家规范','warning',msg.length>0?warn(msg.join('; ')):pass('温度 ['+tmin+'°C, '+tmax+'°C] 合规'));}
+    // R018-R019
+    if(ptype!=='aidc')add('R018','AIDC Tier 必填','系统配置','TIA-942','error',skip('非 AIDC'));
+    else{var t=u.tier||{};if(!t||Object.keys(t).length===0)add('R018','AIDC Tier 必填','系统配置','TIA-942','error',fail('缺少 tier'));
+    else if(!t.redundancy)add('R018','AIDC Tier 必填','系统配置','TIA-942','error',fail('缺少 tier.redundancy'));
+    else if(!t.ups_topology)add('R018','AIDC Tier 必填','系统配置','TIA-942','error',fail('缺少 tier.ups_topology'));
+    else add('R018','AIDC Tier 必填','系统配置','TIA-942','error',pass('AIDC Tier 配置: redundancy='+t.redundancy+', ups='+t.ups_topology));}
+    if(ptype!=='aidc')add('R019','AIDC Tier 冗余','系统配置','TIA-942','error',skip('非 AIDC'));
+    else{var tn=((u.tier&&u.tier.level)||'').replace('Tier ','').trim();var rd2=(u.tier&&u.tier.redundancy)||'';
+      if(tn==='III'&&['N+1','2N+1'].indexOf(rd2)<0)add('R019','AIDC Tier 冗余','系统配置','TIA-942 / Uptime Institute','error',fail('Tier III 冗余 '+rd2+' 应为 N+1'));
+      else if(tn==='IV'&&['2N','2N+1'].indexOf(rd2)<0)add('R019','AIDC Tier 冗余','系统配置','TIA-942 / Uptime Institute','error',fail('Tier IV 冗余 '+rd2+' 应为 2N'));
+      else add('R019','AIDC Tier 冗余','系统配置','TIA-942 / Uptime Institute','error',pass('Tier '+tn+' 冗余 '+rd2+' 合规'));}
+    // R020-R022
+    if(['ess','aidc'].indexOf(ptype)<0)add('R020','接地系统','系统配置','GB 50065','info',skip('非储能/数据中心'));
+    else{var reqs=u.special_requirements||[];var hastns=reqs.some(function(s){return String(s).indexOf('TN-S')>=0||String(s).toLowerCase().indexOf('tns')>=0;});
+      add('R020','接地系统','系统配置','GB 50065','info',hastns?pass('已声明 TN-S'):info('建议声明 TN-S'));}
+    if(!bat)add('R021','消防必配','系统配置','GB 50016','error',skip('无电池'));
+    else if(!fas)add('R021','消防必配','系统配置','GB 50016','error',fail('未配置 FAS'));
+    else{var fn=(fas.params&&fas.params.function)||'';add('R021','消防必配','系统配置','GB 50016','error',(fn.indexOf('气体灭火')>=0||fn.indexOf('温感')>=0)?pass('消防: '+fn):warn('消防配置不完整'));}
+    var sp=(u.special_requirements||[]).map(function(s){return String(s);}).join(' ');
+    if(gridMode==='grid_tied')add('R022','通信协议','系统配置','IEC 61850 / GB/T 36276','info',sp.indexOf('61850')>=0?pass('声明 IEC 61850'):warn('建议声明 IEC 61850'));
+    else add('R022','通信协议','系统配置','IEC 61850 / GB/T 36276','info',sp.toLowerCase().indexOf('modbus')>=0?pass('声明 Modbus'):info('建议声明 Modbus'));
+    // R023-R025
+    add('R023','拓扑匹配','内部一致性','内部规则','info',pass('项目 '+ptype+' 模式 '+gridMode+' 匹配'));
+    var cats=new Set(c.components.map(function(x){return x.category;}));
+    var reqC=[];if(u.electrical&&u.electrical.capacity_kwh)reqC.push('battery_rack');if(u.electrical&&u.electrical.power_kw)reqC.push('pcs');
+    if(['ess','aidc'].indexOf(ptype)>=0)reqC.push('bus','protection');
+    var miss=reqC.filter(function(x){return !cats.has(x);});
+    add('R024','BOM 完整性','内部一致性','内部规则','error',miss.length>0?fail('BOM 缺少: '+miss.join(', ')):pass('BOM 完整: '+reqC.join(', ')));
+    var cap2=u.electrical&&u.electrical.capacity_kwh,pp2=(u.electrical&&(u.electrical.power_kw||u.electrical.load_kw))||0;
+    if(!cap2||!pp2||cap2<=0||pp2<=0)add('R025','容量功率比','内部一致性','工程惯例','error',skip('容量或功率未指定'));
+    else{var ratio=cap2/pp2;add('R025','容量功率比','内部一致性','工程惯例','error',ratio<0.25?fail('比 '+ratio.toFixed(2)+'h < 0.25h'):(ratio>12?fail('比 '+ratio.toFixed(2)+'h > 12h'):pass('比 '+ratio.toFixed(2)+'h 合理')));}
+    return r;
+  }
+  function summarize(rr){
+    var total=rr.length,pc=rr.filter(function(x){return x.result.status==='pass';}).length;
+    var fc=rr.filter(function(x){return x.result.status==='fail';}).length;
+    var sc=rr.filter(function(x){return x.result.status==='skip';}).length;
+    var ec=rr.filter(function(x){return x.result.status==='fail'&&x.result.severity==='error';}).length;
+    var wc=rr.filter(function(x){return x.result.status==='fail'&&x.result.severity==='warning';}).length;
+    var ic=rr.filter(function(x){return x.result.status==='pass'&&x.severity==='info';}).length;
+    var score=Math.max(0,100-ec*5-wc*2);
+    var ev=total-sc;var pr=ev>0?Math.round(pc/ev*1000)/1000:0;
+    return {total:total,pass:pc,fail:fc,skip:sc,errors:ec,warnings:wc,infos:ic,pass_rate:pr,compliance_score:score};
+  }
+  function failing(rr){
+    var f=rr.filter(function(x){return x.result.status==='fail';});
+    f.sort(function(a,b){return ({error:0,warning:1,info:2})[a.result.severity]-({error:0,warning:1,info:2})[b.result.severity];});
+    return f;
+  }
+  var compiled=compile(uem);
+  var results=run(uem,compiled);
+  var summary=summarize(results);
+  var status=summary.errors===0&&summary.warnings===0?'pass':(summary.errors===0?'pass_with_warnings':'fail');
+  var failRules=failing(results).map(function(r){return{rule_id:r.rule_id,rule_name:r.rule_name,category:r.category,standard:r.standard,severity:r.result.severity,message:r.result.message};});
+  return {ok:true,project_id:(uem.project&&uem.project.id)||'unknown',project_type:(uem.project&&uem.project.type),compliance_status:status,summary:summary,rule_results:results,failing_rules:failRules,markdown:'# 合规检查 (本地降级模式)\\n\\n注: 后端 /api/compliance 不可达, 已使用前端内置 25 条规则。\\n\\n## 综合评分: '+summary.compliance_score+'/100'};
+};
+window._ESS_COMPLIANCE_READY=true;
+`;
 }
 
 function switchCategory(cat){
