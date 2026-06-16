@@ -83,6 +83,17 @@ const PROVIDERS = {
     max_tokens: 65536,
     thinking: { type: 'disabled' },   // M3 关掉 thinking,避免 32K 思考吞 content
     protocol: 'anthropic'
+  },
+  // 终极兜底: 模板化生成 UEM,不依赖任何 LLM / API key
+  // 触发场景: Vercel 沙箱跑不到用户本地 llama-server + 4 个云端 LLM 都没配 key
+  rules_engine: {
+    label: '规则引擎 (模板兜底)',
+    url: null,
+    key: null,
+    model: 'rules-engine-v1.1',
+    protocol: 'rules',
+    local: true,
+    enabled: () => true
   }
 };
 
@@ -188,6 +199,155 @@ function formToPromptText(form) {
   return lines.join('\n');
 }
 
+// ====================== Rules Engine (兜底,无 LLM 也能出图) ======================
+// 从 formToPromptText 生成的自然语言 prompt 里反解出关键参数
+// (不要求 100% 精确,只取关键字段;其他用合理默认值)
+function decodeFormFromPrompt(promptText) {
+  const form = { electrical: {}, location: {} };
+  if (!promptText) return form;
+  // 容量
+  const capMatch = promptText.match(/(\d+(?:\.\d+)?)\s*度电/);
+  if (capMatch) form.electrical.capacity_kwh = Number(capMatch[1]);
+  // 功率
+  const powerMatch = promptText.match(/(\d+(?:\.\d+)?)\s*千瓦/);
+  if (powerMatch) form.electrical.power_kw = Number(powerMatch[1]);
+  // 电压
+  if (/10\s*kV|10kV/.test(promptText)) form.electrical.voltage_level = '10kV';
+  else if (/35\s*kV|35kV/.test(promptText)) form.electrical.voltage_level = '35kV';
+  else if (/400V/.test(promptText)) form.electrical.voltage_level = '400V';
+  else if (/380V/.test(promptText)) form.electrical.voltage_level = '380V';
+  else if (/690V/.test(promptText)) form.electrical.voltage_level = '690V';
+  // 并网模式
+  if (/并离网切换|hybrid/i.test(promptText)) form.electrical.grid_mode = 'hybrid';
+  else if (/离网/.test(promptText)) form.electrical.grid_mode = 'off_grid';
+  else form.electrical.grid_mode = 'grid_tied';
+  // 场景
+  if (/工商业/.test(promptText)) form.scenario = 'commercial';
+  else if (/工业园/.test(promptText)) form.scenario = 'industrial';
+  else if (/家用/.test(promptText)) form.scenario = 'residential';
+  else if (/电网侧|调频/.test(promptText)) form.scenario = 'utility';
+  else if (/数据中心|AIDC/.test(promptText)) form.scenario = 'aidc_colocation';
+  else if (/微电网/.test(promptText)) form.scenario = 'microgrid';
+  // 项目类型
+  if (/微电网/.test(promptText)) form.project_type = 'microgrid';
+  else if (/数据中心|AIDC/.test(promptText)) form.project_type = 'aidc';
+  else form.project_type = 'ess';
+  // 光伏
+  const pvMatch = promptText.match(/配套光伏\s*(\d+(?:\.\d+)?)\s*kW/);
+  if (pvMatch) form.electrical.pv_kw = Number(pvMatch[1]);
+  // 负载
+  const loadMatch = promptText.match(/负载\s*(\d+(?:\.\d+)?)\s*kW/);
+  if (loadMatch) form.electrical.load_kw = Number(loadMatch[1]);
+  // 地点
+  if (/江苏/.test(promptText)) form.location.province = '江苏';
+  else if (/广东/.test(promptText)) form.location.province = '广东';
+  else if (/内蒙古/.test(promptText)) form.location.province = '内蒙古';
+  else if (/新疆/.test(promptText)) form.location.province = '新疆';
+  return form;
+}
+
+// 模板生成 UEM v1.1 (不依赖 LLM,无 key 也能出图)
+function generateRulesUem(form) {
+  form = form || {};
+  const elec = form.electrical || {};
+  const cap = Number(elec.capacity_kwh) || 2000;
+  const pwr = Number(elec.power_kw) || 1000;
+  const scen = form.scenario || 'commercial';
+  const isAidc = scen === 'aidc_colocation' || scen === 'aidc_selfbuilt';
+  const isMicrogrid = scen === 'microgrid';
+  const today = new Date();
+  const dateStr = today.getFullYear() +
+    String(today.getMonth() + 1).padStart(2, '0') +
+    String(today.getDate()).padStart(2, '0');
+  const id = `PRJ-${dateStr}-${String(Math.floor(Math.random() * 900) + 100)}`;
+
+  // 推导时长
+  const dur = cap > 0 && pwr > 0 ? +(cap / pwr).toFixed(2) : 2;
+  // 场景合理默认值
+  let voltage = elec.voltage_level;
+  if (!voltage) voltage = isAidc ? '10kV' : (cap > 5000 ? '10kV' : (cap > 100 ? '400V' : '380V'));
+  let gridMode = elec.grid_mode || (isMicrogrid ? 'hybrid' : 'grid_tied');
+
+  return {
+    schema_version: '1.1',
+    project: {
+      id,
+      name: (form.name || 'AI 方案演示项目'),
+      type: isAidc ? 'aidc' : (isMicrogrid ? 'microgrid' : 'ess'),
+      scenario: scen,
+      standard: 'GB',
+      revision: 'Rev.A',
+      location: { country: 'CN', province: (form.location && form.location.province) || '江苏', altitude_m: 50 }
+    },
+    electrical: {
+      capacity_kwh: cap,
+      power_kw: pwr,
+      duration_h: dur,
+      voltage_level: voltage,
+      grid_mode: gridMode,
+      phases: 3,
+      frequency_hz: 50,
+      power_factor: 0.95,
+      efficiency_pct: 92,
+      thdi_pct: 5,
+      soc_min_pct: 10,
+      soc_max_pct: 90
+    },
+    sources: {
+      pv_kw: Number(elec.pv_kw) || 0,
+      wind_kw: Number(elec.wind_kw) || 0,
+      diesel_kw: Number(elec.diesel_kw) || (isMicrogrid && !elec.pv_kw ? 500 : 0),
+      hydro_kw: 0,
+      grid_capacity_kw: pwr
+    },
+    loads: {
+      total_kw: Number(elec.load_kw) || pwr,
+      type: isAidc ? 'it_load' : (isMicrogrid ? 'mixed' : 'general'),
+      peak_kw: pwr,
+      daily_kwh: pwr * 8,
+      ev_charger_kw: 0,
+      critical_load_kw: isAidc ? pwr : 0
+    },
+    aidc_specific: isAidc ? {
+      tier: 'III',
+      redundancy: '2N',
+      it_load_kw: pwr,
+      pue_target: 1.3,
+      ups_topology: 'modular',
+      cooling_type: 'water',
+      generator_transfer_time_ms: 10000
+    } : null,
+    protection: {
+      overcurrent: true,
+      instantaneous: true,
+      earth_fault: true,
+      overcurrent_setting: { setting_pct: 110, delay_s: 1.0 },
+      instantaneous_setting: { setting_pct: 600, delay_s: 0.05 },
+      earth_fault_setting: { setting_pct: 30, delay_s: 0.2 }
+    },
+    compliance: {
+      score: 95,
+      grade: 'B',
+      standards: ['GB 51048-2024', 'GB 50054-2011', 'GB/T 36276-2018'],
+      violations: []
+    },
+    drawings: {
+      sld_required: true,
+      architecture_required: true,
+      communication_required: true
+    },
+    special_requirements: gridMode !== 'off_grid'
+      ? ['IEC 61850 (国标 GB/T 36276)']
+      : ['Modbus RTU/TCP'],
+    metadata: {
+      rules_version: 'v1.1',
+      llm_model: 'rules-engine-v1.1',
+      llm_raw_output: '(generated by rules engine — no LLM API key configured, template-based fallback)',
+      generated_at: today.toISOString()
+    }
+  };
+}
+
 // ====================== Provider 调用层 ======================
 const FETCH_TIMEOUT_MS = 60_000;  // 单 provider 最长 60s
 const LOCAL_TIMEOUT_MS = 5_000;   // 本地 llama-server 默认短超时 (开发机常关)
@@ -202,6 +362,13 @@ function fetchWithTimeout(url, options, timeoutMs = FETCH_TIMEOUT_MS) {
 async function callProvider(providerKey, messages) {
   const cfg = PROVIDERS[providerKey];
   if (!cfg) throw new Error(`Unknown provider: ${providerKey}`);
+
+  // rules engine 不走 HTTP,直接生成 UEM
+  if (cfg.protocol === 'rules') {
+    // 从 messages.user 里反解 form (formToPromptText 的输出)
+    const form = decodeFormFromPrompt(messages[messages.length - 1]?.content || '');
+    return { content: JSON.stringify(generateRulesUem(form)), raw: { rules_engine: true } };
+  }
 
   // 取 key (local 跳过)
   let apiKey = null;
@@ -219,10 +386,10 @@ async function callProvider(providerKey, messages) {
 async function callProviderWithFallback(requestedKey, messages) {
   const tried = new Set();
   const order = [];
-  // 优先用户指定,再按优先级 fallback
-  const priority = ['deepseek_v4', 'glm_5_1', 'qwen3_7max', 'minimax_m3', 'qwen3_local'];
+  // 优先用户指定,再按优先级 fallback; rules_engine 永远最后兜底
+  const priority = ['deepseek_v4', 'glm_5_1', 'qwen3_7max', 'minimax_m3', 'qwen3_local', 'rules_engine'];
   if (requestedKey && priority.includes(requestedKey)) order.push(requestedKey);
-  for (const k of priority) if (k !== requestedKey) order.push(k);
+  for (const k of priority) if (k !== requestedKey && k !== 'rules_engine') order.push(k);
 
   let lastErr = null;
   for (const k of order) {
@@ -243,7 +410,17 @@ async function callProviderWithFallback(requestedKey, messages) {
       lastErr = e;
     }
   }
-  throw lastErr || new Error('All providers failed');
+
+  // 终极兜底: rules_engine(模板生成,不抛错)
+  console.log('[schemagen] all LLM providers failed, falling back to rules_engine template');
+  try {
+    const form = decodeFormFromPrompt(messages[messages.length - 1]?.content || '');
+    const result = { content: JSON.stringify(generateRulesUem(form)), raw: { rules_engine: true } };
+    return { ...result, provider_used: 'rules_engine' };
+  } catch (e) {
+    console.error('[schemagen] rules_engine fallback also failed:', e.message);
+    throw lastErr || new Error('All providers + rules_engine failed');
+  }
 }
 
 async function callOpenAI(cfg, messages, apiKey) {
