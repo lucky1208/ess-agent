@@ -271,11 +271,13 @@ select.form-input{appearance:auto}
 <div id="bsNav" style="display:none">
 <nav class="sub-tabs">
 <div class="sub-tab active" onclick="bsShowPage('bs-design')" data-i18n="bs_design">方案设计</div>
-<div class="sub-tab" onclick="bsShowPage('bs-flow')" data-i18n="bs_flow">换电流程</div>
-<div class="sub-tab" onclick="bsShowPage('bs-strategy')" data-i18n="bs_strategy">充电策略</div>
-<div class="sub-tab" onclick="bsShowPage('bs-layout')" data-i18n="bs_layout">站内布局</div>
-<div class="sub-tab" onclick="bsShowPage('bs-bom')" data-i18n="bs_bom">BOM清单</div>
-<div class="sub-tab" onclick="bsShowPage('bs-drawings')" data-i18n="bs_drawings">图纸</div>
+<div class="sub-tab" onclick="bsShowPage('bs-mech')" data-i18n="bs_mech">机械设计</div>
+<div class="sub-tab" onclick="bsShowPage('bs-elec')" data-i18n="bs_elec">电气设计</div>
+<div class="sub-tab" onclick="bsShowPage('bs-proto')" data-i18n="bs_proto">协议调试</div>
+<div class="sub-tab" onclick="bsShowPage('bs-ops')" data-i18n="bs_ops">运营调度</div>
+<div class="sub-tab" onclick="bsShowPage('bs-trade')" data-i18n="bs_trade">电力交易</div>
+<div class="sub-tab" onclick="bsShowPage('bs-twin')" data-i18n="bs_twin">数字孪生</div>
+<div class="sub-tab" onclick="bsShowPage('bs-aiops')" data-i18n="bs_aiops">AI运维</div>
 </nav>
 </div>
 
@@ -1391,8 +1393,8 @@ ACC AC一体柜专题
 
 <div id="page-bs-design" class="bs-content" style="display:none;padding:24px 32px">
 <div style="background:linear-gradient(135deg,#0F6E56,#185FA5);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
-<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px" data-i18n="bs_design_agent">AI 换电方案智能体</div>
-<div style="font-size:11px;color:#d0f0e0;line-height:1.5" data-i18n="bs_design_agent_desc">从同一份方案JSON同源输出：车型匹配、换电流程、充电策略、站内布局、BOM清单、经济性分析</div>
+<div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px" data-i18n="bs_design_agent">AI 换电站交付智能体</div>
+<div style="font-size:11px;color:#d0f0e0;line-height:1.5" data-i18n="bs_design_agent_desc">从方案设计到工程交付：机械设计、电气设计、协议调试、运营调度、电力交易、数字孪生、AI运维</div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:16px">
 <div style="border-left:3px solid #0F6E56;padding-left:14px">
@@ -1438,58 +1440,7 @@ ACC AC一体柜专题
 <div id="bsSolutionBrief" style="font-size:12px;color:var(--text2);line-height:1.8"></div>
 </div>
 
-<div id="page-bs-flow" class="bs-content" style="display:none;padding:24px 32px">
-<div class="sec-title" data-i18n="bs_flow_title">换电流程 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_flow_desc">完整换电操作流程：车辆进站→自动抬升→拆旧电池→转运上架充电→取满电电池→安装新电池→车辆降下出站</div>
-<div id="bsFlowEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
-<div id="bsFlowContent" style="display:none">
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_flow_title">换电流程图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsFlowSvg','swap-flow.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsFlowSvg"></div></div>
-<div id="bsFlowDetail" style="font-size:12px;line-height:1.8;color:var(--text2);margin-top:16px"></div>
-</div>
-</div>
 
-<div id="page-bs-strategy" class="bs-content" style="display:none;padding:24px 32px">
-<div class="sec-title" data-i18n="bs_strategy_title">充电策略 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_strategy_desc">24h充电功率调度、SOC管理曲线、电池补电策略、循环使用规划</div>
-<div id="bsStrategyEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
-<div id="bsStrategyContent" style="display:none">
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_strategy_power_curve">24h充电功率曲线</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsStrategySvg','charging-strategy.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsStrategySvg"></div></div>
-<div id="bsStrategyDetail" style="font-size:12px;line-height:1.8;color:var(--text2);margin-top:16px"></div>
-</div>
-</div>
-
-<div id="page-bs-layout" class="bs-content" style="display:none;padding:24px 32px">
-<div class="sec-title" data-i18n="bs_layout_title">站内布局 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_layout_desc">换电车间、换电通道、充电架区域、配电室、监控室平面布置</div>
-<div id="bsLayoutEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
-<div id="bsLayoutContent" style="display:none">
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_layout_title">站内平面布置图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsLayoutSvg','station-layout.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsLayoutSvg"></div></div>
-<div id="bsLayoutDetail" style="font-size:12px;line-height:1.8;color:var(--text2);margin-top:16px"></div>
-</div>
-</div>
-
-<div id="page-bs-bom" class="bs-content" style="display:none;padding:24px 32px">
-<div class="sec-title" data-i18n="bs_bom_title">BOM清单 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_bom_desc">换电设备、充电设备、配电设备、监控设备、土建工程清单</div>
-<div id="bsBomEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
-<div id="bsBomContent" style="display:none">
-<div id="bsBomTable" style="margin-bottom:24px"></div>
-<div id="bsEconTable"></div>
-<button class="btn btn-primary" onclick="bsExportBomCsv()" style="margin-top:16px;font-size:12px;padding:8px 16px">导出 CSV</button>
-</div>
-</div>
-
-<div id="page-bs-drawings" class="bs-content" style="display:none;padding:24px 32px">
-<div class="sec-title" data-i18n="bs_dw_title">图纸汇总 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_dw_desc">所有换电图纸集中展示与下载</div>
-<div id="bsDrawingsEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
-<div id="bsDrawingsContent" style="display:none">
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_dw_arch">换电系统架构图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsArchSvg','swap-arch.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsArchSvg"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_dw_flow">换电流程图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsFlowSvg2','swap-flow.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsFlowSvg2"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_dw_layout">站内平面布置图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsLayoutSvg2','station-layout.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsLayoutSvg2"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_dw_cycle">电池循环流程图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsCycleSvg','battery-cycle.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsCycleSvg"></div></div>
-</div>
-</div>
 
 <footer class="footer" data-i18n="footer_text">
 版权所有@卢继雄  请尊重知识产权
@@ -2537,13 +2488,13 @@ zh:{
 header_title:'Open ESS Agent — 开源储能系统解决方案AI智能体',
 header_spec:'设计遵循规范：系统级《GB/T 36558-2023》电气接线设计层《GB 50055》并网层《GB/T 34120》《GB/T 34131》储能电站层《GB/T 42288》｜ 设计人：卢继雄 ｜ 联系电话：15026953905',
 footer_text:'版权所有@卢继雄  请尊重知识产权',
-cat_ess:'储能方案智能体',cat_mg:'微网交付智能体',cat_aidc:'AIDC方案智能体',cat_bs:'换电方案智能体',
+cat_ess:'储能方案智能体',cat_mg:'微网交付智能体',cat_aidc:'AIDC方案智能体',cat_bs:'换电站交付智能体',
   nav_devices:'设备库',nav_input:'方案设计',nav_diagrams:'生成图纸',nav_cases:'应用案例',nav_compliance:'规则检查',
   compliance_title:'工程合规规则检查',compliance_desc:'基于 25 条工程规则对 UEM JSON 自动跑合规检查, 输出带标准引用的报告。',compliance_input_title:'UEM JSON 输入',compliance_run_btn:'跑合规检查',compliance_sample_btn:'加载示例',compliance_clear_btn:'清空',compliance_result_title:'检查结果',compliance_empty:'点击"加载示例"或粘贴 UEM JSON, 然后点"跑合规检查"',compliance_loading:'跑 25 条规则中...',compliance_score_label:'合规评分 / 100',compliance_pass_label:'通过',compliance_fail_label:'失败',compliance_skip_label:'跳过',compliance_failing_title:'待解决问题',compliance_standards_title:'引用标准清单',compliance_detail_title:'25 条规则详细结果',compliance_download_btn:'下载 Markdown 报告',compliance_download_json_btn:'下载 JSON 报告',
 mg_design:'方案设计',mg_drawings:'电气图纸',mg_protocol:'协议调试',mg_energy:'能源管理',mg_deploy:'一键部署',mg_trading:'电力交易',mg_twin:'数字孪生',mg_skill:'核心Skill',
 aidc_design:'方案设计',aidc_power:'供电架构',aidc_cooling:'液冷散热',aidc_pue:'PUE优化',aidc_layout:'机柜布局',aidc_bom:'BOM清单',aidc_drawings:'图纸',
-bs_design:'方案设计',bs_flow:'换电流程',bs_strategy:'充电策略',bs_layout:'站内布局',bs_bom:'BOM清单',bs_drawings:'图纸',
-bs_design_agent:'AI 换电方案智能体',bs_design_agent_desc:'从同一份方案JSON同源输出：车型匹配、换电流程、充电策略、站内布局、BOM清单、经济性分析',
+bs_design:'方案设计',bs_mech:'机械设计',bs_elec:'电气设计',bs_proto:'协议调试',bs_ops:'运营调度',bs_trade:'电力交易',bs_twin:'数字孪生',bs_aiops:'AI运维',
+bs_design_agent:'AI 换电站交付智能体',bs_design_agent_desc:'从方案设计到工程交付：机械设计、电气设计、协议调试、运营调度、电力交易、数字孪生、AI运维',
 bs_nl_label:'自然语言描述',bs_nl_ph:'例：北京物流园50辆重卡换电，日换电2次，423kWh电池，10kV接入，谷电优先充电',bs_ai_btn:'AI识别参数并生成方案',
 bs_vehicle_type:'车型选择',bs_vehicle_truck:'重卡/商用车',bs_vehicle_light:'轻卡/物流车',bs_vehicle_passenger:'乘用车',bs_vehicle_two_wheel:'两轮车/特种车',bs_vehicle_custom:'自定义车型',
 bs_battery_capacity:'电池容量(kWh)',bs_battery_voltage:'电池额定电压(V)',bs_battery_type:'电池类型',bs_battery_lfp:'磷酸铁锂(LFP)',bs_battery_nmc:'三元锂(NMC)',bs_swap_range:'单次换电续航(km)',
@@ -2671,13 +2622,13 @@ en:{
 header_title:'Open ESS Agent — Open-source ESS Solution AI Agent',
 header_spec:'Design Standards: System-level GB/T 36558-2023 | Wiring GB 50055 | Grid-connection GB/T 34120, GB/T 34131 | Station GB/T 42288 | Designer: Lu Jixiong | Tel: 15026953905',
 footer_text:'Copyright @ Lu Jixiong. Please respect intellectual property rights',
-cat_ess:'ESS Solution Agent',cat_mg:'Microgrid Delivery Agent',cat_aidc:'AIDC Solution Agent',cat_bs:'Battery Swap Agent',
+cat_ess:'ESS Solution Agent',cat_mg:'Microgrid Delivery Agent',cat_aidc:'AIDC Solution Agent',cat_bs:'BS Delivery Agent',
   nav_devices:'Device Library',nav_input:'Solution Design',nav_diagrams:'Generate Diagrams',nav_cases:'Use Cases',nav_compliance:'Compliance Check',
   compliance_title:'Engineering Compliance Check',compliance_desc:'Run 25 engineering rules against UEM JSON, output reports with standards referenced.',compliance_input_title:'UEM JSON Input',compliance_run_btn:'Run Compliance Check',compliance_sample_btn:'Load Sample',compliance_clear_btn:'Clear',compliance_result_title:'Check Result',compliance_empty:'Click "Load Sample" or paste UEM JSON, then click "Run Compliance Check"',compliance_loading:'Running 25 rules...',compliance_score_label:'Compliance Score / 100',compliance_pass_label:'Pass',compliance_fail_label:'Fail',compliance_skip_label:'Skip',compliance_failing_title:'Issues to Fix',compliance_standards_title:'Standards Referenced',compliance_detail_title:'25 Rules Detail',compliance_download_btn:'Download Markdown',compliance_download_json_btn:'Download JSON',
 mg_design:'Design',mg_drawings:'Electrical DWG',mg_protocol:'Protocol & Debug',mg_energy:'Energy Mgmt',mg_deploy:'One-Click Deploy',mg_trading:'Power Trading',mg_twin:'Digital Twin',mg_skill:'Core Skills',
 aidc_design:'Design',aidc_power:'Power Arch',aidc_cooling:'Liquid Cooling',aidc_pue:'PUE Optimize',aidc_layout:'Rack Layout',aidc_bom:'BOM',aidc_drawings:'Drawings',
-bs_design:'Design',bs_flow:'Swap Process',bs_strategy:'Charging Strategy',bs_layout:'Station Layout',bs_bom:'BOM',bs_drawings:'Drawings',
-bs_design_agent:'AI Battery Swap Solution Agent',bs_design_agent_desc:'Single-source JSON: vehicle matching, swap process, charging strategy, layout, BOM, economic analysis',
+bs_design:'Design',bs_mech:'Mechanical',bs_elec:'Electrical',bs_proto:'Protocol',bs_ops:'Operations',bs_trade:'Trading',bs_twin:'Digital Twin',bs_aiops:'AI Ops',
+bs_design_agent:'AI BS Delivery Agent',bs_design_agent_desc:'From design to delivery: mechanical, electrical, protocol, operations, trading, digital twin, AI ops',
 bs_nl_label:'Natural Language Description',bs_nl_ph:'e.g. Beijing logistics park 50 heavy trucks, 2 swaps/day, 423kWh battery, 10kV, off-peak priority',bs_ai_btn:'AI Detect & Generate',
 bs_vehicle_type:'Vehicle Selection',bs_vehicle_truck:'Heavy Truck/Commercial',bs_vehicle_light:'Light Truck/Logistics',bs_vehicle_passenger:'Passenger Car',bs_vehicle_two_wheel:'Two-Wheeler/Special',bs_vehicle_custom:'Custom Vehicle',
 bs_battery_capacity:'Battery Capacity (kWh)',bs_battery_voltage:'Battery Voltage (V)',bs_battery_type:'Battery Type',bs_battery_lfp:'LFP (LiFePO4)',bs_battery_nmc:'NMC (Ternary)',bs_swap_range:'Range per Swap (km)',
@@ -2805,13 +2756,13 @@ ar:{
 header_title:'Open ESS Agent — وكيل الذكاء الاصطناعي لحلول أنظمة تخزين الطاقة مفتوحة المصدر',
 header_spec:'معايير التصميم: مستوى النظام GB/T 36558-2023 | التوصيل GB 50055 | ربط الشبكة GB/T 34120, GB/T 34131 | المحطة GB/T 42288 | المصمم: لو جيشيونغ | هاتف: 15026953905',
 footer_text:'حقوق النشر @ لو جيشيونغ. يرجى احترام حقوق الملكية الفكرية',
-cat_ess:'وكيل حلول التخزين',cat_mg:'وكيل تسليم الشبكة المصغرة',cat_aidc:'وكيل حلول AIDC',cat_bs:'وكيل حلول تبديل البطاريات',
+cat_ess:'وكيل حلول التخزين',cat_mg:'وكيل تسليم الشبكة المصغرة',cat_aidc:'وكيل حلول AIDC',cat_bs:'وكيل تسليم محطة التبديل',
   nav_devices:'مكتبة المعدات',nav_input:'تصميم الحل',nav_diagrams:'إنشاء الرسوم',nav_cases:'حالات الاستخدام',nav_compliance:'فحص الامتثال',
   compliance_title:'فحص الامتثال الهندسي',compliance_desc:'تشغيل 25 قاعدة هندسية على UEM JSON, إنتاج تقرير مع الإشارة إلى المعايير.',compliance_input_title:'إدخال UEM JSON',compliance_run_btn:'تشغيل الفحص',compliance_sample_btn:'تحميل عينة',compliance_clear_btn:'مسح',compliance_result_title:'نتيجة الفحص',compliance_empty:'انقر "تحميل عينة" أو الصق UEM JSON, ثم انقر "تشغيل الفحص"',compliance_loading:'تشغيل 25 قاعدة...',compliance_score_label:'درجة الامتثال / 100',compliance_pass_label:'ناجح',compliance_fail_label:'فشل',compliance_skip_label:'تخطي',compliance_failing_title:'القضايا المطلوب حلها',compliance_standards_title:'المعايير المشار إليها',compliance_detail_title:'تفاصيل 25 قاعدة',compliance_download_btn:'تحميل Markdown',compliance_download_json_btn:'تحميل JSON',
 mg_design:'التصميم',mg_drawings:'الرسوم الكهربائية',mg_protocol:'البروتوكول والتصحيح',mg_energy:'إدارة الطاقة',mg_deploy:'نشر بنقرة واحدة',mg_trading:'تداول الطاقة',mg_twin:'التوأم الرقمي',mg_skill:'المهارات الأساسية',
 aidc_design:'التصميم',aidc_power:'بنية الطاقة',aidc_cooling:'التبريد السائل',aidc_pue:'تحسين PUE',aidc_layout:'تخطيط الخزائن',aidc_bom:'قائمة المواد',aidc_drawings:'الرسوم',
-bs_design:'التصميم',bs_flow:'عملية التبديل',bs_strategy:'استراتيجية الشحن',bs_layout:'تخطيط المحطة',bs_bom:'قائمة المواد',bs_drawings:'الرسومات',
-bs_design_agent:'وكيل الذكاء الاصطناعي لحلول تبديل البطاريات',bs_design_agent_desc:'مصدر واحد JSON: مطابقة المركبات، عملية التبديل، استراتيجية الشحن، التخطيط، قائمة المواد، التحليل الاقتصادي',
+bs_design:'التصميم',bs_mech:'الميكانيكي',bs_elec:'الكهربائي',bs_proto:'البروتوكول',bs_ops:'العمليات',bs_trade:'التداول',bs_twin:'التوأم الرقمي',bs_aiops:'الذكاء الاصطناعي',
+bs_design_agent:'وكيل تسليم محطة التبديل',bs_design_agent_desc:'من التصميم إلى التسليم: ميكانيكي، كهربائي، بروتوكول، عمليات، تداول، توأم رقمي، عمليات الذكاء الاصطناعي',
 bs_nl_label:'وصف اللغة الطبيعية',bs_nl_ph:'مثال: حديقة لوجستية بكين 50 شاحنة ثقيلة، تبديلان/يوم، بطارية 423kWh، 10kV، أولوية خارج الذروة',bs_ai_btn:'الكشف بالذكاء الاصطناعي والتوليد',
 bs_vehicle_type:'اختيار المركبة',bs_vehicle_truck:'شاحنة ثقيلة/تجارية',bs_vehicle_light:'شاحنة خفيفة/لوجستية',bs_vehicle_passenger:'سيارة ركاب',bs_vehicle_two_wheel:'مركبة بعجلتين/خاصة',bs_vehicle_custom:'مركبة مخصصة',
 bs_battery_capacity:'سعة البطارية (kWh)',bs_battery_voltage:'جهد البطارية (V)',bs_battery_type:'نوع البطارية',bs_battery_lfp:'فوسفات الحديد الليثيوم',bs_battery_nmc:'ثلاثي النيكل المنغنيز الكوبالت',bs_swap_range:'المدى لكل تبديل (km)',
@@ -3764,19 +3715,24 @@ let LAST_BS_RESULT=null;
 function bsGetText(key){const lang=localStorage.getItem('lang')||'zh';return I18N[lang]&&I18N[lang][key]||I18N.zh[key]||key;}
 
 function bsShowPage(id){
+  const LEGACY_REDIRECT=['bs-flow','bs-strategy','bs-layout','bs-bom','bs-drawings'];
+  if(LEGACY_REDIRECT.includes(id)) id='bs-design';
   document.querySelectorAll('#bsNav .sub-tab').forEach(t=>t.classList.remove('active'));
-  const subPages=['bs-design','bs-flow','bs-strategy','bs-layout','bs-bom','bs-drawings'];
+  const subPages=['bs-design','bs-mech','bs-elec','bs-proto','bs-ops','bs-trade','bs-twin','bs-aiops'];
   const tabIdx=subPages.indexOf(id);
   if(tabIdx>=0) document.querySelectorAll('#bsNav .sub-tab')[tabIdx].classList.add('active');
   document.querySelectorAll('.bs-content').forEach(t=>t.style.display='none');
   const el=document.getElementById('page-'+id);
   if(el) el.style.display='block';
   if(id==='bs-design'&&LAST_BS_RESULT) bsRenderBrief();
-  if(id==='bs-flow') bsRenderFlow();
-  if(id==='bs-strategy') bsRenderStrategy();
-  if(id==='bs-layout') bsRenderLayout();
-  if(id==='bs-bom') bsRenderBom();
-  if(id==='bs-drawings') bsRenderDrawings();
+  if(id==='bs-mech') bsRenderMech();
+  if(id==='bs-elec') bsRenderElec();
+  if(id==='bs-proto') bsShowPtTab('bms');
+  if(id==='bs-ops') bsRenderOps();
+  if(id==='bs-trade') bsRenderTradingInit();
+  if(id==='bs-twin') bsTwinInit();
+  if(id==='bs-aiops') bsRenderAiOps();
+  setTimeout(()=>renderMermaid(),300);
 }
 
 function bsOnVehicleChange(){
@@ -4046,241 +4002,7 @@ function bsRenderBrief(){
   document.getElementById('bsSolutionBrief').innerHTML=h;
 }
 
-function bsRenderFlow(){
-  const empty=document.getElementById('bsFlowEmpty');
-  const content=document.getElementById('bsFlowContent');
-  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
-  empty.style.display='none';content.style.display='';
-  bsRenderSwapFlowSvg('bsFlowSvg',LAST_BS_RESULT.swapProcess);
-  const p=LAST_BS_RESULT.swapProcess;
-  let d='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px">';
-  p.steps.forEach(s=>{
-    d+='<div style="padding:8px;background:var(--bg2);border-radius:4px;border-left:3px solid '+s.color+'"><div style="font-size:12px;font-weight:600;color:var(--text1)">'+s.name+'</div><div style="font-size:11px;color:var(--text2)">'+s.device+' | '+s.time+'s</div></div>';
-  });
-  d+='</div>';
-  d+='<div style="margin-top:12px;font-size:12px;color:var(--text1)">理论耗时: '+p.theoreticalTimeSec+'s | 实际耗时(含缓冲): ~'+p.actualTimeMin+'min</div>';
-  document.getElementById('bsFlowDetail').innerHTML=d;
-}
 
-function bsRenderStrategy(){
-  const empty=document.getElementById('bsStrategyEmpty');
-  const content=document.getElementById('bsStrategyContent');
-  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
-  empty.style.display='none';content.style.display='';
-  bsRenderChargingCurveSvg('bsStrategySvg',LAST_BS_RESULT.chargingStrategy);
-  const s=LAST_BS_RESULT.chargingStrategy;
-  let d='<div style="margin-top:12px;font-size:12px;color:var(--text1)">策略: '+bsGetText('bs_strategy_'+s.strategy)+' | 峰值功率: '+s.peakPower+'kW</div>';
-  document.getElementById('bsStrategyDetail').innerHTML=d;
-}
-
-function bsRenderLayout(){
-  const empty=document.getElementById('bsLayoutEmpty');
-  const content=document.getElementById('bsLayoutContent');
-  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
-  empty.style.display='none';content.style.display='';
-  bsRenderStationLayoutSvg('bsLayoutSvg',LAST_BS_RESULT.stationStructure);
-  const st=LAST_BS_RESULT.stationStructure;
-  let d='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;font-size:12px">';
-  [[bsGetText('bs_layout_workshop'),st.workshop.length+'×'+st.workshop.width+'×'+st.workshop.height+'m'],
-   [bsGetText('bs_layout_swap_lane'),st.swapLane.width+'×'+st.swapLane.length+'m'],
-   [bsGetText('bs_layout_rack_area'),st.rackArea+'m²'],
-   [bsGetText('bs_layout_power_room'),st.powerRoom+'m²'],
-   [bsGetText('bs_layout_monitor_room'),st.monitorRoom+'m²'],
-   [bsGetText('bs_layout_total_area'),st.totalArea+'m²']
-  ].forEach(m=>{d+='<div style="padding:6px;background:var(--bg2);border-radius:4px"><span style="color:var(--text2)">'+m[0]+'</span><br><b style="color:var(--text1)">'+m[1]+'</b></div>';});
-  d+='</div>';
-  document.getElementById('bsLayoutDetail').innerHTML=d;
-}
-
-function bsRenderBom(){
-  const empty=document.getElementById('bsBomEmpty');
-  const content=document.getElementById('bsBomContent');
-  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
-  empty.style.display='none';content.style.display='';
-  const r=LAST_BS_RESULT;
-  let h='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--bg2)"><th style="padding:8px;text-align:left;color:var(--text2)">类别</th><th style="padding:8px;text-align:left;color:var(--text2)">设备名称</th><th style="padding:8px;text-align:left;color:var(--text2)">型号</th><th style="padding:8px;text-align:right;color:var(--text2)">数量</th><th style="padding:8px;text-align:right;color:var(--text2)">单价(万元)</th><th style="padding:8px;text-align:right;color:var(--text2)">小计(万元)</th></tr></thead><tbody>';
-  r.equipmentList.forEach(cat=>{
-    cat.items.forEach((it,idx)=>{
-      h+='<tr style="border-bottom:1px solid var(--border)">';
-      if(idx===0) h+='<td rowspan="'+cat.items.length+'" style="padding:8px;color:var(--text1);font-weight:600;vertical-align:top">'+bsGetText(cat.categoryKey)+'</td>';
-      h+='<td style="padding:8px;color:var(--text1)">'+it.name+'</td><td style="padding:8px;color:var(--text2)">'+it.model+'</td><td style="padding:8px;text-align:right;color:var(--text1)">'+it.quantity+it.unit+'</td><td style="padding:8px;text-align:right;color:var(--text1)">'+it.unitPrice+'</td><td style="padding:8px;text-align:right;color:var(--green);font-weight:600">'+it.subtotal+'</td></tr>';
-    });
-  });
-  h+='</tbody></table>';
-  h+='<div style="margin-top:16px;background:var(--bg2);border-radius:8px;padding:16px;font-size:12px">';
-  h+='<div style="font-weight:bold;color:var(--text1);margin-bottom:8px">'+bsGetText('bs_econ_title')+'</div>';
-  const econ=r.economics;
-  const econMetrics=[[bsGetText('bs_econ_investment'),econ.totalInvestment],[bsGetText('bs_econ_op_cost'),econ.annualOperatingCost],[bsGetText('bs_econ_revenue'),econ.annualRevenue],[bsGetText('bs_econ_profit'),econ.annualProfit],[bsGetText('bs_econ_payback'),econ.paybackYears+'年'],[bsGetText('bs_econ_irr'),econ.irr+'%'],[bsGetText('bs_econ_npv'),econ.npv+'万元']];
-  econMetrics.forEach(m=>{h+='<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--text2)">'+m[0]+'</span><span style="color:var(--text1);font-weight:600">'+m[1]+'</span></div>';});
-  h+='</div>';
-  document.getElementById('bsBomTable').innerHTML=h;
-}
-
-function bsRenderDrawings(){
-  const empty=document.getElementById('bsDrawingsEmpty');
-  const content=document.getElementById('bsDrawingsContent');
-  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
-  empty.style.display='none';content.style.display='';
-  bsRenderArchDiagramSvg('bsArchSvg',LAST_BS_RESULT);
-  bsRenderSwapFlowSvg('bsFlowSvg2',LAST_BS_RESULT.swapProcess);
-  bsRenderStationLayoutSvg('bsLayoutSvg2',LAST_BS_RESULT.stationStructure);
-  bsRenderBatteryCycleSvg('bsCycleSvg',LAST_BS_RESULT.battery);
-}
-
-function bsRenderSwapFlowSvg(containerId,processResult){
-  const c=document.getElementById(containerId);if(!c) return;
-  const steps=processResult.steps;
-  const nodeW=120,nodeH=50,gap=20,totalW=steps.length*(nodeW+gap);
-  const svgW=Math.max(1200,totalW+60);
-  let s='<svg viewBox="0 0 '+svgW+' 320" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  s+='<defs><marker id="bs-arrow-'+containerId+'" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#3a3e45"/></marker></defs>';
-  steps.forEach((step,i)=>{
-    const x=30+i*(nodeW+gap);const y=100;
-    s+='<g transform="translate('+x+','+y+')">';
-    s+='<rect x="0" y="0" width="'+nodeW+'" height="'+nodeH+'" rx="8" fill="'+step.color+'" opacity="0.9"/>';
-    s+='<text x="'+nodeW/2+'" y="'+nodeH/2+5+'" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">'+step.name+'</text>';
-    s+='<text x="'+nodeW/2+'" y="-8" text-anchor="middle" fill="#888" font-size="9">'+step.device+'</text>';
-    s+='<text x="'+nodeW/2+'" y="'+(nodeH+18)+'" text-anchor="middle" fill="#888" font-size="9">'+step.time+'s</text>';
-    s+='</g>';
-    if(i<steps.length-1){
-      const ax=x+nodeW+2;const bx=ax+gap-4;
-      s+='<line x1="'+ax+'" y1="'+(y+nodeH/2)+'" x2="'+bx+'" y2="'+(y+nodeH/2)+'" stroke="#3a3e45" stroke-width="2" marker-end="url(#bs-arrow-'+containerId+')"/>';
-    }
-  });
-  s+='<rect x="30" y="240" width="'+(svgW-60)+'" height="36" rx="6" fill="rgba(24,95,165,0.15)" stroke="#185FA5"/>';
-  s+='<text x="'+(svgW/2)+'" y="263" text-anchor="middle" fill="#185FA5" font-size="12" font-weight="600">'+bsGetText('bs_flow_total_time')+': '+processResult.theoreticalTimeSec+'s ('+bsGetText('bs_flow_step_lift')+' ~'+processResult.actualTimeMin+'min)</text>';
-  s+='</svg>';
-  c.innerHTML=s;
-}
-
-function bsRenderStationLayoutSvg(containerId,structureResult){
-  const c=document.getElementById(containerId);if(!c) return;
-  const ws=structureResult.workshop;
-  const scale=800/Math.max(ws.length,1);
-  let s='<svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  const ox=50,oy=50;
-  const wW=ws.length*scale*0.7,wH=ws.width*scale*0.7;
-  s+='<rect x="'+ox+'" y="'+oy+'" width="'+wW+'" height="'+wH+'" rx="4" fill="none" stroke="#3a3e45" stroke-width="2" stroke-dasharray="8,4"/>';
-  s+='<text x="'+(ox+wW/2)+'" y="'+(oy-8)+'" text-anchor="middle" fill="var(--text2)" font-size="11">'+bsGetText('bs_layout_workshop')+' '+ws.length+'×'+ws.width+'×'+ws.height+'m</text>';
-  const slW=structureResult.swapLane.length*scale*0.7;
-  const slH=structureResult.swapLane.width*scale*0.7;
-  s+='<rect x="'+(ox+20)+'" y="'+(oy+20)+'" width="'+slW+'" height="'+slH+'" rx="4" fill="rgba(24,95,165,0.2)" stroke="#185FA5"/>';
-  s+='<text x="'+(ox+20+slW/2)+'" y="'+(oy+20+slH/2+4)+'" text-anchor="middle" fill="#185FA5" font-size="10">'+bsGetText('bs_layout_swap_lane')+'</text>';
-  const rackX=ox+20+slW+20;
-  const rackW=structureResult.rackArea*scale*0.5;
-  s+='<rect x="'+rackX+'" y="'+(oy+20)+'" width="'+rackW+'" height="'+slH+'" rx="4" fill="rgba(15,110,86,0.2)" stroke="#0F6E56"/>';
-  s+='<text x="'+(rackX+rackW/2)+'" y="'+(oy+20+slH/2+4)+'" text-anchor="middle" fill="#0F6E56" font-size="10">'+bsGetText('bs_layout_rack_area')+' '+structureResult.rackArea+'m²</text>';
-  const prY=oy+20+slH+20;
-  s+='<rect x="'+(ox+20)+'" y="'+prY+'" width="'+(wW*0.3)+'" height="50" rx="4" fill="rgba(239,159,39,0.2)" stroke="#EF9F27"/>';
-  s+='<text x="'+(ox+20+wW*0.15)+'" y="'+(prY+30)+'" text-anchor="middle" fill="#EF9F27" font-size="10">'+bsGetText('bs_layout_power_room')+' '+structureResult.powerRoom+'m²</text>';
-  s+='<rect x="'+(ox+20+wW*0.35)+'" y="'+prY+'" width="'+(wW*0.25)+'" height="50" rx="4" fill="rgba(83,74,183,0.2)" stroke="#534AB7"/>';
-  s+='<text x="'+(ox+20+wW*0.475)+'" y="'+(prY+30)+'" text-anchor="middle" fill="#534AB7" font-size="10">'+bsGetText('bs_layout_monitor_room')+' '+structureResult.monitorRoom+'m²</text>';
-  s+='<text x="'+(ox+wW/2)+'" y="'+(oy+wH+40)+'" text-anchor="middle" fill="var(--text1)" font-size="13" font-weight="600">'+bsGetText('bs_layout_total_area')+': '+structureResult.totalArea+'m²</text>';
-  s+='</svg>';
-  c.innerHTML=s;
-}
-
-function bsRenderBatteryCycleSvg(containerId,cycleResult){
-  const c=document.getElementById(containerId);if(!c) return;
-  const cx=400,cy=280,r=180;
-  const nodes=[
-    {key:'bs_cycle_vehicle',label:bsGetText('bs_cycle_vehicle'),angle:-90,color:'#4a90d9'},
-    {key:'bs_flow_step_remove',label:bsGetText('bs_flow_step_remove'),angle:-30,color:'#c090d0'},
-    {key:'bs_cycle_removed',label:bsGetText('bs_cycle_removed'),angle:30,color:'#e06070'},
-    {key:'bs_cycle_charging',label:bsGetText('bs_cycle_charging'),angle:90,color:'#e8a838'},
-    {key:'bs_cycle_ready',label:bsGetText('bs_cycle_ready'),angle:150,color:'#50c878'},
-    {key:'bs_cycle_transit',label:bsGetText('bs_cycle_transit'),angle:210,color:'#4a90d9'}
-  ];
-  let s='<svg viewBox="0 0 800 560" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  s+='<rect x="'+(cx-60)+'" y="'+(cy-40)+'" width="120" height="80" rx="8" fill="rgba(15,110,86,0.2)" stroke="#0F6E56" stroke-width="2"/>';
-  s+='<text x="'+cx+'" y="'+(cy-8)+'" text-anchor="middle" fill="#0F6E56" font-size="11" font-weight="600">'+bsGetText('bs_physical_rack')+'</text>';
-  s+='<text x="'+cx+'" y="'+(cy+12)+'" text-anchor="middle" fill="var(--text2)" font-size="9">利用率 '+cycleResult.rackUtilization+'%</text>';
-  s+='<text x="'+cx+'" y="'+(cy+26)+'" text-anchor="middle" fill="var(--text2)" font-size="9">满电可用 '+cycleResult.readyBatteryRate+'%</text>';
-  nodes.forEach((n,i)=>{
-    const rad=n.angle*Math.PI/180;
-    const nx=cx+r*Math.cos(rad);const ny=cy+r*Math.sin(rad);
-    s+='<circle cx="'+nx+'" cy="'+ny+'" r="36" fill="'+n.color+'" opacity="0.85"/>';
-    s+='<text x="'+nx+'" y="'+(ny+4)+'" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">'+n.label+'</text>';
-    const next=nodes[(i+1)%nodes.length];
-    const nrad=next.angle*Math.PI/180;
-    const nnx=cx+r*Math.cos(nrad);const nny=cy+r*Math.sin(nrad);
-    const mx=(nx+nnx)/2;const my=(ny+nny)/2;
-    s+='<path d="M'+nx+','+(ny+36)+' Q'+mx+','+my+' '+(nnx-20)+','+(nny-20)+'" fill="none" stroke="#3a3e45" stroke-width="1.5" marker-end="url(#bs-arrow-'+containerId+')"/>';
-  });
-  s+='<defs><marker id="bs-arrow-'+containerId+'" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3a3e45"/></marker></defs>';
-  s+='<text x="400" y="530" text-anchor="middle" fill="var(--text1)" font-size="12" font-weight="600">电池流转比: '+cycleResult.turnoverRatio+' | 站内电池总数: '+cycleResult.totalBatteries+'</text>';
-  s+='</svg>';
-  c.innerHTML=s;
-}
-
-function bsRenderChargingCurveSvg(containerId,strategyResult){
-  const c=document.getElementById(containerId);if(!c) return;
-  const W=960,H=440,padL=60,padR=20,padT=30,padB=40;
-  const chartW=W-padL-padR,chartH=(H-padT-padB)/2-20;
-  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  s+='<defs><marker id="bs-arrow-'+containerId+'" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3a3e45"/></marker></defs>';
-  const peakPower=Math.max(...strategyResult.hourlyPower,1);
-  const periods=[{from:0,to:7,color:'rgba(15,110,86,0.15)',label:bsGetText('bs_strategy_valley_period')},{from:7,to:8,color:'rgba(239,159,39,0.1)',label:bsGetText('bs_strategy_flat_period')},{from:8,to:11,color:'rgba(224,96,112,0.12)',label:bsGetText('bs_strategy_peak_period')},{from:11,to:18,color:'rgba(239,159,39,0.1)',label:''},{from:18,to:21,color:'rgba(224,96,112,0.12)',label:''},{from:21,to:23,color:'rgba(239,159,39,0.1)',label:''},{from:23,to:24,color:'rgba(15,110,86,0.15)',label:''}];
-  periods.forEach(p=>{
-    const x1=padL+p.from/24*chartW;const x2=padL+p.to/24*chartW;
-    s+='<rect x="'+x1+'" y="'+padT+'" width="'+(x2-x1)+'" height="'+chartH+'" fill="'+p.color+'"/>';
-  });
-  s+='<line x1="'+padL+'" y1="'+(padT+chartH)+'" x2="'+(padL+chartW)+'" y2="'+(padT+chartH)+'" stroke="var(--text2)" stroke-width="1"/>';
-  s+='<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(padT+chartH)+'" stroke="var(--text2)" stroke-width="1"/>';
-  s+='<text x="'+(padL-10)+'" y="'+(padT+chartH/2)+'" text-anchor="middle" fill="var(--text2)" font-size="9" transform="rotate(-90,'+(padL-10)+','+(padT+chartH/2)+')">kW</text>';
-  let pathD='';
-  strategyResult.hourlyPower.forEach((p,i)=>{
-    const x=padL+(i+0.5)/24*chartW;const y=padT+chartH-p/peakPower*chartH;
-    pathD+=(i===0?'M':'L')+x+','+y;
-  });
-  s+='<path d="'+pathD+'" fill="none" stroke="#185FA5" stroke-width="2"/>';
-  for(let h=0;h<24;h+=3){const x=padL+(h+0.5)/24*chartW;s+='<text x="'+x+'" y="'+(padT+chartH+14)+'" text-anchor="middle" fill="var(--text2)" font-size="8">'+h+'h</text>';}
-  const socTop=padT+chartH+40;const socH=chartH;
-  s+='<line x1="'+padL+'" y1="'+(socTop+socH)+'" x2="'+(padL+chartW)+'" y2="'+(socTop+socH)+'" stroke="var(--text2)" stroke-width="1"/>';
-  s+='<line x1="'+padL+'" y1="'+socTop+'" x2="'+padL+'" y2="'+(socTop+socH)+'" stroke="var(--text2)" stroke-width="1"/>';
-  s+='<text x="'+(padL-10)+'" y="'+(socTop+socH/2)+'" text-anchor="middle" fill="var(--text2)" font-size="9" transform="rotate(-90,'+(padL-10)+','+(socTop+socH/2)+')">SOC%</text>';
-  let socPath='';
-  strategyResult.hourlySoc.forEach((soc,i)=>{
-    const x=padL+(i+0.5)/24*chartW;const y=socTop+socH-soc/100*socH;
-    socPath+=(i===0?'M':'L')+x+','+y;
-  });
-  s+='<path d="'+socPath+'" fill="none" stroke="#50c878" stroke-width="2"/>';
-  const soc20y=socTop+socH-20/100*socH;
-  s+='<line x1="'+padL+'" y1="'+soc20y+'" x2="'+(padL+chartW)+'" y2="'+soc20y+'" stroke="#E06070" stroke-width="1" stroke-dasharray="4,4"/>';
-  s+='<text x="'+(padL+chartW+5)+'" y="'+(soc20y+3)+'" fill="#E06070" font-size="8">20%</text>';
-  const soc95y=socTop+socH-95/100*socH;
-  s+='<line x1="'+padL+'" y1="'+soc95y+'" x2="'+(padL+chartW)+'" y2="'+soc95y+'" stroke="#0F6E56" stroke-width="1" stroke-dasharray="4,4"/>';
-  s+='<text x="'+(padL+chartW+5)+'" y="'+(soc95y+3)+'" fill="#0F6E56" font-size="8">95%</text>';
-  s+='</svg>';
-  c.innerHTML=s;
-}
-
-function bsRenderArchDiagramSvg(containerId,solutionResult){
-  const c=document.getElementById(containerId);if(!c) return;
-  let s='<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  const layers=[
-    {label:bsGetText('bs_cycle_vehicle'),color:'#4a90d9',items:[bsGetText('bs_vehicle_type'),bsGetText('bs_layout_vehicle_lane')]},
-    {label:bsGetText('bs_flow_step_lift'),color:'#e8a838',items:[bsGetText('bs_physical_lift'),bsGetText('bs_physical_robot'),bsGetText('bs_physical_align')]},
-    {label:bsGetText('bs_physical_rack'),color:'#0F6E56',items:[bsGetText('bs_physical_rack'),bsGetText('bs_physical_charger'),bsGetText('bs_physical_bms')]},
-    {label:bsGetText('bs_layout_power_room'),color:'#EF9F27',items:[bsGetText('bs_bom_power'),bsGetText('bs_physical_safety')]}
-  ];
-  layers.forEach((layer,i)=>{
-    const y=30+i*110;const w=600;const h=80;const x=200;
-    s+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="8" fill="'+layer.color+'" opacity="0.15" stroke="'+layer.color+'" stroke-width="1.5"/>';
-    s+='<text x="'+(x+10)+'" y="'+(y+20)+'" fill="'+layer.color+'" font-size="12" font-weight="700">'+layer.label+'</text>';
-    layer.items.forEach((item,j)=>{
-      const ix=x+10+j*(w/layer.items.length);const iy=y+40;
-      s+='<rect x="'+ix+'" y="'+iy+'" width="'+(w/layer.items.length-20)+'" height="28" rx="4" fill="'+layer.color+'" opacity="0.3"/>';
-      s+='<text x="'+(ix+(w/layer.items.length-20)/2)+'" y="'+(iy+18)+'" text-anchor="middle" fill="var(--text1)" font-size="10">'+item+'</text>';
-    });
-    if(i<layers.length-1){
-      s+='<line x1="'+(x+w/2)+'" y1="'+(y+h)+'" x2="'+(x+w/2)+'" y2="'+(y+h+30)+'" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#bs-arrow-'+containerId+')"/>';
-    }
-  });
-  s+='<defs><marker id="bs-arrow-'+containerId+'" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3a3e45"/></marker></defs>';
-  s+='</svg>';
-  c.innerHTML=s;
-}
 
 function bsDownloadSvg(svgId,filename){
   const el=document.getElementById(svgId);if(!el) return;
