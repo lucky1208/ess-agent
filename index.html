@@ -240,6 +240,7 @@ select.form-input{appearance:auto}
 <div class="nav-tab" onclick="showPage('diagrams')" data-i18n="nav_diagrams">生成图纸</div>
 <div class="nav-tab" onclick="showPage('cases')" data-i18n="nav_cases">应用案例</div>
 <div class="nav-tab" onclick="showPage('compliance')" data-i18n="nav_compliance">规则检查</div>
+<div class="nav-tab" onclick="showPage('ai-design')" data-i18n="nav_ai_design">AI 方案设计</div>
 </nav>
 </div>
 
@@ -533,6 +534,115 @@ ACC AC一体柜专题
       </div>
     </div>
   </div>
+</div>
+</div>
+
+<!-- TAB: AI 方案设计 (Track D) -->
+<div id="page-ai-design" class="tab-content">
+<div style="background:linear-gradient(135deg,#0F6E56,#185FA5);border-radius:8px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)">
+  <div style="font-size:13px;font-weight:bold;color:#fff;margin-bottom:6px">AI 方案设计 (Track D)</div>
+  <div style="font-size:11px;color:#c0e0d0;line-height:1.5">输入工程参数,选择 AI 模型,一键生成 UEM + 单线图 + 系统架构图 + 通信拓扑图 (3 图并行渲染)</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1.2fr;gap:20px;margin-bottom:16px">
+  <!-- LEFT: form -->
+  <div style="border-left:3px solid var(--green);padding-left:14px">
+    <div class="sec-title" style="margin-bottom:8px">项目基础信息</div>
+    <div class="form-row" style="margin-bottom:4px">
+      <div class="form-group"><label class="form-label">项目名称</label><input type="text" class="form-input" id="aiProjName" value="AI 方案演示项目" placeholder="如:苏州工商业储能 2MWh"></div>
+      <div class="form-group"><label class="form-label">项目地点</label><input type="text" class="form-input" id="aiProjSite" value="江苏苏州" placeholder="如:江苏苏州工业园区"></div>
+    </div>
+    <div class="form-row" style="margin-bottom:4px">
+      <div class="form-group"><label class="form-label">电压等级</label><select class="form-input" id="aiVoltage">
+        <option value="400V">400V (低压)</option>
+        <option value="10kV" selected>10kV (中压)</option>
+        <option value="35kV">35kV</option>
+      </select></div>
+      <div class="form-group"><label class="form-label">应用场景</label><select class="form-input" id="aiScenario">
+        <option value="commercial" selected>工商业</option>
+        <option value="industrial">工业园区</option>
+        <option value="utility">电网侧/调频</option>
+        <option value="microgrid">微电网</option>
+      </select></div>
+    </div>
+    <div class="form-row" style="margin-bottom:4px">
+      <div class="form-group"><label class="form-label">储能容量 (kWh)</label><input type="number" class="form-input" id="aiCapacity" value="2000" step="100"></div>
+      <div class="form-group"><label class="form-label">储能功率 (kW)</label><input type="number" class="form-input" id="aiPower" value="1000" step="50"></div>
+    </div>
+    <div class="form-row" style="margin-bottom:4px">
+      <div class="form-group"><label class="form-label">冗余等级</label><select class="form-input" id="aiRedundancy">
+        <option value="N">N (无)</option>
+        <option value="N+1" selected>N+1</option>
+        <option value="2N">2N</option>
+      </select></div>
+      <div class="form-group"><label class="form-label">并网模式</label><select class="form-input" id="aiGridMode">
+        <option value="grid_tied" selected>并网</option>
+        <option value="off_grid">离网</option>
+        <option value="hybrid">并离网切换</option>
+      </select></div>
+    </div>
+    <div class="form-row" style="margin-bottom:4px">
+      <div class="form-group" style="grid-column:1/-1"><label class="form-label">特殊要求 (自由文本)</label><textarea id="aiSpecial" class="form-input" rows="2" placeholder="如:要求 IEC 61850 通信 / TN-S 接地 / 低温电池 / 预算 300 万..."></textarea></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: AI model + submit -->
+  <div>
+    <div class="sec-title" style="margin-bottom:8px">AI 模型选择 (5 Provider)</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5">从 5 个 LLM provider 中选择,系统会自动 fallback 到本地规则引擎。Qwen3 本地默认无需 API key。</div>
+    <div class="form-group" style="margin-bottom:14px"><label class="form-label">AI 模型</label>
+      <select class="form-input" id="aiProvider" style="font-size:13px" onchange="(function(sel){var lbl=document.getElementById('aiProviderKeyLabel');if(lbl)lbl.textContent=AI_PROVIDER_LABEL[sel.value]||sel.value;})(this)">
+        <option value="qwen-local" selected>Qwen3 本地 (llama-server, 默认)</option>
+        <option value="deepseek">DeepSeek V4 (云端, 需 API key)</option>
+        <option value="glm">GLM-5.1 智谱 (云端, 需 API key)</option>
+        <option value="qwen-cloud">Qwen3.7-Max 阿里百炼 (云端, 需 API key)</option>
+        <option value="m3">MiniMax-M3 (Anthropic 兼容, 需 API key)</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px">
+        <div style="font-size:11px;color:var(--text2)">Provider Key</div>
+        <div id="aiProviderKeyLabel" style="font-size:12px;font-weight:600;color:var(--green);margin-top:2px">qwen-local (无 key)</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px">
+        <div style="font-size:11px;color:var(--text2)">预计耗时</div>
+        <div style="font-size:12px;font-weight:600;color:var(--blue);margin-top:2px">3 ~ 10 秒</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="aiSubmitBtn" onclick="aiDesignSubmit()" style="width:100%;padding:13px;font-size:14px;font-weight:600">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="aiSubmitBtnText">AI 生成方案 (3 图并行)</span>
+    </button>
+    <div id="aiErrorBar" style="display:none;margin-top:10px;padding:10px;background:rgba(224,96,112,.12);border:1px solid var(--red);border-radius:6px;font-size:12px;color:var(--red)"></div>
+  </div>
+</div>
+
+<!-- 3 图切换 + 渲染区 -->
+<div id="aiDesignNav" style="display:none;margin-bottom:12px">
+  <nav class="sub-tabs" style="padding:0">
+    <div id="aiSubSld" class="sub-tab active" onclick="aiDesignShowSub('sld')">单线图 (SLD)</div>
+    <div id="aiSubArch" class="sub-tab" onclick="aiDesignShowSub('arch')">系统架构图</div>
+    <div id="aiSubComm" class="sub-tab" onclick="aiDesignShowSub('comm')">通信拓扑图</div>
+  </nav>
+</div>
+
+<div id="aiSldPane" class="ai-diagram-pane" style="display:none;height:600px;overflow:auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px">
+  <div class="sec-title" style="font-size:12px;margin-bottom:8px">电气单线图 (L5 SVG Renderer)</div>
+  <div id="aiSldContent" style="background:#fff;min-height:520px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px">点击 "AI 生成方案" 启动</div>
+</div>
+<div id="aiArchPane" class="ai-diagram-pane" style="display:none;height:600px;overflow:auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px">
+  <div class="sec-title" style="font-size:12px;margin-bottom:8px">系统架构图 (L7 600×400)</div>
+  <div id="aiArchContent" style="background:#fff;min-height:520px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px">点击 "AI 生成方案" 启动</div>
+</div>
+<div id="aiCommPane" class="ai-diagram-pane" style="display:none;height:600px;overflow:auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px">
+  <div class="sec-title" style="font-size:12px;margin-bottom:8px">通信拓扑图 (L8 700×500)</div>
+  <div id="aiCommContent" style="background:#fff;min-height:520px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px">点击 "AI 生成方案" 启动</div>
+</div>
+
+<div id="aiEmptyHint" style="margin-top:16px;padding:16px;background:var(--bg2);border:1px dashed var(--border);border-radius:8px;font-size:12px;color:var(--text2);text-align:center;line-height:1.6">
+  <div style="font-size:24px;margin-bottom:8px">🤖</div>
+  填写左侧 9 字段,选择 AI 模型,点击 "AI 生成方案"<br>
+  系统会: ① 调用 /api/schemagen 生成 v1.1 UEM &nbsp; ② 并行渲染 3 张 SVG 图 (SLD / Arch / Comm)
 </div>
 </div>
 
@@ -3143,17 +3253,218 @@ let LAST_RESULT=null;let currentDiagramIdx=0;let LAST_MG_RESULT=null;
 let LAST_AIDC_RESULT=null;
 let currentFilter='全部';
 
+// ========== AI 方案设计 tab (Track D) ==========
+// 用 var 不用 const/let: <script> 块是块作用域,inline onclick 访问 const/let 会 ReferenceError
+var aiDesignState = {provider:'qwen-local', uem:null, diagrams:{sld:'', arch:'', comm:''}, loading:false};
+var aiDesignSubTab = 'sld';  // sld | arch | comm
+
+// Provider 标签映射 (前端显示用)
+var AI_PROVIDER_KEY_MAP = {
+  'qwen-local': 'qwen3_local',
+  'deepseek': 'deepseek_v4',
+  'glm': 'glm_5_1',
+  'qwen-cloud': 'qwen3_7max',
+  'm3': 'minimax_m3'
+};
+var AI_PROVIDER_LABEL = {
+  'qwen-local': 'qwen-local (无 key)',
+  'deepseek': 'DEEPSEEK_API_KEY',
+  'glm': 'GLM_API_KEY',
+  'qwen-cloud': 'BAILIAN_API_KEY',
+  'm3': 'MINIMAX_API_KEY'
+};
+
+function aiDesignOnShow(){
+  // 切到该 tab 时,同步 provider label + 默认 SLD 子 tab
+  var sel = document.getElementById('aiProvider');
+  if (sel) {
+    var v = sel.value || 'qwen-local';
+    var labelEl = document.getElementById('aiProviderKeyLabel');
+    if (labelEl) labelEl.textContent = AI_PROVIDER_LABEL[v] || v;
+  }
+  aiDesignShowSub(aiDesignSubTab || 'sld');
+}
+
+function aiDesignShowSub(subId){
+  aiDesignSubTab = subId;
+  // 3 个子 tab 高亮
+  var sld = document.getElementById('aiSubSld');
+  var arch = document.getElementById('aiSubArch');
+  var comm = document.getElementById('aiSubComm');
+  if (sld) sld.classList.toggle('active', subId === 'sld');
+  if (arch) arch.classList.toggle('active', subId === 'arch');
+  if (comm) comm.classList.toggle('active', subId === 'comm');
+  // 3 个 pane 显隐
+  var sldP = document.getElementById('aiSldPane');
+  var archP = document.getElementById('aiArchPane');
+  var commP = document.getElementById('aiCommPane');
+  if (sldP) sldP.style.display = subId === 'sld' ? 'block' : 'none';
+  if (archP) archP.style.display = subId === 'arch' ? 'block' : 'none';
+  if (commP) commP.style.display = subId === 'comm' ? 'block' : 'none';
+}
+
+function aiDesignCollectForm(){
+  return {
+    project_name: (document.getElementById('aiProjName') || {}).value || '',
+    project_type: 'ess',
+    scenario: (document.getElementById('aiScenario') || {}).value || 'commercial',
+    location: {
+      country: 'CN',
+      province: ((document.getElementById('aiProjSite') || {}).value || '').split(/[\s,市省]/)[0] || '江苏',
+      site: (document.getElementById('aiProjSite') || {}).value || '江苏苏州',
+      altitude_m: 50,
+      min_temp_c: -10,
+      max_temp_c: 38
+    },
+    electrical: {
+      capacity_kwh: Number((document.getElementById('aiCapacity') || {}).value) || 2000,
+      power_kw: Number((document.getElementById('aiPower') || {}).value) || 1000,
+      voltage_level: (document.getElementById('aiVoltage') || {}).value || '10kV',
+      phases: 3,
+      grid_mode: (document.getElementById('aiGridMode') || {}).value || 'grid_tied',
+      duration_h: 2,
+      frequency_hz: 50,
+      power_factor: 0.98,
+      efficiency: 0.92,
+      soc_min: 10,
+      soc_max: 90,
+      thdi_pct: 3
+    },
+    special: {
+      redundancy: (document.getElementById('aiRedundancy') || {}).value || 'N+1',
+      special_text: (document.getElementById('aiSpecial') || {}).value || ''
+    },
+    ai_provider: AI_PROVIDER_KEY_MAP[(document.getElementById('aiProvider') || {}).value] || 'qwen3_local'
+  };
+}
+
+function aiDesignShowError(msg){
+  var el = document.getElementById('aiErrorBar');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function aiDesignClearError(){
+  var el = document.getElementById('aiErrorBar');
+  if (!el) return;
+  el.textContent = '';
+  el.style.display = 'none';
+}
+
+function aiDesignSetLoading(loading){
+  aiDesignState.loading = loading;
+  var btn = document.getElementById('aiSubmitBtn');
+  var txt = document.getElementById('aiSubmitBtnText');
+  if (btn) btn.disabled = loading;
+  if (txt) txt.textContent = loading ? 'AI 正在生成方案... (3-10s)' : 'AI 生成方案 (3 图并行)';
+}
+
+async function aiDesignRenderOne(apiPath, body, contentId, label){
+  var content = document.getElementById(contentId);
+  if (content) content.innerHTML = '<div style="color:var(--blue);font-size:12px">⏳ 渲染 ' + label + ' 中...</div>';
+  try {
+    var resp = await fetch(apiPath, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      var t = await resp.text();
+      throw new Error('HTTP ' + resp.status + ': ' + t.slice(0, 200));
+    }
+    var data = await resp.json();
+    if (!data.ok) throw new Error(data.error || '后端 ok=false');
+    var svg = data.svg || '';
+    if (!svg) throw new Error('后端未返回 svg');
+    if (content) content.innerHTML = svg;
+    return { ok: true, size: svg.length, meta: data };
+  } catch (e) {
+    if (content) content.innerHTML = '<div style="color:var(--red);font-size:12px;padding:12px;background:rgba(224,96,112,.08);border-radius:6px">❌ ' + label + ' 渲染失败: ' + (e && e.message ? e.message : e) + '</div>';
+    return { ok: false, error: e && e.message ? e.message : String(e) };
+  }
+}
+
+async function aiDesignSubmit(){
+  // 1) 防抖
+  if (aiDesignState.loading) return;
+  aiDesignClearError();
+  aiDesignSetLoading(true);
+
+  var form = aiDesignCollectForm();
+  var provKey = (document.getElementById('aiProvider') || {}).value || 'qwen-local';
+  aiDesignState.provider = provKey;
+
+  // 2) 隐藏 hint, 显示 3 pane
+  var hint = document.getElementById('aiEmptyHint');
+  if (hint) hint.style.display = 'none';
+  var nav = document.getElementById('aiDesignNav');
+  if (nav) nav.style.display = 'block';
+  aiDesignShowSub(aiDesignSubTab || 'sld');
+
+  // 3) 显示 3 个 pane 的 loading 提示
+  var sldC = document.getElementById('aiSldContent');
+  var archC = document.getElementById('aiArchContent');
+  var commC = document.getElementById('aiCommContent');
+  if (sldC) sldC.innerHTML = '<div style="color:var(--blue);font-size:12px">⏳ 等待 UEM 生成...</div>';
+  if (archC) archC.innerHTML = '<div style="color:var(--blue);font-size:12px">⏳ 等待 UEM 生成...</div>';
+  if (commC) commC.innerHTML = '<div style="color:var(--blue);font-size:12px">⏳ 等待 UEM 生成...</div>';
+
+  try {
+    // 4) Step 1: POST /api/schemagen 拿 UEM
+    var sgResp = await fetch('/api/schemagen', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form)
+    });
+    if (!sgResp.ok) {
+      var t = await sgResp.text();
+      throw new Error('schemagen HTTP ' + sgResp.status + ': ' + t.slice(0, 300));
+    }
+    var sgData = await sgResp.json();
+    if (!sgData.ok) throw new Error(sgData.error || 'schemagen ok=false');
+    var uem = sgData.uem;
+    if (!uem) throw new Error('schemagen 未返回 uem 字段');
+    aiDesignState.uem = uem;
+
+    // 5) Step 2: 并行渲染 3 张图
+    var body = { uem: uem };
+    var p1 = aiDesignRenderOne('/api/render_svg', body, 'aiSldContent', '单线图 SLD');
+    var p2 = aiDesignRenderOne('/api/render_arch', body, 'aiArchContent', '系统架构图');
+    var p3 = aiDesignRenderOne('/api/render_comm', body, 'aiCommContent', '通信拓扑图');
+    var results = await Promise.all([p1, p2, p3]);
+    aiDesignState.diagrams.sld = results[0].ok ? 'OK ' + results[0].size + ' chars' : 'FAIL: ' + results[0].error;
+    aiDesignState.diagrams.arch = results[1].ok ? 'OK ' + results[1].size + ' chars' : 'FAIL: ' + results[1].error;
+    aiDesignState.diagrams.comm = results[2].ok ? 'OK ' + results[2].size + ' chars' : 'FAIL: ' + results[2].error;
+
+    // 6) 部分失败提示
+    var fails = results.filter(function(r){ return !r.ok; });
+    if (fails.length > 0 && fails.length < 3) {
+      aiDesignShowError('⚠ 部分图表渲染失败: ' + fails.map(function(f){ return f.error; }).join(' | '));
+    } else if (fails.length === 3) {
+      aiDesignShowError('❌ 3 张图全部渲染失败, 请检查后端 /api/render_svg + /api/render_arch + /api/render_comm');
+    }
+  } catch (e) {
+    aiDesignShowError('❌ 方案生成失败: ' + (e && e.message ? e.message : String(e)));
+    if (sldC) sldC.innerHTML = '<div style="color:var(--red);font-size:12px;padding:12px">未生成</div>';
+    if (archC) archC.innerHTML = '<div style="color:var(--red);font-size:12px;padding:12px">未生成</div>';
+    if (commC) commC.innerHTML = '<div style="color:var(--red);font-size:12px;padding:12px">未生成</div>';
+  } finally {
+    aiDesignSetLoading(false);
+  }
+}
+
 function showPage(id){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  const navIdx=['devices','config','diagrams','cases','compliance'].indexOf(id);
+  const navIdx=['devices','config','diagrams','cases','compliance','ai-design'].indexOf(id);
   if(navIdx>=0)document.querySelectorAll('.nav-tab')[navIdx].classList.add('active');
   const mainEl = document.querySelector('main.content');
   if(mainEl) mainEl.style.display = id==='config' ? 'none' : 'block';
   if(id==='devices')renderDeviceLibrary(currentFilter);
   if(id==='diagrams'&&LAST_RESULT){renderDiagramTabs(LAST_RESULT);renderArchSvg(LAST_RESULT);renderWiringSvg(LAST_RESULT);renderTopoSvg(LAST_RESULT);renderLayoutSvg(LAST_RESULT);renderCableSvg(LAST_RESULT);renderPrincipleSvg(LAST_RESULT);renderBOM(LAST_RESULT);}
   if(id==='cases')renderCases();
+  if(id==='ai-design')aiDesignOnShow();
 }
 
 /* ========== 合规检查 (Compliance) ========== */
