@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ess-agent.com/schemas/uem/v1.1",
+  "title": "Unified Engineering Model (UEM) v1.1",
+  "description": "统一工程数据模型 v1.1 — 储能/微网/AIDC 电气设计的唯一真相来源。从 LLM 输出到图纸/BOM/合规检查,所有下游模块都消费这个 schema。v1.1 扩展(vs v1.0):电气参数(frequency/pf/efficiency/soc)、sources 分区、loads 分区、aidc_specific、compliance、drawings、metadata、protection 三段保护。",
+  "version": "1.1",
+  "type": "object",
+  "required": ["schema_version", "project", "electrical"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0", "1.1"],
+      "description": "Schema 版本,锁定后不允许随工程方便改字段名。v1.0 兼容(不强制 protection),v1.1 强制 protection 三段保护 + 必填项"
+    },
+    "project": {
+      "type": "object",
+      "required": ["id", "type", "scenario", "standard"],
+      "properties": {
+        "id":          { "type": "string", "pattern": "^PRJ-\\d{8}-\\d{3}$", "description": "项目编号 PRJ-YYYYMMDD-NNN" },
+        "name":        { "type": ["string", "null"] },
+        "type":        { "enum": ["ess", "microgrid", "aidc", "hybrid"] },
+        "scenario":    { "enum": ["residential", "commercial", "industrial", "utility", "aidc_colocation", "aidc_selfbuilt"] },
+        "standard":    { "enum": ["GB", "IEC", "NEC", "UL", "mixed"] },
+        "revision":    { "type": ["string", "null"], "default": "Rev.A" },
+        "created_at":  { "type": ["string", "null"], "format": "date-time" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "country":      { "type": ["string", "null"], "default": "CN" },
+            "province":     { "type": ["string", "null"] },
+            "altitude_m":   { "type": ["number", "null"], "minimum": 0, "maximum": 5500, "description": "海拔(米),影响设备降容" },
+            "climate_zone": { "type": ["string", "null"], "description": "气候区,如 tropical/temperate/cold" }
+          }
+        }
+      }
+    },
+    "electrical": {
+      "type": "object",
+      "required": ["capacity_kwh", "power_kw", "voltage_level", "grid_mode", "phases"],
+      "properties": {
+        "capacity_kwh":     { "type": ["number", "null"], "minimum": 0.1, "description": "电池容量,统一 kWh" },
+        "power_kw":         { "type": ["number", "null"], "minimum": 0.1, "description": "额定功率,统一 kW" },
+        "duration_h":       { "type": ["number", "null"], "minimum": 0.1, "description": "储能时长 (cap/power),0.25-12h 为合理范围" },
+        "voltage_level":    { "enum": ["220V", "380V", "400V", "480V", "690V", "10kV", "35kV", "110kV", "220kV", null] },
+        "grid_mode":        { "enum": ["grid_tied", "off_grid", "hybrid"] },
+        "phases":           { "type": "integer", "enum": [1, 3] },
+        "frequency_hz":     { "type": "number", "enum": [50, 60], "default": 50, "description": "中国/欧洲 50Hz,美洲 60Hz" },
+        "power_factor":     { "type": "number", "minimum": 0.5, "maximum": 1, "default": 0.95 },
+        "efficiency_pct":   { "type": "number", "minimum": 50, "maximum": 99, "default": 90, "description": "系统效率(电池→并网)" },
+        "soc_min_pct":      { "type": "number", "minimum": 0, "maximum": 50, "default": 10, "description": "SOC 下限,保护电池" },
+        "soc_max_pct":      { "type": "number", "minimum": 50, "maximum": 100, "default": 90, "description": "SOC 上限" }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "description": "v1.1 新增: 各种能源输入(光伏/风电/柴发/水电/电网)",
+      "properties": {
+        "pv_kw":            { "type": ["number", "null"], "minimum": 0 },
+        "wind_kw":          { "type": ["number", "null"], "minimum": 0 },
+        "diesel_kw":        { "type": ["number", "null"], "minimum": 0 },
+        "hydro_kw":         { "type": ["number", "null"], "minimum": 0 },
+        "grid_capacity_kw": { "type": ["number", "null"], "minimum": 0, "description": "并网容量上限" }
+      }
+    },
+    "loads": {
+      "type": "object",
+      "description": "v1.1 新增: 负载详细参数",
+      "properties": {
+        "total_kw":         { "type": ["number", "null"], "minimum": 0 },
+        "type":             { "enum": ["general", "it_load", "mixed", "motor", "resistive", null] },
+        "peak_kw":          { "type": ["number", "null"], "minimum": 0 },
+        "daily_kwh":        { "type": ["number", "null"], "minimum": 0 },
+        "ev_charger_kw":    { "type": ["number", "null"], "minimum": 0, "description": "EV 充电桩负载" },
+        "critical_load_kw": { "type": ["number", "null"], "minimum": 0, "description": "关键负载 (AIDC 用)" }
+      }
+    },
+    "aidc_specific": {
+      "type": ["object", "null"],
+      "description": "v1.1 新增: AIDC 数据中心特有参数 (仅 aidc 项目填)",
+      "properties": {
+        "tier":                       { "enum": ["I", "II", "III", "IV", null] },
+        "redundancy":                 { "enum": ["N", "N+1", "2N", "2N+1", null] },
+        "it_load_kw":                 { "type": ["number", "null"], "minimum": 0 },
+        "pue_target":                 { "type": ["number", "null"], "minimum": 1.0, "maximum": 3.0, "default": 1.3 },
+        "ups_topology":               { "enum": ["offline", "line_interactive", "online_double", "delta_conversion", "modular", null] },
+        "cooling_type":               { "enum": ["air", "water", "glycol", "dx", null] },
+        "generator_transfer_time_ms": { "type": ["number", "null"], "minimum": 0, "default": 10000 }
+      }
+    },
+    "components": {
+      "type": "array",
+      "description": "由 Engineering Compiler 计算后填充,LLM 不直接产生",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "ref"],
+        "properties": {
+          "id":       { "type": "string" },
+          "category": { "enum": ["battery_rack", "pcs", "transformer", "switchgear", "protection", "metering", "cable", "bus", "load", "source", "controller", "ups", "other"] },
+          "ref":      { "type": "string", "description": "原理图引用编号 F1/QF1/KM1..." },
+          "model":    { "type": "string", "description": "具体型号,从 equipment_db 查" },
+          "qty":      { "type": "integer", "minimum": 1 },
+          "vendor":   { "type": ["string", "null"], "description": "Sungrow/Huawei/Schneider..." },
+          "params":   { "type": "object", "description": "关键参数" }
+        }
+      }
+    },
+    "connections": {
+      "type": "array",
+      "description": "原理图连接关系,Engineering Compiler 生成",
+      "items": {
+        "type": "object",
+        "required": ["from", "to"],
+        "properties": {
+          "from":   { "type": "string" },
+          "to":     { "type": "string" },
+          "type":   { "enum": ["power", "control", "communication"] },
+          "cable":  { "type": ["string", "null"] },
+          "length_m": { "type": ["number", "null"] }
+        }
+      }
+    },
+    "cables": {
+      "type": "array",
+      "description": "v1.1 新增: 电缆清册 (Cable Engine 输出)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ref":      { "type": "string" },
+          "from":     { "type": "string" },
+          "to":       { "type": "string" },
+          "type":     { "type": "string" },
+          "spec":     { "type": "string" },
+          "length_m": { "type": "number" }
+        }
+      }
+    },
+    "protection": {
+      "type": "object",
+      "description": "v1.1 新增: 保护配置。v1.1 必填 (过流/速断/接地 三段, GB 50062)",
+      "properties": {
+        "overcurrent":      { "type": "boolean", "description": "过流保护 (GB 50062)" },
+        "instantaneous":    { "type": "boolean", "description": "速断保护 (GB 50062)" },
+        "earth_fault":      { "type": "boolean", "description": "接地保护 (GB 50062)" },
+        "short_circuit_ka": { "type": ["number", "null"] },
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "device": { "type": "string" },
+              "pickup_a": { "type": "number" },
+              "delay_ms": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "compliance": {
+      "type": "object",
+      "description": "v1.1 新增: 合规检查结果",
+      "properties": {
+        "standards":     { "type": "array", "items": { "type": "string" } },
+        "certificates":  { "type": "array", "items": { "type": "string" } },
+        "checks_passed": { "type": "array", "items": { "type": "string" } },
+        "checks_failed": { "type": "array", "items": { "type": "string" } },
+        "warnings":      { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "bom": {
+      "type": "array",
+      "description": "v1.1 新增: 顶层 BOM 数组 (L3 编译器或 L4 模板填充)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ref":      { "type": "string" },
+          "category": { "type": "string" },
+          "qty":      { "type": "integer" },
+          "model":    { "type": "string" },
+          "vendor":   { "type": ["string", "null"] },
+          "unit_price_rmb": { "type": ["number", "null"] }
+        }
+      }
+    },
+    "drawings": {
+      "type": "object",
+      "description": "v1.1 新增: 图纸状态",
+      "properties": {
+        "sld":           { "type": "object", "properties": { "status": { "enum": ["pending", "generated", "approved"] }, "svg_path": { "type": ["string", "null"] }, "revision": { "type": ["string", "null"] } } },
+        "system_arch":   { "type": "object", "properties": { "status": { "enum": ["pending", "generated", "approved"] }, "svg_path": { "type": ["string", "null"] } } },
+        "comm_topology": { "type": "object", "properties": { "status": { "enum": ["pending", "generated", "approved"] }, "svg_path": { "type": ["string", "null"] } } },
+        "floor_plan":    { "type": "object", "properties": { "status": { "enum": ["pending", "generated", "approved"] }, "svg_path": { "type": ["string", "null"] } } },
+        "cable_routing": { "type": "object", "properties": { "status": { "enum": ["pending", "generated", "approved"] }, "svg_path": { "type": ["string", "null"] } } }
+      }
+    },
+    "special_requirements": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "无法标准化的需求(UL 认证/海拔/低温/海岛/小水电/特殊发电/需求不完整标注)"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "v1.1 新增: 元数据 (LLM 链路追踪 + 版本)",
+      "properties": {
+        "created_by":     { "type": "string" },
+        "llm_model":      { "type": "string" },
+        "llm_raw_output": { "type": "string" },
+        "rules_version":  { "type": "string" },
+        "last_modified":  { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "description": "AIDC 项目必须有 aidc_specific",
+      "if": { "properties": { "project": { "properties": { "type": { "const": "aidc" } } } } },
+      "then": { "required": ["aidc_specific"] }
+    },
+    {
+      "description": "SOC 范围必须 soc_min < soc_max",
+      "if": { "properties": { "electrical": { "required": ["soc_min_pct", "soc_max_pct"] } } },
+      "then": {
+        "properties": {
+          "electrical": {
+            "properties": {
+              "soc_max_pct": { "type": "number", "minimum": 1 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "v1.1 UEM 必须有 protection 块 (GB 50062 三段保护), v1.0 兼容 (跳过)",
+      "if": {
+        "properties": {
+          "schema_version": { "const": "1.1" }
+        }
+      },
+      "then": {
+        "required": ["protection"],
+        "properties": {
+          "protection": {
+            "required": ["overcurrent", "instantaneous", "earth_fault"]
+          }
+        }
+      }
+    },
+    {
+      "description": "并网项目 (grid_tied + ess/aidc/hybrid) 在 v1.1 必填 protection 三段",
+      "if": {
+        "properties": {
+          "schema_version": { "const": "1.1" },
+          "electrical": { "properties": { "grid_mode": { "const": "grid_tied" } } },
+          "project": { "properties": { "type": { "enum": ["ess", "aidc", "hybrid"] } } }
+        }
+      },
+      "then": {
+        "required": ["protection"],
+        "properties": {
+          "protection": {
+            "required": ["overcurrent", "instantaneous", "earth_fault"],
+            "properties": {
+              "overcurrent":   { "const": true },
+              "instantaneous": { "const": true },
+              "earth_fault":   { "const": true }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
