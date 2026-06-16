@@ -1433,11 +1433,138 @@ ACC AC一体柜专题
 <div class="form-group"><label class="form-label" data-i18n="bs_region">所在区域</label><input type="text" class="form-input" id="bsRegion" value="北京市大兴区"></div>
 <div class="form-group"><label class="form-label" data-i18n="bs_budget">预算上限(万元)</label><input type="number" class="form-input" id="bsBudget" value="800" step="50"></div>
 </div>
+<div class="form-row" style="margin-bottom:4px">
+<div class="form-group"><label class="form-label" data-i18n="bs_service_radius">服务半径(km)</label><input type="number" class="form-input" id="bsServiceRadius" value="5" min="1" max="50"></div>
+<div class="form-group"><label class="form-label" data-i18n="bs_land_area">土地面积(m²)</label><input type="number" class="form-input" id="bsLandArea" value="0" min="0" max="10000" placeholder="0=自动计算"></div>
+<div class="form-group"><label class="form-label" data-i18n="bs_transformer_capacity">变压器容量(kVA)</label><input type="number" class="form-input" id="bsTransformerCapacity" value="0" min="0" placeholder="0=自动计算"></div>
+</div>
+<div class="form-row" style="margin-bottom:4px">
+<div class="form-group"><label class="form-label" data-i18n="bs_service_fee_rate">换电服务费率(%)</label><input type="number" class="form-input" id="bsServiceFeeRate" value="20" min="10" max="50"></div>
+<div class="form-group"><label class="form-label" data-i18n="bs_annual_op_days">年运营天数(天)</label><input type="number" class="form-input" id="bsAnnualOpDays" value="330" min="300" max="365"></div>
+<div class="form-group"><label class="form-label" data-i18n="bs_price_flat">平电价(元/kWh)</label><input type="number" class="form-input" id="bsPriceFlat" value="0.60" step="0.01"></div>
+</div>
 </div>
 </div>
 <button class="btn btn-primary" onclick="bsGenerateSolution()" data-i18n="bs_gen_btn" style="width:100%;padding:12px;font-size:14px;margin-bottom:16px">生成换电方案</button>
 <div class="success-msg" id="bsSuccessMsg" data-i18n="bs_success_msg" style="display:none">方案已生成！请切换到其他标签查看换电流程、充电策略、站内布局等详情</div>
 <div id="bsSolutionBrief" style="font-size:12px;color:var(--text2);line-height:1.8"></div>
+</div>
+
+<div id="page-bs-mech" class="bs-content" style="display:none;padding:24px 32px">
+<div class="sec-title" data-i18n="bs_mech_title">机械设计 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_mech_desc">换电机器人选型、升降机构设计、3D布局图、运动轨迹图、爆炸图、机械BOM</div>
+<div id="bsMechEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
+<div id="bsMechContent" style="display:none">
+<div id="bsMechParams" style="margin-bottom:16px"></div>
+<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_mech_3d_layout">3D布局图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bs3DLayoutSvg','3d-layout.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bs3DLayoutSvg"></div></div>
+<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_mech_motion_trail">运动轨迹图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsMotionTrailSvg','motion-trail.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsMotionTrailSvg"></div></div>
+<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_mech_exploded">爆炸图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsExplodedSvg','exploded.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsExplodedSvg"></div></div>
+<div id="bsMechBom" style="margin-top:16px"></div>
+</div>
+</div>
+
+<div id="page-bs-elec" class="bs-content" style="display:none;padding:24px 32px">
+<div class="sec-title" data-i18n="bs_elec_title">电气设计 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_elec_desc">电气一次图、二次图、配电系统图、通讯网络拓扑、接地系统图、参数汇总</div>
+<div id="bsElecEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
+<div id="bsElecContent" style="display:none">
+<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_primary">电气一次图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsPrimarySvg','primary.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsPrimarySvg"></div></div>
+<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_secondary">电气二次图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsSecondarySvg','secondary.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsSecondarySvg"></div></div>
+<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_distribution">配电系统图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsDistributionSvg','distribution.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsDistributionSvg"></div></div>
+<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_comm">通讯网络拓扑</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsCommSvg','comm-topology.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsCommSvg"></div></div>
+<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_grounding">接地系统图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsGroundingSvg','grounding.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsGroundingSvg"></div></div>
+<div id="bsElecParams" style="margin-top:16px"></div>
+</div>
+</div>
+
+<div id="page-bs-proto" class="bs-content" style="display:none;padding:24px 32px">
+<div class="sec-title" data-i18n="bs_proto_title">协议调试 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_proto_desc">BMS/PCS/换电机器人/PLC/EMS/充电模块点表配置、IEC104映射、MQTT主题、联调检查</div>
+<div class="sw-tabs" style="margin-bottom:12px">
+<div class="sw-tab active" id="bsPtTab-bms" onclick="bsShowPtTab('bms')" data-i18n="bs_proto_bms">BMS点表</div>
+<div class="sw-tab" id="bsPtTab-pcs" onclick="bsShowPtTab('pcs')" data-i18n="bs_proto_pcs">PCS点表</div>
+<div class="sw-tab" id="bsPtTab-robot" onclick="bsShowPtTab('robot')" data-i18n="bs_proto_robot">换电机器人</div>
+<div class="sw-tab" id="bsPtTab-plc" onclick="bsShowPtTab('plc')" data-i18n="bs_proto_plc">PLC点表</div>
+<div class="sw-tab" id="bsPtTab-ems" onclick="bsShowPtTab('ems')" data-i18n="bs_proto_ems">EMS点表</div>
+<div class="sw-tab" id="bsPtTab-charger" onclick="bsShowPtTab('charger')" data-i18n="bs_proto_charger">充电模块</div>
+<div class="sw-tab" id="bsPtTab-iec104" onclick="bsShowPtTab('iec104')" data-i18n="bs_proto_iec104">IEC104</div>
+<div class="sw-tab" id="bsPtTab-mqtt" onclick="bsShowPtTab('mqtt')" data-i18n="bs_proto_mqtt">MQTT</div>
+</div>
+<div id="bsProtoEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
+<div id="bsProtoContent" style="display:none">
+<div id="bsPointTableContent"></div>
+<div id="bsDebugChecklist" style="margin-top:16px"></div>
+</div>
+</div>
+
+<div id="page-bs-ops" class="bs-content" style="display:none;padding:24px 32px">
+<div class="sec-title" data-i18n="bs_ops_title">运营调度 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_ops_desc">24h换电需求预测、SOC调度计划、电池库存管理、排班计划</div>
+<div id="bsOpsEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
+<div id="bsOpsContent" style="display:none">
+<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_ops_demand_curve">24h换电需求预测</h3></div><div class="diagram-svg" id="bsDemandCurveSvg"></div></div>
+<div id="bsSocSchedule" style="margin-top:16px"></div>
+<div id="bsInventoryPlan" style="margin-top:16px"></div>
+<div id="bsShiftPlan" style="margin-top:16px"></div>
+</div>
+</div>
+
+<div id="page-bs-trade" class="bs-content" style="display:none;padding:24px 32px">
+<div class="sec-title" data-i18n="bs_trade_title">电力交易 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_trade_desc">储能特性概要、分时电价配置、市场类型选择、交易策略生成、收益汇总</div>
+<div id="bsTradeEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
+<div id="bsTradeContent" style="display:none">
+<div id="bsTradeCapacity" style="margin-bottom:16px"></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+<div class="form-group"><label class="form-label" data-i18n="bs_price_peak">峰电价(元/kWh)</label><input type="number" class="form-input" id="bsTradePricePeak" value="0.85" step="0.01"></div>
+<div class="form-group"><label class="form-label" data-i18n="bs_price_flat">平电价(元/kWh)</label><input type="number" class="form-input" id="bsTradePriceFlat" value="0.60" step="0.01"></div>
+<div class="form-group"><label class="form-label" data-i18n="bs_price_valley">谷电价(元/kWh)</label><input type="number" class="form-input" id="bsTradePriceValley" value="0.35" step="0.01"></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;font-size:12px">
+<label style="display:flex;align-items:center;gap:4px;color:var(--text1)"><input type="checkbox" id="bsTradeArbitrage" checked>峰谷套利</label>
+<label style="display:flex;align-items:center;gap:4px;color:var(--text1)"><input type="checkbox" id="bsTradeDemandResp">需量管理</label>
+<label style="display:flex;align-items:center;gap:4px;color:var(--text1)"><input type="checkbox" id="bsTradeSpot">电力现货</label>
+<label style="display:flex;align-items:center;gap:4px;color:var(--text1)"><input type="checkbox" id="bsTradeAncillary">辅助服务</label>
+<label style="display:flex;align-items:center;gap:4px;color:var(--text1)"><input type="checkbox" id="bsTradeDR">需求响应</label>
+<label style="display:flex;align-items:center;gap:4px;color:var(--text1)"><input type="checkbox" id="bsTradeVPP" checked>VPP聚合</label>
+</div>
+<button class="btn btn-primary" onclick="bsGenerateTrading()" style="font-size:12px;padding:8px 16px;margin-bottom:12px" data-i18n="bs_gen_btn">生成交易策略</button>
+<div id="bsTradingStrategy"></div>
+<div id="bsTradingEcon" style="margin-top:16px"></div>
+<div id="bsTradingSchedule" style="margin-top:16px"></div>
+</div>
+</div>
+
+<div id="page-bs-twin" class="bs-content" style="display:none;padding:24px 32px">
+<div class="sec-title" data-i18n="bs_twin_title">数字孪生 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_twin_desc">3D换电站数字孪生可视化、实时状态监控、相机预设切换</div>
+<div id="bsTwinOuter" style="position:relative">
+<div style="display:flex;gap:8px;margin-bottom:12px">
+<button class="btn btn-primary" onclick="bsTwinCamPreset('overview')" style="font-size:11px;padding:6px 12px" data-i18n="bs_twin_overview">全景</button>
+<button class="btn btn-primary" onclick="bsTwinCamPreset('swap_lane')" style="font-size:11px;padding:6px 12px" data-i18n="bs_twin_swap_lane">换电通道</button>
+<button class="btn btn-primary" onclick="bsTwinCamPreset('rack')" style="font-size:11px;padding:6px 12px" data-i18n="bs_twin_rack">充电架</button>
+<button class="btn btn-primary" onclick="bsTwinCamPreset('power_room')" style="font-size:11px;padding:6px 12px" data-i18n="bs_twin_power_room">配电室</button>
+<button class="btn btn-primary" onclick="bsTwinCamPreset('monitor')" style="font-size:11px;padding:6px 12px" data-i18n="bs_twin_monitor">监控室</button>
+</div>
+<iframe id="bsTwinIframe" src="ess_agent_bss_3d_twin_viewer.html" style="width:100%;height:600px;border:1px solid var(--border);border-radius:8px;background:#0a0e14"></iframe>
+<div id="bsTwinNoData" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
+<div id="bsTwinFallback" style="display:none"><div class="diagram-svg" id="bsTwinFallbackSvg"></div><div style="text-align:center;color:var(--text2);font-size:11px;margin-top:8px" data-i18n="bs_twin_fallback">3D加载失败，已降级为2D视图</div></div>
+</div>
+</div>
+
+<div id="page-bs-aiops" class="bs-content" style="display:none;padding:24px 32px">
+<div class="sec-title" data-i18n="bs_aiops_title">AI运维 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_aiops_desc">智能故障诊断、常见故障速查、设备状态监控、AI问答</div>
+<div id="bsAiOpsEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
+<div id="bsAiOpsContent" style="display:none">
+<div style="display:flex;gap:8px;margin-bottom:16px">
+<input type="text" id="bsAiOpsInput" class="form-input" data-i18n-placeholder="bs_aiops_input_ph" placeholder="输入故障描述，如：为什么3号电池一直不充电？" style="flex:1;font-size:12px">
+<button class="btn btn-primary" onclick="bsAiDiagnose()" data-i18n="bs_aiops_diagnose" style="font-size:12px;padding:8px 16px;white-space:nowrap">AI诊断</button>
+</div>
+<div id="bsAiOpsResult" style="margin-bottom:16px"></div>
+<div id="bsFaultQuickList" style="margin-bottom:16px"></div>
+<div id="bsDeviceStatus"></div>
+</div>
 </div>
 
 
@@ -2493,7 +2620,7 @@ cat_ess:'储能方案智能体',cat_mg:'微网交付智能体',cat_aidc:'AIDC方
   compliance_title:'工程合规规则检查',compliance_desc:'基于 25 条工程规则对 UEM JSON 自动跑合规检查, 输出带标准引用的报告。',compliance_input_title:'UEM JSON 输入',compliance_run_btn:'跑合规检查',compliance_sample_btn:'加载示例',compliance_clear_btn:'清空',compliance_result_title:'检查结果',compliance_empty:'点击"加载示例"或粘贴 UEM JSON, 然后点"跑合规检查"',compliance_loading:'跑 25 条规则中...',compliance_score_label:'合规评分 / 100',compliance_pass_label:'通过',compliance_fail_label:'失败',compliance_skip_label:'跳过',compliance_failing_title:'待解决问题',compliance_standards_title:'引用标准清单',compliance_detail_title:'25 条规则详细结果',compliance_download_btn:'下载 Markdown 报告',compliance_download_json_btn:'下载 JSON 报告',
 mg_design:'方案设计',mg_drawings:'电气图纸',mg_protocol:'协议调试',mg_energy:'能源管理',mg_deploy:'一键部署',mg_trading:'电力交易',mg_twin:'数字孪生',mg_skill:'核心Skill',
 aidc_design:'方案设计',aidc_power:'供电架构',aidc_cooling:'液冷散热',aidc_pue:'PUE优化',aidc_layout:'机柜布局',aidc_bom:'BOM清单',aidc_drawings:'图纸',
-bs_design:'方案设计',bs_mech:'机械设计',bs_elec:'电气设计',bs_proto:'协议调试',bs_ops:'运营调度',bs_trade:'电力交易',bs_twin:'数字孪生',bs_aiops:'AI运维',
+bs_design:'方案设计',bs_mech:'机械设计',bs_elec:'电气设计',bs_proto:'协议调试',bs_ops:'运营调度',bs_trade:'电力交易',bs_twin:'数字孪生',bs_aiops:'AI运维',bs_service_radius:'服务半径(km)',bs_land_area:'土地面积(m²)',bs_transformer_capacity:'变压器容量(kVA)',bs_service_fee_rate:'换电服务费率(%)',bs_annual_op_days:'年运营天数(天)',bs_price_flat:'平电价(元/kWh)',bs_bom_in_brief:'BOM设备清单',bs_warning_title:'警告信息',bs_export_csv:'导出CSV',bs_mech_title:'机械设计 Agent',bs_mech_desc:'换电机器人选型、升降机构设计、3D布局图、运动轨迹图、爆炸图、机械BOM',bs_mech_3d_layout:'3D布局图',bs_mech_motion_trail:'运动轨迹图',bs_mech_exploded:'爆炸图',bs_mech_robot:'换电机器人',bs_mech_lift:'升降机构',bs_mech_alignment:'对位系统',bs_mech_transfer:'转运系统',bs_mech_safety:'安全防护',bs_mech_bom:'机械BOM',bs_elec_title:'电气设计 Agent',bs_elec_desc:'电气一次图、二次图、配电系统图、通讯网络拓扑、接地系统图、参数汇总',bs_elec_primary:'电气一次图',bs_elec_secondary:'电气二次图',bs_elec_distribution:'配电系统图',bs_elec_comm:'通讯网络拓扑',bs_elec_grounding:'接地系统图',bs_elec_params:'电气参数汇总',bs_proto_title:'协议调试 Agent',bs_proto_desc:'BMS/PCS/换电机器人/PLC/EMS/充电模块点表配置、IEC104映射、MQTT主题、联调检查',bs_proto_bms:'BMS点表',bs_proto_pcs:'PCS点表',bs_proto_robot:'换电机器人',bs_proto_plc:'PLC点表',bs_proto_ems:'EMS点表',bs_proto_charger:'充电模块',bs_proto_iec104:'IEC104',bs_proto_mqtt:'MQTT',bs_proto_checklist:'联调检查清单',bs_ops_title:'运营调度 Agent',bs_ops_desc:'24h换电需求预测、SOC调度计划、电池库存管理、排班计划',bs_ops_demand_curve:'24h换电需求预测',bs_ops_soc_schedule:'SOC调度计划',bs_ops_inventory:'电池库存计划',bs_ops_shift:'排班计划',bs_trade_title:'电力交易 Agent',bs_trade_desc:'储能特性概要、分时电价配置、市场类型选择、交易策略生成、收益汇总',bs_twin_title:'数字孪生 Agent',bs_twin_desc:'3D换电站数字孪生可视化、实时状态监控、相机预设切换',bs_twin_overview:'全景',bs_twin_swap_lane:'换电通道',bs_twin_rack:'充电架',bs_twin_power_room:'配电室',bs_twin_monitor:'监控室',bs_twin_fallback:'3D加载失败，已降级为2D视图',bs_aiops_title:'AI运维 Agent',bs_aiops_desc:'智能故障诊断、常见故障速查、设备状态监控、AI问答',bs_aiops_input_ph:'输入故障描述，如：为什么3号电池一直不充电？',bs_aiops_diagnose:'AI诊断',bs_aiops_phenomenon:'故障现象',bs_aiops_causes:'可能原因',bs_aiops_root_cause:'根因分析',bs_aiops_suggestion:'修复建议',bs_aiops_device_status:'设备状态',
 bs_design_agent:'AI 换电站交付智能体',bs_design_agent_desc:'从方案设计到工程交付：机械设计、电气设计、协议调试、运营调度、电力交易、数字孪生、AI运维',
 bs_nl_label:'自然语言描述',bs_nl_ph:'例：北京物流园50辆重卡换电，日换电2次，423kWh电池，10kV接入，谷电优先充电',bs_ai_btn:'AI识别参数并生成方案',
 bs_vehicle_type:'车型选择',bs_vehicle_truck:'重卡/商用车',bs_vehicle_light:'轻卡/物流车',bs_vehicle_passenger:'乘用车',bs_vehicle_two_wheel:'两轮车/特种车',bs_vehicle_custom:'自定义车型',
@@ -2627,7 +2754,7 @@ cat_ess:'ESS Solution Agent',cat_mg:'Microgrid Delivery Agent',cat_aidc:'AIDC So
   compliance_title:'Engineering Compliance Check',compliance_desc:'Run 25 engineering rules against UEM JSON, output reports with standards referenced.',compliance_input_title:'UEM JSON Input',compliance_run_btn:'Run Compliance Check',compliance_sample_btn:'Load Sample',compliance_clear_btn:'Clear',compliance_result_title:'Check Result',compliance_empty:'Click "Load Sample" or paste UEM JSON, then click "Run Compliance Check"',compliance_loading:'Running 25 rules...',compliance_score_label:'Compliance Score / 100',compliance_pass_label:'Pass',compliance_fail_label:'Fail',compliance_skip_label:'Skip',compliance_failing_title:'Issues to Fix',compliance_standards_title:'Standards Referenced',compliance_detail_title:'25 Rules Detail',compliance_download_btn:'Download Markdown',compliance_download_json_btn:'Download JSON',
 mg_design:'Design',mg_drawings:'Electrical DWG',mg_protocol:'Protocol & Debug',mg_energy:'Energy Mgmt',mg_deploy:'One-Click Deploy',mg_trading:'Power Trading',mg_twin:'Digital Twin',mg_skill:'Core Skills',
 aidc_design:'Design',aidc_power:'Power Arch',aidc_cooling:'Liquid Cooling',aidc_pue:'PUE Optimize',aidc_layout:'Rack Layout',aidc_bom:'BOM',aidc_drawings:'Drawings',
-bs_design:'Design',bs_mech:'Mechanical',bs_elec:'Electrical',bs_proto:'Protocol',bs_ops:'Operations',bs_trade:'Trading',bs_twin:'Digital Twin',bs_aiops:'AI Ops',
+bs_design:'Design',bs_mech:'Mechanical',bs_elec:'Electrical',bs_proto:'Protocol',bs_ops:'Operations',bs_trade:'Trading',bs_twin:'Digital Twin',bs_aiops:'AI Ops',bs_service_radius:'Service Radius(km)',bs_land_area:'Land Area(m²)',bs_transformer_capacity:'Transformer Cap.(kVA)',bs_service_fee_rate:'Service Fee Rate(%)',bs_annual_op_days:'Annual Op Days',bs_price_flat:'Flat Price(¥/kWh)',bs_bom_in_brief:'BOM Equipment List',bs_warning_title:'Warnings',bs_export_csv:'Export CSV',bs_mech_title:'Mechanical Design Agent',bs_mech_desc:'Robot selection, lift design, 3D layout, motion trail, exploded view, mechanical BOM',bs_mech_3d_layout:'3D Layout',bs_mech_motion_trail:'Motion Trail',bs_mech_exploded:'Exploded View',bs_mech_robot:'Swap Robot',bs_mech_lift:'Lift Mechanism',bs_mech_alignment:'Alignment System',bs_mech_transfer:'Transfer System',bs_mech_safety:'Safety System',bs_mech_bom:'Mechanical BOM',bs_elec_title:'Electrical Design Agent',bs_elec_desc:'Primary diagram, secondary diagram, distribution, comm topology, grounding, params',bs_elec_primary:'Primary Diagram',bs_elec_secondary:'Secondary Diagram',bs_elec_distribution:'Distribution System',bs_elec_comm:'Comm Topology',bs_elec_grounding:'Grounding System',bs_elec_params:'Electrical Parameters',bs_proto_title:'Protocol Debug Agent',bs_proto_desc:'BMS/PCS/Robot/PLC/EMS/Charger point tables, IEC104 mapping, MQTT topics, debug checklist',bs_proto_bms:'BMS Points',bs_proto_pcs:'PCS Points',bs_proto_robot:'Robot Points',bs_proto_plc:'PLC Points',bs_proto_ems:'EMS Points',bs_proto_charger:'Charger Points',bs_proto_iec104:'IEC104',bs_proto_mqtt:'MQTT',bs_proto_checklist:'Debug Checklist',bs_ops_title:'Operations Agent',bs_ops_desc:'24h demand forecast, SOC schedule, battery inventory, shift plan',bs_ops_demand_curve:'24h Demand Forecast',bs_ops_soc_schedule:'SOC Schedule',bs_ops_inventory:'Battery Inventory',bs_ops_shift:'Shift Plan',bs_trade_title:'Trading Agent',bs_trade_desc:'Storage capacity, TOU pricing, market selection, strategy generation, revenue summary',bs_twin_title:'Digital Twin Agent',bs_twin_desc:'3D station visualization, real-time monitoring, camera presets',bs_twin_overview:'Overview',bs_twin_swap_lane:'Swap Lane',bs_twin_rack:'Rack',bs_twin_power_room:'Power Room',bs_twin_monitor:'Monitor',bs_twin_fallback:'3D failed, fallback to 2D',bs_aiops_title:'AI Ops Agent',bs_aiops_desc:'Intelligent fault diagnosis, quick fault lookup, device status, AI Q&A',bs_aiops_input_ph:'Enter fault description...',bs_aiops_diagnose:'AI Diagnose',bs_aiops_phenomenon:'Phenomenon',bs_aiops_causes:'Possible Causes',bs_aiops_root_cause:'Root Cause',bs_aiops_suggestion:'Suggestions',bs_aiops_device_status:'Device Status',
 bs_design_agent:'AI BS Delivery Agent',bs_design_agent_desc:'From design to delivery: mechanical, electrical, protocol, operations, trading, digital twin, AI ops',
 bs_nl_label:'Natural Language Description',bs_nl_ph:'e.g. Beijing logistics park 50 heavy trucks, 2 swaps/day, 423kWh battery, 10kV, off-peak priority',bs_ai_btn:'AI Detect & Generate',
 bs_vehicle_type:'Vehicle Selection',bs_vehicle_truck:'Heavy Truck/Commercial',bs_vehicle_light:'Light Truck/Logistics',bs_vehicle_passenger:'Passenger Car',bs_vehicle_two_wheel:'Two-Wheeler/Special',bs_vehicle_custom:'Custom Vehicle',
@@ -2761,7 +2888,7 @@ cat_ess:'وكيل حلول التخزين',cat_mg:'وكيل تسليم الشب�
   compliance_title:'فحص الامتثال الهندسي',compliance_desc:'تشغيل 25 قاعدة هندسية على UEM JSON, إنتاج تقرير مع الإشارة إلى المعايير.',compliance_input_title:'إدخال UEM JSON',compliance_run_btn:'تشغيل الفحص',compliance_sample_btn:'تحميل عينة',compliance_clear_btn:'مسح',compliance_result_title:'نتيجة الفحص',compliance_empty:'انقر "تحميل عينة" أو الصق UEM JSON, ثم انقر "تشغيل الفحص"',compliance_loading:'تشغيل 25 قاعدة...',compliance_score_label:'درجة الامتثال / 100',compliance_pass_label:'ناجح',compliance_fail_label:'فشل',compliance_skip_label:'تخطي',compliance_failing_title:'القضايا المطلوب حلها',compliance_standards_title:'المعايير المشار إليها',compliance_detail_title:'تفاصيل 25 قاعدة',compliance_download_btn:'تحميل Markdown',compliance_download_json_btn:'تحميل JSON',
 mg_design:'التصميم',mg_drawings:'الرسوم الكهربائية',mg_protocol:'البروتوكول والتصحيح',mg_energy:'إدارة الطاقة',mg_deploy:'نشر بنقرة واحدة',mg_trading:'تداول الطاقة',mg_twin:'التوأم الرقمي',mg_skill:'المهارات الأساسية',
 aidc_design:'التصميم',aidc_power:'بنية الطاقة',aidc_cooling:'التبريد السائل',aidc_pue:'تحسين PUE',aidc_layout:'تخطيط الخزائن',aidc_bom:'قائمة المواد',aidc_drawings:'الرسوم',
-bs_design:'التصميم',bs_mech:'الميكانيكي',bs_elec:'الكهربائي',bs_proto:'البروتوكول',bs_ops:'العمليات',bs_trade:'التداول',bs_twin:'التوأم الرقمي',bs_aiops:'الذكاء الاصطناعي',
+bs_design:'التصميم',bs_mech:'الميكانيكي',bs_elec:'الكهربائي',bs_proto:'البروتوكول',bs_ops:'العمليات',bs_trade:'التداول',bs_twin:'التوأم الرقمي',bs_aiops:'الذكاء الاصطناعي',bs_service_radius:'نصف قطر الخدمة(km)',bs_land_area:'مساحة الأرض(m²)',bs_transformer_capacity:'سعة المحول(kVA)',bs_service_fee_rate:'معدل رسوم الخدمة(%)',bs_annual_op_days:'أيام التشغيل السنوية',bs_price_flat:'سعر مسطح(¥/kWh)',bs_bom_in_brief:'قائمة المعدات',bs_warning_title:'تحذيرات',bs_export_csv:'تصدير CSV',bs_mech_title:'وكيل التصميم الميكانيكي',bs_mech_desc:'اختيار الروبوت، تصميم الرفع، تخطيط ثلاثي الأبعاد',bs_mech_3d_layout:'تخطيط ثلاثي الأبعاد',bs_mech_motion_trail:'مسار الحركة',bs_mech_exploded:'عرض متفجر',bs_mech_robot:'روبوت التبديل',bs_mech_lift:'آلية الرفع',bs_mech_alignment:'نظام المحاذاة',bs_mech_transfer:'نظام النقل',bs_mech_safety:'نظام السلامة',bs_mech_bom:'قائمة المواد الميكانيكية',bs_elec_title:'وكيل التصميم الكهربائي',bs_elec_desc:'مخطط أولي، ثانوي، توزيع، اتصالات، تأريض',bs_elec_primary:'مخطط أولي',bs_elec_secondary:'مخطط ثانوي',bs_elec_distribution:'نظام التوزيع',bs_elec_comm:'طوبولوجيا الاتصالات',bs_elec_grounding:'نظام التأريض',bs_elec_params:'المعلمات الكهربائية',bs_proto_title:'وكيل تصحيح البروتوكول',bs_proto_desc:'جداول نقاط BMS/PCS/روبوت/PLC/EMS/شاحن',bs_proto_bms:'نقاط BMS',bs_proto_pcs:'نقاط PCS',bs_proto_robot:'نقاط الروبوت',bs_proto_plc:'نقاط PLC',bs_proto_ems:'نقاط EMS',bs_proto_charger:'نقاط الشاحن',bs_proto_iec104:'IEC104',bs_proto_mqtt:'MQTT',bs_proto_checklist:'قائمة التحقق',bs_ops_title:'وكيل العمليات',bs_ops_desc:'توقعات الطلب، جدول SOC، مخزون البطارية',bs_ops_demand_curve:'توقعات الطلب 24 ساعة',bs_ops_soc_schedule:'جدول SOC',bs_ops_inventory:'مخزون البطارية',bs_ops_shift:'خطة الوردية',bs_trade_title:'وكيل التداول',bs_trade_desc:'سعة التخزين، تسعيرة TOU، اختيار السوق',bs_twin_title:'وكيل التوأم الرقمي',bs_twin_desc:'تصور ثلاثي الأبعاد، مراقبة في الوقت الفعلي',bs_twin_overview:'نظرة عامة',bs_twin_swap_lane:'مسار التبديل',bs_twin_rack:'الرف',bs_twin_power_room:'غرفة الطاقة',bs_twin_monitor:'مراقبة',bs_twin_fallback:'فشل ثلاثي الأبعاد، تراجع إلى ثنائي الأبعاد',bs_aiops_title:'وكيل عمليات الذكاء الاصطناعي',bs_aiops_desc:'تشخيص الأعطال، البحث السريع، حالة الجهاز',bs_aiops_input_ph:'أدخل وصف الخطأ...',bs_aiops_diagnose:'تشخيص AI',bs_aiops_phenomenon:'الظاهرة',bs_aiops_causes:'الأسباب المحتملة',bs_aiops_root_cause:'السبب الجذري',bs_aiops_suggestion:'الاقتراحات',bs_aiops_device_status:'حالة الجهاز',
 bs_design_agent:'وكيل تسليم محطة التبديل',bs_design_agent_desc:'من التصميم إلى التسليم: ميكانيكي، كهربائي، بروتوكول، عمليات، تداول، توأم رقمي، عمليات الذكاء الاصطناعي',
 bs_nl_label:'وصف اللغة الطبيعية',bs_nl_ph:'مثال: حديقة لوجستية بكين 50 شاحنة ثقيلة، تبديلان/يوم، بطارية 423kWh، 10kV، أولوية خارج الذروة',bs_ai_btn:'الكشف بالذكاء الاصطناعي والتوليد',
 bs_vehicle_type:'اختيار المركبة',bs_vehicle_truck:'شاحنة ثقيلة/تجارية',bs_vehicle_light:'شاحنة خفيفة/لوجستية',bs_vehicle_passenger:'سيارة ركاب',bs_vehicle_two_wheel:'مركبة بعجلتين/خاصة',bs_vehicle_custom:'مركبة مخصصة',
@@ -3787,6 +3914,10 @@ function bsParseNatural(){
   if(txt.includes('谷电优先')){document.getElementById('bsChargingStrategy').value='off_peak_first';filled++;}
   if(txt.includes('恒功率')){document.getElementById('bsChargingStrategy').value='constant_power';filled++;}
   if(txt.includes('动态')){document.getElementById('bsChargingStrategy').value='dynamic';filled++;}
+  const kmMatch=txt.match(/(\d+)\s*km/);if(kmMatch){document.getElementById('bsServiceRadius').value=kmMatch[1];filled++;}
+  const m2Match=txt.match(/(\d+)\s*m[²2]|\d+\s*平米/);if(m2Match){document.getElementById('bsLandArea').value=m2Match[1];filled++;}
+  const feeMatch=txt.match(/(\d+)\s*%/);if(feeMatch&&(txt.includes('费率')||txt.includes('服务费'))){document.getElementById('bsServiceFeeRate').value=feeMatch[1];filled++;}
+  if(txt.includes('平电价')){const pm=txt.match(/平电价[：:]?\s*(\d+\.?\d*)/);if(pm){document.getElementById('bsPriceFlat').value=pm[1];filled++;}}
   bsCalcDemand();
   if(filled===0){alert(bsGetText('bs_no_result'));return;}
   bsGenerateSolution();
@@ -3911,10 +4042,12 @@ function bsCalcEconomics(params,equipmentList){
   const designFee=Math.round(equipmentTotal*0.05);
   const contingency=Math.round(equipmentTotal*0.03);
   const totalInvestment=equipmentTotal+installFee+designFee+contingency;
-  const annualElecCost=params.dailySwapDemand*365*params.batteryCapacity*0.8*params.priceValley/10000;
+  const annualDays=params.annualOpDays||330;
+  const annualElecCost=params.dailySwapDemand*annualDays*params.batteryCapacity*0.8*params.priceValley/10000;
   const annualOpCost=Math.round(totalInvestment*0.03+annualElecCost+20+totalInvestment/10);
-  const swapPricePerKwh=params.priceValley*1.2;
-  const annualRevenue=Math.round(params.dailySwapDemand*365*params.batteryCapacity*0.8*swapPricePerKwh/10000);
+  const feeRate=(params.serviceFeeRate||20)/100;
+  const swapPricePerKwh=params.priceValley*(1+feeRate);
+  const annualRevenue=Math.round(params.dailySwapDemand*annualDays*params.batteryCapacity*0.8*swapPricePerKwh/10000);
   const annualProfit=annualRevenue-annualOpCost;
   const paybackYears=annualProfit>0?Math.round(totalInvestment/annualProfit*10)/10:99;
   let irr=0;
@@ -3952,6 +4085,12 @@ function bsGenerateSolution(){
     projName:document.getElementById('bsProjName').value,
     region:document.getElementById('bsRegion').value,
     budget:parseFloat(document.getElementById('bsBudget').value),
+    serviceRadius:parseFloat(document.getElementById('bsServiceRadius').value)||5,
+    landArea:parseFloat(document.getElementById('bsLandArea').value)||0,
+    transformerCapacityOverride:parseFloat(document.getElementById('bsTransformerCapacity').value)||0,
+    serviceFeeRate:parseFloat(document.getElementById('bsServiceFeeRate').value)||20,
+    annualOpDays:parseFloat(document.getElementById('bsAnnualOpDays').value)||330,
+    priceFlat:parseFloat(document.getElementById('bsPriceFlat').value)||0.60,
     swapCycleMin:BS_VEHICLES.find(v=>v.id===document.getElementById('bsVehicleType').value)?.swapCycleMin||5,
     socMin:BS_VEHICLES.find(v=>v.id===document.getElementById('bsVehicleType').value)?.socMin||20
   };
@@ -3968,10 +4107,18 @@ function bsGenerateSolution(){
   const strategy=bsCalcChargingStrategy(params);
   const equipmentList=bsCalcEquipmentList(params);
   const economics=bsCalcEconomics(params,equipmentList);
+  const mechanical=bsCalcMechanicalDesign(params);
+  const electrical=bsCalcElectricalDesign(params,power);
+  const opsSchedule=bsCalcDemandForecast(params);
+  const socSchedule=bsCalcSocSchedule(params,strategy);
+  const inventory=bsCalcInventoryPlan(params,battery,rackResult);
+  const shiftPlan=bsCalcShiftPlan(params,opsSchedule);
   const warnings=[];
   if(throughput.capacityMargin<20) warnings.push(bsGetText('bs_strategy')+' '+bsGetText('bs_layout_safety_zone')+': <20%');
   if(economics.totalInvestment>params.budget) warnings.push(bsGetText('bs_budget')+': '+economics.totalInvestment+'>'+params.budget);
-  LAST_BS_RESULT={id:'BS-'+Date.now(),projectName:params.projName,region:params.region,vehicleId:params.vehicleId,vehicleName:params.vehicleName,stationType:params.stationType,inputParams:params,swapThroughput:throughput,chargingRack:rackResult,battery,powerCapacity:power,stationStructure:structure,swapProcess:process,chargingStrategy:strategy,equipmentList,economics,warnings};
+  if(rackResult.actualSlots>200) warnings.push(bsGetText('bs_swap_bay_count')+': '+rackResult.actualSlots+' >200');
+  if(battery.readyBatteryRate<30) warnings.push(bsGetText('bs_cycle_ready')+': '+battery.readyBatteryRate+'% <30%');
+  LAST_BS_RESULT={id:'BS-'+Date.now(),projectName:params.projName,region:params.region,vehicleId:params.vehicleId,vehicleName:params.vehicleName,stationType:params.stationType,inputParams:params,swapThroughput:throughput,chargingRack:rackResult,battery,powerCapacity:power,stationStructure:structure,swapProcess:process,chargingStrategy:strategy,equipmentList,economics,mechanical,electrical,opsSchedule,socSchedule,inventory,shiftPlan,warnings};
   document.getElementById('bsSuccessMsg').style.display='block';
   bsRenderBrief();
 }
@@ -3989,16 +4136,31 @@ function bsRenderBrief(){
     ['站内电池总数',r.battery.totalBatteries+'块'],['电池流转比',r.battery.turnoverRatio],
     ['峰值充电功率',r.powerCapacity.peakPower+'kW'],['变压器',r.powerCapacity.transformerCount+'×'+r.powerCapacity.transformerUnitCapacity+'kVA'],
     [L('bs_layout_total_area'),r.stationStructure.totalArea+'m²'],[L('bs_econ_investment'),r.economics.totalInvestment+'万元'],
-    [L('bs_econ_payback'),r.economics.paybackYears+'年'],['IRR',r.economics.irr+'%']
+    [L('bs_econ_payback'),r.economics.paybackYears+'年'],['IRR',r.economics.irr+'%'],
+    [L('bs_service_radius'),r.inputParams.serviceRadius+'km'],[L('bs_service_fee_rate'),r.inputParams.serviceFeeRate+'%']
   ];
   metrics.forEach(m=>{h+='<div style="padding:6px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">'+m[0]+'</span><br><b style="color:var(--text1)">'+m[1]+'</b></div>';});
   h+='</div>';
+  h+='</div>';
+  h+='<div style="margin-top:16px;background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  h+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_bom_in_brief">BOM设备清单</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--bg1)"><th style="padding:6px;text-align:left;color:var(--text2)">类别</th><th style="padding:6px;text-align:left;color:var(--text2)">设备名称</th><th style="padding:6px;text-align:right;color:var(--text2)">数量</th><th style="padding:6px;text-align:right;color:var(--text2)">小计(万元)</th></tr></thead><tbody>';
+  r.equipmentList.forEach(cat=>{
+    cat.items.forEach((it,idx)=>{
+      h+='<tr style="border-bottom:1px solid var(--border)">';
+      if(idx===0) h+='<td rowspan="'+cat.items.length+'" style="padding:6px;color:var(--text1);font-weight:600;vertical-align:top">'+L(cat.categoryKey)+'</td>';
+      h+='<td style="padding:6px;color:var(--text1)">'+it.name+'</td><td style="padding:6px;text-align:right;color:var(--text1)">'+it.quantity+it.unit+'</td><td style="padding:6px;text-align:right;color:var(--green);font-weight:600">'+it.subtotal+'</td></tr>';
+    });
+  });
+  h+='</tbody></table>';
+  h+='<button class="btn btn-primary" onclick="bsExportBomCsv()" style="margin-top:8px;font-size:11px;padding:6px 12px" data-i18n="bs_export_csv">导出CSV</button>';
+  h+='</div>';
   if(r.warnings.length>0){
     h+='<div style="margin-top:12px;padding:8px;border-radius:4px;background:rgba(239,159,39,.15);border:1px solid #EF9F27;font-size:11px;color:#EF9F27">';
+    h+='<div style="font-weight:600;margin-bottom:4px" data-i18n="bs_warning_title">警告信息</div>';
     r.warnings.forEach(w=>{h+='⚠ '+w+'<br>';});
     h+='</div>';
   }
-  h+='</div>';
   document.getElementById('bsSolutionBrief').innerHTML=h;
 }
 
@@ -4023,6 +4185,725 @@ function bsExportBomCsv(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BOM-'+LAST_BS_RESULT.id+'.csv';a.click();
 }
 
+const BS_MECH_TEMPLATES={
+  truck:{robot:{model:'6轴底置式换电机器人',axes:6,grabMethod:'底部抓取',stroke:2000,speed:1.5,trackType:'地轨'},lift:{method:'剪叉式升降',stroke:1800,ratedLoad:5000,speed:0.1,motorPower:15},alignment:{method:'激光+视觉',precision:2,time:8},transfer:{method:'滚筒输送',speed:0.5},safety:{type:'光幕+急停'}},
+  passenger:{robot:{model:'顶置式换电机器人',axes:4,grabMethod:'顶部吊装',stroke:1500,speed:2.0,trackType:'天轨'},lift:{method:'液压升降',stroke:1200,ratedLoad:800,speed:0.15,motorPower:7.5},alignment:{method:'视觉引导',precision:3,time:6},transfer:{method:'链条输送',speed:0.6},safety:{type:'光幕+急停+防撞'}},
+  two_wheel:{robot:{model:'抽屉式换电机构',axes:2,grabMethod:'侧推式',stroke:600,speed:1.0,trackType:'无'},lift:{method:'无',stroke:0,ratedLoad:30,speed:0,motorPower:0},alignment:{method:'机械定位',precision:5,time:3},transfer:{method:'推拉式',speed:0.3},safety:{type:'急停+温度'}}
+};
+const BS_MECH_EQUIPMENT={
+  swap:[
+    {id:'robot',name:'换电机器人',unitPrice:{truck:85,passenger:65,two_wheel:12},unit:'台',qtyPerBay:1},
+    {id:'lift',name:'升降机构',unitPrice:{truck:35,passenger:25,two_wheel:0},unit:'套',qtyPerBay:1},
+    {id:'alignment',name:'对位系统',unitPrice:{truck:18,passenger:15,two_wheel:5},unit:'套',qtyPerBay:1},
+    {id:'transfer',name:'转运系统',unitPrice:{truck:12,passenger:10,two_wheel:3},unit:'套',qtyPerBay:1},
+    {id:'safety',name:'安全防护',unitPrice:{truck:8,passenger:6,two_wheel:2},unit:'套',qtyPerBay:1}
+  ]
+};
+const BS_ELEC_TEMPLATES={
+  truck:{primary:{incoming:'10kV',hvSwitch:'KYN28-12',transformer:'SCB11-2000/10',lvPanel:'GCS',charger:'60kW×N',batteryBay:'仓位×N'},secondary:{protection:'差动+过流+速断',measurement:'有功+无功+功率因数',metering:'0.5S级关口表'},comm:{center:'EMS站控',bms:'CAN 2.0B',pcs:'Modbus TCP',robot:'Modbus TCP',plc:'Modbus RTU',charger:'CAN/Modbus',env:'RS485/硬接点'},grounding:{type:'TN-S',resistance:'≤4Ω',mainBus:'40×4铜排',downConductor:'2根φ12圆钢'}},
+  passenger:{primary:{incoming:'10kV',hvSwitch:'KYN28-12',transformer:'SCB11-1250/10',lvPanel:'GCS',charger:'30kW×N',batteryBay:'仓位×N'},secondary:{protection:'差动+过流+速断',measurement:'有功+无功+功率因数',metering:'0.5S级关口表'},comm:{center:'EMS站控',bms:'CAN 2.0B',pcs:'Modbus TCP',robot:'Modbus TCP',plc:'Modbus RTU',charger:'CAN/Modbus',env:'RS485/硬接点'},grounding:{type:'TN-S',resistance:'≤4Ω',mainBus:'30×4铜排',downConductor:'2根φ12圆钢'}},
+  two_wheel:{primary:{incoming:'0.4kV',hvSwitch:'无',transformer:'无',lvPanel:'GCS',charger:'2kW×N',batteryBay:'仓位×N'},secondary:{protection:'过流+漏电',measurement:'有功',metering:'1.0级'},comm:{center:'EMS站控',bms:'CAN 2.0B',pcs:'无',robot:'无',plc:'Modbus RTU',charger:'CAN',env:'RS485'},grounding:{type:'TT',resistance:'≤10Ω',mainBus:'25×4铜排',downConductor:'1根φ10圆钢'}}
+};
+const BS_POINT_TABLES={
+  bms:[
+    ['电池组SOC','CAN 2.0B','0x100+0','只读','UINT16','0-100%'],
+    ['电池组SOH','CAN 2.0B','0x100+2','只读','UINT16','0-100%'],
+    ['额定容量','CAN 2.0B','0x100+4','只读','UINT32','Ah'],
+    ['总电压','CAN 2.0B','0x100+8','只读','FP32','V'],
+    ['总电流','CAN 2.0B','0x100+12','只读','FP32','A'],
+    ['最高单体电压','CAN 2.0B','0x101+0','只读','FP32','V'],
+    ['最低单体电压','CAN 2.0B','0x101+4','只读','FP32','V'],
+    ['最高温度','CAN 2.0B','0x101+8','只读','FP32','℃'],
+    ['最低温度','CAN 2.0B','0x101+12','只读','FP32','℃'],
+    ['绝缘电阻','CAN 2.0B','0x102+0','只读','UINT32','kΩ'],
+    ['主接触器状态','CAN 2.0B','0x102+4','只读','BOOL','0断1合'],
+    ['预充接触器状态','CAN 2.0B','0x102+5','只读','BOOL','0断1合'],
+    ['充电接触器状态','CAN 2.0B','0x102+6','只读','BOOL','0断1合'],
+    ['放电接触器状态','CAN 2.0B','0x102+7','只读','BOOL','0断1合'],
+    ['故障等级','CAN 2.0B','0x103+0','只读','UINT8','0无1警2故'],
+    ['故障码','CAN 2.0B','0x103+2','只读','UINT16','HEX'],
+    ['均衡状态','CAN 2.0B','0x103+4','只读','UINT8','0关1充2放'],
+    ['单体电压组1','CAN 2.0B','0x200+0','只读','FP32×8','V'],
+    ['单体电压组2','CAN 2.0B','0x200+32','只读','FP32×8','V'],
+    ['温度组1','CAN 2.0B','0x300+0','只读','FP32×8','℃']
+  ],
+  pcs:[
+    ['运行状态','Modbus TCP','40001','Holding','UINT16','0停1运2故'],
+    ['运行模式','Modbus TCP','40002','Holding','R/W','UINT16','0待机1充2放'],
+    ['有功功率设定','Modbus TCP','40003','Holding','R/W','FP32','kW'],
+    ['无功功率设定','Modbus TCP','40005','Holding','R/W','FP32','kVar'],
+    ['有功功率','Modbus TCP','40010','Input','FP32','kW'],
+    ['无功功率','Modbus TCP','40012','Input','FP32','kVar'],
+    ['交流电压','Modbus TCP','40014','Input','FP32','V'],
+    ['交流电流','Modbus TCP','40016','Input','FP32','A'],
+    ['直流电压','Modbus TCP','40018','Input','FP32','V'],
+    ['直流电流','Modbus TCP','40020','Input','FP32','A'],
+    ['频率','Modbus TCP','40022','Input','FP32','Hz'],
+    ['机内温度','Modbus TCP','40024','Input','FP32','℃'],
+    ['故障码','Modbus TCP','40026','Input','UINT16','HEX'],
+    ['日充电量','Modbus TCP','40028','Input','FP32','kWh'],
+    ['日放电量','Modbus TCP','40030','Input','FP32','kWh']
+  ],
+  robot:[
+    ['运行状态','Modbus TCP','30001','Holding','UINT16','0待1运2故'],
+    ['X坐标','Modbus TCP','30002','Holding','R/W','FP32','mm'],
+    ['Y坐标','Modbus TCP','30004','Holding','R/W','FP32','mm'],
+    ['Z坐标','Modbus TCP','30006','Holding','R/W','FP32','mm'],
+    ['运动模式','Modbus TCP','30008','Holding','R/W','UINT16','0手1自'],
+    ['抓取状态','Modbus TCP','30010','Input','UINT16','0无1抓2放'],
+    ['锁止状态','Modbus TCP','30011','Input','UINT16','0开1锁'],
+    ['运动速度','Modbus TCP','30012','Holding','R/W','FP32','mm/s'],
+    ['当前工位','Modbus TCP','30014','Input','UINT16','编号'],
+    ['电池ID','Modbus TCP','30015','Input','UINT32','HEX'],
+    ['急停状态','Modbus TCP','30017','Input','BOOL','0正常1急停'],
+    ['故障码','Modbus TCP','30018','Input','UINT16','HEX'],
+    ['累计换电次数','Modbus TCP','30020','Input','UINT32','次'],
+    ['电机电流A','Modbus TCP','30022','Input','FP32','A'],
+    ['电机温度','Modbus TCP','30024','Input','FP32','℃']
+  ],
+  plc:[
+    ['升降位置','Modbus RTU','20001','Holding','R/W','UINT16','0底1顶'],
+    ['对位状态','Modbus RTU','20002','Input','UINT16','0未1已'],
+    ['安全光幕','Modbus RTU','20003','Input','BOOL','0通1断'],
+    ['急停按钮','Modbus RTU','20004','Input','BOOL','0正常1急停'],
+    ['转运电机状态','Modbus RTU','20005','Input','UINT16','0停1正2反'],
+    ['仓位占用','Modbus RTU','20006','Input','UINT16','bit位'],
+    ['运行模式','Modbus RTU','20007','Holding','R/W','UINT16','0手1自'],
+    ['升降速度','Modbus RTU','20008','Holding','R/W','FP32','mm/s'],
+    ['扫描周期','Modbus RTU','20010','Input','UINT16','ms'],
+    ['I/O输入状态','Modbus RTU','20011','Input','UINT16','bit位'],
+    ['I/O输出状态','Modbus RTU','20012','Holding','UINT16','bit位'],
+    ['故障码','Modbus RTU','20013','Input','UINT16','HEX'],
+    ['消防信号','Modbus RTU','20014','Input','BOOL','0正常1报警'],
+    ['温湿度','Modbus RTU','20015','Input','FP32×2','℃/%'],
+    ['门禁状态','Modbus RTU','20017','Input','BOOL','0关1开']
+  ],
+  ems:[
+    ['系统状态','内部','SYS:01','只读','UINT8','0停1运2故'],
+    ['调度模式','内部','SYS:02','R/W','UINT8','0手1自2优'],
+    ['总有功功率','内部','PWR:01','只读','FP32','kW'],
+    ['平均SOC','内部','BAT:01','只读','FP32','%'],
+    ['满电电池数','内部','BAT:02','只读','UINT16','块'],
+    ['充电中电池数','内部','BAT:03','只读','UINT16','块'],
+    ['活跃告警数','内部','ALM:01','只读','UINT16','条'],
+    ['今日换电次数','内部','OPS:01','只读','UINT16','次'],
+    ['调度计划版本','内部','SCH:01','只读','STRING','v1.x'],
+    ['最后指令时间','内部','CMD:01','只读','DATETIME','']
+  ],
+  charger:[
+    ['充电状态','CAN/Modbus','50001','Holding','UINT16','0待1充2满3故'],
+    ['输出电压','CAN/Modbus','50002','Input','FP32','V'],
+    ['输出电流','CAN/Modbus','50004','Input','FP32','A'],
+    ['输出功率','CAN/Modbus','50006','Input','FP32','kW'],
+    ['充电模式','CAN/Modbus','50008','Holding','R/W','UINT16','0恒压1恒流2涓流'],
+    ['电池SOC','CAN/Modbus','50010','Input','FP32','%'],
+    ['电池温度','CAN/Modbus','50012','Input','FP32','℃'],
+    ['充电时长','CAN/Modbus','50014','Input','UINT16','min'],
+    ['已充电量','CAN/Modbus','50016','Input','FP32','kWh'],
+    ['故障码','CAN/Modbus','50018','Input','UINT16','HEX'],
+    ['模块温度','CAN/Modbus','50020','Input','FP32','℃'],
+    ['风扇状态','CAN/Modbus','50022','Input','UINT8','0关1低2高']
+  ],
+  iec104:[
+    ['遥测-总有功','IEC104','13-1-1','M_ME_NC_1','只读','FP32','kW'],
+    ['遥测-总无功','IEC104','13-1-2','M_ME_NC_1','只读','FP32','kVar'],
+    ['遥测-频率','IEC104','13-1-3','M_ME_NC_1','只读','FP32','Hz'],
+    ['遥信-主开关','IEC104','13-2-1','M_SP_NA_1','只读','BOOL','0分1合'],
+    ['遥信-故障','IEC104','13-2-2','M_SP_NA_1','只读','BOOL','0正常1故障'],
+    ['遥控-开关合','IEC104','13-3-1','C_SC_NA_1','R/W','BOOL','合闸命令'],
+    ['遥控-开关分','IEC104','13-3-2','C_SC_NA_1','R/W','BOOL','分闸命令'],
+    ['遥调-功率设定','IEC104','13-4-1','C_SE_NC_1','R/W','FP32','kW']
+  ],
+  mqtt:[
+    ['遥测数据','MQTT','bss/{id}/telemetry','发布','JSON','2s周期'],
+    ['事件告警','MQTT','bss/{id}/event','发布','JSON','触发'],
+    ['调度指令','MQTT','bss/{id}/command','订阅','JSON','实时'],
+    ['限功率','MQTT','bss/{id}/limit','订阅','JSON','实时'],
+    ['心跳','MQTT','bss/{id}/heartbeat','发布','JSON','30s'],
+    ['OTA升级','MQTT','bss/{id}/ota','订阅','JSON','触发']
+  ]
+};
+const BS_FAULT_RULES=[
+  {id:'battery_no_charge',keywords:['不充电','无法充电','充不上','充电失败'],causes:['充电接触器未闭合或BMS锁止','充电模块输出异常或CAN通讯中断','电池SOC已达上限或温度保护'],rootCause:'BMS充电接触器状态={contactorMainPos}，充电模块输出={outputVoltage}V/{outputCurrent}A，电池SOC={soc}%温度={temp}℃',devices:['bms','charger'],suggestions:['检查BMS充电接触器是否闭合，确认CAN终端电阻120Ω','检查充电模块输出电压/电流，确认CAN通讯正常','确认电池SOC<95%且温度在-10~55℃范围内']},
+  {id:'robot_stuck',keywords:['机器人卡死','机器人不动','卡住','机器人故障'],causes:['轨道异物或机械卡阻','伺服驱动器故障或编码器异常','急停信号未复位'],rootCause:'机器人运行状态={runMode}，急停={estop}，电机电流={motorCurrent}A，故障码={faultCode}',devices:['robot'],suggestions:['检查轨道是否有异物，手动推车确认机械无卡阻','检查伺服驱动器故障码，确认编码器信号正常','确认急停按钮已复位，检查安全光幕状态']},
+  {id:'soc_abnormal_drop',keywords:['SOC异常','SOC下降快','掉电快','SOC跳变'],causes:['BMS采样校准漂移','单体电池内阻增大导致压降','绝缘故障导致漏电'],rootCause:'SOC={soc}%，SOH={soh}%，绝缘电阻={insulation}kΩ，最高温度={temp}℃',devices:['bms'],suggestions:['执行BMS SOC校准，确认采样精度','检查单体电压极差，内阻偏大的电池需更换','测量绝缘电阻，<100kΩ需排查漏电点']},
+  {id:'charging_power_low',keywords:['充电功率不足','充电慢','功率低','充电效率低'],causes:['充电模块功率受限或降额','电池温度保护降功率','电网电压偏低'],rootCause:'充电功率={outputPower}kW，模块温度={temp}℃，输出电压={outputVoltage}V',devices:['charger'],suggestions:['检查充电模块是否降额运行，确认散热正常','确认电池温度在允许范围内，温度保护阈值合理','测量电网电压，确认不低于额定电压-10%']},
+  {id:'swap_cycle_timeout',keywords:['换电超时','换电慢','循环超时','换电时间过长'],causes:['机器人运动速度降低或对位超时','升降机构卡阻或速度异常','通讯延迟导致指令响应慢'],rootCause:'机器人状态={runMode}，升降位置={liftPosition}，对位状态={alignStatus}',devices:['robot','plc'],suggestions:['检查机器人运动速度设置，确认无降速保护','检查升降机构润滑和电机状态','检查PLC扫描周期≤100ms，通讯延迟<500ms']},
+  {id:'comm_interrupt',keywords:['通讯中断','通信断','离线','连接失败'],causes:['CAN总线终端电阻缺失或总线短路','Modbus TCP连接超时或IP冲突','交换机端口故障或网线接触不良'],rootCause:'BMS通讯={bmsComm}，PCS通讯={pcsComm}，机器人通讯={robotComm}',devices:['ems'],suggestions:['检查CAN终端电阻120Ω，确认总线无短路','检查Modbus TCP超时≥2s，重试3次，确认IP无冲突','检查交换机端口指示灯，更换网线测试']}
+];
+const BS_SIMULATED_LOGS={
+  bms:{soc:75,soh:95,insulation:500,temp:35,faultCode:0,contactorMainPos:1,contactorPreCharge:0},
+  charger:{outputVoltage:560,outputCurrent:50,outputPower:28,status:1,faultCode:0,temp:42},
+  plc:{ioStatus:0xFF00,runMode:1,faultCode:0,liftPosition:1,alignStatus:1},
+  ems:{dispatchMode:2,activeAlarms:0,lastCommand:'charge_start',scheduleVersion:'v1.3'}
+};
+
+function bsCalcMechanicalDesign(params){
+  const stKey=params.stationType.replace('_station','');
+  const tpl=BS_MECH_TEMPLATES[stKey]||BS_MECH_TEMPLATES.truck;
+  return{robot:tpl.robot,lift:tpl.lift,alignment:tpl.alignment,transfer:tpl.transfer,safety:tpl.safety,swapBayCount:params.swapBayCount};
+}
+function bsCalcElectricalDesign(params,powerResult){
+  const stKey=params.stationType.replace('_station','');
+  const tpl=BS_ELEC_TEMPLATES[stKey]||BS_ELEC_TEMPLATES.truck;
+  return{primary:{...tpl.primary,transformer:powerResult.transformerCount+'×'+powerResult.transformerUnitCapacity+'kVA',charger:params.chargingPower+'kW×'+(params.rackSlots||4)},secondary:tpl.secondary,comm:tpl.comm,grounding:tpl.grounding,params:{transformerCapacity:powerResult.transformerCapacity,peakPower:powerResult.peakPower,chargerCount:params.rackSlots||4}};
+}
+function bsCalcDemandForecast(params){
+  const DEMAND_CURVES={
+    truck:[0.02,0.01,0.01,0.01,0.02,0.04,0.08,0.10,0.07,0.05,0.04,0.06,0.08,0.06,0.04,0.04,0.05,0.07,0.09,0.06,0.03,0.02,0.01,0.01],
+    passenger:[0.01,0.01,0.01,0.01,0.01,0.02,0.05,0.10,0.09,0.06,0.04,0.04,0.04,0.04,0.04,0.05,0.07,0.10,0.09,0.06,0.03,0.02,0.01,0.01],
+    two_wheel:[0.01,0.01,0.01,0.01,0.01,0.02,0.03,0.06,0.09,0.08,0.07,0.06,0.06,0.05,0.04,0.04,0.06,0.09,0.08,0.05,0.03,0.02,0.01,0.01]
+  };
+  const stKey=params.stationType.replace('_station','');
+  const curve=DEMAND_CURVES[stKey]||DEMAND_CURVES.truck;
+  const hourlyDemand=curve.map(c=>Math.round(params.dailySwapDemand*c*10)/10);
+  const peakHour=hourlyDemand.indexOf(Math.max(...hourlyDemand));
+  return{hourlyDemand,peakHour,totalDaily:params.dailySwapDemand};
+}
+function bsCalcSocSchedule(params,strategyResult){
+  const schedule=[];
+  for(let h=0;h<24;h++){
+    let priority='half_power';
+    if(h>=23||h<7) priority='full_power';
+    else if((h>=8&&h<11)||(h>=18&&h<21)) priority='minimum';
+    else if(h>=6&&h<8) priority='pre_charge';
+    const powerMap={full_power:1.0,pre_charge:0.8,half_power:0.5,minimum:0.15};
+    schedule.push({hour:h,priority,chargingPower:Math.round((params.rackSlots||4)*params.chargingPower*powerMap[priority])});
+  }
+  return schedule;
+}
+function bsCalcInventoryPlan(params,batteryResult,rackResult){
+  const total=batteryResult.totalBatteries;
+  const ready=Math.round(total*batteryResult.readyBatteryRate/100);
+  const charging=Math.round(total*batteryResult.rackUtilization/100);
+  const maintenance=Math.max(1,Math.round(total*0.02));
+  const backup=total-ready-charging-maintenance;
+  return{totalBatteries:total,readyBatteries:ready,chargingBatteries:charging,maintenanceBatteries:maintenance,backupBatteries:Math.max(0,backup)};
+}
+function bsCalcShiftPlan(params,opsResult){
+  const peakDemand=Math.max(...opsResult.hourlyDemand);
+  let shiftMode='one_shift',perShift=1;
+  if(peakDemand>8){shiftMode='three_shift';perShift=3;}
+  else if(peakDemand>4){shiftMode='two_shift';perShift=2;}
+  const minHour=opsResult.hourlyDemand.indexOf(Math.min(...opsResult.hourlyDemand));
+  return{shiftMode,perShift,maintenanceWindow:minHour+':00-'+((minHour+2)%24)+':00',robotMaintenance:'每周'+minHour+'时',chargerInspection:'每月1次'};
+}
+
+function bsRender3DLayoutSvg(containerId,data){
+  const c=document.getElementById(containerId);if(!c) return;
+  const st=data.stationStructure;const r=data.chargingRack;
+  let s='<svg viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
+  s+='<rect x="50" y="50" width="1100" height="600" rx="8" fill="none" stroke="#3a3e45" stroke-width="2" stroke-dasharray="8,4"/>';
+  s+='<text x="600" y="35" text-anchor="middle" fill="var(--text2)" font-size="12">换电站3D布局 (等轴测投影)</text>';
+  s+='<rect x="80" y="80" width="500" height="250" rx="4" fill="rgba(24,95,165,0.15)" stroke="#185FA5"/>';
+  s+='<text x="330" y="105" text-anchor="middle" fill="#185FA5" font-size="11" font-weight="600">换电车间</text>';
+  s+='<rect x="100" y="120" width="200" height="80" rx="4" fill="rgba(15,110,86,0.2)" stroke="#0F6E56"/>';
+  s+='<text x="200" y="165" text-anchor="middle" fill="#0F6E56" font-size="10">换电通道</text>';
+  s+='<rect x="320" y="120" width="240" height="180" rx="4" fill="rgba(232,168,56,0.15)" stroke="#e8a838"/>';
+  s+='<text x="440" y="145" text-anchor="middle" fill="#e8a838" font-size="10">充电架区域 ('+r.actualSlots+'仓位)</text>';
+  const cols=Math.ceil(r.actualSlots/r.rackStructure.layers);
+  for(let i=0;i<Math.min(cols,8);i++){
+    for(let j=0;j<r.rackStructure.layers;j++){
+      const x=335+i*28;const y=160+j*30;
+      s+='<rect x="'+x+'" y="'+y+'" width="22" height="24" rx="2" fill="rgba(232,168,56,0.3)" stroke="#e8a838" stroke-width="0.5"/>';
+    }
+  }
+  s+='<line x1="100" y1="210" x2="560" y2="210" stroke="#e8603a" stroke-width="3"/>';
+  s+='<text x="330" y="230" text-anchor="middle" fill="#e8603a" font-size="9">机器人轨道</text>';
+  s+='<rect x="80" y="350" width="250" height="120" rx="4" fill="rgba(239,159,39,0.15)" stroke="#EF9F27"/>';
+  s+='<text x="205" y="375" text-anchor="middle" fill="#EF9F27" font-size="10">配电室</text>';
+  s+='<rect x="80" y="490" width="200" height="80" rx="4" fill="rgba(83,74,183,0.15)" stroke="#534AB7"/>';
+  s+='<text x="180" y="535" text-anchor="middle" fill="#534AB7" font-size="10">监控室</text>';
+  s+='<rect x="650" y="80" width="480" height="540" rx="4" fill="rgba(80,200,120,0.08)" stroke="#50c878" stroke-dasharray="4,4"/>';
+  s+='<text x="890" y="105" text-anchor="middle" fill="#50c878" font-size="10">AGV通道 (虚线)</text>';
+  s+='<text x="600" y="680" text-anchor="middle" fill="var(--text1)" font-size="12" font-weight="600">总面积: '+st.totalArea+'m²</text>';
+  s+='</svg>';
+  c.innerHTML=s;
+}
+function bsRenderMotionTrailSvg(containerId,data){
+  const c=document.getElementById(containerId);if(!c) return;
+  let s='<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
+  s+='<text x="500" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">换电机器人运动轨迹 (俯视)</text>';
+  const pts=[{x:150,y:300,label:'待机位',color:'#50c878'},{x:400,y:300,label:'车辆底部',color:'#e06070'},{x:700,y:300,label:'充电架',color:'#4a90d9'}];
+  pts.forEach((p,i)=>{
+    s+='<circle cx="'+p.x+'" cy="'+p.y+'" r="30" fill="'+p.color+'" opacity="0.85"/>';
+    s+='<text x="'+p.x+'" y="'+(p.y+4)+'" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">'+p.label+'</text>';
+    if(i<pts.length-1){
+      const nx=pts[i+1].x;
+      s+='<line x1="'+(p.x+35)+'" y1="'+p.y+'" x2="'+(nx-35)+'" y2="'+(p.y)+'" stroke="#3a3e45" stroke-width="2" marker-end="url(#bs-arrow-motion)"/>';
+      const dist=Math.round((nx-p.x-70)*2);
+      s+='<text x="'+(p.x+nx)/2+'" y="'+(p.y-15)+'" text-anchor="middle" fill="var(--text2)" font-size="9">'+dist+'mm</text>';
+    }
+  });
+  s+='<path d="M735,300 Q800,200 150,300" fill="none" stroke="#185FA5" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#bs-arrow-motion)"/>';
+  s+='<text x="450" y="180" text-anchor="middle" fill="#185FA5" font-size="9">返回路径 (空载)</text>';
+  s+='<defs><marker id="bs-arrow-motion" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3a3e45"/></marker></defs>';
+  s+='</svg>';
+  c.innerHTML=s;
+}
+function bsRenderExplodedSvg(containerId,data){
+  const c=document.getElementById(containerId);if(!c) return;
+  let s='<svg viewBox="0 0 800 900" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
+  s+='<text x="400" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">换电站爆炸图</text>';
+  const layers=[
+    {label:'雨棚',color:'#534AB7',y:60},
+    {label:'换电通道',color:'#185FA5',y:200},
+    {label:'换电机器人',color:'#e8603a',y:340},
+    {label:'升降机构',color:'#e8a838',y:480},
+    {label:'充电架',color:'#0F6E56',y:620},
+    {label:'配电系统',color:'#EF9F27',y:760}
+  ];
+  layers.forEach((layer,i)=>{
+    s+='<rect x="200" y="'+layer.y+'" width="400" height="100" rx="8" fill="'+layer.color+'" opacity="0.15" stroke="'+layer.color+'" stroke-width="1.5"/>';
+    s+='<text x="400" y="'+(layer.y+55)+'" text-anchor="middle" fill="'+layer.color+'" font-size="13" font-weight="600">'+layer.label+'</text>';
+    if(i<layers.length-1){
+      s+='<line x1="350" y1="'+(layer.y+100)+'" x2="350" y2="'+(layers[i+1].y)+'" stroke="var(--text2)" stroke-width="1" stroke-dasharray="4,4"/>';
+      s+='<line x1="450" y1="'+(layer.y+100)+'" x2="450" y2="'+(layers[i+1].y)+'" stroke="var(--text2)" stroke-width="1" stroke-dasharray="4,4"/>';
+    }
+  });
+  s+='</svg>';
+  c.innerHTML=s;
+}
+function bsRenderMechBom(){
+  if(!LAST_BS_RESULT) return;
+  const mech=LAST_BS_RESULT.mechanical;
+  const stKey=LAST_BS_RESULT.stationType.replace('_station','');
+  let h='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  h+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_mech_bom">机械BOM</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--bg1)"><th style="padding:6px;text-align:left;color:var(--text2)">名称</th><th style="padding:6px;text-align:left;color:var(--text2)">型号</th><th style="padding:6px;text-align:right;color:var(--text2)">数量</th><th style="padding:6px;text-align:right;color:var(--text2)">单价(万)</th><th style="padding:6px;text-align:right;color:var(--text2)">小计(万)</th></tr></thead><tbody>';
+  BS_MECH_EQUIPMENT.swap.forEach(eq=>{
+    const qty=eq.qtyPerBay*mech.swapBayCount;
+    const price=eq.unitPrice[stKey]||eq.unitPrice.truck;
+    const subtotal=Math.round(price*qty*100)/100;
+    h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px;color:var(--text1)">'+eq.name+'</td><td style="padding:6px;color:var(--text2)">'+(mech[eq.id]?.model||'-')+'</td><td style="padding:6px;text-align:right;color:var(--text1)">'+qty+eq.unit+'</td><td style="padding:6px;text-align:right;color:var(--text1)">'+price+'</td><td style="padding:6px;text-align:right;color:var(--green);font-weight:600">'+subtotal+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  document.getElementById('bsMechBom').innerHTML=h;
+}
+function bsRenderMech(){
+  const empty=document.getElementById('bsMechEmpty');
+  const content=document.getElementById('bsMechContent');
+  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
+  empty.style.display='none';content.style.display='';
+  const mech=LAST_BS_RESULT.mechanical;
+  const L=bsGetText;
+  let ph='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;font-size:12px">';
+  const params=[
+    [L('bs_mech_robot'),mech.robot.model,mech.robot.axes+'轴/'+mech.robot.grabMethod],
+    [L('bs_mech_lift'),mech.lift.method,mech.lift.stroke+'mm/'+mech.lift.ratedLoad+'kg'],
+    [L('bs_mech_alignment'),mech.alignment.method,mech.alignment.precision+'mm/'+mech.alignment.time+'s'],
+    [L('bs_mech_transfer'),mech.transfer.method,mech.transfer.speed+'m/s'],
+    [L('bs_mech_safety'),mech.safety.type,'-']
+  ];
+  params.forEach(p=>{ph+='<div style="padding:8px;background:var(--bg2);border-radius:4px;border-left:3px solid #0F6E56"><div style="color:var(--text2);font-size:11px">'+p[0]+'</div><div style="color:var(--text1);font-weight:600">'+p[1]+'</div><div style="color:var(--text2);font-size:10px">'+p[2]+'</div></div>';});
+  ph+='</div>';
+  document.getElementById('bsMechParams').innerHTML=ph;
+  bsRender3DLayoutSvg('bs3DLayoutSvg',LAST_BS_RESULT);
+  bsRenderMotionTrailSvg('bsMotionTrailSvg',LAST_BS_RESULT);
+  bsRenderExplodedSvg('bsExplodedSvg',LAST_BS_RESULT);
+  bsRenderMechBom();
+}
+
+function bsRenderPrimaryDiagramSvg(containerId,data){
+  const c=document.getElementById(containerId);if(!c) return;
+  const elec=data.electrical;
+  let s='<svg viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
+  s+='<text x="600" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">电气一次图 (电力流向)</text>';
+  const nodes=[
+    {label:'10kV电网',color:'#4a90d9',detail:elec.primary.incoming},
+    {label:'高压开关柜',color:'#534AB7',detail:elec.primary.hvSwitch},
+    {label:'变压器',color:'#e8a838',detail:elec.primary.transformer},
+    {label:'低压配电柜',color:'#0F6E56',detail:elec.primary.lvPanel},
+    {label:'充电模块组',color:'#e06070',detail:elec.primary.charger},
+    {label:'电池仓',color:'#50c878',detail:elec.primary.batteryBay}
+  ];
+  nodes.forEach((n,i)=>{
+    const x=50+i*195;const y=100;
+    s+='<rect x="'+x+'" y="'+y+'" width="170" height="80" rx="8" fill="'+n.color+'" opacity="0.15" stroke="'+n.color+'" stroke-width="1.5"/>';
+    s+='<text x="'+(x+85)+'" y="'+(y+30)+'" text-anchor="middle" fill="'+n.color+'" font-size="12" font-weight="600">'+n.label+'</text>';
+    s+='<text x="'+(x+85)+'" y="'+(y+55)+'" text-anchor="middle" fill="var(--text1)" font-size="10">'+n.detail+'</text>';
+    if(i<nodes.length-1){
+      s+='<line x1="'+(x+170)+'" y1="'+(y+40)+'" x2="'+(x+195)+'" y2="'+(y+40)+'" stroke="#3a3e45" stroke-width="2" marker-end="url(#bs-arrow-elec)"/>';
+    }
+  });
+  s+='<rect x="50" y="250" width="1100" height="100" rx="8" fill="rgba(15,110,86,0.08)" stroke="#0F6E56" stroke-width="1"/>';
+  s+='<text x="600" y="275" text-anchor="middle" fill="#0F6E56" font-size="11" font-weight="600">保护配置</text>';
+  s+='<text x="600" y="300" text-anchor="middle" fill="var(--text1)" font-size="10">'+elec.secondary.protection+'</text>';
+  s+='<text x="600" y="320" text-anchor="middle" fill="var(--text2)" font-size="9">测控: '+elec.secondary.measurement+' | 计量: '+elec.secondary.metering+'</text>';
+  s+='<defs><marker id="bs-arrow-elec" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3a3e45"/></marker></defs>';
+  s+='</svg>';
+  c.innerHTML=s;
+}
+function bsRenderSecondaryDiagramSvg(containerId,data){
+  const c=document.getElementById(containerId);if(!c) return;
+  const elec=data.electrical;
+  let s='<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
+  s+='<text x="500" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">电气二次图</text>';
+  const blocks=[
+    {label:'差动保护',x:80,y:60,color:'#e06070',detail:'比率制动+差动速断'},
+    {label:'过流保护',x:80,y:180,color:'#e8a838',detail:'定时限+反时限'},
+    {label:'速断保护',x:80,y:300,color:'#534AB7',detail:'无时限电流速断'},
+    {label:'有功/无功测控',x:500,y:60,color:'#4a90d9',detail:'功率因数补偿'},
+    {label:'0.5S级计量',x:500,y:180,color:'#0F6E56',detail:'关口电能计量'}
+  ];
+  blocks.forEach(b=>{
+    s+='<rect x="'+b.x+'" y="'+b.y+'" width="400" height="90" rx="8" fill="'+b.color+'" opacity="0.15" stroke="'+b.color+'" stroke-width="1.5"/>';
+    s+='<text x="'+(b.x+200)+'" y="'+(b.y+35)+'" text-anchor="middle" fill="'+b.color+'" font-size="12" font-weight="600">'+b.label+'</text>';
+    s+='<text x="'+(b.x+200)+'" y="'+(b.y+60)+'" text-anchor="middle" fill="var(--text1)" font-size="10">'+b.detail+'</text>';
+  });
+  s+='</svg>';
+  c.innerHTML=s;
+}
+function bsRenderDistributionSvg(containerId,data){
+  const c=document.getElementById(containerId);if(!c) return;
+  let s='<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
+  s+='<text x="500" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">配电系统单线图</text>';
+  s+='<rect x="400" y="50" width="200" height="50" rx="4" fill="rgba(232,168,56,0.2)" stroke="#e8a838"/>';
+  s+='<text x="500" y="80" text-anchor="middle" fill="#e8a838" font-size="11" font-weight="600">变压器低压侧</text>';
+  s+='<line x1="500" y1="100" x2="500" y2="140" stroke="#3a3e45" stroke-width="2"/>';
+  s+='<rect x="420" y="140" width="160" height="40" rx="4" fill="rgba(224,96,112,0.2)" stroke="#e06070"/>';
+  s+='<text x="500" y="165" text-anchor="middle" fill="#e06070" font-size="10">主断路器</text>';
+  s+='<line x1="500" y1="180" x2="500" y2="210" stroke="#3a3e45" stroke-width="2"/>';
+  s+='<line x1="200" y1="210" x2="800" y2="210" stroke="#3a3e45" stroke-width="3"/>';
+  s+='<text x="500" y="230" text-anchor="middle" fill="var(--text2)" font-size="9">母线</text>';
+  const circuits=[
+    {label:'充电模块',x:250,color:'#0F6E56',cap:'60kW×N'},
+    {label:'照明',x:400,color:'#4a90d9',cap:'10kW'},
+    {label:'空调',x:550,color:'#534AB7',cap:'30kW'},
+    {label:'消防',x:700,color:'#e06070',cap:'15kW'}
+  ];
+  circuits.forEach(ct=>{
+    s+='<line x1="'+ct.x+'" y1="210" x2="'+ct.x+'" y2="270" stroke="#3a3e45" stroke-width="1.5"/>';
+    s+='<rect x="'+(ct.x-50)+'" y="270" width="100" height="60" rx="4" fill="'+ct.color+'" opacity="0.15" stroke="'+ct.color+'"/>';
+    s+='<text x="'+ct.x+'" y="295" text-anchor="middle" fill="'+ct.color+'" font-size="10">'+ct.label+'</text>';
+    s+='<text x="'+ct.x+'" y="315" text-anchor="middle" fill="var(--text2)" font-size="9">'+ct.cap+'</text>';
+  });
+  s+='</svg>';
+  c.innerHTML=s;
+}
+function bsRenderCommTopologySvg(containerId,data){
+  const c=document.getElementById(containerId);if(!c) return;
+  const elec=data.electrical;
+  let s='<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
+  s+='<text x="400" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">通讯网络拓扑</text>';
+  s+='<circle cx="400" cy="300" r="60" fill="rgba(15,110,86,0.2)" stroke="#0F6E56" stroke-width="2"/>';
+  s+='<text x="400" y="295" text-anchor="middle" fill="#0F6E56" font-size="11" font-weight="600">EMS</text>';
+  s+='<text x="400" y="312" text-anchor="middle" fill="#0F6E56" font-size="9">站控系统</text>';
+  const devices=[
+    {label:'BMS',proto:'CAN 2.0B',angle:-90,color:'#4a90d9'},
+    {label:'PCS',proto:'Modbus TCP',angle:-30,color:'#e8a838'},
+    {label:'机器人',proto:'Modbus TCP',angle:30,color:'#e06070'},
+    {label:'PLC',proto:'Modbus RTU',angle:90,color:'#534AB7'},
+    {label:'充电模块',proto:'CAN/Modbus',angle:150,color:'#50c878'},
+    {label:'消防环境',proto:'RS485',angle:210,color:'#EF9F27'}
+  ];
+  devices.forEach((d,i)=>{
+    const rad=d.angle*Math.PI/180;
+    const nx=400+200*Math.cos(rad);const ny=300+200*Math.sin(rad);
+    s+='<circle cx="'+nx+'" cy="'+ny+'" r="40" fill="'+d.color+'" opacity="0.85"/>';
+    s+='<text x="'+nx+'" y="'+(ny-3)+'" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">'+d.label+'</text>';
+    s+='<text x="'+nx+'" y="'+(ny+12)+'" text-anchor="middle" fill="#fff" font-size="8">'+d.proto+'</text>';
+    s+='<line x1="'+(400+60*Math.cos(rad))+'" y1="'+(300+60*Math.sin(rad))+'" x2="'+(nx-40*Math.cos(rad))+'" y2="'+(ny-40*Math.sin(rad))+'" stroke="var(--text2)" stroke-width="1.5"/>';
+  });
+  s+='</svg>';
+  c.innerHTML=s;
+}
+function bsRenderGroundingSvg(containerId,data){
+  const c=document.getElementById(containerId);if(!c) return;
+  const elec=data.electrical;
+  let s='<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
+  s+='<text x="400" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">接地系统图</text>';
+  s+='<rect x="100" y="60" width="600" height="350" rx="8" fill="rgba(15,110,86,0.08)" stroke="#0F6E56" stroke-dasharray="6,4"/>';
+  s+='<text x="400" y="85" text-anchor="middle" fill="#0F6E56" font-size="11" font-weight="600">接地网</text>';
+  s+='<line x1="150" y1="120" x2="650" y2="120" stroke="#0F6E56" stroke-width="3"/>';
+  s+='<text x="400" y="140" text-anchor="middle" fill="#0F6E56" font-size="10">主接地母线: '+elec.grounding.mainBus+'</text>';
+  for(let i=0;i<5;i++){
+    const x=200+i*100;
+    s+='<line x1="'+x+'" y1="120" x2="'+x+'" y2="200" stroke="#0F6E56" stroke-width="1.5"/>';
+    s+='<circle cx="'+x+'" cy="210" r="8" fill="#0F6E56" opacity="0.6"/>';
+    s+='<text x="'+x+'" y="235" text-anchor="middle" fill="var(--text2)" font-size="8">接地极</text>';
+  }
+  s+='<rect x="200" y="270" width="180" height="60" rx="4" fill="rgba(232,168,56,0.15)" stroke="#e8a838"/>';
+  s+='<text x="290" y="295" text-anchor="middle" fill="#e8a838" font-size="10">等电位连接</text>';
+  s+='<text x="290" y="315" text-anchor="middle" fill="var(--text2)" font-size="9">引下线: '+elec.grounding.downConductor+'</text>';
+  s+='<rect x="450" y="270" width="180" height="60" rx="4" fill="rgba(224,96,112,0.15)" stroke="#e06070"/>';
+  s+='<text x="540" y="295" text-anchor="middle" fill="#e06070" font-size="10">接地类型: '+elec.grounding.type+'</text>';
+  s+='<text x="540" y="315" text-anchor="middle" fill="var(--text2)" font-size="9">接地电阻: '+elec.grounding.resistance+'</text>';
+  s+='</svg>';
+  c.innerHTML=s;
+}
+function bsRenderElec(){
+  const empty=document.getElementById('bsElecEmpty');
+  const content=document.getElementById('bsElecContent');
+  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
+  empty.style.display='none';content.style.display='';
+  bsRenderPrimaryDiagramSvg('bsPrimarySvg',LAST_BS_RESULT);
+  bsRenderSecondaryDiagramSvg('bsSecondarySvg',LAST_BS_RESULT);
+  bsRenderDistributionSvg('bsDistributionSvg',LAST_BS_RESULT);
+  bsRenderCommTopologySvg('bsCommSvg',LAST_BS_RESULT);
+  bsRenderGroundingSvg('bsGroundingSvg',LAST_BS_RESULT);
+  const elec=LAST_BS_RESULT.electrical;
+  const L=bsGetText;
+  let h='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  h+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_elec_params">电气参数汇总</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">';
+  const params=[
+    ['变压器容量',elec.params.transformerCapacity+'kVA'],['峰值功率',elec.params.peakPower+'kW'],['充电模块数',elec.params.chargerCount+'个'],
+    ['高压开关柜',elec.primary.hvSwitch],['低压配电柜',elec.primary.lvPanel],['接地类型',elec.grounding.type],
+    ['接地电阻',elec.grounding.resistance],['保护配置',elec.secondary.protection],['计量',elec.secondary.metering]
+  ];
+  params.forEach(p=>{h+='<div style="padding:6px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">'+p[0]+'</span><br><b style="color:var(--text1)">'+p[1]+'</b></div>';});
+  h+='</div></div>';
+  document.getElementById('bsElecParams').innerHTML=h;
+}
+
+function bsShowPtTab(key){
+  document.querySelectorAll('#page-bs-proto .sw-tab').forEach(t=>t.classList.remove('active'));
+  const tabMap={bms:0,pcs:1,robot:2,plc:3,ems:4,charger:5,iec104:6,mqtt:7};
+  const tabs=document.querySelectorAll('#page-bs-proto .sw-tab');
+  if(tabMap[key]!==undefined&&tabs[tabMap[key]]) tabs[tabMap[key]].classList.add('active');
+  if(!LAST_BS_RESULT) return;
+  document.getElementById('bsProtoEmpty').style.display='none';
+  document.getElementById('bsProtoContent').style.display='';
+  bsRenderPtTable(key);
+}
+function bsRenderPtTable(key){
+  const data=BS_POINT_TABLES[key];
+  if(!data) return;
+  let h='<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:var(--bg2)"><th style="padding:6px;text-align:left;color:var(--text2)">信号名称</th><th style="padding:6px;text-align:left;color:var(--text2)">协议</th><th style="padding:6px;text-align:left;color:var(--text2)">地址/主题</th><th style="padding:6px;text-align:left;color:var(--text2)">寄存器类型</th><th style="padding:6px;text-align:left;color:var(--text2)">R/W</th><th style="padding:6px;text-align:left;color:var(--text2)">数据类型</th><th style="padding:6px;text-align:left;color:var(--text2)">说明</th></tr></thead><tbody>';
+  data.forEach(row=>{
+    h+='<tr style="border-bottom:1px solid var(--border)">';
+    row.forEach((cell,i)=>{h+='<td style="padding:4px 6px;color:'+(i===0?'var(--text1)':'var(--text2)')+'">'+cell+'</td>';});
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  document.getElementById('bsPointTableContent').innerHTML=h;
+  bsRenderDebugChecklist();
+}
+function bsRenderDebugChecklist(){
+  const items=[
+    'BMS点表配置完整，CAN终端电阻120Ω已标注',
+    'PCS写寄存器有模式/权限/闭锁校验',
+    '机器人急停使用硬接点+通信双通道',
+    'PLC I/O点地址无冲突，扫描周期≤100ms',
+    'EMS充电限功率可覆盖充电模块输出',
+    'Modbus TCP超时≥2s，重试3次',
+    'IEC104总召功能正常，SOE时标同步',
+    'MQTT断线重连+遗嘱消息配置',
+    '换电机器人坐标系统与PLC坐标一致',
+    '消防急停硬接线联跳PCS+机器人'
+  ];
+  let h='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  h+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_proto_checklist">联调检查清单</div>';
+  items.forEach((item,i)=>{
+    h+='<label class="ck-label" style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;color:var(--text1)"><input type="checkbox" class="ck-group"'+(i<3?' checked':'')+'> '+item+'</label>';
+  });
+  h+='</div>';
+  document.getElementById('bsDebugChecklist').innerHTML=h;
+}
+
+function bsRenderDemandCurveSvg(containerId,data){
+  const c=document.getElementById(containerId);if(!c) return;
+  const W=1000,H=400,padL=60,padR=20,padT=30,padB=40;
+  const chartW=W-padL-padR,chartH=H-padT-padB;
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
+  const periods=[{from:0,to:7,color:'rgba(15,110,86,0.15)',label:'谷'},{from:7,to:8,color:'rgba(239,159,39,0.1)',label:'平'},{from:8,to:11,color:'rgba(224,96,112,0.12)',label:'峰'},{from:11,to:18,color:'rgba(239,159,39,0.1)',label:''},{from:18,to:21,color:'rgba(224,96,112,0.12)',label:''},{from:21,to:23,color:'rgba(239,159,39,0.1)',label:''},{from:23,to:24,color:'rgba(15,110,86,0.15)',label:''}];
+  periods.forEach(p=>{
+    const x1=padL+p.from/24*chartW;const x2=padL+p.to/24*chartW;
+    s+='<rect x="'+x1+'" y="'+padT+'" width="'+(x2-x1)+'" height="'+chartH+'" fill="'+p.color+'"/>';
+    if(p.label) s+='<text x="'+(x1+(x2-x1)/2)+'" y="'+(padT+14)+'" text-anchor="middle" fill="var(--text2)" font-size="8">'+p.label+'</text>';
+  });
+  s+='<line x1="'+padL+'" y1="'+(padT+chartH)+'" x2="'+(padL+chartW)+'" y2="'+(padT+chartH)+'" stroke="var(--text2)" stroke-width="1"/>';
+  s+='<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(padT+chartH)+'" stroke="var(--text2)" stroke-width="1"/>';
+  const peakDemand=Math.max(...data.hourlyDemand,1);
+  let pathD='';
+  data.hourlyDemand.forEach((d,i)=>{
+    const x=padL+(i+0.5)/24*chartW;const y=padT+chartH-d/peakDemand*chartH;
+    pathD+=(i===0?'M':'L')+x+','+y;
+  });
+  s+='<path d="'+pathD+'" fill="none" stroke="#185FA5" stroke-width="2"/>';
+  for(let h=0;h<24;h+=3){const x=padL+(h+0.5)/24*chartW;s+='<text x="'+x+'" y="'+(padT+chartH+14)+'" text-anchor="middle" fill="var(--text2)" font-size="8">'+h+'h</text>';}
+  s+='<text x="'+(padL-10)+'" y="'+(padT+chartH/2)+'" text-anchor="middle" fill="var(--text2)" font-size="9" transform="rotate(-90,'+(padL-10)+','+(padT+chartH/2)+')">次/h</text>';
+  s+='</svg>';
+  c.innerHTML=s;
+}
+function bsRenderOps(){
+  const empty=document.getElementById('bsOpsEmpty');
+  const content=document.getElementById('bsOpsContent');
+  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
+  empty.style.display='none';content.style.display='';
+  const L=bsGetText;
+  bsRenderDemandCurveSvg('bsDemandCurveSvg',LAST_BS_RESULT.opsSchedule);
+  let sh='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  sh+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_ops_soc_schedule">SOC调度计划</div>';
+  sh+='<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:var(--bg1)"><th style="padding:4px;color:var(--text2)">时段</th><th style="padding:4px;color:var(--text2)">优先级</th><th style="padding:4px;color:var(--text2)">充电功率(kW)</th></tr></thead><tbody>';
+  LAST_BS_RESULT.socSchedule.forEach(s=>{
+    const pColor=s.priority==='full_power'?'#50c878':s.priority==='minimum'?'#e06070':s.priority==='pre_charge'?'#4a90d9':'#e8a838';
+    sh+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:4px;color:var(--text1)">'+s.hour+':00</td><td style="padding:4px;color:'+pColor+'">'+s.priority+'</td><td style="padding:4px;color:var(--text1)">'+s.chargingPower+'</td></tr>';
+  });
+  sh+='</tbody></table></div>';
+  document.getElementById('bsSocSchedule').innerHTML=sh;
+  const inv=LAST_BS_RESULT.inventory;
+  let ih='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  ih+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_ops_inventory">电池库存计划</div>';
+  ih+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;font-size:12px">';
+  [[L('bs_cycle_ready'),inv.readyBatteries,'#50c878'],['充电中',inv.chargingBatteries,'#e8a838'],['待维护',inv.maintenanceBatteries,'#e06070'],['备用',inv.backupBatteries,'#4a90d9'],['总计',inv.totalBatteries,'var(--text1)']].forEach(m=>{
+    ih+='<div style="padding:8px;background:var(--bg1);border-radius:4px;border-left:3px solid '+m[2]+'"><span style="color:var(--text2)">'+m[0]+'</span><br><b style="color:var(--text1)">'+m[1]+'块</b></div>';
+  });
+  ih+='</div></div>';
+  document.getElementById('bsInventoryPlan').innerHTML=ih;
+  const sp=LAST_BS_RESULT.shiftPlan;
+  let sph='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  sph+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_ops_shift">排班计划</div>';
+  sph+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">';
+  [['排班模式',sp.shiftMode],['每班人数',sp.perShift+'人'],['维护窗口',sp.maintenanceWindow]].forEach(m=>{
+    sph+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">'+m[0]+'</span><br><b style="color:var(--text1)">'+m[1]+'</b></div>';
+  });
+  sph+='</div></div>';
+  document.getElementById('bsShiftPlan').innerHTML=sph;
+}
+
+function bsRenderTradingInit(){
+  if(!LAST_BS_RESULT) return;
+  document.getElementById('bsTradeEmpty').style.display='none';
+  document.getElementById('bsTradeContent').style.display='';
+  const r=LAST_BS_RESULT;
+  const totalCapacity=Math.round(r.battery.totalBatteries*r.inputParams.batteryCapacity/1000*100)/100;
+  const dispatchCapacity=Math.round(r.chargingRack.actualSlots*r.inputParams.batteryCapacity/1000*100)/100;
+  const peakPowerMW=Math.round(r.powerCapacity.peakPower/1000*100)/100;
+  let h='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">';
+  h+='<div style="padding:12px;background:var(--bg2);border-radius:8px;border-left:3px solid #4a90d9"><span style="color:var(--text2)">总储能容量</span><br><b style="color:var(--text1);font-size:16px">'+totalCapacity+'</b> <span style="color:var(--text2)">MWh</span></div>';
+  h+='<div style="padding:12px;background:var(--bg2);border-radius:8px;border-left:3px solid #0F6E56"><span style="color:var(--text2)">可调度容量</span><br><b style="color:var(--text1);font-size:16px">'+dispatchCapacity+'</b> <span style="color:var(--text2)">MWh</span></div>';
+  h+='<div style="padding:12px;background:var(--bg2);border-radius:8px;border-left:3px solid #e8a838"><span style="color:var(--text2)">峰值功率</span><br><b style="color:var(--text1);font-size:16px">'+peakPowerMW+'</b> <span style="color:var(--text2)">MW</span></div>';
+  h+='</div>';
+  document.getElementById('bsTradeCapacity').innerHTML=h;
+}
+function bsGenerateTrading(){
+  if(!LAST_BS_RESULT) return;
+  const r=LAST_BS_RESULT;
+  const dispatchCapacity=r.chargingRack.actualSlots*r.inputParams.batteryCapacity/1000;
+  const peakPowerMW=r.powerCapacity.peakPower/1000;
+  const pricePeak=parseFloat(document.getElementById('bsTradePricePeak').value)||0.85;
+  const priceValley=parseFloat(document.getElementById('bsTradePriceValley').value)||0.35;
+  const doArbitrage=document.getElementById('bsTradeArbitrage').checked;
+  const doDR=document.getElementById('bsTradeDR').checked;
+  const doVPP=document.getElementById('bsTradeVPP').checked;
+  const doSpot=document.getElementById('bsTradeSpot').checked;
+  const doAncillary=document.getElementById('bsTradeAncillary').checked;
+  const doDemandResp=document.getElementById('bsTradeDemandResp').checked;
+  const strategies=[];
+  if(doArbitrage){const rev=Math.round(dispatchCapacity*0.8*0.92*(pricePeak-priceValley)*1000*365/10000);strategies.push({market:'峰谷套利',annual:rev,desc:'谷充峰放，日2循环，效率92%'});}
+  if(doDR){const rev=Math.round(peakPowerMW*0.3*2.5*12/10)/10;strategies.push({market:'需求响应',annual:rev,desc:'峰值削减30%，补偿2.5万元/MW/月'});}
+  if(doVPP){const rev=Math.round(dispatchCapacity*0.5*12+peakPowerMW*8)/10;strategies.push({market:'VPP聚合',annual:rev,desc:'容量补偿+调频收益'});}
+  if(doSpot){const rev=Math.round(dispatchCapacity*0.35*330*0.3/10)/10;strategies.push({market:'电力现货',annual:rev,desc:'日内套利35%可用容量'});}
+  if(doAncillary){const rev=Math.round(dispatchCapacity*0.5*0.008*330/10)/10;strategies.push({market:'辅助服务',annual:rev,desc:'AGC调频0.8%里程'});}
+  if(doDemandResp){const rev=Math.round(peakPowerMW*0.2*1.5*6/10)/10;strategies.push({market:'需量管理',annual:rev,desc:'降低基本电费20%'});}
+  let sh='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  sh+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px">交易策略</div>';
+  sh+='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--bg1)"><th style="padding:6px;text-align:left;color:var(--text2)">市场类型</th><th style="padding:6px;text-align:right;color:var(--text2)">年收益(万元)</th><th style="padding:6px;text-align:left;color:var(--text2)">策略描述</th></tr></thead><tbody>';
+  strategies.forEach(st=>{sh+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px;color:var(--text1)">'+st.market+'</td><td style="padding:6px;text-align:right;color:var(--green);font-weight:600">'+st.annual+'</td><td style="padding:6px;color:var(--text2)">'+st.desc+'</td></tr>';});
+  sh+='</tbody></table></div>';
+  document.getElementById('bsTradingStrategy').innerHTML=sh;
+  const total=strategies.reduce((s,st)=>s+st.annual,0);
+  let eh='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  eh+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px">收益汇总</div>';
+  eh+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px">';
+  let cum=0;
+  strategies.forEach((st,i)=>{cum+=st.annual;eh+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">'+(i+1)+'种市场</span><br><b style="color:var(--green)">'+cum+'万/年</b></div>';});
+  eh+='</div></div>';
+  document.getElementById('bsTradingEcon').innerHTML=eh;
+}
+
+let bsTwin3D=null;
+function bsTwinInit(){
+  const outer=document.getElementById('bsTwinOuter');
+  const iframe=document.getElementById('bsTwinIframe');
+  const noData=document.getElementById('bsTwinNoData');
+  if(!outer||!iframe) return;
+  if(!LAST_BS_RESULT){if(noData) noData.style.display='';iframe.style.display='none';return;}
+  if(noData) noData.style.display='none';
+  iframe.style.display='';
+  if(!bsTwin3D&&iframe.contentWindow){
+    const data={type:'bss-update',data:{soc:LAST_BS_RESULT.battery.readyBatteryRate,swapBayStatus:'idle',rackSlots:LAST_BS_RESULT.chargingRack.actualSlots,robotStatus:'standby',vehicleStatus:'none',chargingPower:LAST_BS_RESULT.powerCapacity.peakPower,totalPower:LAST_BS_RESULT.powerCapacity.peakPower}};
+    iframe.contentWindow.postMessage(data,'*');
+  }
+  bsTwin3D=true;
+}
+function bsTwinCamPreset(preset){
+  bsTwinInit();
+  const iframe=document.getElementById('bsTwinIframe');
+  if(iframe&&iframe.contentWindow) iframe.contentWindow.postMessage({type:'bss-cam-preset',preset},'*');
+}
+
+function bsAiDiagnose(){
+  const q=document.getElementById('bsAiOpsInput').value.trim();
+  if(!q) return;
+  const rule=bsMatchFaultRule(q);
+  if(!rule){
+    document.getElementById('bsAiOpsResult').innerHTML='<div style="padding:12px;background:var(--bg2);border-radius:8px;color:var(--text2);font-size:12px">暂无法自动诊断该故障，建议联系设备厂商技术支持</div>';
+    return;
+  }
+  bsRenderDiagnosis(rule);
+}
+function bsMatchFaultRule(question){
+  for(const rule of BS_FAULT_RULES){
+    if(rule.keywords.some(kw=>question.includes(kw))) return rule;
+  }
+  return null;
+}
+function bsRenderDiagnosis(rule){
+  const logs={...BS_SIMULATED_LOGS};
+  let rootText=rule.rootCause;
+  Object.keys(logs).forEach(dev=>{
+    Object.keys(logs[dev]).forEach(k=>{
+      rootText=rootText.replace(new RegExp('\\{'+k+'\\}','g'),logs[dev][k]);
+    });
+  });
+  let h='<div style="display:grid;gap:12px">';
+  h+='<div style="padding:12px;border-radius:8px;border:1px solid #4a90d9;background:rgba(74,144,217,0.08)"><div style="font-weight:600;color:#4a90d9;margin-bottom:6px" data-i18n="bs_aiops_phenomenon">故障现象</div><div style="font-size:12px;color:var(--text1)">'+rule.keywords.join(' / ')+'</div></div>';
+  h+='<div style="padding:12px;border-radius:8px;border:1px solid #e8a838;background:rgba(232,168,56,0.08)"><div style="font-weight:600;color:#e8a838;margin-bottom:6px" data-i18n="bs_aiops_causes">可能原因</div><div style="font-size:12px;color:var(--text1)">';
+  rule.causes.forEach((c,i)=>{h+='<div style="margin-bottom:4px">'+(i+1)+'. '+c+'</div>';});
+  h+='</div></div>';
+  h+='<div style="padding:12px;border-radius:8px;border:1px solid #e06070;background:rgba(224,96,112,0.08)"><div style="font-weight:600;color:#e06070;margin-bottom:6px" data-i18n="bs_aiops_root_cause">根因分析</div><div style="font-size:12px;color:var(--text1)">'+rootText+'</div></div>';
+  h+='<div style="padding:12px;border-radius:8px;border:1px solid #50c878;background:rgba(80,200,120,0.08)"><div style="font-weight:600;color:#50c878;margin-bottom:6px" data-i18n="bs_aiops_suggestion">修复建议</div><div style="font-size:12px;color:var(--text1)">';
+  rule.suggestions.forEach((s,i)=>{h+='<div style="margin-bottom:4px">'+(i+1)+'. '+s+'</div>';});
+  h+='</div></div></div>';
+  document.getElementById('bsAiOpsResult').innerHTML=h;
+}
+function bsRenderDeviceStatus(){
+  const devices=[
+    {name:'BMS',status:'正常',count:1,color:'#50c878'},
+    {name:'充电模块',status:'运行中',count:1,color:'#50c878'},
+    {name:'换电机器人',status:'待机',count:1,color:'#e8a838'},
+    {name:'PLC',status:'运行中',count:1,color:'#50c878'},
+    {name:'EMS',status:'运行中',count:1,color:'#50c878'},
+    {name:'消防环境',status:'正常',count:1,color:'#50c878'}
+  ];
+  let h='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  h+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_aiops_device_status">设备状态</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">';
+  devices.forEach(d=>{
+    h+='<div style="padding:8px;background:var(--bg1);border-radius:4px;display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:'+d.color+';display:inline-block"></span><span style="color:var(--text1)">'+d.name+'</span><span style="color:var(--text2);margin-left:auto">'+d.status+'</span></div>';
+  });
+  h+='</div></div>';
+  document.getElementById('bsDeviceStatus').innerHTML=h;
+}
+function bsRenderAiOps(){
+  const empty=document.getElementById('bsAiOpsEmpty');
+  const content=document.getElementById('bsAiOpsContent');
+  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
+  empty.style.display='none';content.style.display='';
+  let fh='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:12px">';
+  BS_FAULT_RULES.forEach(rule=>{
+    fh+='<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="document.getElementById(\'bsAiOpsInput\').value=\''+rule.keywords[0]+'\';bsAiDiagnose()">';
+    fh+='<div style="font-weight:600;color:var(--text1);margin-bottom:4px">'+rule.id.replace(/_/g,' ').toUpperCase()+'</div>';
+    fh+='<div style="color:var(--text2)">'+rule.keywords.join(' / ')+'</div>';
+    fh+='</div>';
+  });
+  fh+='</div>';
+  document.getElementById('bsFaultQuickList').innerHTML=fh;
+  bsRenderDeviceStatus();
+}
 
 function showSwSub(id){
   document.querySelectorAll('.sw-sub-content').forEach(t=>t.style.display='none');
