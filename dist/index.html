@@ -1563,6 +1563,16 @@ ACC AC一体柜专题
 <div class="form-group"><label class="form-label" data-i18n="bs_annual_op_days">年运营天数(天)</label><input type="number" class="form-input" id="bsAnnualOpDays" value="330" min="300" max="365"></div>
 <div class="form-group"><label class="form-label" data-i18n="bs_price_flat">平电价(元/kWh)</label><input type="number" class="form-input" id="bsPriceFlat" value="0.60" step="0.01"></div>
 </div>
+<div class="form-row" style="margin-bottom:4px">
+<div class="form-group"><label class="form-label" data-i18n="llm_provider">AI模型</label>
+    <select class="form-input" id="bsLlmProvider">
+      <option value="local" data-i18n="llm_local">本地模型引擎</option>
+      <option value="deepseek" data-i18n="llm_deepseek">DeepSeek V4</option>
+      <option value="glm" data-i18n="llm_glm">GLM-5.2 (智谱)</option>
+      <option value="bailian" data-i18n="llm_bailian">Qwen3.7-Max (阿里百炼)</option>
+    </select>
+  </div>
+</div>
 </div>
 </div>
 <button class="btn btn-primary" onclick="bsGenerateSolution()" data-i18n="bs_gen_btn" style="width:100%;padding:12px;font-size:14px;margin-bottom:16px">生成换电方案</button>
@@ -6541,7 +6551,8 @@ function getLangInstruction(){
 }
 
 async function callLLM(messages, useStream, providerOverride) {
-  const provider = providerOverride || document.getElementById('llmProvider').value;
+  const bsEl=document.getElementById('bsLlmProvider');
+  const provider = providerOverride || (bsEl&&bsEl.closest('#page-bs-design')&&document.getElementById('page-bs-design').style.display!=='none'?bsEl.value:null) || document.getElementById('llmProvider').value;
   const forceNonStream = (provider === 'bailian');
   if (useStream && !forceNonStream) {
     const resp = await fetch('/api/ess-config', {
