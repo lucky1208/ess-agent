@@ -359,9 +359,11 @@ function makeHArrow(fromNode, toNode, label, sublabel) {
   const head2y = baseY - py * 4;
   const arrowHead = `M ${head1x} ${head1y} L ${tipX} ${tipY} L ${head2x} ${head2y}`;
 
-  // 标签位置: 线段中点上方
+  // 标签位置: 优先放线段中点上方 22px (脱离两节点 y 范围),如果仍落在某个节点 bbox 内
+  // 就改成放到节点下方 22px
   const midX = (fx + tx) / 2;
-  const midY = (fy + ty) / 2 - 6;
+  const midY = (fy + ty) / 2 - 22;
+  // Note: caller will pass nodes to renderArrow() which clamps labelX/labelY outside nodes.
   return { path, arrowHead, label, sublabel, labelX: midX, labelY: midY };
 }
 
@@ -380,8 +382,8 @@ function makeVArrow(fromNode, toNode, label, sublabel) {
   const head2x = tx + 4;
   const arrowHead = `M ${head1x} ${baseY} L ${tx} ${tipY} L ${head2x} ${baseY}`;
 
-  // 标签: 线段右侧
-  const labelX = Math.max(fx, tx) + 8;
+  // 标签: 线段右侧 12px (脱离两节点 x 范围),caller 会再次 clamp
+  const labelX = Math.max(fx, tx) + 14;
   const labelY = (fy + ty) / 2 + 4;
   return { path, arrowHead, label, sublabel, labelX, labelY };
 }
@@ -405,7 +407,7 @@ function makeLArrow(fromNode, toNode, label, sublabel) {
   const arrowHead = `M ${baseX} ${head1y} L ${tipX} ${tipY} L ${baseX} ${head2y}`;
 
   const labelX = (fx + tx) / 2;
-  const labelY = Math.min(fy, ty) - 8;
+  const labelY = Math.min(fy, ty) - 24;
   return { path, arrowHead, label, sublabel, labelX, labelY };
 }
 
@@ -436,17 +438,49 @@ function renderBlock(n) {
   return lines.join('\n');
 }
 
+// ====================== 标签位置避让节点 bbox ======================
+// 如果标签矩形 (labelX - labelW/2, labelY - 9, labelW, 14) 与任意 node bbox 重叠,
+// 优先向上挪 (prefUp=true,默认),否则向下挪,确保标签完全脱离节点区域
+function clampLabelOutsideNodes(labelX, labelY, labelW, nodes, prefUp) {
+  const labelH = 14;
+  let x = labelX;
+  let y = labelY;
+  for (let tries = 0; tries < 5; tries++) {
+    const rect = { x1: x - labelW / 2, y1: y - 9, x2: x + labelW / 2, y2: y - 9 + labelH };
+    let conflict = null;
+    for (const n of nodes) {
+      if (rect.x1 < n.x + n.w && rect.x2 > n.x && rect.y1 < n.y + n.h && rect.y2 > n.y) {
+        conflict = n;
+        break;
+      }
+    }
+    if (!conflict) break;
+    // 挪方向: 优先向上,落到节点 bbox 上方 18px;否则向下
+    if (prefUp !== false && y - 9 - conflict.y >= 18) {
+      // 已经在节点上方但仍冲突,说明离得太近,再向上 14px
+      y = conflict.y - 18;
+    } else {
+      y = conflict.y + conflict.h + 18;
+    }
+  }
+  return { x, y };
+}
+
 // ====================== 渲染箭头 ======================
-function renderArrow(a) {
+function renderArrow(a, nodes) {
   const lines = [];
   // 路径
   lines.push(`  <path d="${a.path}" fill="none" stroke="${COLOR_ARROW}" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrowhead)"/>`);
   // 标签: 功率 + 电压
   if (a.label || a.sublabel) {
     const combined = [a.label, a.sublabel].filter(Boolean).join(' / ');
-    const labelW = combined.length * 6 + 8;
-    lines.push(`  <rect x="${a.labelX - labelW / 2}" y="${a.labelY - 9}" width="${labelW}" height="14" rx="2" ry="2" fill="#fff" stroke="${COLOR_ARROW}" stroke-width="0.5" opacity="0.95"/>`);
-    lines.push(`  <text x="${a.labelX}" y="${a.labelY + 1}" text-anchor="middle" fill="${COLOR_ARROW}" ${FONT_ARROW}>${escapeXml(combined)}</text>`);
+    const labelW = combined.length * 6 + 10;
+    // 标签位置避让节点 bbox
+    const clamped = clampLabelOutsideNodes(a.labelX, a.labelY, labelW, nodes || [], true);
+    const lx = clamped.x;
+    const ly = clamped.y;
+    lines.push(`  <rect x="${lx - labelW / 2}" y="${ly - 9}" width="${labelW}" height="14" rx="3" ry="3" fill="#fff" stroke="${COLOR_ARROW}" stroke-width="0.6"/>`);
+    lines.push(`  <text x="${lx}" y="${ly + 1}" text-anchor="middle" fill="${COLOR_ARROW}" ${FONT_ARROW}>${escapeXml(combined)}</text>`);
   }
   return lines.join('\n');
 }
@@ -579,7 +613,7 @@ function renderArchitectureSvg(uem) {
 
   // 先画箭头
   arrows.forEach(a => {
-    out.push(renderArrow(a));
+    out.push(renderArrow(a, nodes));
   });
 
   // 再画节点 (覆盖箭头端点)

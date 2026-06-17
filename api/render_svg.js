@@ -529,9 +529,9 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
         const sy = p.y + (p.h - sh) / 2;
         out.push(`<svg x="${sx.toFixed(1)}" y="${sy.toFixed(1)}" width="${sw.toFixed(1)}" height="${sh.toFixed(1)}" viewBox="${sym.viewBox}">${sym.innerSvg}</svg>`);
       }
-      out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" height="${p.h}" fill="white" stroke="#333" stroke-width="1"/>`);
-      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y - 4).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#222">${escapeXml(c.ref || c.id)}</text>`);
-      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 12).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
+out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" height="${p.h}" fill="white" stroke="#333" stroke-width="1"/>`);
+        out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#222">${escapeXml(c.ref || c.id)}</text>`);
+        out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 14).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
     }
   }
 
@@ -544,6 +544,55 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
   for (const k in positions) { if (positions[k].y + positions[k].h > rowBottom) rowBottom = positions[k].y + positions[k].h; }
   const trunkY = rowBottom + 30;          // 30px below the row
   const layerWidth = LAYER_GAP_X + NODE_WIDTH;
+
+  // 收集所有已渲染的线段 (用于后面跳线检测 + AABB 避障)
+  // 每条连线存储: id, segments[{x1,y1,x2,y2}], endpoint {x,y} (dst 端)
+  const allSegments = [];
+  // 收集所有非端点 node bbox (用作避障参考)
+  const nodeBoxes = [];
+  for (const k in positions) {
+    const pp = positions[k];
+    // Bus 节点扩展 padding 用于避障
+    const pad = 6;
+    nodeBoxes.push({ x1: pp.x - pad, y1: pp.y - pad, x2: pp.x + pp.w + pad, y2: pp.y + pp.h + pad, id: k });
+  }
+
+  function segmentsCrossH(s, y) {
+    // 线段 s 与水平线 y 是否相交 (返回交点 x,否则 null)
+    const minY = Math.min(s.y1, s.y2), maxY = Math.max(s.y1, s.y2);
+    if (y < minY - 0.5 || y > maxY + 0.5) return null;
+    if (Math.abs(s.y1 - s.y2) < 0.5) return null; // 本身就是水平线
+    const t = (y - s.y1) / (s.y2 - s.y1);
+    return s.x1 + t * (s.x2 - s.x1);
+  }
+  function segmentsCrossV(x, s) {
+    const minX = Math.min(s.x1, s.x2), maxX = Math.max(s.x1, s.x2);
+    if (x < minX - 0.5 || x > maxX + 0.5) return null;
+    if (Math.abs(s.x1 - s.x2) < 0.5) return null;
+    const t = (x - s.x1) / (s.x2 - s.x1);
+    return s.y1 + t * (s.y2 - s.y1);
+  }
+  // AABB 检查: 线段 s 是否穿过 node box (除自身端点 node)
+  function segmentCrossesNodeBox(s, excludeNodeId) {
+    for (const b of nodeBoxes) {
+      if (excludeNodeId && (b.id === excludeNodeId)) continue;
+      // 端点 node 不算穿过 (端点本来就要连)
+      // 判断线段 (x1,y1)-(x2,y2) 与矩形 (x1,y1,x2,y2) 是否相交
+      // 用 Liang-Barsky 简化: 检测线段两端点是否在矩形内 + 矩形 4 边是否穿过线段
+      const inBox = (px, py) => px > b.x1 && px < b.x2 && py > b.y1 && py < b.y2;
+      if (inBox(s.x1, s.y1) && inBox(s.x2, s.y2)) return b; // 全在矩形内
+      // 简化: 仅检测线段是否水平或垂直穿过矩形的内部
+      if (Math.abs(s.y1 - s.y2) < 0.5) {
+        // 水平线: 检查 y 在矩形内 + x 范围重叠
+        if (s.y1 > b.y1 && s.y1 < b.y2 && Math.max(s.x1, s.x2) > b.x1 && Math.min(s.x1, s.x2) < b.x2) return b;
+      } else if (Math.abs(s.x1 - s.x2) < 0.5) {
+        // 垂直线: 检查 x 在矩形内 + y 范围重叠
+        if (s.x1 > b.x1 && s.x1 < b.x2 && Math.max(s.y1, s.y2) > b.y1 && Math.min(s.y1, s.y2) < b.y2) return b;
+      }
+    }
+    return null;
+  }
+
   for (const conn of (compiled.connections || [])) {
     const a = positions[conn.from];
     const b = positions[conn.to];
@@ -551,21 +600,97 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
     const pa = getPort(a, 'right');
     const pb = getPort(b, 'left');
     const spanSlots = Math.abs(slotIndexOf(b, positions) - slotIndexOf(a, positions));
+    let d, segs = [];
     if (Math.abs(pa.y - pb.y) < 0.5 && spanSlots <= 1) {
       // Aligned ports and adjacent columns: a single straight line is fine
+      const lineEndX = pb.x;
+      d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${lineEndX.toFixed(1)} ${pb.y.toFixed(1)}`;
+      segs = [{ x1: pa.x, y1: pa.y, x2: pb.x, y2: pb.y }];
       out.push(`<line x1="${pa.x.toFixed(1)}" y1="${pa.y.toFixed(1)}" x2="${pb.x.toFixed(1)}" y2="${pb.y.toFixed(1)}" stroke="black" stroke-width="2"/>`);
     } else if (spanSlots > 1) {
       // Long connection: drop to the trunk channel, run, then climb to the dst.
-      const d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${(pa.x + 20).toFixed(1)} ${pa.y.toFixed(1)} L ${(pa.x + 20).toFixed(1)} ${trunkY.toFixed(1)} L ${(pb.x - 20).toFixed(1)} ${trunkY.toFixed(1)} L ${(pb.x - 20).toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      const dropX1 = pa.x + 20;
+      const dropX2 = pb.x - 20;
+      d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      segs = [
+        { x1: pa.x, y1: pa.y, x2: dropX1, y2: pa.y },
+        { x1: dropX1, y1: pa.y, x2: dropX1, y2: trunkY },
+        { x1: dropX1, y1: trunkY, x2: dropX2, y2: trunkY },
+        { x1: dropX2, y1: trunkY, x2: dropX2, y2: pb.y },
+        { x1: dropX2, y1: pb.y, x2: pb.x, y2: pb.y }
+      ];
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else {
       // Adjacent column but ports at different Y: simple 4-vertex ortho at src-Y
       const midX = (pa.x + pb.x) / 2;
-      const d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      // 检查 midX 处的竖直段是否穿过任何节点 (除 a, b)
+      const vSeg = { x1: midX, y1: pa.y, x2: midX, y2: pb.y };
+      const conflict = segmentCrossesNodeBox(vSeg, conn.from) && segmentCrossesNodeBox(vSeg, conn.to);
+      if (conflict && conflict.id !== conn.from && conflict.id !== conn.to) {
+        // 改走 trunk 通道绕行
+        const dropX1 = pa.x + 20;
+        const dropX2 = pb.x - 20;
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+        segs = [
+          { x1: pa.x, y1: pa.y, x2: dropX1, y2: pa.y },
+          { x1: dropX1, y1: pa.y, x2: dropX1, y2: trunkY },
+          { x1: dropX1, y1: trunkY, x2: dropX2, y2: trunkY },
+          { x1: dropX2, y1: trunkY, x2: dropX2, y2: pb.y },
+          { x1: dropX2, y1: pb.y, x2: pb.x, y2: pb.y }
+        ];
+      } else {
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+        segs = [
+          { x1: pa.x, y1: pa.y, x2: midX, y2: pa.y },
+          { x1: midX, y1: pa.y, x2: midX, y2: pb.y },
+          { x1: midX, y1: pb.y, x2: pb.x, y2: pb.y }
+        ];
+      }
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     }
     // arrow head at the dst end
     out.push(`<circle cx="${pb.x.toFixed(1)}" cy="${pb.y.toFixed(1)}" r="3" fill="black"/>`);
+    allSegments.push({ conn, segs, endpoint: { x: pb.x, y: pb.y } });
+  }
+
+  // ====================== 跳线半圆 (jump/hop) 检测 ======================
+  // 对于每对连线,检测水平段是否与垂直段相交,如果是 T 形交叉,给"先画的"
+  // (allSegments 中排在前面的) 画一个 5px 半径的半圆弧,白色背景覆盖 + 黑色跳线
+  const JUMP_R = 6;
+  for (let i = 0; i < allSegments.length; i++) {
+    for (let j = i + 1; j < allSegments.length; j++) {
+      const A = allSegments[i].segs;
+      const B = allSegments[j].segs;
+      for (const a of A) {
+        if (Math.abs(a.y1 - a.y2) > 0.5) continue; // 只检测水平线
+        for (const b of B) {
+          if (Math.abs(b.x1 - b.x2) > 0.5) continue; // 只检测垂直线
+          // 水平段 a, 垂直段 b, 求交点
+          const x = b.x1;
+          const y = a.y1;
+          // 检查交点是否在两条线段内
+          if (x < Math.min(a.x1, a.x2) - 0.5 || x > Math.max(a.x1, a.x2) + 0.5) continue;
+          if (y < Math.min(b.y1, b.y2) - 0.5 || y > Math.max(b.y1, b.y2) + 0.5) continue;
+          // 跳过端点附近 (避免跳线画在节点端口上)
+          const endA = allSegments[i].endpoint;
+          const endB = allSegments[j].endpoint;
+          const distToEndA = Math.hypot(x - endA.x, y - endA.y);
+          const distToEndB = Math.hypot(x - endB.x, y - endB.y);
+          if (distToEndA < 8 || distToEndB < 8) continue;
+          // A 是先画的, 给 A 加跳线半圆
+          // 半圆弧画法: 白色背景弧盖住 + 黑色跳线弧 (从 A 垂直方向凸出)
+          // 用 path 半圆: M (x-JUMP_R) y A JUMP_R JUMP_R 0 0 0 (x+JUMP_R) y
+          // 加上: M (x-JUMP_R) y L (x+JUMP_R) y (白底线)
+          const arcPath = `M ${(x - JUMP_R).toFixed(1)} ${y.toFixed(1)} A ${JUMP_R} ${JUMP_R} 0 0 0 ${(x + JUMP_R).toFixed(1)} ${y.toFixed(1)}`;
+          // 先画白底弧盖住底下的水平线
+          out.push(`<path d="${arcPath}" fill="white" stroke="white" stroke-width="2"/>`);
+          // 再画黑色跳线弧
+          out.push(`<path d="${arcPath}" fill="none" stroke="black" stroke-width="2"/>`);
+          // 跳过 A 的这条 segment 后续,避免重复画 (但我们没法改 out[] 序列)
+          break;
+        }
+      }
+    }
   }
 
   // Layer labels at the bottom of the canvas
