@@ -402,46 +402,46 @@ function compileBatterySwap(uem) {
 
   // MV side
   const mvKv = mv.incoming_voltage_kv || 10;
-  components.push({ id: 'GRID', category: 'source', ref: 'GRID', model: `${mvKv}kV 市电`, qty: 1, params: { voltage_level: `${mvKv}kV` } });
-  components.push({ id: 'MV_SWGR', category: 'switchgear', ref: 'KYN28-12', model: `${mv.type || 'KYN28-12'} ${mvKv}kV 进线柜`, qty: 1, params: { voltage_kv: mvKv, panel_type: mv.type || 'KYN28-12', protection: mv.protection || ['overcurrent', 'instantaneous'] } });
-  components.push({ id: 'MV_PT', category: 'metering', ref: 'PT1', model: `PT柜 ${mv.metering_class || '0.5S'}`, qty: 1, params: { metering_class: mv.metering_class || '0.5S' } });
+  components.push({ id: 'GRID', category: 'source', ref: 'GRID', model: `${mvKv}kV 市电`, qty: 1, zone: 'mv', params: { voltage_level: `${mvKv}kV` } });
+  components.push({ id: 'MV_SWGR', category: 'switchgear', ref: 'KYN28-12', model: `${mv.type || 'KYN28-12'} ${mvKv}kV 进线柜`, qty: 1, zone: 'mv', params: { voltage_kv: mvKv, panel_type: mv.type || 'KYN28-12', protection: mv.protection || ['overcurrent', 'instantaneous'] } });
+  components.push({ id: 'MV_PT', category: 'metering', ref: 'PT1', model: `PT柜 ${mv.metering_class || '0.5S'}`, qty: 1, zone: 'mv', params: { metering_class: mv.metering_class || '0.5S' } });
 
-  // Transformer
+  // Transformer (boundary component — belongs to BOTH mv (secondary) and lv (primary) zones)
   const trKva = tr.capacity_kva || 1300;
-  components.push({ id: 'TR', category: 'transformer', ref: 'T1', model: `${tr.type || 'SCB13'} ${trKva}kVA ${tr.hv_kv || 10}/${tr.lv_kv || 0.4}kV`, qty: tr.qty || 1, params: { rating_kva: trKva, hv_voltage_v: (tr.hv_kv || 10) * 1000, lv_voltage_v: (tr.lv_kv || 0.4) * 1000, type: tr.type || 'Dry-type SCB13', connection: tr.connection || 'Dyn11' } });
+  components.push({ id: 'TR', category: 'transformer', ref: 'T1', model: `${tr.type || 'SCB13'} ${trKva}kVA ${tr.hv_kv || 10}/${tr.lv_kv || 0.4}kV`, qty: tr.qty || 1, zone: 'mv,lv', params: { rating_kva: trKva, hv_voltage_v: (tr.hv_kv || 10) * 1000, lv_voltage_v: (tr.lv_kv || 0.4) * 1000, type: tr.type || 'Dry-type SCB13', connection: tr.connection || 'Dyn11' } });
 
   // LV side: GCS panel + main breaker + feeders
   const lvKv = tr.lv_kv || 0.4;
-  components.push({ id: 'LV_SWGR', category: 'switchgear', ref: 'GCS', model: `${lv.panel_type || 'GCS'} 低压配电柜`, qty: 1, params: { panel_type: lv.panel_type || 'GCS', main_breaker_a: lv.main_breaker_a || 2500 } });
-  components.push({ id: 'AC_BUS', category: 'bus', ref: 'AC-LV', model: `AC-${lvKv*1000}V`, qty: 1, params: { voltage_v: lvKv * 1000 } });
+  components.push({ id: 'LV_SWGR', category: 'switchgear', ref: 'GCS', model: `${lv.panel_type || 'GCS'} 低压配电柜`, qty: 1, zone: 'lv', params: { panel_type: lv.panel_type || 'GCS', main_breaker_a: lv.main_breaker_a || 2500 } });
+  components.push({ id: 'AC_BUS', category: 'bus', ref: 'AC-LV', model: `AC-${lvKv*1000}V`, qty: 1, zone: 'lv,dc', params: { voltage_v: lvKv * 1000 } });
 
   // Charging modules: total_modules grouped as one rack or several
   const totalModules = chg.total_modules || 32;
   const modulesPerSlot = chg.modules_per_slot || 2;
   const moduleKw = chg.module_power_kw || 30;
   for (let r = 1; r <= (chg.rack_count || 1); r++) {
-    components.push({ id: `CM_RACK-${r}`, category: 'charger', ref: `CM-R${r}`, model: `充电模块架 ${totalModules / (chg.rack_count || 1)}×${moduleKw}kW`, qty: 1, params: { modules: totalModules / (chg.rack_count || 1), module_kw: moduleKw, modules_per_slot: modulesPerSlot } });
+    components.push({ id: `CM_RACK-${r}`, category: 'charger', ref: `CM-R${r}`, model: `充电模块架 ${totalModules / (chg.rack_count || 1)}×${moduleKw}kW`, qty: 1, zone: 'dc', params: { modules: totalModules / (chg.rack_count || 1), module_kw: moduleKw, modules_per_slot: modulesPerSlot } });
   }
-  components.push({ id: 'CHG_CTRL', category: 'controller', ref: 'CCU', model: `充电控制器 ${totalModules} 模块`, qty: 1, params: { managed_modules: totalModules } });
+  components.push({ id: 'CHG_CTRL', category: 'controller', ref: 'CCU', model: `充电控制器 ${totalModules} 模块`, qty: 1, zone: 'dc', params: { managed_modules: totalModules } });
 
   // DC distribution
-  components.push({ id: 'DC_BUS', category: 'dc_bus', ref: 'DC+', model: `DC-${dc.bus_voltage_v || 750}V`, qty: 1, params: { voltage_v: dc.bus_voltage_v || 750, insulation_monitor: dc.insulation_monitor !== false } });
+  components.push({ id: 'DC_BUS', category: 'dc_bus', ref: 'DC+', model: `DC-${dc.bus_voltage_v || 750}V`, qty: 1, zone: 'dc', params: { voltage_v: dc.bus_voltage_v || 750, insulation_monitor: dc.insulation_monitor !== false } });
 
   // Battery cabin: total slots with state per slot
   for (let i = 0; i < totalSlots; i++) {
     const slotId = `SLOT-${String(i+1).padStart(2, '0')}`;
     const slotState = slots[i] || { state: 'IDLE', soc_pct: 0 };
-    components.push({ id: slotId, category: 'battery_slot', ref: slotId, model: `LFP-${moduleKw * modulesPerSlot}kWh (${slotState.state})`, qty: 1, params: { slot_index: i + 1, state: slotState.state, soc_pct: slotState.soc_pct, slot_id: slotState.slot_id || slotId } });
+    components.push({ id: slotId, category: 'battery_slot', ref: slotId, model: `LFP-${moduleKw * modulesPerSlot}kWh (${slotState.state})`, qty: 1, zone: 'dc', params: { slot_index: i + 1, state: slotState.state, soc_pct: slotState.soc_pct, slot_id: slotState.slot_id || slotId } });
   }
-  components.push({ id: 'BAT_CAB', category: 'battery_cabin', ref: 'BC', model: `电池仓 ${lay.rows || 3}×${lay.cols || 6} = ${totalSlots} 仓位`, qty: 1, params: { rows: lay.rows || 3, cols: lay.cols || 6, total_slots: totalSlots } });
+  components.push({ id: 'BAT_CAB', category: 'battery_cabin', ref: 'BC', model: `电池仓 ${lay.rows || 3}×${lay.cols || 6} = ${totalSlots} 仓位`, qty: 1, zone: 'dc', params: { rows: lay.rows || 3, cols: lay.cols || 6, total_slots: totalSlots } });
 
   // Swap area: 2 bays with gantry robots
   const bayCount = swa.bay_count || 2;
   for (let b = 1; b <= bayCount; b++) {
-    components.push({ id: `BAY-${b}`, category: 'swap_bay', ref: `BAY-${b}`, model: `换电工位 ${b}`, qty: 1, params: { bay_index: b, swap_time_min: swa.swap_time_min || 6 } });
+    components.push({ id: `BAY-${b}`, category: 'swap_bay', ref: `BAY-${b}`, model: `换电工位 ${b}`, qty: 1, zone: 'dc', params: { bay_index: b, swap_time_min: swa.swap_time_min || 6 } });
   }
   for (const rob of (swa.robots || [])) {
-    components.push({ id: rob.id || `ROB-${Math.random().toString(36).slice(2,6)}`, category: 'robot', ref: rob.id || 'ROB', model: `${rob.type || 'gantry_3axis'} ${rob.power_kw || 75}kW`, qty: 1, params: { type: rob.type || 'gantry_3axis', power_kw: rob.power_kw || 75 } });
+    components.push({ id: rob.id || `ROB-${Math.random().toString(36).slice(2,6)}`, category: 'robot', ref: rob.id || 'ROB', model: `${rob.type || 'gantry_3axis'} ${rob.power_kw || 75}kW`, qty: 1, zone: 'dc', params: { type: rob.type || 'gantry_3axis', power_kw: rob.power_kw || 75 } });
   }
 
   // Connections (topological for SLD drawing)
@@ -784,14 +784,34 @@ out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" heigh
     }
   }
 
-  // Layer labels at the bottom of the canvas
-  const layerNames = ['源 (Source)', '电池 (Battery)', '直流母线 (DC Bus)', 'PCS', '交流母线 (AC Bus)', '升压/负载 (XF / Load)'];
+  // Layer labels at the bottom of the canvas — dynamic per actual component category
+  function getLayerLabel(layer) {
+    if (!layer.length) return null;
+    const c = layer[0];
+    const cat = String(c.category || '').toLowerCase();
+    if (cat === 'source') return '源 (Source)';
+    if (cat === 'battery' || cat === 'battery_storage' || cat === 'battery_slot') return '电池 (Battery)';
+    if (cat === 'dc_bus' || cat === 'bus_dc') return '直流母线 (DC Bus)';
+    if (cat === 'pcs' || cat === 'inverter') return 'PCS';
+    if (cat === 'ac_bus' || cat === 'bus_ac' || cat === 'bus') return '交流母线 (AC Bus)';
+    if (cat === 'transformer') return '变压器 (XFMR)';
+    if (cat === 'switchgear') return '开关柜 (SWGR)';
+    if (cat === 'metering') return 'PT 计量 (PT)';
+    if (cat === 'charger') return '充电模块 (Charger)';
+    if (cat === 'controller') return '控制器 (Ctrl)';
+    if (cat === 'battery_cabin') return '电池仓 (Cabin)';
+    if (cat === 'swap_bay') return '换电工位 (Bay)';
+    if (cat === 'robot') return '机器人 (Robot)';
+    if (cat === 'load') return '负载 (Load)';
+    return null;
+  }
   for (let li = 0; li < layers.length; li++) {
     const layer = layers[li];
     if (!layer.length) continue;
     const slotLeft = PAGE_PADDING_X + li * (LAYER_GAP_X + NODE_WIDTH);
     const xCenter = slotLeft + NODE_WIDTH / 2;
-    out.push(`<text x="${xCenter.toFixed(1)}" y="${(totalH - 18).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#888">${escapeXml(layerNames[li] || ('L' + li))}</text>`);
+    const label = getLayerLabel(layer) || `L${li}`;
+    out.push(`<text x="${xCenter.toFixed(1)}" y="${(totalH - 18).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#888">${escapeXml(label)}</text>`);
   }
 
   // Legend
@@ -835,11 +855,14 @@ function wrapBssDrawing(svgInner, uem, opts) {
   for (let i = 1; i < 4; i++) {
     out.push(`<line x1="${i * colW}" y1="${tbH + totalH}" x2="${i * colW}" y2="${tbH + totalH + fbH}" stroke="#999"/>`);
   }
-  const fbText = (label, value) => `<text x="8" y="${tbH + totalH + 12}" font-family="Arial, sans-serif" font-size="9" fill="#666">${label}</text><text x="8" y="${tbH + totalH + 25}" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#222">${escapeXml(value || '-')}</text>`;
-  out.push(fbText('设计', project.designer || '卢继雄'));
-  out.push(fbText('日期', new Date().toISOString().slice(0, 10)));
-  out.push(fbText('规范', (project.standard || 'GB') + ' / IEC 60617'));
-  out.push(fbText('图号', opts.drawingNo + ' / ' + (project.revision || 'Rev.A')));
+  const fbText = (col, label, value) => {
+    const x = 8 + col * colW;
+    return `<text x="${x}" y="${tbH + totalH + 12}" font-family="Arial, sans-serif" font-size="9" fill="#666">${label}</text><text x="${x}" y="${tbH + totalH + 25}" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#222">${escapeXml(value || '-')}</text>`;
+  };
+  out.push(fbText(0, '设计', project.designer || '卢继雄'));
+  out.push(fbText(1, '日期', new Date().toISOString().slice(0, 10)));
+  out.push(fbText(2, '规范', (project.standard || 'GB') + ' / IEC 60617'));
+  out.push(fbText(3, '图号', opts.drawingNo + ' / ' + (project.revision || 'Rev.A')));
   out.push('</svg>');
   return out.join('\n');
 }
@@ -900,7 +923,29 @@ export default async function handler(req, res) {
     if (!compiled.components.length) {
       return res.status(400).json({ ok: false, error: 'compileUem returned no components' });
     }
-    const layers = assignLayers(compiled.components);
+    // Filter components by type-specific zone (E-01/E-02/E-03 each focus on a sub-system)
+    let components = compiled.components;
+    let connections = compiled.connections || [];
+    if (type === 'e01') {
+      // E-01 10kV 一次接线图: GRID/MV_SWGR/MV_PT/TR (MV + TR boundary)
+      const keep = new Set(['GRID', 'MV_SWGR', 'MV_PT', 'TR']);
+      components = components.filter(c => keep.has(c.id));
+      connections = connections.filter(c => keep.has(c.from) && keep.has(c.to));
+    } else if (type === 'e02') {
+      // E-02 低压 AC 配电单线图: TR + LV_SWGR + AC_BUS + CHG_CTRL
+      const keep = new Set(['TR', 'LV_SWGR', 'AC_BUS', 'CHG_CTRL']);
+      components = components.filter(c => keep.has(c.id));
+      connections = connections.filter(c => keep.has(c.from) && keep.has(c.to));
+    } else if (type === 'e03') {
+      // E-03 充电模块-DC 系统图: AC_BUS + CM_RACK-* + CHG_CTRL + DC_BUS + BAT_CAB + SLOT-* + BAY-* + ROB-*
+      components = components.filter(c => c.zone && c.zone.split(',').includes('dc') || c.id === 'BAT_CAB');
+      const dcIds = new Set(components.map(c => c.id));
+      connections = connections.filter(c => dcIds.has(c.from) && dcIds.has(c.to));
+    }
+    if (!components.length) {
+      return res.status(400).json({ ok: false, error: `no components after type=${type} filter` });
+    }
+    const layers = assignLayers(components);
     const { positions, totalW, totalH } = computeLayout(layers);
 
     // Render (router by type)
