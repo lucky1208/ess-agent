@@ -35,36 +35,54 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ====================== CONFIG ======================
-const NODE_WIDTH = 100;
+// HORIZONTAL layered layout: 6 layers, left -> right
+//   0 source      : PV / WT / GEN / GRID / MAINS
+//   1 battery     : BAT (battery_rack)
+//   2 dc_bus      : DC_BUS / bus_dc
+//   3 pcs         : PCS
+//   4 ac_bus      : AC_BUS / bus_ac / bus
+//   5 xf_load     : XF (transformer), LOAD, QF, protection, switching, controller
+const NODE_WIDTH = 110;
 const NODE_HEIGHT = 60;
-const LAYER_GAP_Y = 100;
-const NODE_GAP_X = 30;
-const PAGE_PADDING_X = 30;
-const PAGE_PADDING_TOP = 30;
-const PAGE_PADDING_BOTTOM = 30;
+const BUS_WIDTH = 160;          // bus horizontal bar length
+const BUS_THICKNESS = 4;        // bus bar stroke
+const LAYER_GAP_X = 200;        // horizontal gap between layers
+const NODE_GAP_Y = 24;          // vertical gap between nodes in same layer
+const PAGE_PADDING_X = 40;
+const PAGE_PADDING_TOP = 60;    // extra space for title
+const PAGE_PADDING_BOTTOM = 50;
+// Canvas: 6 layer slots.  slot width = NODE_WIDTH; gap = LAYER_GAP_X.
+// 6*NODE_WIDTH + 5*LAYER_GAP_X + 2*PAGE_PADDING_X = 660 + 1000 + 80 = 1740 → round to 1800
+const CANVAS_W = 1800;
+const CANVAS_H = 700;
 
+// Category -> horizontal layer index (0..5)
 const CATEGORY_TO_LAYER = {
-  // Layer numbers in the task spec: 100/200/300/400/500/600/700
-  // These map to the vertical slot in the SVG.  Higher = drawn higher (smaller y).
-  pv: 100,
-  battery: 200,
-  battery_rack: 200,
-  dc_bus: 300,
-  bus_dc: 300,
-  pcs: 400,
-  ac_bus: 500,
-  bus: 500,
-  bus_ac: 500,
-  transformer: 600,
-  protection: 650,
-  switching: 660,
-  controller: 670,
-  ups: 480,
-  load: 750,
-  source: 700,
-  grid: 700,
-  wind: 80,
-  diesel: 90,
+  // source side (left)
+  pv: 0,
+  wind: 0,
+  diesel: 0,
+  source: 0,
+  grid: 0,
+  // battery (left-center)
+  battery: 1,
+  battery_rack: 1,
+  // dc bus
+  dc_bus: 2,
+  bus_dc: 2,
+  // pcs
+  pcs: 3,
+  ups: 3,
+  controller: 3,
+  // ac bus
+  ac_bus: 4,
+  bus_ac: 4,
+  bus: 4,
+  // right side: transformer + load + protection
+  transformer: 5,
+  protection: 5,
+  switching: 5,
+  load: 5,
 };
 
 // IEC symbol id picked per category (id matches docs/iec_symbols_index.json)
@@ -271,16 +289,19 @@ function compileEss(uem) {
 
   components.push({ id: 'GRID', category: 'source', ref: 'GRID', model: voltage, qty: 1, params: { voltage_level: voltage } });
 
-  // Connections (topological order for line drawing)
+  // Connections (topological order for line drawing).
+  // Layout convention: source layer is on the LEFT, transformer/load on the RIGHT.
+  // Power flows left -> right. The grid mains connection (GRID -> XF) is drawn
+  // left-to-right to keep the wire short and avoid a backtrack across the page.
   connections.push({ from: 'BAT', to: 'DC_BUS' });
   connections.push({ from: 'DC_BUS', to: 'PCS' });
   connections.push({ from: 'PCS', to: 'AC_BUS' });
   connections.push({ from: 'AC_BUS', to: 'QF' });
   if (components.find(c => c.id === 'XF')) {
     connections.push({ from: 'QF', to: 'XF' });
-    connections.push({ from: 'XF', to: 'GRID' });
+    connections.push({ from: 'GRID', to: 'XF' });
   } else {
-    connections.push({ from: 'QF', to: 'GRID' });
+    connections.push({ from: 'GRID', to: 'QF' });
   }
 
   return { components, connections };
@@ -336,9 +357,11 @@ function compileAidc(uem) {
   }
   components.push({ id: 'AC_BUS', category: 'bus', ref: 'AC-IT', model: `AC-380V-${Math.floor(loadKw)}kW`, qty: 1, params: { voltage_v: 380 } });
   components.push({ id: 'PDU', category: 'load', ref: 'PDU', model: `列头柜-${Math.floor(loadKw)}kW`, qty: 1, params: { load_kw: loadKw } });
-  // Simplified: just chain MAINS -> AC_BUS -> PDU
+  // Connections: chain each MAINS to AC_BUS (a single AC_BUS line per mains feed).
+  const connections = [];
   for (let i = 0; i < mainsCount; i++) connections.push({ from: `MAINS-${i+1}`, to: 'AC_BUS' });
-  return { components, connections: [] };
+  connections.push({ from: 'AC_BUS', to: 'PDU' });
+  return { components, connections };
 }
 
 function compileUem(uem) {
@@ -358,58 +381,71 @@ function compileUem(uem) {
 }
 
 // ====================== LAYOUT ======================
+function isBusCategory(cat) {
+  if (!cat) return false;
+  const c = String(cat).toLowerCase();
+  return c === 'dc_bus' || c === 'bus_dc' || c === 'ac_bus' || c === 'bus_ac' || c === 'bus';
+}
+
 function assignLayers(components) {
-  // Group components by their layer slot.  Use a Map to preserve insertion order.
-  const layers = new Map();
+  // Group components by horizontal-layer index 0..5. Preserve order within each layer.
+  const buckets = [[], [], [], [], [], []];
   for (const c of components) {
-    const layer = CATEGORY_TO_LAYER[c.category] != null
-      ? CATEGORY_TO_LAYER[c.category]
-      : CATEGORY_TO_LAYER[CATEGORY_TO_LAYER[c.id.split('-')[0].toLowerCase()] != null ? c.id.split('-')[0].toLowerCase() : 'bus'] || 500;
-    // Layer by id fallback (for cases where category is missing)
     let slot = CATEGORY_TO_LAYER[c.category];
     if (slot == null) {
-      const idLower = c.id.toLowerCase();
-      if (idLower.startsWith('bat')) slot = 200;
-      else if (idLower.startsWith('dc')) slot = 300;
-      else if (idLower.startsWith('pcs')) slot = 400;
-      else if (idLower.startsWith('ac')) slot = 500;
-      else if (idLower.startsWith('xf') || idLower.startsWith('t')) slot = 600;
-      else if (idLower.startsWith('qf') || idLower.startsWith('qs')) slot = 650;
-      else if (idLower.startsWith('grid') || idLower.startsWith('mains')) slot = 700;
-      else if (idLower.startsWith('pdu') || idLower.startsWith('load')) slot = 750;
-      else slot = 500;
+      // id-based fallback
+      const idLower = (c.id || '').toLowerCase();
+      if (idLower.startsWith('pv') || idLower.startsWith('wt') || idLower.startsWith('gen') || idLower.startsWith('grid') || idLower.startsWith('mains')) slot = 0;
+      else if (idLower.startsWith('bat')) slot = 1;
+      else if (idLower.startsWith('dc')) slot = 2;
+      else if (idLower.startsWith('pcs')) slot = 3;
+      else if (idLower.startsWith('ac')) slot = 4;
+      else if (idLower.startsWith('xf') || idLower.startsWith('t') || idLower.startsWith('load') || idLower.startsWith('qf') || idLower.startsWith('pdu')) slot = 5;
+      else slot = 5;
     }
-    if (!layers.has(slot)) layers.set(slot, []);
-    layers.get(slot).push(c);
+    if (slot < 0 || slot > 5) slot = 5;
+    buckets[slot].push(c);
   }
-  // Sort by layer slot DESCENDING: higher slot = drawn at TOP (source side).
-  // Python's reference implementation draws GRID (slot 700) at y=30 (top) and
-  // BAT (slot 200) at y=530 (bottom) — a typical SLD convention with source on top.
-  return [...layers.entries()].sort((a, b) => b[0] - a[0]).map(([_, list]) => list);
+  // Return as array of layers in left-to-right order; drop empty layers.
+  return buckets.filter(b => b.length > 0);
 }
 
 function computeLayout(layers) {
-  // y for each layer: layer 1 (lowest slot number) starts at PAGE_PADDING_TOP, then +LAYER_GAP_Y each.
-  // To keep y increasing downward, layers with smaller slot value (e.g. pv=100, battery=200) come first.
+  // Each layer is a vertical column at fixed X. Within a column, nodes stack Y-down.
+  // For bus categories we render a horizontal bar (w=BUS_WIDTH) instead of a regular block.
   const positions = {};
-  let layerWidths = layers.map(layer => layer.length * NODE_WIDTH + Math.max(0, layer.length - 1) * NODE_GAP_X);
-  const maxLayerW = Math.max(0, ...layerWidths);
-  let y = PAGE_PADDING_TOP;
+  // Compute Y stack: pick the layer with most nodes, that drives total height.
+  const maxCount = Math.max(1, ...layers.map(l => l.length));
+  const totalStackH = maxCount * NODE_HEIGHT + Math.max(0, maxCount - 1) * NODE_GAP_Y;
+  const centerY = PAGE_PADDING_TOP + (CANVAS_H - PAGE_PADDING_TOP - PAGE_PADDING_BOTTOM - totalStackH) / 2;
+  // Place each layer
   for (let li = 0; li < layers.length; li++) {
     const layer = layers[li];
-    if (layer.length === 0) continue;
-    const lw = layerWidths[li];
-    const xStart = (maxLayerW - lw) / 2 + PAGE_PADDING_X;
+    // Column X: each layer gets its own slot; non-bus nodes are NODE_WIDTH wide,
+    // bus nodes are BUS_WIDTH wide (longer horizontal bar). Use NODE_WIDTH as the
+    // base slot width so gaps remain predictable, and let bus extend rightward.
+    const slotLeft = PAGE_PADDING_X + li * (LAYER_GAP_X + NODE_WIDTH);
+    // center the layer column vertically
+    const layerStackH = layer.length * NODE_HEIGHT + Math.max(0, layer.length - 1) * NODE_GAP_Y;
+    const yStart = centerY + (totalStackH - layerStackH) / 2;
     for (let i = 0; i < layer.length; i++) {
       const c = layer[i];
-      const x = xStart + i * (NODE_WIDTH + NODE_GAP_X);
-      positions[c.id] = { x, y, w: NODE_WIDTH, h: NODE_HEIGHT, component: c };
+      const isBus = isBusCategory(c.category);
+      const w = isBus ? BUS_WIDTH : NODE_WIDTH;
+      // Bus extends rightward from the column left edge (so its right end reaches
+      // further into the next column's gap, signalling "this is a bus bar").
+      // Non-bus nodes are centered on the column center.
+      let x;
+      if (isBus) {
+        x = slotLeft;
+      } else {
+        x = slotLeft + (NODE_WIDTH - w) / 2;
+      }
+      const y = yStart + i * (NODE_HEIGHT + NODE_GAP_Y);
+      positions[c.id] = { x, y, w, h: NODE_HEIGHT, component: c, isBus };
     }
-    y += LAYER_GAP_Y;
   }
-  const totalW = maxLayerW + 2 * PAGE_PADDING_X;
-  const totalH = y + PAGE_PADDING_BOTTOM;
-  return { positions, totalW: Math.ceil(totalW), totalH: Math.ceil(totalH) };
+  return { positions, totalW: CANVAS_W, totalH: CANVAS_H };
 }
 
 // ====================== SVG RENDERING ======================
@@ -422,6 +458,33 @@ function escapeXml(s) {
     .replace(/'/g, '&apos;');
 }
 
+// Port (edge) anchor for a node on the horizontal SLD.
+//   bus:  endpoint on the bus bar (left or right end) when connecting to/from a bus
+//   side: 'right' means the right side of the node, 'left' means the left side
+function getPort(p, side) {
+  if (p.isBus) {
+    if (side === 'right') return { x: p.x + p.w, y: p.y + p.h / 2 };
+    return { x: p.x, y: p.y + p.h / 2 };
+  }
+  if (side === 'right') return { x: p.x + p.w, y: p.y + p.h / 2 };
+  return { x: p.x, y: p.y + p.h / 2 };
+}
+
+// Resolve the slot index of a node from the positions table.
+function slotIndexOf(p, positions) {
+  if (!p) return 0;
+  // The slot is determined by the layer it belongs to; we encoded it indirectly
+  // via the component's id and the assignLayers result.  Re-derive from the
+  // assigned positions by looking at which column-slot (PAGE_PADDING_X + li*(LAYER_GAP_X+NODE_WIDTH))
+  // the node's left edge lies in.
+  const x = p.x;
+  for (let li = 0; li < 6; li++) {
+    const slotLeft = PAGE_PADDING_X + li * (LAYER_GAP_X + NODE_WIDTH);
+    if (x >= slotLeft - 0.5 && x < slotLeft + LAYER_GAP_X + NODE_WIDTH) return li;
+  }
+  return 0;
+}
+
 function renderSldSvg(uem, layers, positions, totalW, totalH) {
   const project = uem.project || {};
   const elec = uem.electrical || {};
@@ -431,13 +494,31 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
   out.push('<?xml version="1.0" encoding="UTF-8"?>');
   out.push(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}">`);
   out.push(`<rect x="0" y="0" width="${totalW}" height="${totalH}" fill="white"/>`);
-  out.push(`<text x="${(totalW / 2).toFixed(1)}" y="20" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">${escapeXml(title)}</text>`);
+  // Title: smaller font, top-left aligned, no truncation
+  out.push(`<text x="${PAGE_PADDING_X}" y="28" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#222">${escapeXml(title)}</text>`);
+  // Optional: project meta line right under title
+  const meta = `UEM v${uem.schema_version || '1.0'} | ${elec.capacity_kwh || '-'} kWh | ${elec.power_kw || '-'} kW | ${elec.voltage_level || '-'}`;
+  out.push(`<text x="${PAGE_PADDING_X}" y="44" text-anchor="start" font-family="Arial, sans-serif" font-size="9" fill="#666">${escapeXml(meta)}</text>`);
 
   // Draw nodes
   for (const layer of layers) {
     for (const c of layer) {
       const p = positions[c.id];
       if (!p) continue;
+      if (p.isBus) {
+        // Bus bar: thick horizontal line + end caps + label above + voltage below
+        const yMid = p.y + p.h / 2;
+        out.push(`<line x1="${p.x.toFixed(1)}" y1="${yMid.toFixed(1)}" x2="${(p.x + p.w).toFixed(1)}" y2="${yMid.toFixed(1)}" stroke="#1a3a6e" stroke-width="${BUS_THICKNESS}" stroke-linecap="round"/>`);
+        // end caps (small filled circles)
+        out.push(`<circle cx="${p.x.toFixed(1)}" cy="${yMid.toFixed(1)}" r="5" fill="#1a3a6e"/>`);
+        out.push(`<circle cx="${(p.x + p.w).toFixed(1)}" cy="${yMid.toFixed(1)}" r="5" fill="#1a3a6e"/>`);
+        // ref label above
+        out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y - 6).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#1a3a6e">${escapeXml(c.ref || c.id)}</text>`);
+        // model label below
+        out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 14).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
+        continue;
+      }
+      // Regular node: IEC symbol inside a box, ref above, model below
       const symId = findIecIdByCategory(c.category);
       if (symId) {
         const sym = loadIecSymbol(symId);
@@ -448,29 +529,59 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
         const sy = p.y + (p.h - sh) / 2;
         out.push(`<svg x="${sx.toFixed(1)}" y="${sy.toFixed(1)}" width="${sw.toFixed(1)}" height="${sh.toFixed(1)}" viewBox="${sym.viewBox}">${sym.innerSvg}</svg>`);
       }
-      out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" height="${p.h}" fill="none" stroke="#999" stroke-width="0.5"/>`);
-      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y - 4).toFixed(1)}" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold">${escapeXml(c.ref || c.id)}</text>`);
-      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 12).toFixed(1)}" text-anchor="middle" font-family="Arial" font-size="9">${escapeXml(c.model || '')}</text>`);
+      out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" height="${p.h}" fill="white" stroke="#333" stroke-width="1"/>`);
+      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y - 4).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#222">${escapeXml(c.ref || c.id)}</text>`);
+      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 12).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
     }
   }
 
-  // Draw connections
+  // Draw connections (orthogonal: src-right -> midX -> dst-left).  When the
+  // horizontal span is more than 1.5 layer slots, route the trunk along a
+  // dedicated channel below the components row to avoid crossing them.
   const compiled = compileUem(uem);
+  // Compute the components-row baseline: bottom of the lowest placed node.
+  let rowBottom = 0;
+  for (const k in positions) { if (positions[k].y + positions[k].h > rowBottom) rowBottom = positions[k].y + positions[k].h; }
+  const trunkY = rowBottom + 30;          // 30px below the row
+  const layerWidth = LAYER_GAP_X + NODE_WIDTH;
   for (const conn of (compiled.connections || [])) {
     const a = positions[conn.from];
     const b = positions[conn.to];
     if (!a || !b) continue;
-    const x1 = a.x + a.w / 2;
-    const y1 = a.y + a.h;
-    const x2 = b.x + b.w / 2;
-    const y2 = b.y;
-    out.push(`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="black" stroke-width="1"/>`);
+    const pa = getPort(a, 'right');
+    const pb = getPort(b, 'left');
+    const spanSlots = Math.abs(slotIndexOf(b, positions) - slotIndexOf(a, positions));
+    if (Math.abs(pa.y - pb.y) < 0.5 && spanSlots <= 1) {
+      // Aligned ports and adjacent columns: a single straight line is fine
+      out.push(`<line x1="${pa.x.toFixed(1)}" y1="${pa.y.toFixed(1)}" x2="${pb.x.toFixed(1)}" y2="${pb.y.toFixed(1)}" stroke="black" stroke-width="2"/>`);
+    } else if (spanSlots > 1) {
+      // Long connection: drop to the trunk channel, run, then climb to the dst.
+      const d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${(pa.x + 20).toFixed(1)} ${pa.y.toFixed(1)} L ${(pa.x + 20).toFixed(1)} ${trunkY.toFixed(1)} L ${(pb.x - 20).toFixed(1)} ${trunkY.toFixed(1)} L ${(pb.x - 20).toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
+    } else {
+      // Adjacent column but ports at different Y: simple 4-vertex ortho at src-Y
+      const midX = (pa.x + pb.x) / 2;
+      const d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
+    }
+    // arrow head at the dst end
+    out.push(`<circle cx="${pb.x.toFixed(1)}" cy="${pb.y.toFixed(1)}" r="3" fill="black"/>`);
+  }
+
+  // Layer labels at the bottom of the canvas
+  const layerNames = ['源 (Source)', '电池 (Battery)', '直流母线 (DC Bus)', 'PCS', '交流母线 (AC Bus)', '升压/负载 (XF / Load)'];
+  for (let li = 0; li < layers.length; li++) {
+    const layer = layers[li];
+    if (!layer.length) continue;
+    const slotLeft = PAGE_PADDING_X + li * (LAYER_GAP_X + NODE_WIDTH);
+    const xCenter = slotLeft + NODE_WIDTH / 2;
+    out.push(`<text x="${xCenter.toFixed(1)}" y="${(totalH - 18).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#888">${escapeXml(layerNames[li] || ('L' + li))}</text>`);
   }
 
   // Legend
-  const legendY = totalH - 12;
-  out.push(`<text x="20" y="${legendY}" font-family="Arial" font-size="8" fill="#666">ess-platform L5 SVG Renderer | UEM v${uem.schema_version || '1.0'}</text>`);
-  out.push(`<text x="${totalW - 20}" y="${legendY}" text-anchor="end" font-family="Arial" font-size="8" fill="#666">PRJ: ${escapeXml(project.id || '')} | 容量: ${elec.capacity_kwh || '-'} kWh | 功率: ${elec.power_kw || '-'} kW</text>`);
+  const legendY = totalH - 6;
+  out.push(`<text x="${PAGE_PADDING_X}" y="${legendY}" font-family="Arial, sans-serif" font-size="8" fill="#999">ess-platform L5 SVG Renderer | ${escapeXml(project.id || '')}</text>`);
+  out.push(`<text x="${(totalW - PAGE_PADDING_X).toFixed(1)}" y="${legendY}" text-anchor="end" font-family="Arial, sans-serif" font-size="8" fill="#999">ess-agent.com (Vercel)</text>`);
 
   out.push('</svg>');
   return out.join('\n');
