@@ -4890,7 +4890,11 @@ function bsCalcBatteryLifeMgmt(params){
 
 
 function bsElecBuildEngModel(bsResult){
-  const p=bsResult.inputParams;const pw=bsResult.powerCapacity;const cs=bsResult.chargingSystem;const cr=bsResult.chargingRack;const bp=bsResult.batteryPool;
+  const p=bsResult.inputParams||{voltage:10,swapBayCount:2,vehicleCount:5,chargingPower:60,batteryCapacity:282,projName:'换电站项目（待命名）'};
+  const pw=bsResult.powerCapacity||{transformerCount:1,transformerUnitCapacity:1600};
+  const cs=bsResult.chargingSystem||{pcsPower:0,moduleCount:0};
+  const cr=bsResult.chargingRack||{actualSlots:0,rackStructure:{layers:4}};
+  const bp=bsResult.batteryPool||{total:0,online:0};
   const trCount=pw.transformerCount||1;
   const trCap=pw.transformerUnitCapacity||1600;
   const rackCount=Math.max(1,Math.ceil(cr.actualSlots/24));
@@ -5051,13 +5055,27 @@ function bsElecBuildTopology(engModel,symbolMap){
   Object.keys(SLD_RULES.topologyTemplates).forEach(key=>{
     const template=SLD_RULES.topologyTemplates[key];
     const layout=bsElecCalcLayout(key,template,deviceMap);
-    topologies[key]={diagramType:key,description:template.description,links:template.links,busbarSegments:template.busbarSegments,circuitDesignations:template.circuitDesignations,layout,deviceMap};
+    const supplementedLinks=[];
+    template.links.forEach(link=>{
+      supplementedLinks.push(link);
+      if(link.to&&deviceMap[link.to]){
+        const toDev=deviceMap[link.to];
+        if((toDev.type==='motor'||toDev.type==='rack')&&link.from&&!deviceMap[link.from+'_'+toDev.code]){
+          const breakerCode='QF_AUTO_'+toDev.code;
+          if(!deviceMap[breakerCode]){
+            const autoDev={code:breakerCode,type:toDev.type==='motor'?'mccb':'breaker',nameZh:(toDev.type==='motor'?'塑壳断路器':'DC断路器')+'(自动补充)',voltage:toDev.voltage,model:'-',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{top:link.from,bottom:link.to},symbolCode:toDev.type==='motor'?'MCCB':'QF',symbolDef:IEC_SYMBOL_REGISTRY[toDev.type==='motor'?'MCCB':'QF']||null,_autoAdded:true};
+            deviceMap[breakerCode]=autoDev;
+          }
+        }
+      }
+    });
+    topologies[key]={diagramType:key,description:template.description,links:supplementedLinks,busbarSegments:template.busbarSegments,circuitDesignations:template.circuitDesignations,layout,deviceMap};
   });
   return topologies;
 }
 
 function bsElecDrawSymbol(device,x,y){
-  if(!device.symbolDef) return '<g transform="translate('+x+','+y+')"><rect x="-12" y="-12" width="24" height="24" rx="2" fill="none" stroke="#e06070" stroke-width="1.5"/><text x="0" y="4" text-anchor="middle" fill="#e06070" font-size="9">'+(device.symbolCode||device.code)+'</text></g>';
+  if(!device.symbolDef){console.warn('[IEC] 图元缺失: '+device.code+' → '+device.type);return '<g transform="translate('+x+','+y+')"><rect x="-12" y="-12" width="24" height="24" rx="2" fill="none" stroke="#ff4444" stroke-width="1.5"/><text x="0" y="4" text-anchor="middle" fill="#ff4444" font-size="9">'+(device.symbolCode||device.code)+'</text></g>';}
   const sym=device.symbolDef;
   let s='<g transform="translate('+x+','+y+')">';
   const lw=sym.code==='BUS'?3:1.5;
@@ -5148,6 +5166,14 @@ function bsElecRenderDiagram(containerId,topology,symbolMap,engModel){
 function bsElecRender10kvDiagram(containerId,topology,symbolMap,engModel){
   const c=document.getElementById(containerId);if(!c) return;
   const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
+  if(engModel.voltageLevel&&String(engModel.voltageLevel).includes('0.4')){
+    let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
+    s+='<text x="840" y="500" text-anchor="middle" fill="#EF9F27" font-size="18" font-weight="bold">本项目采用0.4kV低压接入，无10kV一次系统</text>';
+    s+='<text x="840" y="540" text-anchor="middle" fill="#888" font-size="12">请查看"低压配电单线图"获取完整电气设计</text>';
+    s+='</svg>';
+    s=bsElecRenderTitleBlock(s,'10kv_primary',engModel);
+    c.innerHTML=s;return;
+  }
   const top=topology['10kv_primary'];if(!top) return;
   const devMap=top.deviceMap||{};
   let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
@@ -5281,6 +5307,13 @@ function bsElecExportSvg(mode){
     const serializer=new XMLSerializer();
     let svgStr=serializer.serializeToString(svgEl);
     svgStr='<?xml version="1.0" encoding="UTF-8"?>\n'+svgStr;
+    if(svgStr.length<500){
+      const warn=document.createElement('span');
+      warn.textContent='导出内容可能不完整，请检查';
+      warn.style.cssText='color:#EF9F27;font-size:11px;margin-left:8px';
+      document.getElementById('bsElecToolbar').appendChild(warn);
+      setTimeout(function(){warn.remove();},3000);
+    }
     const blob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
