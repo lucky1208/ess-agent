@@ -255,6 +255,7 @@ function generateRulesUem(form) {
   const scen = form.scenario || 'commercial';
   const isAidc = scen === 'aidc_colocation' || scen === 'aidc_selfbuilt';
   const isMicrogrid = scen === 'microgrid';
+  const isBss = form.project_type === 'battery_swap' || /换电|swap/i.test(form.name || '') || scen === 'heavy_truck_logistics' || scen === 'mining' || scen === 'port';
   const today = new Date();
   const dateStr = today.getFullYear() +
     String(today.getMonth() + 1).padStart(2, '0') +
@@ -265,8 +266,100 @@ function generateRulesUem(form) {
   const dur = cap > 0 && pwr > 0 ? +(cap / pwr).toFixed(2) : 2;
   // 场景合理默认值
   let voltage = elec.voltage_level;
-  if (!voltage) voltage = isAidc ? '10kV' : (cap > 5000 ? '10kV' : (cap > 100 ? '400V' : '380V'));
+  if (!voltage) voltage = isAidc || isBss ? '10kV' : (cap > 5000 ? '10kV' : (cap > 100 ? '400V' : '380V'));
   let gridMode = elec.grid_mode || (isMicrogrid ? 'hybrid' : 'grid_tied');
+
+  // ====================== 换电站分支 (v1.2) ======================
+  if (isBss) {
+    const moduleKw = 30;
+    const modulesPerSlot = 2;
+    const totalSlots = 16;
+    const totalModules = totalSlots * modulesPerSlot;
+    const trKva = Math.ceil((pwr * 1.1) / 100) * 100 || 1300;
+    return {
+      schema_version: '1.2',
+      project: {
+        id,
+        name: (form.name || 'XX物流园重卡换电站'),
+        type: 'battery_swap',
+        scenario: scen === 'commercial' ? 'heavy_truck_logistics' : scen,
+        standard: 'GB',
+        revision: 'Rev.A',
+        designer: '卢继雄',
+        location: { country: 'CN', province: (form.location && form.location.province) || '江苏', altitude_m: 50 }
+      },
+      electrical: {
+        capacity_kwh: cap,
+        power_kw: pwr,
+        duration_h: dur,
+        voltage_level: voltage,
+        grid_mode: gridMode,
+        phases: 3,
+        frequency_hz: 50,
+        power_factor: 0.95,
+        efficiency_pct: 92,
+        thdi_pct: 5,
+        soc_min_pct: 10,
+        soc_max_pct: 90
+      },
+      sources: { pv_kw: 0, grid_capacity_kw: pwr },
+      loads: { total_kw: pwr, type: 'mixed', peak_kw: pwr, daily_kwh: pwr * 8 },
+      swap_station: {
+        mv_switchgear: { type: 'KYN28-12', incoming_voltage_kv: 10, protection: ['differential', 'overcurrent', 'instantaneous'], metering_class: '0.5S' },
+        transformer: { qty: 1, capacity_kva: trKva, hv_kv: 10, lv_kv: 0.4, type: 'Dry-type SCB13', connection: 'Dyn11' },
+        lv_distribution: {
+          panel_type: 'GCS', main_breaker_a: 2500,
+          feeders: [
+            { name: 'ChargingModules', power_kw: pwr, breaker_a: Math.ceil(pwr * 1000 / (400 * Math.sqrt(3) * 0.85) * 1.25) },
+            { name: 'SwapRobot-1', power_kw: 75, breaker_a: 160 },
+            { name: 'SwapRobot-2', power_kw: 75, breaker_a: 160 },
+            { name: 'HVAC', power_kw: 30, breaker_a: 63 },
+            { name: 'Lighting', power_kw: 10, breaker_a: 32 },
+            { name: 'FireFighting', power_kw: 15, breaker_a: 32 }
+          ]
+        },
+        dc_distribution: { bus_voltage_v: 750, rated_current_a: 1600, insulation_monitor: true },
+        charging_system: { total_modules: totalModules, module_power_kw: moduleKw, modules_per_slot: modulesPerSlot, rack_count: 1, rack_layout: { rows: 3, cols: 6 } },
+        battery_cabin: {
+          layout: { rows: 3, cols: 6, total_slots: totalSlots },
+          slot_states: [
+            { slot_id: 'R1C1', state: 'FULL', soc_pct: 100 }, { slot_id: 'R1C2', state: 'FULL', soc_pct: 100 },
+            { slot_id: 'R1C3', state: 'FULL', soc_pct: 100 }, { slot_id: 'R1C4', state: 'FULL', soc_pct: 100 },
+            { slot_id: 'R1C5', state: 'FULL', soc_pct: 100 }, { slot_id: 'R1C6', state: 'CHARGING', soc_pct: 75 },
+            { slot_id: 'R2C1', state: 'CHARGING', soc_pct: 60 }, { slot_id: 'R2C2', state: 'CHARGING', soc_pct: 50 },
+            { slot_id: 'R2C3', state: 'CHARGING', soc_pct: 80 }, { slot_id: 'R2C4', state: 'CHARGING', soc_pct: 45 },
+            { slot_id: 'R2C5', state: 'CHARGING', soc_pct: 90 }, { slot_id: 'R2C6', state: 'IDLE', soc_pct: 0 },
+            { slot_id: 'R3C1', state: 'IDLE', soc_pct: 0 }, { slot_id: 'R3C2', state: 'IDLE', soc_pct: 0 },
+            { slot_id: 'R3C3', state: 'IDLE', soc_pct: 0 }, { slot_id: 'R3C4', state: 'FAULTY', soc_pct: 0 }
+          ]
+        },
+        swap_area: {
+          bay_count: 2, swap_time_min: 6,
+          robots: [
+            { id: 'ROB-01', type: 'gantry_3axis', power_kw: 75 },
+            { id: 'ROB-02', type: 'gantry_3axis', power_kw: 75 }
+          ]
+        },
+        communication: { ems_proto: 'IEC104', bms_proto: 'CAN2.0B', pcs_proto: 'ModbusTCP', robot_proto: 'ModbusTCP' },
+        grounding: { system_type: 'TN-S', resistance_ohm: 4.0, main_bus: 'TMY-40x4' }
+      },
+      protection: {
+        overcurrent: true, instantaneous: true, earth_fault: true,
+        overcurrent_setting: { setting_pct: 110, delay_s: 1.0 },
+        instantaneous_setting: { setting_pct: 600, delay_s: 0.05 },
+        earth_fault_setting: { setting_pct: 30, delay_s: 0.2 }
+      },
+      compliance: { score: 95, grade: 'B', standards: ['GB 50059', 'GB 50054'], violations: [] },
+      drawings: { sld_required: true, architecture_required: true, communication_required: true },
+      special_requirements: ['KYN28-12 中压柜', 'GCS 低压配电', 'DC750V 充电母线', 'IEC104 通信协议', 'TN-S 接地 (≤4Ω)'],
+      metadata: {
+        rules_version: 'v1.2',
+        llm_model: 'rules-engine-v1.2',
+        llm_raw_output: '(generated by rules engine — no LLM API key configured, template-based fallback for battery_swap)',
+        generated_at: today.toISOString()
+      }
+    };
+  }
 
   return {
     schema_version: '1.1',
@@ -359,14 +452,15 @@ function fetchWithTimeout(url, options, timeoutMs = FETCH_TIMEOUT_MS) {
     .finally(() => clearTimeout(timer));
 }
 
-async function callProvider(providerKey, messages) {
+async function callProvider(providerKey, messages, rawForm) {
   const cfg = PROVIDERS[providerKey];
   if (!cfg) throw new Error(`Unknown provider: ${providerKey}`);
 
   // rules engine 不走 HTTP,直接生成 UEM
   if (cfg.protocol === 'rules') {
-    // 从 messages.user 里反解 form (formToPromptText 的输出)
-    const form = decodeFormFromPrompt(messages[messages.length - 1]?.content || '');
+    // 从 messages.user 里反解 form (formToPromptText 的输出),并 merge rawForm 字段 (name/project_type)
+    const decoded = decodeFormFromPrompt(messages[messages.length - 1]?.content || '');
+    const form = Object.assign({}, decoded, rawForm || {});
     return { content: JSON.stringify(generateRulesUem(form)), raw: { rules_engine: true } };
   }
 
@@ -383,7 +477,7 @@ async function callProvider(providerKey, messages) {
 }
 
 // Fallback chain: 在 callProvider 失败时,自动降级
-async function callProviderWithFallback(requestedKey, messages) {
+async function callProviderWithFallback(requestedKey, messages, rawForm) {
   const tried = new Set();
   const order = [];
   // 优先用户指定,再按优先级 fallback; rules_engine 永远最后兜底
@@ -403,7 +497,7 @@ async function callProviderWithFallback(requestedKey, messages) {
     }
     try {
       console.log(`[schemagen] trying ${k}...`);
-      const result = await callProvider(k, messages);
+      const result = await callProvider(k, messages, rawForm);
       return { ...result, provider_used: k };
     } catch (e) {
       console.warn(`[schemagen] ${k} failed: ${e.message?.slice(0, 200)}`);
@@ -414,7 +508,8 @@ async function callProviderWithFallback(requestedKey, messages) {
   // 终极兜底: rules_engine(模板生成,不抛错)
   console.log('[schemagen] all LLM providers failed, falling back to rules_engine template');
   try {
-    const form = decodeFormFromPrompt(messages[messages.length - 1]?.content || '');
+    const decoded = decodeFormFromPrompt(messages[messages.length - 1]?.content || '');
+    const form = Object.assign({}, decoded, rawForm || {});
     const result = { content: JSON.stringify(generateRulesUem(form)), raw: { rules_engine: true } };
     return { ...result, provider_used: 'rules_engine' };
   } catch (e) {
@@ -720,7 +815,18 @@ function runtimeBackfill(uem) {
     uem.special_requirements = [];
   }
   const gridMode = elec.grid_mode || 'grid_tied';
-  if (gridMode !== 'off_grid') {
+  // 换电站场景: 用 IEC104 + CAN2.0B 而不是通用 IEC 61850
+  if (uem.project && uem.project.type === 'battery_swap') {
+    if (!uem.special_requirements.some(s => /IEC\s*104/i.test(s))) {
+      uem.special_requirements.push('IEC 104 通信协议 (国标 DL/T 634.5104)');
+    }
+    if (!uem.special_requirements.some(s => /CAN\s*2\.0\s*B/i.test(s))) {
+      uem.special_requirements.push('CAN 2.0B 总线 (电池管理)');
+    }
+    if (!uem.special_requirements.some(s => /TN-S/i.test(s) || /接地/i.test(s))) {
+      uem.special_requirements.push('TN-S 接地系统 (≤4Ω)');
+    }
+  } else if (gridMode !== 'off_grid') {
     if (!uem.special_requirements.some(s => /IEC\s*61850/i.test(s))) {
       uem.special_requirements.push('IEC 61850 (国标 GB/T 36276)');
     }
@@ -735,7 +841,9 @@ function runtimeBackfill(uem) {
   if (!uem.metadata.llm_raw_output) {
     uem.metadata.llm_raw_output = '(set by L1)';
   }
-  if (!uem.metadata.rules_version) uem.metadata.rules_version = 'v1.1';
+  if (!uem.metadata.rules_version) {
+    uem.metadata.rules_version = (uem.schema_version === '1.2') ? 'v1.2' : 'v1.1';
+  }
 
   return uem;
 }
@@ -785,12 +893,15 @@ export default async function handler(req, res) {
     const systemPrompt = loadSystemPrompt();
     const userPrompt = formToPromptText(form);
 
+    // 2.5) schema_version 升级到 v1.2 (如果 LLM 返回 v1.1 但 project.type=battery_swap,强制升级)
+    // 由 runtimeBackfill 后续统一处理
+
     // 3) 调 LLM (带 fallback)
     const messages = [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt }
     ];
-    const { content, provider_used } = await callProviderWithFallback(providerUsed, messages);
+    const { content, provider_used } = await callProviderWithFallback(providerUsed, messages, form);
     if (provider_used) providerUsed = provider_used;
 
     // 4) 5 级 JSON 修复链
@@ -806,9 +917,13 @@ export default async function handler(req, res) {
       });
     }
 
-    // 5) 注入 metadata 模型名
+    // 5) 注入 metadata 模型名 + v1.2 升级
     if (!uem.metadata) uem.metadata = {};
     uem.metadata.llm_model = PROVIDERS[providerUsed]?.model || providerUsed;
+    if (uem.project && uem.project.type === 'battery_swap' && (!uem.schema_version || uem.schema_version === '1.1')) {
+      uem.schema_version = '1.2';
+      console.log('[schemagen] upgraded UEM schema_version to 1.2 for battery_swap');
+    }
 
     // 6) runtime backfill (soc_min_pct 等)
     uem = runtimeBackfill(uem);

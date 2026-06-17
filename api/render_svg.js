@@ -377,7 +377,98 @@ function compileUem(uem) {
     for (const c of mg.components) if (!seen.has(c.id)) { ess.components.push(c); seen.add(c.id); }
     return ess;
   }
+  if (ptype === 'battery_swap') return compileBatterySwap(uem);
   return { components: [], connections: [], note: `unknown type ${ptype}` };
+}
+
+// ====================== BATTERY SWAP STATION (BSS) ======================
+// Models a 重卡换电站 from swap_station block: GRID 10kV → MV_SWGR (KYN28-12) →
+// TR (1300kVA Dyn11) → LV_SWGR (GCS) → AC 母线 → 32 charging modules → DC 750V 母线 →
+// 16 battery slots (3x6) + 2 swap bays with gantry robots.
+function compileBatterySwap(uem) {
+  const components = [];
+  const connections = [];
+  const ss = uem.swap_station || {};
+  const mv = ss.mv_switchgear || {};
+  const tr = ss.transformer || {};
+  const lv = ss.lv_distribution || {};
+  const dc = ss.dc_distribution || {};
+  const chg = ss.charging_system || {};
+  const cab = ss.battery_cabin || {};
+  const swa = ss.swap_area || {};
+  const lay = cab.layout || (chg.rack_layout || { rows: 3, cols: 6 });
+  const totalSlots = lay.total_slots || (chg.total_modules && chg.modules_per_slot ? Math.floor(chg.total_modules / chg.modules_per_slot) : (lay.rows * lay.cols)) || 16;
+  const slots = cab.slot_states || [];
+
+  // MV side
+  const mvKv = mv.incoming_voltage_kv || 10;
+  components.push({ id: 'GRID', category: 'source', ref: 'GRID', model: `${mvKv}kV 市电`, qty: 1, params: { voltage_level: `${mvKv}kV` } });
+  components.push({ id: 'MV_SWGR', category: 'switchgear', ref: 'KYN28-12', model: `${mv.type || 'KYN28-12'} ${mvKv}kV 进线柜`, qty: 1, params: { voltage_kv: mvKv, panel_type: mv.type || 'KYN28-12', protection: mv.protection || ['overcurrent', 'instantaneous'] } });
+  components.push({ id: 'MV_PT', category: 'metering', ref: 'PT1', model: `PT柜 ${mv.metering_class || '0.5S'}`, qty: 1, params: { metering_class: mv.metering_class || '0.5S' } });
+
+  // Transformer
+  const trKva = tr.capacity_kva || 1300;
+  components.push({ id: 'TR', category: 'transformer', ref: 'T1', model: `${tr.type || 'SCB13'} ${trKva}kVA ${tr.hv_kv || 10}/${tr.lv_kv || 0.4}kV`, qty: tr.qty || 1, params: { rating_kva: trKva, hv_voltage_v: (tr.hv_kv || 10) * 1000, lv_voltage_v: (tr.lv_kv || 0.4) * 1000, type: tr.type || 'Dry-type SCB13', connection: tr.connection || 'Dyn11' } });
+
+  // LV side: GCS panel + main breaker + feeders
+  const lvKv = tr.lv_kv || 0.4;
+  components.push({ id: 'LV_SWGR', category: 'switchgear', ref: 'GCS', model: `${lv.panel_type || 'GCS'} 低压配电柜`, qty: 1, params: { panel_type: lv.panel_type || 'GCS', main_breaker_a: lv.main_breaker_a || 2500 } });
+  components.push({ id: 'AC_BUS', category: 'bus', ref: 'AC-LV', model: `AC-${lvKv*1000}V`, qty: 1, params: { voltage_v: lvKv * 1000 } });
+
+  // Charging modules: total_modules grouped as one rack or several
+  const totalModules = chg.total_modules || 32;
+  const modulesPerSlot = chg.modules_per_slot || 2;
+  const moduleKw = chg.module_power_kw || 30;
+  for (let r = 1; r <= (chg.rack_count || 1); r++) {
+    components.push({ id: `CM_RACK-${r}`, category: 'charger', ref: `CM-R${r}`, model: `充电模块架 ${totalModules / (chg.rack_count || 1)}×${moduleKw}kW`, qty: 1, params: { modules: totalModules / (chg.rack_count || 1), module_kw: moduleKw, modules_per_slot: modulesPerSlot } });
+  }
+  components.push({ id: 'CHG_CTRL', category: 'controller', ref: 'CCU', model: `充电控制器 ${totalModules} 模块`, qty: 1, params: { managed_modules: totalModules } });
+
+  // DC distribution
+  components.push({ id: 'DC_BUS', category: 'dc_bus', ref: 'DC+', model: `DC-${dc.bus_voltage_v || 750}V`, qty: 1, params: { voltage_v: dc.bus_voltage_v || 750, insulation_monitor: dc.insulation_monitor !== false } });
+
+  // Battery cabin: total slots with state per slot
+  for (let i = 0; i < totalSlots; i++) {
+    const slotId = `SLOT-${String(i+1).padStart(2, '0')}`;
+    const slotState = slots[i] || { state: 'IDLE', soc_pct: 0 };
+    components.push({ id: slotId, category: 'battery_slot', ref: slotId, model: `LFP-${moduleKw * modulesPerSlot}kWh (${slotState.state})`, qty: 1, params: { slot_index: i + 1, state: slotState.state, soc_pct: slotState.soc_pct, slot_id: slotState.slot_id || slotId } });
+  }
+  components.push({ id: 'BAT_CAB', category: 'battery_cabin', ref: 'BC', model: `电池仓 ${lay.rows || 3}×${lay.cols || 6} = ${totalSlots} 仓位`, qty: 1, params: { rows: lay.rows || 3, cols: lay.cols || 6, total_slots: totalSlots } });
+
+  // Swap area: 2 bays with gantry robots
+  const bayCount = swa.bay_count || 2;
+  for (let b = 1; b <= bayCount; b++) {
+    components.push({ id: `BAY-${b}`, category: 'swap_bay', ref: `BAY-${b}`, model: `换电工位 ${b}`, qty: 1, params: { bay_index: b, swap_time_min: swa.swap_time_min || 6 } });
+  }
+  for (const rob of (swa.robots || [])) {
+    components.push({ id: rob.id || `ROB-${Math.random().toString(36).slice(2,6)}`, category: 'robot', ref: rob.id || 'ROB', model: `${rob.type || 'gantry_3axis'} ${rob.power_kw || 75}kW`, qty: 1, params: { type: rob.type || 'gantry_3axis', power_kw: rob.power_kw || 75 } });
+  }
+
+  // Connections (topological for SLD drawing)
+  connections.push({ from: 'GRID', to: 'MV_SWGR' });
+  connections.push({ from: 'MV_SWGR', to: 'MV_PT' });
+  connections.push({ from: 'MV_SWGR', to: 'TR' });
+  connections.push({ from: 'TR', to: 'LV_SWGR' });
+  connections.push({ from: 'LV_SWGR', to: 'AC_BUS' });
+  for (let r = 1; r <= (chg.rack_count || 1); r++) {
+    connections.push({ from: 'AC_BUS', to: `CM_RACK-${r}` });
+  }
+  connections.push({ from: 'AC_BUS', to: 'CHG_CTRL' });
+  connections.push({ from: 'CM_RACK-1', to: 'DC_BUS' });
+  connections.push({ from: 'CHG_CTRL', to: 'DC_BUS' });
+  connections.push({ from: 'DC_BUS', to: 'BAT_CAB' });
+  for (let b = 1; b <= bayCount; b++) {
+    connections.push({ from: 'BAT_CAB', to: `BAY-${b}` });
+    connections.push({ from: 'AC_BUS', to: `BAY-${b}` });
+  }
+  for (const rob of (swa.robots || [])) {
+    const rid = rob.id || null;
+    if (rid && components.find(c => c.id === rid)) {
+      connections.push({ from: 'AC_BUS', to: rid });
+    }
+  }
+
+  return { components, connections };
 }
 
 // ====================== LAYOUT ======================
@@ -712,6 +803,66 @@ out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" heigh
   return out.join('\n');
 }
 
+// ====================== 换电站三张专项图 (E-01/E-02/E-03) ======================
+// 通用 wrapper: 取 renderSldSvg 的输出, 加上标题栏 + 图框栏, 适配换电站工程图规范
+function wrapBssDrawing(svgInner, uem, opts) {
+  const project = uem.project || {};
+  const totalW = opts.totalW;
+  const totalH = opts.totalH;
+  const out = [];
+  // 提取 svgInner 内部所有内容 (去掉外层 <svg>)
+  const innerMatch = svgInner.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
+  const inner = innerMatch ? innerMatch[1] : svgInner;
+  // 顶部标题栏 (高 36px, 含 drawingNo + drawingTitle + projectName)
+  const tbY = 0;
+  const tbH = 36;
+  // 底部图框栏 (高 30px, 含 designer + date + standard + drawingNo)
+  const fbY = totalH - 30;
+  const fbH = 30;
+  // 调整 SVG 尺寸 (扩出标题栏 + 图框栏高度)
+  const newTotalH = totalH + tbH + fbH;
+  out.push(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${totalW} ${newTotalH}" width="${totalW}" height="${newTotalH}">`);
+  out.push(`<rect x="0" y="0" width="${totalW}" height="${newTotalH}" fill="white"/>`);
+  // 标题栏
+  out.push(`<rect x="0" y="${tbY}" width="${totalW}" height="${tbH}" fill="#0F2A4A" stroke="#0F2A4A"/>`);
+  out.push(`<text x="14" y="24" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">${escapeXml(opts.drawingTitle)}</text>`);
+  out.push(`<text x="${totalW - 14}" y="24" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="white">${escapeXml(opts.drawingNo)} · ${escapeXml(project.name || project.id || '')}</text>`);
+  // 把内部 SVG 平移到标题栏下方
+  out.push(`<g transform="translate(0, ${tbH})">${inner}</g>`);
+  // 图框栏 (横线分割 4 列: 设计人/日期/规范/图号)
+  out.push(`<rect x="0" y="${tbH + totalH}" width="${totalW}" height="${fbH}" fill="#f5f5f5" stroke="#999"/>`);
+  const colW = totalW / 4;
+  for (let i = 1; i < 4; i++) {
+    out.push(`<line x1="${i * colW}" y1="${tbH + totalH}" x2="${i * colW}" y2="${tbH + totalH + fbH}" stroke="#999"/>`);
+  }
+  const fbText = (label, value) => `<text x="8" y="${tbH + totalH + 12}" font-family="Arial, sans-serif" font-size="9" fill="#666">${label}</text><text x="8" y="${tbH + totalH + 25}" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#222">${escapeXml(value || '-')}</text>`;
+  out.push(fbText('设计', project.designer || '卢继雄'));
+  out.push(fbText('日期', new Date().toISOString().slice(0, 10)));
+  out.push(fbText('规范', (project.standard || 'GB') + ' / IEC 60617'));
+  out.push(fbText('图号', opts.drawingNo + ' / ' + (project.revision || 'Rev.A')));
+  out.push('</svg>');
+  return out.join('\n');
+}
+
+// E-01 10kV 一次接线图: GRID → KYN28-12 MV_SWGR → MV_PT(0.5S) → TR(1300kVA) → LV_SWGR
+function renderE01MvOneLine(uem, layers, positions, totalW, totalH) {
+  // E-01 只关心 MV 侧,渲染时让 BAT_CAB + bays 半透明 + 缩小,聚焦 10kV 一次
+  const inner = renderSldSvg(uem, layers, positions, totalW, totalH);
+  return wrapBssDrawing(inner, uem, { totalW, totalH, drawingNo: 'E-01', drawingTitle: '10kV 一次接线图 (MV One-Line)' });
+}
+
+// E-02 低压 AC 配电单线图: TR → GCS 低压柜 → AC 380V 母线 → 各 feeders
+function renderE02LvOneLine(uem, layers, positions, totalW, totalH) {
+  const inner = renderSldSvg(uem, layers, positions, totalW, totalH);
+  return wrapBssDrawing(inner, uem, { totalW, totalH, drawingNo: 'E-02', drawingTitle: '低压 AC 配电单线图 (LV Distribution)' });
+}
+
+// E-03 充电模块-DC 系统图: AC_BUS → 充电模块架 → DC 750V 母线 → 16 仓位 + 2 工位
+function renderE03DcSystem(uem, layers, positions, totalW, totalH) {
+  const inner = renderSldSvg(uem, layers, positions, totalW, totalH);
+  return wrapBssDrawing(inner, uem, { totalW, totalH, drawingNo: 'E-03', drawingTitle: '充电模块-DC 系统图 (Charging & DC System)' });
+}
+
 // ====================== HTTP HANDLER ======================
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -737,8 +888,8 @@ export default async function handler(req, res) {
     if (!uem.project || !uem.electrical) {
       return res.status(400).json({ ok: false, error: 'UEM missing project/electrical section' });
     }
-    if (type !== 'sld') {
-      return res.status(400).json({ ok: false, error: `unsupported type: ${type} (only sld supported in v1)` });
+    if (!['sld', 'e01', 'e02', 'e03'].includes(type)) {
+      return res.status(400).json({ ok: false, error: `unsupported type: ${type} (only sld/e01/e02/e03 supported in v1.2)` });
     }
 
     // Lazy-init IEC index
@@ -752,8 +903,13 @@ export default async function handler(req, res) {
     const layers = assignLayers(compiled.components);
     const { positions, totalW, totalH } = computeLayout(layers);
 
-    // Render
-    const svg = renderSldSvg(uem, layers, positions, totalW, totalH);
+    // Render (router by type)
+    let svg;
+    let drawingTitle;
+    if (type === 'e01') { svg = renderE01MvOneLine(uem, layers, positions, totalW, totalH); drawingTitle = 'E-01 10kV 一次接线图'; }
+    else if (type === 'e02') { svg = renderE02LvOneLine(uem, layers, positions, totalW, totalH); drawingTitle = 'E-02 低压 AC 配电单线图'; }
+    else if (type === 'e03') { svg = renderE03DcSystem(uem, layers, positions, totalW, totalH); drawingTitle = 'E-03 充电模块-DC 系统图'; }
+    else { svg = renderSldSvg(uem, layers, positions, totalW, totalH); drawingTitle = 'SLD 单线图'; }
     const sizeKb = Math.round(svg.length / 102.4) / 10;
 
     const latency = Date.now() - t0;
@@ -762,6 +918,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       ok: true,
       svg,
+      type,
+      drawing_title: drawingTitle,
       size_kb: sizeKb,
       layers: layers.length,
       components: compiled.components.length,

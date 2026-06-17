@@ -1,16 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ess-agent.com/schemas/uem/v1.1",
-  "title": "Unified Engineering Model (UEM) v1.1",
-  "description": "统一工程数据模型 v1.1 — 储能/微网/AIDC 电气设计的唯一真相来源。从 LLM 输出到图纸/BOM/合规检查,所有下游模块都消费这个 schema。v1.1 扩展(vs v1.0):电气参数(frequency/pf/efficiency/soc)、sources 分区、loads 分区、aidc_specific、compliance、drawings、metadata、protection 三段保护。",
-  "version": "1.1",
+  "$id": "https://ess-agent.com/schemas/uem/v1.2",
+  "title": "Unified Engineering Model (UEM) v1.2",
+  "description": "统一工程数据模型 v1.2 — 储能/微网/AIDC/换电站电气设计的唯一真相来源。从 LLM 输出到图纸/BOM/合规检查,所有下游模块都消费这个 schema。v1.2 扩展(vs v1.1):新增 project.type=battery_swap + swap_station 块(mv_switchgear/transformer/lv_distribution/dc_distribution/charging_system/battery_cabin/swap_area/communication/grounding),匹配 GLM5.2 工程级换电站建模。",
+  "version": "1.2",
   "type": "object",
   "required": ["schema_version", "project", "electrical"],
   "properties": {
     "schema_version": {
       "type": "string",
-      "enum": ["1.0", "1.1"],
-      "description": "Schema 版本,锁定后不允许随工程方便改字段名。v1.0 兼容(不强制 protection),v1.1 强制 protection 三段保护 + 必填项"
+      "enum": ["1.0", "1.1", "1.2"],
+      "description": "Schema 版本,锁定后不允许随工程方便改字段名。v1.0 兼容(不强制 protection),v1.1 强制 protection 三段保护 + 必填项,v1.2 新增 swap_station 块 + battery_swap 类型"
     },
     "project": {
       "type": "object",
@@ -18,11 +18,12 @@
       "properties": {
         "id":          { "type": "string", "pattern": "^PRJ-\\d{8}-\\d{3}$", "description": "项目编号 PRJ-YYYYMMDD-NNN" },
         "name":        { "type": ["string", "null"] },
-        "type":        { "enum": ["ess", "microgrid", "aidc", "hybrid"] },
-        "scenario":    { "enum": ["residential", "commercial", "industrial", "utility", "aidc_colocation", "aidc_selfbuilt"] },
+        "type":        { "enum": ["ess", "microgrid", "aidc", "hybrid", "battery_swap"] },
+        "scenario":    { "enum": ["residential", "commercial", "industrial", "utility", "aidc_colocation", "aidc_selfbuilt", "heavy_truck_logistics", "mining", "port"] },
         "standard":    { "enum": ["GB", "IEC", "NEC", "UL", "mixed"] },
         "revision":    { "type": ["string", "null"], "default": "Rev.A" },
         "created_at":  { "type": ["string", "null"], "format": "date-time" },
+        "designer":    { "type": ["string", "null"], "description": "设计人姓名(可选,出现于图纸标题栏)" },
         "location": {
           "type": "object",
           "properties": {
@@ -262,6 +263,157 @@
               "overcurrent":   { "const": true },
               "instantaneous": { "const": true },
               "earth_fault":   { "const": true }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "v1.2 项目 (含 battery_swap) 强制 swap_station 块存在 + 子对象必填",
+      "if": {
+        "properties": {
+          "schema_version": { "const": "1.2" },
+          "project": { "properties": { "type": { "const": "battery_swap" } } }
+        }
+      },
+      "then": {
+        "required": ["swap_station", "electrical", "compliance", "drawings", "protection"],
+        "properties": {
+          "swap_station": {
+            "type": "object",
+            "required": ["mv_switchgear", "transformer", "lv_distribution", "dc_distribution", "charging_system", "battery_cabin", "swap_area"],
+            "properties": {
+              "mv_switchgear": {
+                "type": "object",
+                "required": ["type", "incoming_voltage_kv", "protection"],
+                "properties": {
+                  "type": { "enum": ["KYN28-12", "XGN15-12", "KYN61-40.5", "SF6", "GIS"] },
+                  "incoming_voltage_kv": { "type": "number", "enum": [6, 10, 35] },
+                  "protection": { "type": "array", "items": { "enum": ["differential", "overcurrent", "instantaneous", "earth_fault", "distance"] }, "minItems": 1 },
+                  "metering_class": { "enum": ["0.2S", "0.5S", "1.0"] }
+                }
+              },
+              "transformer": {
+                "type": "object",
+                "required": ["qty", "capacity_kva", "hv_kv", "lv_kv", "type", "connection"],
+                "properties": {
+                  "qty": { "type": "integer", "minimum": 1, "maximum": 4 },
+                  "capacity_kva": { "type": "number", "minimum": 100 },
+                  "hv_kv": { "type": "number", "enum": [6, 10, 35] },
+                  "lv_kv": { "type": "number", "enum": [0.4, 0.69] },
+                  "type": { "enum": ["Dry-type SCB13", "Dry-type SCB10", "Oil-immersed S11", "Oil-immersed S13"] },
+                  "connection": { "enum": ["Dyn11", "Yyn0", "YNd11", "Dyn5"] }
+                }
+              },
+              "lv_distribution": {
+                "type": "object",
+                "required": ["panel_type", "main_breaker_a", "feeders"],
+                "properties": {
+                  "panel_type": { "enum": ["GCS", "GGD", "MNS", "Blokset", "Domestic-Custom"] },
+                  "main_breaker_a": { "type": "number", "minimum": 100 },
+                  "feeders": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["name", "power_kw", "breaker_a"],
+                      "properties": {
+                        "name": { "type": "string" },
+                        "power_kw": { "type": "number", "minimum": 0 },
+                        "breaker_a": { "type": "number", "minimum": 6 },
+                        "cable_type": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              },
+              "dc_distribution": {
+                "type": "object",
+                "required": ["bus_voltage_v"],
+                "properties": {
+                  "bus_voltage_v": { "type": "number", "enum": [200, 540, 600, 700, 750, 1000] },
+                  "rated_current_a": { "type": "number", "minimum": 100 },
+                  "insulation_monitor": { "type": "boolean" }
+                }
+              },
+              "charging_system": {
+                "type": "object",
+                "required": ["total_modules", "module_power_kw", "modules_per_slot"],
+                "properties": {
+                  "total_modules": { "type": "integer", "minimum": 1 },
+                  "module_power_kw": { "type": "number", "minimum": 5 },
+                  "modules_per_slot": { "type": "integer", "minimum": 1, "maximum": 8 },
+                  "rack_count": { "type": "integer", "minimum": 1 },
+                  "rack_layout": {
+                    "type": "object",
+                    "properties": {
+                      "rows": { "type": "integer", "minimum": 1 },
+                      "cols": { "type": "integer", "minimum": 1 }
+                    }
+                  }
+                }
+              },
+              "battery_cabin": {
+                "type": "object",
+                "required": ["layout"],
+                "properties": {
+                  "layout": {
+                    "type": "object",
+                    "required": ["rows", "cols", "total_slots"],
+                    "properties": {
+                      "rows": { "type": "integer", "minimum": 1 },
+                      "cols": { "type": "integer", "minimum": 1 },
+                      "total_slots": { "type": "integer", "minimum": 1 }
+                    }
+                  },
+                  "slot_states": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "slot_id": { "type": "string" },
+                        "state": { "enum": ["FULL", "CHARGING", "IDLE", "FAULTY"] },
+                        "soc_pct": { "type": "number", "minimum": 0, "maximum": 100 }
+                      }
+                    }
+                  }
+                }
+              },
+              "swap_area": {
+                "type": "object",
+                "required": ["bay_count", "swap_time_min"],
+                "properties": {
+                  "bay_count": { "type": "integer", "minimum": 1 },
+                  "swap_time_min": { "type": "number", "minimum": 1 },
+                  "robots": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "type": { "enum": ["gantry_3axis", "forklift_type", "robot_arm", "agv"] },
+                        "power_kw": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              },
+              "communication": {
+                "type": "object",
+                "properties": {
+                  "ems_proto": { "enum": ["IEC104", "ModbusTCP", "MQTT", "IEC61850"] },
+                  "bms_proto": { "enum": ["CAN2.0B", "RS485", "ModbusRTU"] },
+                  "pcs_proto": { "enum": ["ModbusTCP", "IEC61850"] },
+                  "robot_proto": { "enum": ["ModbusTCP", "Profinet", "EtherCAT"] }
+                }
+              },
+              "grounding": {
+                "type": "object",
+                "properties": {
+                  "system_type": { "enum": ["TN-S", "TN-C-S", "TT", "IT"] },
+                  "resistance_ohm": { "type": "number", "maximum": 4 },
+                  "main_bus": { "type": "string" }
+                }
+              }
             }
           }
         }
