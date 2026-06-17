@@ -1583,10 +1583,7 @@ ACC AC一体柜专题
 <div class="sw-tabs" style="margin-bottom:12px">
 <div class="sw-tab active" id="bsPtTab-bms" onclick="bsShowPtTab('bms')" data-i18n="bs_proto_bms">BMS点表</div>
 <div class="sw-tab" id="bsPtTab-pcs" onclick="bsShowPtTab('pcs')" data-i18n="bs_proto_pcs">PCS点表</div>
-<div class="sw-tab" id="bsPtTab-robot" onclick="bsShowPtTab('robot')" data-i18n="bs_proto_robot">换电机器人</div>
 <div class="sw-tab" id="bsPtTab-plc" onclick="bsShowPtTab('plc')" data-i18n="bs_proto_plc">PLC点表</div>
-<div class="sw-tab" id="bsPtTab-ems" onclick="bsShowPtTab('ems')" data-i18n="bs_proto_ems">EMS点表</div>
-<div class="sw-tab" id="bsPtTab-charger" onclick="bsShowPtTab('charger')" data-i18n="bs_proto_charger">充电模块</div>
 <div class="sw-tab" id="bsPtTab-iec104" onclick="bsShowPtTab('iec104')" data-i18n="bs_proto_iec104">IEC104</div>
 <div class="sw-tab" id="bsPtTab-mqtt" onclick="bsShowPtTab('mqtt')" data-i18n="bs_proto_mqtt">MQTT</div>
 </div>
@@ -4579,7 +4576,10 @@ const BS_POINT_TABLES={
     ['均衡状态','CAN 2.0B','0x103+4','只读','UINT8','0关1充2放'],
     ['单体电压组1','CAN 2.0B','0x200+0','只读','FP32×8','V'],
     ['单体电压组2','CAN 2.0B','0x200+32','只读','FP32×8','V'],
-    ['温度组1','CAN 2.0B','0x300+0','只读','FP32×8','℃']
+    ['温度组1','CAN 2.0B','0x300+0','只读','FP32×8','℃'],
+    ['充电状态(充电模块)','CAN/Modbus','50001','Holding','UINT16','0待1充2满3故'],
+    ['输出功率(充电模块)','CAN/Modbus','50006','Input','FP32','kW'],
+    ['充电限功率(充电模块)','CAN/Modbus','50024','Holding','R/W','FP32','kW']
   ],
   pcs:[
     ['运行状态','Modbus TCP','40001','Holding','UINT16','0停1运2故'],
@@ -4596,24 +4596,10 @@ const BS_POINT_TABLES={
     ['机内温度','Modbus TCP','40024','Input','FP32','℃'],
     ['故障码','Modbus TCP','40026','Input','UINT16','HEX'],
     ['日充电量','Modbus TCP','40028','Input','FP32','kWh'],
-    ['日放电量','Modbus TCP','40030','Input','FP32','kWh']
-  ],
-  robot:[
-    ['运行状态','Modbus TCP','30001','Holding','UINT16','0待1运2故'],
-    ['X坐标','Modbus TCP','30002','Holding','R/W','FP32','mm'],
-    ['Y坐标','Modbus TCP','30004','Holding','R/W','FP32','mm'],
-    ['Z坐标','Modbus TCP','30006','Holding','R/W','FP32','mm'],
-    ['运动模式','Modbus TCP','30008','Holding','R/W','UINT16','0手1自'],
-    ['抓取状态','Modbus TCP','30010','Input','UINT16','0无1抓2放'],
-    ['锁止状态','Modbus TCP','30011','Input','UINT16','0开1锁'],
-    ['运动速度','Modbus TCP','30012','Holding','R/W','FP32','mm/s'],
-    ['当前工位','Modbus TCP','30014','Input','UINT16','编号'],
-    ['电池ID','Modbus TCP','30015','Input','UINT32','HEX'],
-    ['急停状态','Modbus TCP','30017','Input','BOOL','0正常1急停'],
-    ['故障码','Modbus TCP','30018','Input','UINT16','HEX'],
-    ['累计换电次数','Modbus TCP','30020','Input','UINT32','次'],
-    ['电机电流A','Modbus TCP','30022','Input','FP32','A'],
-    ['电机温度','Modbus TCP','30024','Input','FP32','℃']
+    ['日放电量','Modbus TCP','40030','Input','FP32','kWh'],
+    ['调度模式(EMS)','内部','SYS:02','R/W','UINT8','0手1自2优'],
+    ['总充电功率(EMS)','内部','PWR:01','只读','FP32','kW'],
+    ['告警总数(EMS)','内部','ALM:01','只读','UINT16','条']
   ],
   plc:[
     ['升降位置','Modbus RTU','20001','Holding','R/W','UINT16','0底1顶'],
@@ -4630,33 +4616,10 @@ const BS_POINT_TABLES={
     ['故障码','Modbus RTU','20013','Input','UINT16','HEX'],
     ['消防信号','Modbus RTU','20014','Input','BOOL','0正常1报警'],
     ['温湿度','Modbus RTU','20015','Input','FP32×2','℃/%'],
-    ['门禁状态','Modbus RTU','20017','Input','BOOL','0关1开']
-  ],
-  ems:[
-    ['系统状态','内部','SYS:01','只读','UINT8','0停1运2故'],
-    ['调度模式','内部','SYS:02','R/W','UINT8','0手1自2优'],
-    ['总有功功率','内部','PWR:01','只读','FP32','kW'],
-    ['平均SOC','内部','BAT:01','只读','FP32','%'],
-    ['满电电池数','内部','BAT:02','只读','UINT16','块'],
-    ['充电中电池数','内部','BAT:03','只读','UINT16','块'],
-    ['活跃告警数','内部','ALM:01','只读','UINT16','条'],
-    ['今日换电次数','内部','OPS:01','只读','UINT16','次'],
-    ['调度计划版本','内部','SCH:01','只读','STRING','v1.x'],
-    ['最后指令时间','内部','CMD:01','只读','DATETIME','']
-  ],
-  charger:[
-    ['充电状态','CAN/Modbus','50001','Holding','UINT16','0待1充2满3故'],
-    ['输出电压','CAN/Modbus','50002','Input','FP32','V'],
-    ['输出电流','CAN/Modbus','50004','Input','FP32','A'],
-    ['输出功率','CAN/Modbus','50006','Input','FP32','kW'],
-    ['充电模式','CAN/Modbus','50008','Holding','R/W','UINT16','0恒压1恒流2涓流'],
-    ['电池SOC','CAN/Modbus','50010','Input','FP32','%'],
-    ['电池温度','CAN/Modbus','50012','Input','FP32','℃'],
-    ['充电时长','CAN/Modbus','50014','Input','UINT16','min'],
-    ['已充电量','CAN/Modbus','50016','Input','FP32','kWh'],
-    ['故障码','CAN/Modbus','50018','Input','UINT16','HEX'],
-    ['模块温度','CAN/Modbus','50020','Input','FP32','℃'],
-    ['风扇状态','CAN/Modbus','50022','Input','UINT8','0关1低2高']
+    ['门禁状态','Modbus RTU','20017','Input','BOOL','0关1开'],
+    ['机器人运行状态','Modbus TCP','30001','Holding','UINT16','0待1运2故'],
+    ['电池抓取状态','Modbus TCP','30010','Input','UINT16','0无1抓2放'],
+    ['急停指令(机器人)','Modbus TCP','30017','Input','BOOL','0正常1急停']
   ],
   iec104:[
     ['遥测-总有功','IEC104','13-1-1','M_ME_NC_1','只读','FP32','kW'],
@@ -5151,7 +5114,7 @@ function bsRenderElec(){
 
 function bsShowPtTab(key){
   document.querySelectorAll('#page-bs-proto .sw-tab').forEach(t=>t.classList.remove('active'));
-  const tabMap={bms:0,pcs:1,robot:2,plc:3,ems:4,charger:5,iec104:6,mqtt:7};
+  const tabMap={bms:0,pcs:1,plc:2,iec104:3,mqtt:4};
   const tabs=document.querySelectorAll('#page-bs-proto .sw-tab');
   if(tabMap[key]!==undefined&&tabs[tabMap[key]]) tabs[tabMap[key]].classList.add('active');
   if(!LAST_BS_RESULT) return;
