@@ -4288,7 +4288,27 @@ function bsCalcEquipmentList(params){
   return result;
 }
 
-function bsCalcEconomics(params,equipmentList){
+function bsCalcStationScale(dailySwapDemand){
+  if(dailySwapDemand<=50) return{level:'小型站',levelEn:'Small',bays:'1-2',slots:'≤48',batteries:'≤60',area:'300-500'};
+  if(dailySwapDemand<=150) return{level:'中型站',levelEn:'Medium',bays:'2-4',slots:'48-144',batteries:'60-150',area:'500-1200'};
+  return{level:'大型站',levelEn:'Large',bays:'4-8',slots:'>144',batteries:'>150',area:'1200-3000'};
+}
+
+function bsCalcBatteryPool(totalBatteries,readyBatteryRate,rackUtilization){
+  const online=Math.round(totalBatteries*readyBatteryRate/100);
+  const charging=Math.round(totalBatteries*rackUtilization/100);
+  const backup=totalBatteries-online-charging;
+  return{total:totalBatteries,online,charging,backup:Math.max(0,backup)};
+}
+
+function bsCalcChargingSystem(rackSlots,chargingPower){
+  const pcsPower=rackSlots*chargingPower;
+  const moduleCount=Math.ceil(pcsPower/30);
+  const distributionCapacity=Math.round(pcsPower/0.9*1.2);
+  return{pcsPower:Math.round(pcsPower),moduleCount,distributionCapacity};
+}
+
+function bsCalcEconomics(params,equipmentList,rackResult,powerResult){
   const equipmentTotal=equipmentList.reduce((s,cat)=>s+cat.items.reduce((ss,it)=>ss+it.subtotal,0),0);
   const installFee=Math.round(equipmentTotal*0.12);
   const designFee=Math.round(equipmentTotal*0.05);
@@ -4299,7 +4319,14 @@ function bsCalcEconomics(params,equipmentList){
   const annualOpCost=Math.round(totalInvestment*0.03+annualElecCost+20+totalInvestment/10);
   const feeRate=(params.serviceFeeRate||20)/100;
   const swapPricePerKwh=params.priceValley*(1+feeRate);
-  const annualRevenue=Math.round(params.dailySwapDemand*annualDays*params.batteryCapacity*0.8*swapPricePerKwh/10000);
+  const annualSwapRevenue=Math.round(params.dailySwapDemand*annualDays*params.batteryCapacity*0.8*swapPricePerKwh/10000);
+  const dispatchableCapacity=params.batteryCapacity*(rackResult?rackResult.actualSlots:params.rackSlots||4)*0.8/1000;
+  const priceDiff=params.pricePeak-params.priceValley;
+  const arbitrageRevenue=Math.round(dispatchableCapacity*0.8*0.92*priceDiff*1000*annualDays/10000);
+  const demandRespRevenue=Math.round(((powerResult?powerResult.peakPower:params.rackSlots*params.chargingPower||0)/1000)*0.3*2.5*12/10000);
+  const vppRevenue=Math.round(dispatchableCapacity*0.5*12/10000+dispatchableCapacity*0.2*8/10000);
+  const annualTradingRevenue=arbitrageRevenue+demandRespRevenue+vppRevenue;
+  const annualRevenue=annualSwapRevenue+annualTradingRevenue;
   const annualProfit=annualRevenue-annualOpCost;
   const paybackYears=annualProfit>0?Math.round(totalInvestment/annualProfit*10)/10:99;
   let irr=0;
@@ -4312,7 +4339,7 @@ function bsCalcEconomics(params,equipmentList){
   }
   let npv=-totalInvestment;
   for(let y=1;y<=10;y++) npv+=annualProfit/Math.pow(1.08,y);
-  return{equipmentTotal:Math.round(equipmentTotal),installFee,designFee,contingency,totalInvestment,annualOperatingCost:annualOpCost,annualRevenue,annualProfit,paybackYears,irr:Math.round(irr*10)/10,npv:Math.round(npv)};
+  return{equipmentTotal:Math.round(equipmentTotal),installFee,designFee,contingency,totalInvestment,annualOperatingCost:annualOpCost,annualRevenue,annualSwapRevenue,annualTradingRevenue,arbitrageRevenue,demandRespRevenue,vppRevenue,annualProfit,paybackYears,irr:Math.round(irr*10)/10,npv:Math.round(npv)};
 }
 
 function bsGenerateSolution(){
@@ -4358,19 +4385,25 @@ function bsGenerateSolution(){
   const process=bsCalcSwapProcess(params);
   const strategy=bsCalcChargingStrategy(params);
   const equipmentList=bsCalcEquipmentList(params);
-  const economics=bsCalcEconomics(params,equipmentList);
+  const economics=bsCalcEconomics(params,equipmentList,rackResult,power);
   const mechanical=bsCalcMechanicalDesign(params);
   const electrical=bsCalcElectricalDesign(params,power);
   const opsSchedule=bsCalcDemandForecast(params);
   const socSchedule=bsCalcSocSchedule(params,strategy);
   const inventory=bsCalcInventoryPlan(params,battery,rackResult);
   const shiftPlan=bsCalcShiftPlan(params,opsSchedule);
+  const stationScale=bsCalcStationScale(params.dailySwapDemand);
+  const batteryPool=bsCalcBatteryPool(battery.totalBatteries,battery.readyBatteryRate,battery.rackUtilization);
+  const chargingSystem=bsCalcChargingSystem(rackResult.actualSlots,params.chargingPower);
   const warnings=[];
   if(throughput.capacityMargin<20) warnings.push(bsGetText('bs_strategy')+' '+bsGetText('bs_layout_safety_zone')+': <20%');
   if(economics.totalInvestment>params.budget) warnings.push(bsGetText('bs_budget')+': '+economics.totalInvestment+'>'+params.budget);
   if(rackResult.actualSlots>200) warnings.push(bsGetText('bs_swap_bay_count')+': '+rackResult.actualSlots+' >200');
   if(battery.readyBatteryRate<30) warnings.push(bsGetText('bs_cycle_ready')+': '+battery.readyBatteryRate+'% <30%');
-  LAST_BS_RESULT={id:'BS-'+Date.now(),projectName:params.projName,region:params.region,vehicleId:params.vehicleId,vehicleName:params.vehicleName,stationType:params.stationType,inputParams:params,swapThroughput:throughput,chargingRack:rackResult,battery,powerCapacity:power,stationStructure:structure,swapProcess:process,chargingStrategy:strategy,equipmentList,economics,mechanical,electrical,opsSchedule,socSchedule,inventory,shiftPlan,warnings};
+  if(throughput.capacityMargin<20) warnings.push('能力裕度: <20%');
+  if(economics.irr<5) warnings.push('IRR: <5%');
+  if(economics.paybackYears>15) warnings.push('回收期: >15年');
+  LAST_BS_RESULT={id:'BS-'+Date.now(),projectName:params.projName,region:params.region,vehicleId:params.vehicleId,vehicleName:params.vehicleName,stationType:params.stationType,inputParams:params,swapThroughput:throughput,chargingRack:rackResult,battery,powerCapacity:power,stationStructure:structure,swapProcess:process,chargingStrategy:strategy,equipmentList,economics,mechanical,electrical,opsSchedule,socSchedule,inventory,shiftPlan,stationScale,batteryPool,chargingSystem,warnings};
   document.getElementById('bsSuccessMsg').style.display='block';
   bsRenderBrief();
 }
@@ -4379,7 +4412,38 @@ function bsRenderBrief(){
   if(!LAST_BS_RESULT) return;
   const r=LAST_BS_RESULT;
   const L=bsGetText;
-  let h='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  let h='';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+  h+='<div style="background:linear-gradient(135deg,#0F6E56,#185FA5);border-radius:8px;padding:16px;color:#fff">';
+  h+='<div style="font-size:11px;opacity:.8;margin-bottom:8px">🏗️ 建多大</div>';
+  h+='<div style="font-size:22px;font-weight:bold">'+r.stationScale.level+'</div>';
+  h+='<div style="font-size:11px;opacity:.85;margin-top:6px;line-height:1.6">';
+  h+='工位: '+r.stationScale.bays+' | 仓位: '+r.stationScale.slots+'<br>';
+  h+='电池: '+r.stationScale.batteries+'块 | 占地: '+r.stationScale.area+'m²';
+  h+='</div></div>';
+  h+='<div style="background:linear-gradient(135deg,#185FA5,#6C3FA0);border-radius:8px;padding:16px;color:#fff">';
+  h+='<div style="font-size:11px;opacity:.8;margin-bottom:8px">🔋 要多少电池</div>';
+  h+='<div style="font-size:22px;font-weight:bold">'+r.batteryPool.total+'块</div>';
+  h+='<div style="font-size:11px;opacity:.85;margin-top:6px;line-height:1.6">';
+  h+='在线: '+r.batteryPool.online+' | 充电中: '+r.batteryPool.charging+' | 备用: '+r.batteryPool.backup+'<br>';
+  h+='变压器: '+r.powerCapacity.transformerCount+'×'+r.powerCapacity.transformerUnitCapacity+'kVA';
+  h+='</div></div>';
+  h+='<div style="background:linear-gradient(135deg,#6C3FA0,#C0392B);border-radius:8px;padding:16px;color:#fff">';
+  h+='<div style="font-size:11px;opacity:.8;margin-bottom:8px">🚛 一天换多少车</div>';
+  h+='<div style="font-size:22px;font-weight:bold">'+r.swapThroughput.dailyThroughput+'车次/日</div>';
+  h+='<div style="font-size:11px;opacity:.85;margin-top:6px;line-height:1.6">';
+  h+='峰值: '+r.swapThroughput.peakThroughputPerHour+'车次/h<br>';
+  h+='能力裕度: '+r.swapThroughput.capacityMargin+'%';
+  h+='</div></div>';
+  h+='<div style="background:linear-gradient(135deg,#C0392B,#D4AC0D);border-radius:8px;padding:16px;color:#fff">';
+  h+='<div style="font-size:11px;opacity:.8;margin-bottom:8px">💰 多久回本</div>';
+  h+='<div style="font-size:22px;font-weight:bold">'+r.economics.paybackYears+'年</div>';
+  h+='<div style="font-size:11px;opacity:.85;margin-top:6px;line-height:1.6">';
+  h+='CAPEX: '+r.economics.totalInvestment+'万 | IRR: '+r.economics.irr+'%<br>';
+  h+='年收入: '+r.economics.annualRevenue+'万 (换电'+r.economics.annualSwapRevenue+' + 交易'+r.economics.annualTradingRevenue+')';
+  h+='</div></div>';
+  h+='</div>';
+  h+='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
   h+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px">'+r.projectName+' ('+r.id+')</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px">';
   const metrics=[
@@ -4392,7 +4456,22 @@ function bsRenderBrief(){
     [L('bs_service_radius'),r.inputParams.serviceRadius+'km'],[L('bs_service_fee_rate'),r.inputParams.serviceFeeRate+'%']
   ];
   metrics.forEach(m=>{h+='<div style="padding:6px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">'+m[0]+'</span><br><b style="color:var(--text1)">'+m[1]+'</b></div>';});
-  h+='</div>';
+  h+='</div></div>';
+  h+='<div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+  h+='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  h+='<div style="font-size:12px;font-weight:bold;color:var(--text1);margin-bottom:8px">机械设备选型概要</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:11px">';
+  h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:4px;color:var(--text2)">换电机器人</td><td style="padding:4px;color:var(--text1);text-align:right">'+(r.mechanical?r.mechanical.robotModel||'RG-300':'RG-300')+'</td></tr>';
+  h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:4px;color:var(--text2)">升降方式</td><td style="padding:4px;color:var(--text1);text-align:right">'+(r.mechanical?r.mechanical.liftType||'液压举升':'液压举升')+'</td></tr>';
+  h+='<tr><td style="padding:4px;color:var(--text2)">对位方式</td><td style="padding:4px;color:var(--text1);text-align:right">'+(r.mechanical?r.mechanical.alignmentType||'激光+视觉':'激光+视觉')+'</td></tr>';
+  h+='</table></div>';
+  h+='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
+  h+='<div style="font-size:12px;font-weight:bold;color:var(--text1);margin-bottom:8px">电力交易收益概要</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:11px">';
+  h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:4px;color:var(--text2)">峰谷套利</td><td style="padding:4px;color:var(--green);text-align:right">'+r.economics.arbitrageRevenue+'万/年</td></tr>';
+  h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:4px;color:var(--text2)">需求响应</td><td style="padding:4px;color:var(--green);text-align:right">'+r.economics.demandRespRevenue+'万/年</td></tr>';
+  h+='<tr><td style="padding:4px;color:var(--text2)">VPP聚合</td><td style="padding:4px;color:var(--green);text-align:right">'+r.economics.vppRevenue+'万/年</td></tr>';
+  h+='</table></div>';
   h+='</div>';
   h+='<div style="margin-top:16px;background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
   h+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_bom_in_brief">BOM设备清单</div>';
