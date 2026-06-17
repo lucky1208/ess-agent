@@ -4644,6 +4644,55 @@ const BS_POINT_TABLES={
     ['OTA升级','MQTT','bss/{id}/ota','订阅','JSON','触发']
   ]
 };
+
+const IEC_SYMBOL_REGISTRY={
+  TR:{code:'TR',nameZh:'变压器',nameEn:'Transformer',symbolPath:['M-8,-15 A10,10 0 0,1 8,-15 A10,10 0 0,1 -8,-15','M-8,15 A10,10 0 0,0 8,15 A10,10 0 0,0 -8,15','M0,-25 L0,-15','M0,15 L0,25'],boundingBox:{w:30,h:60},connectionPoints:{top:{x:0,y:-25},bottom:{x:0,y:25}},labelPosition:{x:20,y:0,anchor:'start'}},
+  QF:{code:'QF',nameZh:'断路器',nameEn:'Circuit Breaker',symbolPath:['M0,-20 L0,-8','M-6,-8 L6,8','M0,8 L0,20','M-6,8 L6,-8'],boundingBox:{w:16,h:40},connectionPoints:{top:{x:0,y:-20},bottom:{x:0,y:20}},labelPosition:{x:12,y:0,anchor:'start'}},
+  QS:{code:'QS',nameZh:'隔离开关',nameEn:'Disconnector',symbolPath:['M0,-20 L0,-6','M-6,6 L0,-6 L6,6','M0,6 L0,20'],boundingBox:{w:12,h:40},connectionPoints:{top:{x:0,y:-20},bottom:{x:0,y:20}},labelPosition:{x:10,y:0,anchor:'start'}},
+  TA:{code:'TA',nameZh:'电流互感器',nameEn:'CT',symbolPath:['M0,-20 L0,-8','M0,8 L0,20','M0,0 A8,8 0 1,1 0.01,0','M-3,-3 L3,3','M-3,3 L3,-3'],boundingBox:{w:16,h:30},connectionPoints:{top:{x:0,y:-20},bottom:{x:0,y:20}},labelPosition:{x:14,y:0,anchor:'start'}},
+  TV:{code:'TV',nameZh:'电压互感器',nameEn:'PT',symbolPath:['M0,-20 L0,-8','M0,8 L0,20','M0,0 A8,8 0 1,1 0.01,0','M-4,0 L4,0','M0,-4 L0,4'],boundingBox:{w:16,h:30},connectionPoints:{top:{x:0,y:-20},bottom:{x:0,y:20}},labelPosition:{x:14,y:0,anchor:'start'}},
+  LA:{code:'LA',nameZh:'避雷器',nameEn:'Arrester',symbolPath:['M0,-18 L0,-6','M-8,-6 L8,-6 L0,6 Z','M0,6 L0,18','M-6,10 L6,10'],boundingBox:{w:16,h:36},connectionPoints:{top:{x:0,y:-18},bottom:{x:0,y:18}},labelPosition:{x:12,y:0,anchor:'start'}},
+  FU:{code:'FU',nameZh:'熔断器',nameEn:'Fuse',symbolPath:['M0,-18 L0,-8','M-5,-8 L5,-8 L5,8 L-5,8 Z','M0,-4 L0,4','M0,8 L0,18'],boundingBox:{w:12,h:36},connectionPoints:{top:{x:0,y:-18},bottom:{x:0,y:18}},labelPosition:{x:10,y:0,anchor:'start'}},
+  BUS:{code:'BUS',nameZh:'母线',nameEn:'Busbar',symbolPath:['M0,0 L200,0'],boundingBox:{w:200,h:6},connectionPoints:{left:{x:0,y:0},right:{x:200,y:0}},labelPosition:{x:100,y:-8,anchor:'middle'}},
+  PE:{code:'PE',nameZh:'接地',nameEn:'Ground',symbolPath:['M0,-10 L0,0','M-10,0 L10,0','M-7,5 L7,5','M-4,10 L4,10'],boundingBox:{w:16,h:18},connectionPoints:{top:{x:0,y:-10}},labelPosition:{x:14,y:4,anchor:'start'}},
+  ACB:{code:'ACB',nameZh:'框架断路器',nameEn:'ACB',symbolPath:['M0,-20 L0,-10','M-8,-10 L8,-10 L8,10 L-8,10 Z','M-5,0 L5,0','M0,-5 L0,5','M0,10 L0,20'],boundingBox:{w:24,h:40},connectionPoints:{top:{x:0,y:-20},bottom:{x:0,y:20}},labelPosition:{x:14,y:0,anchor:'start'}},
+  MCCB:{code:'MCCB',nameZh:'塑壳断路器',nameEn:'MCCB',symbolPath:['M0,-16 L0,-8','M-5,-8 L5,-8 L5,8 L-5,8 Z','M-3,0 L3,0','M0,8 L0,16'],boundingBox:{w:12,h:32},connectionPoints:{top:{x:0,y:-16},bottom:{x:0,y:16}},labelPosition:{x:10,y:0,anchor:'start'}},
+  M:{code:'M',nameZh:'电动机',nameEn:'Motor',symbolPath:['M0,-18 L0,-10','M0,10 L0,18','M0,0 A10,10 0 1,1 0.01,0','M-4,-3 L4,-3 L0,4 Z'],boundingBox:{w:20,h:36},connectionPoints:{top:{x:0,y:-18},bottom:{x:0,y:18}},labelPosition:{x:16,y:0,anchor:'start'}},
+  KM:{code:'KM',nameZh:'接触器',nameEn:'Contactor',symbolPath:['M0,-18 L0,-8','M-5,-8 L5,-8 L5,8 L-5,8 Z','M0,-3 L0,3','M0,8 L0,18'],boundingBox:{w:12,h:36},connectionPoints:{top:{x:0,y:-18},bottom:{x:0,y:18}},labelPosition:{x:10,y:0,anchor:'start'}},
+  K:{code:'K',nameZh:'继电器',nameEn:'Relay',symbolPath:['M0,-16 L0,-8','M-6,-8 L6,-8 L6,8 L-6,8 Z','M0,8 L0,16'],boundingBox:{w:16,h:32},connectionPoints:{top:{x:0,y:-16},bottom:{x:0,y:16}},labelPosition:{x:12,y:0,anchor:'start'}},
+  L:{code:'L',nameZh:'电抗器',nameEn:'Reactor',symbolPath:['M0,-18 L0,-10','M-4,-10 C-4,-6 4,-6 4,-2 C4,2 -4,2 -4,6 C-4,10 4,10 4,14','M0,14 L0,18'],boundingBox:{w:12,h:36},connectionPoints:{top:{x:0,y:-18},bottom:{x:0,y:18}},labelPosition:{x:10,y:0,anchor:'start'}},
+  PCS:{code:'PCS',nameZh:'功率变换系统',nameEn:'PCS',symbolPath:['M0,-20 L0,-12','M-10,-12 L10,-12 L10,12 L-10,12 Z','M-5,0 L0,-5 L5,0 L0,5 Z','M0,12 L0,20'],boundingBox:{w:24,h:40},connectionPoints:{top:{x:0,y:-20},bottom:{x:0,y:20}},labelPosition:{x:16,y:0,anchor:'start'}},
+  RACK:{code:'RACK',nameZh:'电池组',nameEn:'Battery Rack',symbolPath:['M0,-18 L0,-10','M-8,-10 L8,-10 L8,10 L-8,10 Z','M-4,-4 L4,-4','M-4,0 L4,0','M-4,4 L4,4','M0,10 L0,18'],boundingBox:{w:20,h:36},connectionPoints:{top:{x:0,y:-18},bottom:{x:0,y:18}},labelPosition:{x:14,y:0,anchor:'start'}},
+  IM:{code:'IM',nameZh:'绝缘监测',nameEn:'Insulation Monitor',symbolPath:['M0,-16 L0,-8','M-6,-8 L6,-8 L6,8 L-6,8 Z','M-3,-3 L3,3','M-3,3 L3,-3','M0,8 L0,16'],boundingBox:{w:16,h:32},connectionPoints:{top:{x:0,y:-16},bottom:{x:0,y:16}},labelPosition:{x:12,y:0,anchor:'start'}}
+};
+
+const SLD_RULES={
+  circuitDesignation:{'10kv_incoming':'101','transformer_1':'201','transformer_2':'202','lv_main_incoming':'401','feeder_swap_robot':'411','feeder_charger':'412','feeder_hvac':'413','feeder_fire':'414','feeder_lighting':'415','charger_module_prefix':'301','dc_feeder_prefix':'701'},
+  busbarRules:{busbarLineWidth:3,feederSpacing:120,minFeederSpacing:80,maxFeedersPerRow:6,busbarPaddingX:100},
+  labelRules:{transformer:['capacity','voltageRatio','impedance'],breaker:['model','currentRating','settingCurrent'],ct:['ratio'],pt:['ratio'],busbar:['voltage','specification'],charger:['power','inputVoltage','outputVoltage'],motor:['power'],rack:['batteryCount','totalCapacity']},
+  topologyTemplates:{
+    '10kv_primary':{description:'10kV一次接线图',links:['10KV_IN->LA1','LA1->QS1','QS1->TA1','TA1->QF1','QF1->BUS_10KV','BUS_10KV->QS2','QS2->TA2','TA2->QF2','QF2->TR1','BUS_10KV->TV1'],busbarSegments:[{id:'BUS_10KV',voltage:'10kV'}],circuitDesignations:[{circuit:'101',devices:['LA1','QS1','TA1','QF1']},{circuit:'201',devices:['QS2','TA2','QF2','TR1']}]},
+    'lv_distribution':{description:'低压配电单线图',links:['TR1_LV->ACB1','ACB1->BUS_04KV','BUS_04KV->MCCB1','MCCB1->M_SWAP','BUS_04KV->MCCB2','MCCB2->M_CHARGER','BUS_04KV->MCCB3','MCCB3->M_HVAC','BUS_04KV->MCCB4','MCCB4->M_FIRE','BUS_04KV->MCCB5','MCCB5->M_LIGHT'],busbarSegments:[{id:'BUS_04KV',voltage:'0.4kV'}],circuitDesignations:[{circuit:'401',devices:['ACB1']},{circuit:'411',devices:['MCCB1']},{circuit:'412',devices:['MCCB2']},{circuit:'413',devices:['MCCB3']},{circuit:'414',devices:['MCCB4']},{circuit:'415',devices:['MCCB5']}]},
+    'charger_wiring':{description:'充电模块接线图',links:['10KV_IN->TR1','TR1->BUS_AC380','BUS_AC380->QF_AC','QF_AC->PCS_G1','PCS_G1->BUS_DC750','BUS_DC750->QF_DC','QF_DC->BATTERY_BAY'],busbarSegments:[{id:'BUS_AC380',voltage:'AC380V'},{id:'BUS_DC750',voltage:'DC750V'}],circuitDesignations:[{circuit:'201',devices:['TR1']},{circuit:'301',devices:['QF_AC','PCS_G1']},{circuit:'701',devices:['QF_DC']}]},
+    'dc_system':{description:'电池仓DC系统图',links:['BUS_DC750->QFDC_1','QFDC_1->RACK_01','BUS_DC750->QFDC_2','QFDC_2->RACK_02','BUS_DC750->QFDC_3','QFDC_3->RACK_03','BUS_DC750->QFDC_4','QFDC_4->RACK_04','RACK_01->BMS','RACK_02->BMS','RACK_03->BMS','RACK_04->BMS','BMS->PCS','BUS_DC750->IM_1','IM_1->PE'],busbarSegments:[{id:'BUS_DC750',voltage:'DC750V'}],circuitDesignations:[{circuit:'701',devices:['QFDC_1','RACK_01']},{circuit:'702',devices:['QFDC_2','RACK_02']},{circuit:'703',devices:['QFDC_3','RACK_03']},{circuit:'704',devices:['QFDC_4','RACK_04']}]}
+  }
+};
+
+const TITLE_BLOCK_TEMPLATE={
+  A3_landscape:{viewBox:'0 0 1680 1190',outerFrameOffset:10,innerFrameOffset:5,titleBlockWidth:504,titleBlockHeight:178,sections:[
+    {key:'projectName',label:'项目名称',width:252,height:44},
+    {key:'diagramName',label:'图名',width:252,height:44},
+    {key:'diagramNumber',label:'图号',width:126,height:45},
+    {key:'scale',label:'比例',width:126,height:45},
+    {key:'phase',label:'阶段',width:126,height:45},
+    {key:'designer',label:'设计',width:126,height:45},
+    {key:'reviewer',label:'审核',width:126,height:45},
+    {key:'date',label:'日期',width:126,height:45}
+  ]},
+  A4_landscape:{viewBox:'0 0 1190 842',outerFrameOffset:8,innerFrameOffset:4,titleBlockWidth:357,titleBlockHeight:126},
+  diagramNumberRule:{prefix:'BS-ELEC',types:{'10kv_primary':'01','lv_distribution':'02','charger_wiring':'03','dc_system':'04'},versionPrefix:'V'}
+};
+
 const BS_FAULT_RULES=[
   {id:'battery_no_charge',keywords:['不充电','无法充电','充不上','充电失败'],causes:['充电接触器未闭合或BMS锁止','充电模块输出异常或CAN通讯中断','电池SOC已达上限或温度保护'],rootCause:'BMS充电接触器状态={contactorMainPos}，充电模块输出={outputVoltage}V/{outputCurrent}A，电池SOC={soc}%温度={temp}℃',devices:['bms','charger'],suggestions:['检查BMS充电接触器是否闭合，确认CAN终端电阻120Ω','检查充电模块输出电压/电流，确认CAN通讯正常','确认电池SOC<95%且温度在-10~55℃范围内']},
   {id:'robot_stuck',keywords:['机器人卡死','机器人不动','卡住','机器人故障'],causes:['轨道异物或机械卡阻','伺服驱动器故障或编码器异常','急停信号未复位'],rootCause:'机器人运行状态={runMode}，急停={estop}，电机电流={motorCurrent}A，故障码={faultCode}',devices:['robot'],suggestions:['检查轨道是否有异物，手动推车确认机械无卡阻','检查伺服驱动器故障码，确认编码器信号正常','确认急停按钮已复位，检查安全光幕状态']},
