@@ -5121,6 +5121,93 @@ function bsElecRenderDiagram(containerId,topology,symbolMap,engModel){
   c.innerHTML=s;
 }
 
+function bsElecRender10kvDiagram(containerId,topology,symbolMap,engModel){
+  const c=document.getElementById(containerId);if(!c) return;
+  const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
+  const top=topology['10kv_primary'];if(!top) return;
+  const devMap=top.deviceMap||{};
+  let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
+  s+='<text x="840" y="40" text-anchor="middle" fill="#aaa" font-size="16" font-weight="bold">10kV供配电系统单线图</text>';
+  top.layout.busbars.forEach(b=>{s+=bsElecDrawBusbar(b);});
+  top.layout.connections.forEach(cn=>{s+=bsElecDrawConnection(cn);});
+  top.layout.nodes.forEach(n=>{
+    const dev=devMap[n.code];
+    if(dev) s+=bsElecDrawSymbol(dev,n.x,n.y);
+    else s+='<g transform="translate('+n.x+','+n.y+')"><text x="0" y="0" text-anchor="middle" fill="#aaa" font-size="10">'+(n.label||n.code)+'</text></g>';
+  });
+  top.circuitDesignations.forEach(cd=>{s+=bsElecDrawCircuitLabel(cd,top.layout);});
+  s+='</svg>';
+  s=bsElecRenderTitleBlock(s,'10kv_primary',engModel);
+  c.innerHTML=s;
+}
+
+function bsElecRenderLvDiagram(containerId,topology,symbolMap,engModel){
+  const c=document.getElementById(containerId);if(!c) return;
+  const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
+  const top=topology['lv_distribution'];if(!top) return;
+  const devMap=top.deviceMap||{};
+  let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
+  s+='<text x="840" y="40" text-anchor="middle" fill="#aaa" font-size="16" font-weight="bold">0.4kV低压配电单线图</text>';
+  top.layout.busbars.forEach(b=>{s+=bsElecDrawBusbar(b);});
+  top.layout.connections.forEach(cn=>{s+=bsElecDrawConnection(cn);});
+  top.layout.nodes.forEach(n=>{
+    const dev=devMap[n.code];
+    if(dev) s+=bsElecDrawSymbol(dev,n.x,n.y);
+    else s+='<g transform="translate('+n.x+','+n.y+')"><text x="0" y="0" text-anchor="middle" fill="#aaa" font-size="10">'+(n.label||n.code)+'</text></g>';
+  });
+  top.circuitDesignations.forEach(cd=>{s+=bsElecDrawCircuitLabel(cd,top.layout);});
+  s+='</svg>';
+  s=bsElecRenderTitleBlock(s,'lv_distribution',engModel);
+  c.innerHTML=s;
+}
+
+function bsElecRenderChargerDiagram(containerId,topology,symbolMap,engModel){
+  const c=document.getElementById(containerId);if(!c) return;
+  const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
+  const top=topology['charger_wiring'];if(!top) return;
+  const devMap=top.deviceMap||{};
+  let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
+  s+='<text x="840" y="40" text-anchor="middle" fill="#aaa" font-size="16" font-weight="bold">充电模块接线图</text>';
+  top.layout.busbars.forEach(b=>{
+    let bs=bsElecDrawBusbar(b);
+    if(b.voltage==='DC750V') bs=bs.replace('stroke="#ddd"','stroke="#ff4444"').replace('stroke-width="3"','stroke-width="3"');
+    s+=bs;
+  });
+  s+='<text x="150" y="530" fill="#ff4444" font-size="10">DC+ (正极母线)</text>';
+  s+='<text x="150" y="560" fill="#4488ff" font-size="10">DC- (负极母线)</text>';
+  top.layout.connections.forEach(cn=>{s+=bsElecDrawConnection(cn);});
+  top.layout.nodes.forEach(n=>{
+    const dev=devMap[n.code];
+    if(dev) s+=bsElecDrawSymbol(dev,n.x,n.y);
+    else s+='<g transform="translate('+n.x+','+n.y+')"><text x="0" y="0" text-anchor="middle" fill="#aaa" font-size="10">'+(n.label||n.code)+'</text></g>';
+  });
+  top.circuitDesignations.forEach(cd=>{s+=bsElecDrawCircuitLabel(cd,top.layout);});
+  s+='</svg>';
+  s=bsElecRenderTitleBlock(s,'charger_wiring',engModel);
+  c.innerHTML=s;
+}
+
+function bsElecRenderDcDiagram(containerId,topology,symbolMap,engModel){
+  const c=document.getElementById(containerId);if(!c) return;
+  const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
+  const top=topology['dc_system'];if(!top) return;
+  const devMap=top.deviceMap||{};
+  let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
+  s+='<text x="840" y="40" text-anchor="middle" fill="#aaa" font-size="16" font-weight="bold">电池仓DC系统图</text>';
+  top.layout.busbars.forEach(b=>{s+=bsElecDrawBusbar(b);});
+  top.layout.connections.forEach(cn=>{s+=bsElecDrawConnection(cn);});
+  top.layout.nodes.forEach(n=>{
+    const dev=devMap[n.code];
+    if(dev) s+=bsElecDrawSymbol(dev,n.x,n.y);
+    else s+='<g transform="translate('+n.x+','+n.y+')"><text x="0" y="0" text-anchor="middle" fill="#aaa" font-size="10">'+(n.label||n.code)+'</text></g>';
+  });
+  top.circuitDesignations.forEach(cd=>{s+=bsElecDrawCircuitLabel(cd,top.layout);});
+  s+='<text x="840" y="680" text-anchor="middle" fill="#888" font-size="10">绝缘监测报警阈值: 100kΩ报警 / 50kΩ跳闸</text>';
+  s+='</svg>';
+  s=bsElecRenderTitleBlock(s,'dc_system',engModel);
+  c.innerHTML=s;
+}
+
 function bsRenderArchDiagramSvg(containerId,data){
   const c=document.getElementById(containerId);if(!c) return;
   const p=data.inputParams;const r=data;
