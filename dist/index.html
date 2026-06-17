@@ -5174,7 +5174,7 @@ function bsElecRender10kvDiagram(containerId,topology,symbolMap,engModel){
     s=bsElecRenderTitleBlock(s,'10kv_primary',engModel);
     c.innerHTML=s;return;
   }
-  const top=topology['10kv_primary'];if(!top) return;
+  const top=topology;if(!top||!top.layout) return;
   const devMap=top.deviceMap||{};
   let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
   s+='<text x="840" y="40" text-anchor="middle" fill="#aaa" font-size="16" font-weight="bold">10kV供配电系统单线图</text>';
@@ -5194,7 +5194,7 @@ function bsElecRender10kvDiagram(containerId,topology,symbolMap,engModel){
 function bsElecRenderLvDiagram(containerId,topology,symbolMap,engModel){
   const c=document.getElementById(containerId);if(!c) return;
   const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
-  const top=topology['lv_distribution'];if(!top) return;
+  const top=topology;if(!top||!top.layout) return;
   const devMap=top.deviceMap||{};
   let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
   s+='<text x="840" y="40" text-anchor="middle" fill="#aaa" font-size="16" font-weight="bold">0.4kV低压配电单线图</text>';
@@ -5214,7 +5214,7 @@ function bsElecRenderLvDiagram(containerId,topology,symbolMap,engModel){
 function bsElecRenderChargerDiagram(containerId,topology,symbolMap,engModel){
   const c=document.getElementById(containerId);if(!c) return;
   const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
-  const top=topology['charger_wiring'];if(!top) return;
+  const top=topology;if(!top||!top.layout) return;
   const devMap=top.deviceMap||{};
   let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
   s+='<text x="840" y="40" text-anchor="middle" fill="#aaa" font-size="16" font-weight="bold">充电模块接线图</text>';
@@ -5240,7 +5240,7 @@ function bsElecRenderChargerDiagram(containerId,topology,symbolMap,engModel){
 function bsElecRenderDcDiagram(containerId,topology,symbolMap,engModel){
   const c=document.getElementById(containerId);if(!c) return;
   const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
-  const top=topology['dc_system'];if(!top) return;
+  const top=topology;if(!top||!top.layout) return;
   const devMap=top.deviceMap||{};
   let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
   s+='<text x="840" y="40" text-anchor="middle" fill="#aaa" font-size="16" font-weight="bold">电池仓DC系统图</text>';
