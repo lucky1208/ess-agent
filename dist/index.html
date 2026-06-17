@@ -212,6 +212,18 @@ select.form-input{appearance:auto}
 .compl-cat-group{margin-bottom:10px;background:var(--bg2);border-radius:6px;padding:8px 10px;border:1px solid var(--border)}
 .compl-cat-title{font-size:11px;font-weight:600;color:var(--text1);margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .compl-cat-title::before{content:"";display:inline-block;width:3px;height:12px;background:var(--blue);border-radius:2px}
+.bs-elec-tab{padding:8px 18px;font-size:13px;cursor:pointer;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);transition:all .2s;white-space:nowrap}
+.bs-elec-tab:hover{border-color:var(--blue);color:var(--text1);background:rgba(24,95,165,.08)}
+.bs-elec-tab.active{border-color:var(--blue);color:#fff;background:linear-gradient(135deg,#185FA5,#0F6E56);box-shadow:0 2px 8px rgba(24,95,165,.3)}
+.bs-elec-toolbar{display:flex;gap:8px;margin-bottom:8px;font-size:11px;align-items:center}
+.bs-elec-svg-container{overflow:hidden;border:1px solid var(--border);border-radius:8px;background:#0d1117;cursor:grab;position:relative;min-height:500px}
+.bs-elec-svg-container:active{cursor:grabbing}
+.bs-elec-params-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:16px}
+.bs-elec-params-table th{background:var(--bg2);color:var(--text1);padding:8px 10px;text-align:left;border:1px solid var(--border);font-weight:600;position:sticky;top:0}
+.bs-elec-params-table td{padding:6px 10px;border:1px solid var(--border);color:var(--text2)}
+.bs-elec-params-table tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.bs-elec-params-group{background:var(--blue);color:#fff;font-weight:600;font-size:12px}
+.bs-elec-params-group td{background:rgba(24,95,165,.15);color:var(--blue);font-weight:600;padding:8px 10px}
 </style>
 </head>
 <body>
@@ -1562,17 +1574,29 @@ ACC AC一体柜专题
 
 <div id="page-bs-elec" class="bs-content" style="display:none;padding:24px 32px">
 <div class="sec-title" data-i18n="bs_elec_title">换电站电气设计 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_elec_desc">系统架构、一次图、电池仓拓扑、充电架布置、配电图、二次图、通讯图、接地图</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="bs_elec_desc_eng">IEC 60617标准工程电气图纸：10kV一次接线图、低压配电单线图、充电模块接线图、电池仓DC系统图</div>
 <div id="bsElecEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「方案设计」中生成换电方案</div>
 <div id="bsElecContent" style="display:none">
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_arch">系统架构图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsArchSvg','arch.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsArchSvg"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_primary">电气一次图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsPrimarySvg','primary.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsPrimarySvg"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_battery_bay">电池仓拓扑图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsBatteryBaySvg','battery-bay.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsBatteryBaySvg"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_charging_rack">充电架布置图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsChargingRackSvg','charging-rack.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsChargingRackSvg"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_distribution">配电系统图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsDistributionSvg','distribution.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsDistributionSvg"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_secondary">电气二次图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsSecondarySvg','secondary.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsSecondarySvg"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_comm">通讯网络拓扑</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsCommSvg','comm-topology.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsCommSvg"></div></div>
-<div class="diagram-container"><div class="diagram-header"><h3 class="diagram-title" data-i18n="bs_elec_grounding">接地系统图</h3><div class="diagram-actions"><button onclick="bsDownloadSvg('bsGroundingSvg','grounding.svg')" data-i18n="download_svg">下载 SVG</button></div></div><div class="diagram-svg" id="bsGroundingSvg"></div></div>
+<div id="bsElecDiagramTabs" style="display:flex;gap:8px;margin-bottom:12px">
+<div class="bs-elec-tab active" onclick="bsElecSwitchDiagram('10kv_primary')" data-i18n="bs_elec_10kv">10kV一次接线图</div>
+<div class="bs-elec-tab" onclick="bsElecSwitchDiagram('lv_distribution')" data-i18n="bs_elec_lv">低压配电单线图</div>
+<div class="bs-elec-tab" onclick="bsElecSwitchDiagram('charger_wiring')" data-i18n="bs_elec_charger">充电模块接线图</div>
+<div class="bs-elec-tab" onclick="bsElecSwitchDiagram('dc_system')" data-i18n="bs_elec_dc">电池仓DC系统图</div>
+</div>
+<div id="bsElecToolbar" style="display:flex;gap:8px;margin-bottom:8px;font-size:11px;align-items:center">
+<span style="color:var(--text2)">缩放:</span>
+<button class="btn btn-primary" onclick="bsElecZoomPan('zoomOut')" style="font-size:10px;padding:4px 8px">-</button>
+<span id="bsElecZoomLevel" style="color:var(--text1);min-width:40px;text-align:center">100%</span>
+<button class="btn btn-primary" onclick="bsElecZoomPan('zoomIn')" style="font-size:10px;padding:4px 8px">+</button>
+<button class="btn btn-primary" onclick="bsElecZoomPan('reset')" style="font-size:10px;padding:4px 8px" data-i18n="bs_elec_reset">重置</button>
+<button class="btn btn-primary" onclick="bsElecExportSvg('svg')" style="font-size:10px;padding:4px 8px" data-i18n="download_svg">下载 SVG</button>
+<button class="btn btn-primary" onclick="bsElecExportSvg('print')" style="font-size:10px;padding:4px 8px" data-i18n="bs_elec_print">打印</button>
+</div>
+<div id="bsElecSvgContainer" style="overflow:hidden;border:1px solid var(--border);border-radius:8px;background:#0d1117;cursor:grab">
+<div id="bsElecSvgWrapper">
+<div id="bsElecSvg"></div>
+</div>
+</div>
 <div id="bsElecParams" style="margin-top:16px"></div>
 </div>
 </div>
@@ -5208,304 +5232,156 @@ function bsElecRenderDcDiagram(containerId,topology,symbolMap,engModel){
   c.innerHTML=s;
 }
 
-function bsRenderArchDiagramSvg(containerId,data){
-  const c=document.getElementById(containerId);if(!c) return;
-  const p=data.inputParams;const r=data;
-  let s='<svg viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
-  const layers=[
-    {label:'电网层',sub:'10kV接入',x:40,y:60,w:140,h:80,color:'#2196F3'},
-    {label:'配电层',sub:'开关柜/变压器',x:220,y:60,w:160,h:80,color:'#FF9800'},
-    {label:'充电层',sub:'PCS/充电模块',x:420,y:60,w:160,h:80,color:'#4CAF50'},
-    {label:'电池层',sub:'电池仓',x:620,y:60,w:180,h:80,color:'#9C27B0'},
-    {label:'换电层',sub:'换电机器人',x:840,y:60,w:140,h:80,color:'#F44336'},
-    {label:'车辆层',sub:'重卡',x:1020,y:60,w:140,h:80,color:'#607D8B'}
-  ];
-  layers.forEach((ly,i)=>{
-    s+='<rect x="'+ly.x+'" y="'+ly.y+'" width="'+ly.w+'" height="'+ly.h+'" rx="6" fill="'+ly.color+'" fill-opacity="0.2" stroke="'+ly.color+'" stroke-width="1.5"/>';
-    s+='<text x="'+(ly.x+ly.w/2)+'" y="'+(ly.y+30)+'" text-anchor="middle" fill="'+ly.color+'" font-size="13" font-weight="bold">'+ly.label+'</text>';
-    s+='<text x="'+(ly.x+ly.w/2)+'" y="'+(ly.y+52)+'" text-anchor="middle" fill="'+ly.color+'" font-size="10" opacity="0.8">'+ly.sub+'</text>';
-  });
-  const params=[
-    {x:110,y:180,text:p.voltage+'kV',color:'#2196F3'},
-    {x:300,y:180,text:r.powerCapacity.transformerCount+'×'+r.powerCapacity.transformerUnitCapacity+'kVA',color:'#FF9800'},
-    {x:500,y:180,text:r.chargingSystem.pcsPower+'kW PCS',color:'#4CAF50'},
-    {x:710,y:180,text:r.chargingRack.actualSlots+'仓位',color:'#9C27B0'},
-    {x:910,y:180,text:p.swapBayCount+'工位',color:'#F44336'},
-    {x:1090,y:180,text:p.vehicleCount+'辆',color:'#607D8B'}
-  ];
-  params.forEach(pm=>{
-    s+='<text x="'+pm.x+'" y="'+pm.y+'" text-anchor="middle" fill="'+pm.color+'" font-size="11">'+pm.text+'</text>';
-  });
-  for(let i=0;i<5;i++){
-    const x1=layers[i].x+layers[i].w;const x2=layers[i+1].x;
-    const y1=layers[i].y+layers[i].h/2;
-    s+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y1+'" stroke="#555" stroke-width="2" marker-end="url(#arrowE)"/>';
+let _bsElecZoom=1;let _bsElecPanX=0;let _bsElecPanY=0;let _bsElecIsPanning=false;let _bsElecPanStartX=0;let _bsElecPanStartY=0;
+
+function bsElecSwitchDiagram(diagramType){
+  const engModel=window._bsElecEngModel;
+  const symbolMap=window._bsElecSymbolMap;
+  const topology=window._bsElecTopology;
+  if(!engModel||!symbolMap||!topology){console.warn('[bsElec] 数据未初始化');return;}
+  document.querySelectorAll('.bs-elec-tab').forEach(t=>t.classList.remove('active'));
+  const tabMap={'10kv_primary':0,'lv_distribution':1,'charger_wiring':2,'dc_system':3};
+  const tabs=document.querySelectorAll('.bs-elec-tab');
+  if(tabMap[diagramType]!==undefined&&tabs[tabMap[diagramType]]) tabs[tabMap[diagramType]].classList.add('active');
+  window._bsElecCurrentDiagram=diagramType;
+  try{
+    if(diagramType==='10kv_primary') bsElecRender10kvDiagram('bsElecSvg',topology['10kv_primary'],symbolMap,engModel);
+    else if(diagramType==='lv_distribution') bsElecRenderLvDiagram('bsElecSvg',topology['lv_distribution'],symbolMap,engModel);
+    else if(diagramType==='charger_wiring') bsElecRenderChargerDiagram('bsElecSvg',topology['charger_wiring'],symbolMap,engModel);
+    else if(diagramType==='dc_system') bsElecRenderDcDiagram('bsElecSvg',topology['dc_system'],symbolMap,engModel);
+  }catch(e){
+    console.error('[bsElec] 渲染失败:',e);
+    document.getElementById('bsElecSvg').innerHTML='<div style="padding:40px;text-align:center;color:var(--red)">图纸渲染失败，请刷新页面重试<br><span style="font-size:11px;color:var(--text2)">'+e.message+'</span></div>';
   }
-  s+='<defs><marker id="arrowE" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#555"/></marker></defs>';
-  s+='<rect x="40" y="220" width="1120" height="60" rx="6" fill="#1a2332" stroke="#333" stroke-width="1"/>';
-  s+='<text x="600" y="248" text-anchor="middle" fill="#00BCD4" font-size="13" font-weight="bold">EMS 能量管理系统</text>';
-  s+='<text x="600" y="268" text-anchor="middle" fill="#00BCD4" font-size="10" opacity="0.7">Modbus | CAN | IEC104 | MQTT</text>';
-  const emsY=250;
-  layers.forEach(ly=>{
-    s+='<line x1="600" y1="280" x2="'+(ly.x+ly.w/2)+'" y2="'+(ly.y+ly.h)+'" stroke="#00BCD4" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.5"/>';
-  });
-  s+='<rect x="40" y="310" width="1120" height="170" rx="6" fill="#111822" stroke="#222" stroke-width="1"/>';
-  s+='<text x="60" y="340" fill="#aaa" font-size="12" font-weight="bold">能量流 (实线) &amp; 信息流 (虚线)</text>';
-  const flowItems=[
-    {label:'电网→配电',x:80,y:370,desc:p.voltage+'kV → '+r.powerCapacity.transformerCount+'×'+r.powerCapacity.transformerUnitCapacity+'kVA'},
-    {label:'配电→充电',x:300,y:370,desc:'AC→DC '+r.chargingSystem.pcsPower+'kW'},
-    {label:'充电→电池',x:520,y:370,desc:p.chargingPower+'kW/仓位 × '+r.chargingRack.actualSlots+'仓位'},
-    {label:'电池→换电',x:740,y:370,desc:r.batteryPool.online+'块在线'},
-    {label:'换电→车辆',x:960,y:370,desc:p.swapCycleMin+'min/次'}
-  ];
-  flowItems.forEach((fi,i)=>{
-    s+='<text x="'+fi.x+'" y="'+fi.y+'" fill="#4CAF50" font-size="11" font-weight="bold">'+fi.label+'</text>';
-    s+='<text x="'+fi.x+'" y="'+(fi.y+18)+'" fill="#888" font-size="10">'+fi.desc+'</text>';
-    if(i<flowItems.length-1){
-      s+='<line x1="'+(fi.x+180)+'" y1="'+(fi.y-5)+'" x2="'+(flowItems[i+1].x-10)+'" y2="'+(flowItems[i+1].y-5)+'" stroke="#4CAF50" stroke-width="1.5" marker-end="url(#arrowG)"/>';
-    }
-  });
-  s+='<defs><marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#4CAF50"/></marker></defs>';
-  s+='</svg>';
-  c.innerHTML=s;
+  _bsElecZoom=1;_bsElecPanX=0;_bsElecPanY=0;
+  const wrapper=document.getElementById('bsElecSvgWrapper');
+  if(wrapper) wrapper.style.transform='';
+  const zl=document.getElementById('bsElecZoomLevel');
+  if(zl) zl.textContent='100%';
 }
 
-function bsRenderBatteryBaySvg(containerId,data){
-  const c=document.getElementById(containerId);if(!c) return;
-  const slots=data.chargingRack.actualSlots;
-  const layers=data.chargingRack.rackStructure.layers;
-  const cols=Math.ceil(slots/layers);
-  let s='<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
-  s+='<text x="500" y="30" text-anchor="middle" fill="#aaa" font-size="13" font-weight="bold">电池仓仓位布局 ('+slots+'仓位, '+layers+'层, '+cols+'列)</text>';
-  const cellW=Math.min(60,Math.floor((900-cols*4)/cols));
-  const cellH=40;
-  const startX=Math.max(50,(1000-cols*(cellW+4))/2);
-  const colors=['#4CAF50','#F44336','#888','#FF9800'];
-  const statusLabels=['满电','充电中','空闲','故障'];
-  const statusCounts=[Math.round(slots*0.3),Math.round(slots*0.4),Math.round(slots*0.25),Math.max(1,slots-Math.round(slots*0.3)-Math.round(slots*0.4)-Math.round(slots*0.25))];
-  let slotIdx=0;
-  for(let row=0;row<layers;row++){
-    s+='<text x="'+(startX-10)+'" y="'+(80+row*(cellH+8)+cellH/2+4)+'" text-anchor="end" fill="#666" font-size="10">L'+(row+1)+'</text>';
-    for(let col=0;col<cols;col++){
-      if(slotIdx>=slots) break;
-      const x=startX+col*(cellW+4);
-      const y=60+row*(cellH+8);
-      const st=slotIdx<statusCounts[0]?0:slotIdx<statusCounts[0]+statusCounts[1]?1:slotIdx<statusCounts[0]+statusCounts[1]+statusCounts[2]?2:3;
-      s+='<rect x="'+x+'" y="'+y+'" width="'+cellW+'" height="'+cellH+'" rx="3" fill="'+colors[st]+'" fill-opacity="0.25" stroke="'+colors[st]+'" stroke-width="1"/>';
-      s+='<text x="'+(x+cellW/2)+'" y="'+(y+16)+'" text-anchor="middle" fill="'+colors[st]+'" font-size="9" font-weight="bold">R'+(row+1)+'C'+(col+1)+'</text>';
-      s+='<text x="'+(x+cellW/2)+'" y="'+(y+30)+'" text-anchor="middle" fill="'+colors[st]+'" font-size="8" opacity="0.7">'+statusLabels[st]+'</text>';
-      slotIdx++;
+function bsElecZoomPan(action){
+  if(action==='zoomIn'){_bsElecZoom=Math.min(3,_bsElecZoom+0.2);}
+  else if(action==='zoomOut'){_bsElecZoom=Math.max(0.5,_bsElecZoom-0.2);}
+  else if(action==='reset'){_bsElecZoom=1;_bsElecPanX=0;_bsElecPanY=0;}
+  const wrapper=document.getElementById('bsElecSvgWrapper');
+  if(wrapper) wrapper.style.transform='translate('+_bsElecPanX+'px,'+_bsElecPanY+'px) scale('+_bsElecZoom+')';
+  const zl=document.getElementById('bsElecZoomLevel');
+  if(zl) zl.textContent=Math.round(_bsElecZoom*100)+'%';
+}
+
+function bsElecExportSvg(mode){
+  const svgEl=document.querySelector('#bsElecSvg svg');
+  if(!svgEl){alert('无可导出的图纸');return;}
+  const nameMap={'10kv_primary':'10kV一次接线图','lv_distribution':'低压配电单线图','charger_wiring':'充电模块接线图','dc_system':'电池仓DC系统图'};
+  const diagramType=window._bsElecCurrentDiagram||'10kv_primary';
+  const diagramName=nameMap[diagramType]||'电气图纸';
+  const version='V'+(window._bsElecVersion||1);
+  if(mode==='svg'){
+    const serializer=new XMLSerializer();
+    let svgStr=serializer.serializeToString(svgEl);
+    svgStr='<?xml version="1.0" encoding="UTF-8"?>\n'+svgStr;
+    const blob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=diagramName+'_'+version+'.svg';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }else if(mode==='print'){
+    const serializer=new XMLSerializer();
+    const svgStr=serializer.serializeToString(svgEl);
+    const printWin=window.open('','_blank','width=1200,height=800');
+    if(printWin){
+      printWin.document.write('<!DOCTYPE html><html><head><title>'+diagramName+'</title><style>@page{size:A3 landscape;margin:10mm}body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff}svg{max-width:100%;max-height:100vh}</style></head><body>'+svgStr+'</body></html>');
+      printWin.document.close();
+      setTimeout(function(){printWin.print();},500);
     }
   }
-  s+='<rect x="50" y="'+(60+layers*(cellH+8)+20)+'" width="900" height="40" rx="4" fill="#111822" stroke="#333" stroke-width="1"/>';
-  colors.forEach((cl,i)=>{
-    const lx=80+i*200;
-    s+='<rect x="'+lx+'" y="'+(60+layers*(cellH+8)+30)+'" width="14" height="14" rx="2" fill="'+cl+'" fill-opacity="0.4" stroke="'+cl+'" stroke-width="1"/>';
-    s+='<text x="'+(lx+20)+'" y="'+(60+layers*(cellH+8)+42)+'" fill="#aaa" font-size="10">'+statusLabels[i]+': '+statusCounts[i]+'</text>';
-  });
-  s+='</svg>';
-  c.innerHTML=s;
 }
 
-function bsRenderChargingRackSvg(containerId,data){
-  const c=document.getElementById(containerId);if(!c) return;
-  const slots=data.chargingRack.actualSlots;
-  const layers=data.chargingRack.rackStructure.layers;
-  const cols=Math.ceil(slots/layers);
-  let s='<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
-  s+='<text x="500" y="30" text-anchor="middle" fill="#aaa" font-size="13" font-weight="bold">充电架物理布置图 (正面视图)</text>';
-  const rackW=700;const rackH=420;
-  const rackX=150;const rackY=50;
-  s+='<rect x="'+rackX+'" y="'+rackY+'" width="'+rackW+'" height="'+rackH+'" rx="4" fill="none" stroke="#444" stroke-width="2"/>';
-  s+='<text x="'+(rackX+rackW/2)+'" y="'+(rackY-10)+'" text-anchor="middle" fill="#666" font-size="11">充电架 #1</text>';
-  const slotH=Math.min(50,Math.floor((rackH-40)/layers));
-  const slotW=Math.min(80,Math.floor((rackW-40)/cols));
-  for(let row=0;row<layers;row++){
-    const sy=rackY+20+row*(slotH+6);
-    s+='<text x="'+(rackX-10)+'" y="'+(sy+slotH/2+4)+'" text-anchor="end" fill="#666" font-size="9">层'+(row+1)+'</text>';
-    for(let col=0;col<cols;col++){
-      const sx=rackX+20+col*(slotW+4);
-      if(row*cols+col>=slots) break;
-      s+='<rect x="'+sx+'" y="'+sy+'" width="'+slotW+'" height="'+slotH+'" rx="2" fill="#1a2332" stroke="#333" stroke-width="1"/>';
-      s+='<text x="'+(sx+slotW/2)+'" y="'+(sy+slotH/2+3)+'" text-anchor="middle" fill="#4CAF50" font-size="8">'+(row*cols+col+1)+'</text>';
-    }
-  }
-  const arrowY=rackY+rackH+20;
-  s+='<line x1="'+rackX+'" y1="'+arrowY+'" x2="'+(rackX+rackW)+'" y2="'+arrowY+'" stroke="#2196F3" stroke-width="1.5" marker-end="url(#arrowR)"/>';
-  s+='<text x="'+(rackX+rackW/2)+'" y="'+(arrowY+16)+'" text-anchor="middle" fill="#2196F3" font-size="10">← 散热通道方向 →</text>';
-  s+='<defs><marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2196F3"/></marker></defs>';
-  const maintY=arrowY+35;
-  s+='<line x1="'+rackX+'" y1="'+maintY+'" x2="'+(rackX+rackW)+'" y2="'+maintY+'" stroke="#FF9800" stroke-width="1" stroke-dasharray="6,4"/>';
-  s+='<text x="'+(rackX+rackW/2)+'" y="'+(maintY+14)+'" text-anchor="middle" fill="#FF9800" font-size="10">维护通道 (≥1.2m)</text>';
-  const modY=maintY+35;
-  s+='<text x="60" y="'+modY+'" fill="#aaa" font-size="11" font-weight="bold">充电模块分配</text>';
-  const modCount=data.chargingSystem.moduleCount;
-  for(let m=0;m<Math.min(modCount,8);m++){
-    const mx=60+m*110;
-    s+='<rect x="'+mx+'" y="'+(modY+10)+'" width="100" height="30" rx="3" fill="#1a2332" stroke="#4CAF50" stroke-width="1"/>';
-    s+='<text x="'+(mx+50)+'" y="'+(modY+30)+'" text-anchor="middle" fill="#4CAF50" font-size="9">模块 #'+(m+1)+'</text>';
-  }
-  if(modCount>8) s+='<text x="'+(60+8*110)+'" y="'+(modY+30)+'" fill="#888" font-size="9">...共'+modCount+'个</text>';
-  s+='</svg>';
-  c.innerHTML=s;
+function bsElecRenderParamsTable(engModel){
+  if(!engModel){return;}
+  const container=document.getElementById('bsElecParams');
+  if(!container) return;
+  const cd=SLD_RULES.circuitDesignation;
+  let h='<table class="bs-elec-params-table">';
+  const groups=[
+    {title:'10kV侧设备',devices:engModel.devices10kV},
+    {title:'0.4kV侧设备',devices:engModel.devices04kV},
+    {title:'充电系统设备',devices:engModel.chargerDevices},
+    {title:'DC侧设备',devices:engModel.dcDevices}
+  ];
+  groups.forEach(function(g){
+    if(!g.devices||g.devices.length===0) return;
+    h+='<tr class="bs-elec-params-group"><td colspan="7">'+g.title+'</td></tr>';
+    h+='<tr><th>设备代号</th><th>设备名称</th><th>型号</th><th>容量/额定值</th><th>数量</th><th>回路编号</th><th>备注</th></tr>';
+    g.devices.forEach(function(d){
+      const rating=d.rating?(d.rating+(d.type==='transformer'?'kVA':d.type==='motor'?'kW':'A')):(d.currentRating?d.currentRating+'A':'-');
+      const circuit=cd[d.code]||'-';
+      const model=d.model||'-';
+      const qty=d.qty||1;
+      const note=d.voltage?d.voltage:'';
+      h+='<tr><td>'+d.code+'</td><td>'+(d.nameZh||d.type)+'</td><td>'+model+'</td><td>'+rating+'</td><td>'+qty+'</td><td>'+circuit+'</td><td>'+note+'</td></tr>';
+    });
+  });
+  h+='</table>';
+  container.innerHTML=h;
 }
+
+function bsElecInitZoomPan(){
+  const container=document.getElementById('bsElecSvgContainer');
+  if(!container||container._bsElecZoomBound) return;
+  container._bsElecZoomBound=true;
+  container.addEventListener('wheel',function(e){
+    e.preventDefault();
+    if(e.deltaY<0) bsElecZoomPan('zoomIn');
+    else bsElecZoomPan('zoomOut');
+  },{passive:false});
+  container.addEventListener('mousedown',function(e){
+    if(e.button!==0) return;
+    _bsElecIsPanning=true;_bsElecPanStartX=e.clientX-_bsElecPanX;_bsElecPanStartY=e.clientY-_bsElecPanY;
+    container.style.cursor='grabbing';
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!_bsElecIsPanning) return;
+    _bsElecPanX=e.clientX-_bsElecPanStartX;_bsElecPanY=e.clientY-_bsElecPanStartY;
+    const wrapper=document.getElementById('bsElecSvgWrapper');
+    if(wrapper) wrapper.style.transform='translate('+_bsElecPanX+'px,'+_bsElecPanY+'px) scale('+_bsElecZoom+')';
+  });
+  document.addEventListener('mouseup',function(){
+    if(_bsElecIsPanning){_bsElecIsPanning=false;container.style.cursor='grab';}
+  });
+  container.addEventListener('dblclick',function(){bsElecZoomPan('reset');});
+}
+
+function bsRenderArchDiagramSvg(containerId,data){return;}
+
+function bsRenderBatteryBaySvg(containerId,data){return;}
+
+function bsRenderChargingRackSvg(containerId,data){return;}
 
 
 
-function bsRenderPrimaryDiagramSvg(containerId,data){
-  const c=document.getElementById(containerId);if(!c) return;
-  const elec=data.electrical;
-  let s='<svg viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  s+='<text x="600" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">电气一次图 (电力流向)</text>';
-  const nodes=[
-    {label:'10kV电网',color:'#4a90d9',detail:elec.primary.incoming},
-    {label:'高压开关柜',color:'#534AB7',detail:elec.primary.hvSwitch},
-    {label:'变压器',color:'#e8a838',detail:elec.primary.transformer},
-    {label:'低压配电柜',color:'#0F6E56',detail:elec.primary.lvPanel},
-    {label:'充电模块组',color:'#e06070',detail:elec.primary.charger},
-    {label:'电池仓',color:'#50c878',detail:elec.primary.batteryBay}
-  ];
-  nodes.forEach((n,i)=>{
-    const x=50+i*195;const y=100;
-    s+='<rect x="'+x+'" y="'+y+'" width="170" height="80" rx="8" fill="'+n.color+'" opacity="0.15" stroke="'+n.color+'" stroke-width="1.5"/>';
-    s+='<text x="'+(x+85)+'" y="'+(y+30)+'" text-anchor="middle" fill="'+n.color+'" font-size="12" font-weight="600">'+n.label+'</text>';
-    s+='<text x="'+(x+85)+'" y="'+(y+55)+'" text-anchor="middle" fill="var(--text1)" font-size="10">'+n.detail+'</text>';
-    if(i<nodes.length-1){
-      s+='<line x1="'+(x+170)+'" y1="'+(y+40)+'" x2="'+(x+195)+'" y2="'+(y+40)+'" stroke="#3a3e45" stroke-width="2" marker-end="url(#bs-arrow-elec)"/>';
-    }
-  });
-  s+='<rect x="50" y="250" width="1100" height="100" rx="8" fill="rgba(15,110,86,0.08)" stroke="#0F6E56" stroke-width="1"/>';
-  s+='<text x="600" y="275" text-anchor="middle" fill="#0F6E56" font-size="11" font-weight="600">保护配置</text>';
-  s+='<text x="600" y="300" text-anchor="middle" fill="var(--text1)" font-size="10">'+elec.secondary.protection+'</text>';
-  s+='<text x="600" y="320" text-anchor="middle" fill="var(--text2)" font-size="9">测控: '+elec.secondary.measurement+' | 计量: '+elec.secondary.metering+'</text>';
-  s+='<defs><marker id="bs-arrow-elec" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3a3e45"/></marker></defs>';
-  s+='</svg>';
-  c.innerHTML=s;
-}
-function bsRenderSecondaryDiagramSvg(containerId,data){
-  const c=document.getElementById(containerId);if(!c) return;
-  const elec=data.electrical;
-  let s='<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  s+='<text x="500" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">电气二次图</text>';
-  const blocks=[
-    {label:'差动保护',x:80,y:60,color:'#e06070',detail:'比率制动+差动速断'},
-    {label:'过流保护',x:80,y:180,color:'#e8a838',detail:'定时限+反时限'},
-    {label:'速断保护',x:80,y:300,color:'#534AB7',detail:'无时限电流速断'},
-    {label:'有功/无功测控',x:500,y:60,color:'#4a90d9',detail:'功率因数补偿'},
-    {label:'0.5S级计量',x:500,y:180,color:'#0F6E56',detail:'关口电能计量'}
-  ];
-  blocks.forEach(b=>{
-    s+='<rect x="'+b.x+'" y="'+b.y+'" width="400" height="90" rx="8" fill="'+b.color+'" opacity="0.15" stroke="'+b.color+'" stroke-width="1.5"/>';
-    s+='<text x="'+(b.x+200)+'" y="'+(b.y+35)+'" text-anchor="middle" fill="'+b.color+'" font-size="12" font-weight="600">'+b.label+'</text>';
-    s+='<text x="'+(b.x+200)+'" y="'+(b.y+60)+'" text-anchor="middle" fill="var(--text1)" font-size="10">'+b.detail+'</text>';
-  });
-  s+='</svg>';
-  c.innerHTML=s;
-}
-function bsRenderDistributionSvg(containerId,data){
-  const c=document.getElementById(containerId);if(!c) return;
-  let s='<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  s+='<text x="500" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">配电系统单线图</text>';
-  s+='<rect x="400" y="50" width="200" height="50" rx="4" fill="rgba(232,168,56,0.2)" stroke="#e8a838"/>';
-  s+='<text x="500" y="80" text-anchor="middle" fill="#e8a838" font-size="11" font-weight="600">变压器低压侧</text>';
-  s+='<line x1="500" y1="100" x2="500" y2="140" stroke="#3a3e45" stroke-width="2"/>';
-  s+='<rect x="420" y="140" width="160" height="40" rx="4" fill="rgba(224,96,112,0.2)" stroke="#e06070"/>';
-  s+='<text x="500" y="165" text-anchor="middle" fill="#e06070" font-size="10">主断路器</text>';
-  s+='<line x1="500" y1="180" x2="500" y2="210" stroke="#3a3e45" stroke-width="2"/>';
-  s+='<line x1="200" y1="210" x2="800" y2="210" stroke="#3a3e45" stroke-width="3"/>';
-  s+='<text x="500" y="230" text-anchor="middle" fill="var(--text2)" font-size="9">母线</text>';
-  const circuits=[
-    {label:'充电模块',x:250,color:'#0F6E56',cap:'60kW×N'},
-    {label:'照明',x:400,color:'#4a90d9',cap:'10kW'},
-    {label:'空调',x:550,color:'#534AB7',cap:'30kW'},
-    {label:'消防',x:700,color:'#e06070',cap:'15kW'}
-  ];
-  circuits.forEach(ct=>{
-    s+='<line x1="'+ct.x+'" y1="210" x2="'+ct.x+'" y2="270" stroke="#3a3e45" stroke-width="1.5"/>';
-    s+='<rect x="'+(ct.x-50)+'" y="270" width="100" height="60" rx="4" fill="'+ct.color+'" opacity="0.15" stroke="'+ct.color+'"/>';
-    s+='<text x="'+ct.x+'" y="295" text-anchor="middle" fill="'+ct.color+'" font-size="10">'+ct.label+'</text>';
-    s+='<text x="'+ct.x+'" y="315" text-anchor="middle" fill="var(--text2)" font-size="9">'+ct.cap+'</text>';
-  });
-  s+='</svg>';
-  c.innerHTML=s;
-}
-function bsRenderCommTopologySvg(containerId,data){
-  const c=document.getElementById(containerId);if(!c) return;
-  const elec=data.electrical;
-  let s='<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  s+='<text x="400" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">通讯网络拓扑</text>';
-  s+='<circle cx="400" cy="300" r="60" fill="rgba(15,110,86,0.2)" stroke="#0F6E56" stroke-width="2"/>';
-  s+='<text x="400" y="295" text-anchor="middle" fill="#0F6E56" font-size="11" font-weight="600">EMS</text>';
-  s+='<text x="400" y="312" text-anchor="middle" fill="#0F6E56" font-size="9">站控系统</text>';
-  const devices=[
-    {label:'BMS',proto:'CAN 2.0B',angle:-90,color:'#4a90d9'},
-    {label:'PCS',proto:'Modbus TCP',angle:-30,color:'#e8a838'},
-    {label:'机器人',proto:'Modbus TCP',angle:30,color:'#e06070'},
-    {label:'PLC',proto:'Modbus RTU',angle:90,color:'#534AB7'},
-    {label:'充电模块',proto:'CAN/Modbus',angle:150,color:'#50c878'},
-    {label:'消防环境',proto:'RS485',angle:210,color:'#EF9F27'}
-  ];
-  devices.forEach((d,i)=>{
-    const rad=d.angle*Math.PI/180;
-    const nx=400+200*Math.cos(rad);const ny=300+200*Math.sin(rad);
-    s+='<circle cx="'+nx+'" cy="'+ny+'" r="40" fill="'+d.color+'" opacity="0.85"/>';
-    s+='<text x="'+nx+'" y="'+(ny-3)+'" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">'+d.label+'</text>';
-    s+='<text x="'+nx+'" y="'+(ny+12)+'" text-anchor="middle" fill="#fff" font-size="8">'+d.proto+'</text>';
-    s+='<line x1="'+(400+60*Math.cos(rad))+'" y1="'+(300+60*Math.sin(rad))+'" x2="'+(nx-40*Math.cos(rad))+'" y2="'+(ny-40*Math.sin(rad))+'" stroke="var(--text2)" stroke-width="1.5"/>';
-  });
-  s+='</svg>';
-  c.innerHTML=s;
-}
-function bsRenderGroundingSvg(containerId,data){
-  const c=document.getElementById(containerId);if(!c) return;
-  const elec=data.electrical;
-  let s='<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" style="width:100%">';
-  s+='<text x="400" y="25" text-anchor="middle" fill="var(--text2)" font-size="12">接地系统图</text>';
-  s+='<rect x="100" y="60" width="600" height="350" rx="8" fill="rgba(15,110,86,0.08)" stroke="#0F6E56" stroke-dasharray="6,4"/>';
-  s+='<text x="400" y="85" text-anchor="middle" fill="#0F6E56" font-size="11" font-weight="600">接地网</text>';
-  s+='<line x1="150" y1="120" x2="650" y2="120" stroke="#0F6E56" stroke-width="3"/>';
-  s+='<text x="400" y="140" text-anchor="middle" fill="#0F6E56" font-size="10">主接地母线: '+elec.grounding.mainBus+'</text>';
-  for(let i=0;i<5;i++){
-    const x=200+i*100;
-    s+='<line x1="'+x+'" y1="120" x2="'+x+'" y2="200" stroke="#0F6E56" stroke-width="1.5"/>';
-    s+='<circle cx="'+x+'" cy="210" r="8" fill="#0F6E56" opacity="0.6"/>';
-    s+='<text x="'+x+'" y="235" text-anchor="middle" fill="var(--text2)" font-size="8">接地极</text>';
-  }
-  s+='<rect x="200" y="270" width="180" height="60" rx="4" fill="rgba(232,168,56,0.15)" stroke="#e8a838"/>';
-  s+='<text x="290" y="295" text-anchor="middle" fill="#e8a838" font-size="10">等电位连接</text>';
-  s+='<text x="290" y="315" text-anchor="middle" fill="var(--text2)" font-size="9">引下线: '+elec.grounding.downConductor+'</text>';
-  s+='<rect x="450" y="270" width="180" height="60" rx="4" fill="rgba(224,96,112,0.15)" stroke="#e06070"/>';
-  s+='<text x="540" y="295" text-anchor="middle" fill="#e06070" font-size="10">接地类型: '+elec.grounding.type+'</text>';
-  s+='<text x="540" y="315" text-anchor="middle" fill="var(--text2)" font-size="9">接地电阻: '+elec.grounding.resistance+'</text>';
-  s+='</svg>';
-  c.innerHTML=s;
-}
+function bsRenderPrimaryDiagramSvg(containerId,data){return;}
+function bsRenderSecondaryDiagramSvg(containerId,data){return;}
+function bsRenderDistributionSvg(containerId,data){return;}
+function bsRenderCommTopologySvg(containerId,data){return;}
+function bsRenderGroundingSvg(containerId,data){return;}
 function bsRenderElec(){
   const empty=document.getElementById('bsElecEmpty');
   const content=document.getElementById('bsElecContent');
   if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
   empty.style.display='none';content.style.display='';
-  bsRenderArchDiagramSvg('bsArchSvg',LAST_BS_RESULT);
-  bsRenderPrimaryDiagramSvg('bsPrimarySvg',LAST_BS_RESULT);
-  bsRenderBatteryBaySvg('bsBatteryBaySvg',LAST_BS_RESULT);
-  bsRenderChargingRackSvg('bsChargingRackSvg',LAST_BS_RESULT);
-  bsRenderSecondaryDiagramSvg('bsSecondarySvg',LAST_BS_RESULT);
-  bsRenderDistributionSvg('bsDistributionSvg',LAST_BS_RESULT);
-  bsRenderCommTopologySvg('bsCommSvg',LAST_BS_RESULT);
-  bsRenderGroundingSvg('bsGroundingSvg',LAST_BS_RESULT);
-  const elec=LAST_BS_RESULT.electrical;
-  const L=bsGetText;
-  let h='<div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)">';
-  h+='<div style="font-size:13px;font-weight:bold;color:var(--text1);margin-bottom:12px" data-i18n="bs_elec_params">电气参数汇总</div>';
-  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">';
-  const params=[
-    ['变压器容量',elec.params.transformerCapacity+'kVA'],['峰值功率',elec.params.peakPower+'kW'],['充电模块数',elec.params.chargerCount+'个'],
-    ['高压开关柜',elec.primary.hvSwitch],['低压配电柜',elec.primary.lvPanel],['接地类型',elec.grounding.type],
-    ['接地电阻',elec.grounding.resistance],['保护配置',elec.secondary.protection],['计量',elec.secondary.metering]
-  ];
-  params.forEach(p=>{h+='<div style="padding:6px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">'+p[0]+'</span><br><b style="color:var(--text1)">'+p[1]+'</b></div>';});
-  h+='</div></div>';
-  document.getElementById('bsElecParams').innerHTML=h;
+  const engModel=bsElecBuildEngModel(LAST_BS_RESULT);
+  const symbolMap=bsElecResolveSymbols(engModel);
+  const topology=bsElecBuildTopology(engModel,symbolMap);
+  window._bsElecEngModel=engModel;
+  window._bsElecSymbolMap=symbolMap;
+  window._bsElecTopology=topology;
+  window._bsElecVersion=(window._bsElecVersion||0)+1;
+  bsElecSwitchDiagram('10kv_primary');
+  bsElecRenderParamsTable(engModel);
+  bsElecInitZoomPan();
 }
 
 function bsShowPtTab(key){
