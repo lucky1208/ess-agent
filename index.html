@@ -4865,6 +4865,262 @@ function bsCalcBatteryLifeMgmt(params){
 
 
 
+function bsElecBuildEngModel(bsResult){
+  const p=bsResult.inputParams;const pw=bsResult.powerCapacity;const cs=bsResult.chargingSystem;const cr=bsResult.chargingRack;const bp=bsResult.batteryPool;
+  const trCount=pw.transformerCount||1;
+  const trCap=pw.transformerUnitCapacity||1600;
+  const rackCount=Math.max(1,Math.ceil(cr.actualSlots/24));
+  const modGroups=Math.max(1,Math.ceil(cs.moduleCount/6));
+  const devices10kV=[
+    {code:'10KV_IN',type:'incoming',nameZh:'10kV进线',voltage:'10kV',model:'-',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{top:null,bottom:'LA1'}},
+    {code:'LA1',type:'arrester',nameZh:'避雷器',voltage:'10kV',model:'HY5WZ-17/45',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{top:'10KV_IN',bottom:'QS1'}},
+    {code:'QS1',type:'disconnector',nameZh:'隔离开关',voltage:'10kV',model:'GN30-12',rating:'630A',currentRating:'-',ratio:null,qty:1,ports:{top:'LA1',bottom:'TA1'}},
+    {code:'TA1',type:'ct',nameZh:'电流互感器',voltage:'10kV',model:'LZZBJ9-10',rating:'-',currentRating:'-',ratio:'100/5',qty:1,ports:{top:'QS1',bottom:'QF1'}},
+    {code:'QF1',type:'breaker',nameZh:'真空断路器',voltage:'10kV',model:'VS1-12',rating:'630A',currentRating:'630A',ratio:null,qty:1,ports:{top:'TA1',bottom:'BUS_10KV'}},
+    {code:'BUS_10KV',type:'busbar',nameZh:'10kV母线',voltage:'10kV',model:'TMY-3(80×8)',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{}},
+    {code:'TV1',type:'pt',nameZh:'电压互感器',voltage:'10kV',model:'JDZX9-10',rating:'-',currentRating:'-',ratio:'10/0.1',qty:1,ports:{top:'BUS_10KV',bottom:null}}
+  ];
+  for(let i=1;i<=trCount;i++){
+    devices10kV.push({code:'QS'+(i+1),type:'disconnector',nameZh:'隔离开关'+i,voltage:'10kV',model:'GN30-12',rating:'630A',currentRating:'-',ratio:null,qty:1,ports:{top:'BUS_10KV',bottom:'TA'+(i+1)}});
+    devices10kV.push({code:'TA'+(i+1),type:'ct',nameZh:'电流互感器'+i,voltage:'10kV',model:'LZZBJ9-10',rating:'-',currentRating:'-',ratio:'100/5',qty:1,ports:{top:'QS'+(i+1),bottom:'QF'+(i+1)}});
+    devices10kV.push({code:'QF'+(i+1),type:'breaker',nameZh:'真空断路器'+i,voltage:'10kV',model:'VS1-12',rating:'630A',currentRating:'630A',ratio:null,qty:1,ports:{top:'TA'+(i+1),bottom:'TR'+i}});
+    devices10kV.push({code:'TR'+i,type:'transformer',nameZh:'变压器'+i,voltage:'10/0.4kV',model:'SCB'+(trCap>=2500?'13':'11'),rating:trCap+'kVA',currentRating:'-',ratio:'10/0.4',qty:1,ports:{top:'QF'+(i+1),bottom:null}});
+  }
+  const devices04kV=[
+    {code:'ACB1',type:'acb',nameZh:'框架断路器',voltage:'0.4kV',model:'DW45',rating:'3200A',currentRating:'3200A',ratio:null,qty:1,ports:{top:'TR1',bottom:'BUS_04KV'}},
+    {code:'BUS_04KV',type:'busbar',nameZh:'0.4kV母线',voltage:'0.4kV',model:'TMY-3(100×10)',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{}},
+    {code:'MCCB1',type:'mccb',nameZh:'塑壳断路器1',voltage:'0.4kV',model:'NSX250N',rating:'250A',currentRating:'250A',ratio:null,qty:1,ports:{top:'BUS_04KV',bottom:'M_SWAP'}},
+    {code:'M_SWAP',type:'motor',nameZh:'换电机器人',voltage:'0.4kV',model:'-',rating:'55kW',currentRating:'-',ratio:null,qty:p.swapBayCount,ports:{top:'MCCB1',bottom:null}},
+    {code:'MCCB2',type:'mccb',nameZh:'塑壳断路器2',voltage:'0.4kV',model:'NSX400N',rating:'400A',currentRating:'400A',ratio:null,qty:1,ports:{top:'BUS_04KV',bottom:'M_CHARGER'}},
+    {code:'M_CHARGER',type:'motor',nameZh:'充电模块',voltage:'0.4kV',model:'-',rating:cs.pcsPower+'kW',currentRating:'-',ratio:null,qty:cs.moduleCount,ports:{top:'MCCB2',bottom:null}},
+    {code:'MCCB3',type:'mccb',nameZh:'塑壳断路器3',voltage:'0.4kV',model:'NSX100N',rating:'100A',currentRating:'100A',ratio:null,qty:1,ports:{top:'BUS_04KV',bottom:'M_HVAC'}},
+    {code:'M_HVAC',type:'motor',nameZh:'空调',voltage:'0.4kV',model:'-',rating:'45kW',currentRating:'-',ratio:null,qty:2,ports:{top:'MCCB3',bottom:null}},
+    {code:'MCCB4',type:'mccb',nameZh:'塑壳断路器4',voltage:'0.4kV',model:'NSX63N',rating:'63A',currentRating:'63A',ratio:null,qty:1,ports:{top:'BUS_04KV',bottom:'M_FIRE'}},
+    {code:'M_FIRE',type:'motor',nameZh:'消防',voltage:'0.4kV',model:'-',rating:'15kW',currentRating:'-',ratio:null,qty:1,ports:{top:'MCCB4',bottom:null}},
+    {code:'MCCB5',type:'mccb',nameZh:'塑壳断路器5',voltage:'0.4kV',model:'NSX63N',rating:'63A',currentRating:'63A',ratio:null,qty:1,ports:{top:'BUS_04KV',bottom:'M_LIGHT'}},
+    {code:'M_LIGHT',type:'motor',nameZh:'照明',voltage:'0.4kV',model:'-',rating:'10kW',currentRating:'-',ratio:null,qty:1,ports:{top:'MCCB5',bottom:null}}
+  ];
+  const chargerDevices=[
+    {code:'BUS_AC380',type:'busbar',nameZh:'AC380V母线',voltage:'AC380V',model:'-',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{}},
+    {code:'QF_AC',type:'breaker',nameZh:'交流断路器',voltage:'0.4kV',model:'NSX630N',rating:'630A',currentRating:'630A',ratio:null,qty:1,ports:{top:'BUS_AC380',bottom:'PCS_G1'}},
+    {code:'PCS_G1',type:'pcs',nameZh:'充电模块组1',voltage:'AC380V/DC750V',model:'-',rating:cs.pcsPower+'kW',currentRating:'-',ratio:null,qty:cs.moduleCount,ports:{top:'QF_AC',bottom:'BUS_DC750'}},
+    {code:'BUS_DC750',type:'busbar',nameZh:'DC750V母线',voltage:'DC750V',model:'TMY-2(80×6)',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{}},
+    {code:'QF_DC',type:'breaker',nameZh:'直流断路器',voltage:'DC750V',model:'DCM6-800',rating:'800A',currentRating:'800A',ratio:null,qty:1,ports:{top:'BUS_DC750',bottom:'BATTERY_BAY'}},
+    {code:'BATTERY_BAY',type:'rack',nameZh:'电池仓',voltage:'DC750V',model:'-',rating:p.batteryCapacity+'kWh',currentRating:'-',ratio:null,qty:bp.total,ports:{top:'QF_DC',bottom:null}}
+  ];
+  const dcDevices=[
+    {code:'BUS_DC750',type:'busbar',nameZh:'DC750V母线',voltage:'DC750V',model:'TMY-2(80×6)',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{}}
+  ];
+  for(let i=1;i<=rackCount;i++){
+    dcDevices.push({code:'QFDC_'+i,type:'breaker',nameZh:'DC断路器'+i,voltage:'DC750V',model:'DCM6-250',rating:'250A',currentRating:'250A',ratio:null,qty:1,ports:{top:'BUS_DC750',bottom:'RACK_0'+i}});
+    const rackBats=Math.min(24,cr.actualSlots-(i-1)*24);
+    dcDevices.push({code:'RACK_0'+i,type:'rack',nameZh:'电池组'+i,voltage:'DC750V',model:'-',rating:(rackBats*p.batteryCapacity)+'kWh',currentRating:'-',ratio:null,qty:rackBats,ports:{top:'QFDC_'+i,bottom:null}});
+  }
+  dcDevices.push({code:'BMS',type:'relay',nameZh:'BMS主控',voltage:'-',model:'-',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{}});
+  dcDevices.push({code:'PCS',type:'pcs',nameZh:'PCS总控',voltage:'-',model:'-',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{}});
+  dcDevices.push({code:'IM_1',type:'insulation_monitor',nameZh:'绝缘监测',voltage:'DC750V',model:'-',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{}});
+  dcDevices.push({code:'PE',type:'ground',nameZh:'接地',voltage:'-',model:'-',rating:'-',currentRating:'-',ratio:null,qty:1,ports:{}});
+  return{projectName:p.projName||'换电站项目',transformerCount:trCount,devices10kV,devices04kV,chargerDevices,dcDevices,voltageLevel:p.voltage,batteryCapacity:p.batteryCapacity,rackCount,moduleCount:cs.moduleCount};
+}
+
+function bsElecResolveSymbols(engModel){
+  const TYPE_SYMBOL_MAP={transformer:'TR',breaker:'QF',disconnector:'QS',ct:'TA',pt:'TV',arrester:'LA',fuse:'FU',busbar:'BUS',ground:'PE',acb:'ACB',mccb:'MCCB',motor:'M',contactor:'KM',relay:'K',reactor:'L',pcs:'PCS',rack:'RACK',insulation_monitor:'IM',incoming:'BUS'};
+  const allDevices=[].concat(engModel.devices10kV,engModel.devices04kV,engModel.chargerDevices,engModel.dcDevices);
+  const resolved=allDevices.map(d=>{
+    const symbolCode=TYPE_SYMBOL_MAP[d.type]||'MISSING';
+    const symbolDef=IEC_SYMBOL_REGISTRY[symbolCode]||null;
+    if(!symbolDef) console.warn('IEC symbol missing for device type:',d.type,d.code);
+    return{...d,symbolCode,symbolDef};
+  });
+  return{devices:resolved,missingSymbols:resolved.filter(d=>!d.symbolDef)};
+}
+
+function bsElecCalcLayout(diagramType,template,deviceMap){
+  const nodes=[];const connections=[];const busbars=[];
+  if(diagramType==='10kv_primary'){
+    const col1=200;const busY=500;
+    nodes.push({code:'10KV_IN',x:col1,y:80,label:'10kV进线'});
+    nodes.push({code:'LA1',x:col1,y:160});
+    nodes.push({code:'QS1',x:col1,y:240});
+    nodes.push({code:'TA1',x:col1,y:320});
+    nodes.push({code:'QF1',x:col1,y:400});
+    busbars.push({x:150,y:busY,width:1200,voltage:'10kV'});
+    const trStartX=500;
+    for(let i=0;i<(deviceMap.TR?1:0)+(deviceMap.TR1?1:0)+(deviceMap.TR2?1:0);i++){
+      const trCode=i===0?(deviceMap.TR1?'TR1':'TR'):'TR2';
+      const tx=trStartX+i*350;
+      nodes.push({code:'QS'+(i+2),x:tx,y:320});
+      nodes.push({code:'TA'+(i+2),x:tx,y:240});
+      nodes.push({code:'QF'+(i+2),x:tx,y:160});
+      nodes.push({code:trCode,x:tx,y:80,label:deviceMap[trCode]?.rating||''});
+      connections.push({x1:tx,y1:busY-40,x2:tx,y2:busY,type:'electrical'});
+    }
+    nodes.push({code:'TV1',x:1100,y:400});
+    connections.push({x1:col1,y1:80,x2:col1,y2:160,type:'electrical'});
+    connections.push({x1:col1,y1:160+20,x2:col1,y2:240-20,type:'electrical'});
+    connections.push({x1:col1,y1:240+20,x2:col1,y2:320-20,type:'electrical'});
+    connections.push({x1:col1,y1:320+15,x2:col1,y2:400-20,type:'electrical'});
+    connections.push({x1:col1,y1:400+20,x2:col1,y2:busY,type:'electrical'});
+  }else if(diagramType==='lv_distribution'){
+    const colX=200;const busY=350;
+    nodes.push({code:'TR1',x:colX,y:80,label:deviceMap.TR1?.rating||''});
+    nodes.push({code:'ACB1',x:colX,y:200});
+    busbars.push({x:150,y:busY,width:1200,voltage:'0.4kV'});
+    const feeders=['MCCB1','MCCB2','MCCB3','MCCB4','MCCB5'];
+    const feederLabels=['换电机器人','充电模块','空调','消防','照明'];
+    feeders.forEach((f,i)=>{
+      const fx=250+i*200;
+      nodes.push({code:f,x:fx,y:busY+60});
+      const loadCode=f.replace('MCCB','M_')+['SWAP','CHARGER','HVAC','FIRE','LIGHT'][i];
+      nodes.push({code:deviceMap[loadCode]?loadCode:'M_'+i,x:fx,y:busY+160,label:feederLabels[i]});
+      connections.push({x1:fx,y1:busY,x2:fx,y2:busY+60-16,type:'electrical'});
+      connections.push({x1:fx,y1:busY+60+16,x2:fx,y2:busY+160-18,type:'electrical'});
+    });
+    connections.push({x1:colX,y1:80+25,x2:colX,y2:200-20,type:'electrical'});
+    connections.push({x1:colX,y1:200+20,x2:colX,y2:busY,type:'electrical'});
+  }else if(diagramType==='charger_wiring'){
+    const cx=500;
+    nodes.push({code:'TR1',x:cx,y:80,label:'变压器'});
+    nodes.push({code:'BUS_AC380',x:cx,y:220});
+    busbars.push({x:150,y:220,width:700,voltage:'AC380V'});
+    nodes.push({code:'QF_AC',x:300,y:320});
+    nodes.push({code:'PCS_G1',x:500,y:400,label:'充电模块组'});
+    nodes.push({code:'BUS_DC750',x:cx,y:540});
+    busbars.push({x:150,y:540,width:700,voltage:'DC750V'});
+    nodes.push({code:'QF_DC',x:500,y:640});
+    nodes.push({code:'BATTERY_BAY',x:500,y:760,label:'电池仓'});
+    connections.push({x1:cx,y1:80+25,x2:cx,y2:220,type:'electrical'});
+    connections.push({x1:300,y1:220,x2:300,y2:320-20,type:'electrical'});
+    connections.push({x1:300,y1:320+20,x2:300,y2:400,type:'electrical'});
+    connections.push({x1:500,y1:400+20,x2:500,y2:540,type:'electrical'});
+    connections.push({x1:500,y1:540,x2:500,y2:640-20,type:'electrical'});
+    connections.push({x1:500,y1:640+20,x2:500,y2:760-18,type:'electrical'});
+  }else if(diagramType==='dc_system'){
+    const busY=150;
+    busbars.push({x:100,y:busY,width:1000,voltage:'DC750V'});
+    const rackCount=Object.keys(deviceMap).filter(k=>k.startsWith('RACK_')).length;
+    for(let i=1;i<=Math.max(rackCount,1);i++){
+      const rx=200+(i-1)*220;
+      const qfCode='QFDC_'+i;const rackCode='RACK_0'+i;
+      nodes.push({code:qfCode,x:rx,y:busY+80});
+      nodes.push({code:rackCode,x:rx,y:busY+180,label:'电池组'+i});
+      connections.push({x1:rx,y1:busY,x2:rx,y2:busY+80-20,type:'electrical'});
+      connections.push({x1:rx,y1:busY+80+20,x2:rx,y2:busY+180-18,type:'electrical'});
+    }
+    nodes.push({code:'BMS',x:200,y:busY+350,label:'BMS主控'});
+    nodes.push({code:'PCS',x:500,y:busY+350,label:'PCS总控'});
+    nodes.push({code:'IM_1',x:900,y:busY+80,label:'绝缘监测'});
+    nodes.push({code:'PE',x:900,y:busY+180});
+    connections.push({x1:200,y1:busY+350-16,x2:200,y2:busY+180+18,type:'communication'});
+    connections.push({x1:500,y1:busY+350-20,x2:500,y2:busY+180+18,type:'communication'});
+    connections.push({x1:900,y1:busY+80-16,x2:900,y2:busY,type:'electrical'});
+    connections.push({x1:900,y1:busY+80+16,x2:900,y2:busY+180-10,type:'electrical'});
+  }
+  return{nodes,connections,busbars};
+}
+
+function bsElecBuildTopology(engModel,symbolMap){
+  const topologies={};
+  const allDevices=symbolMap.devices;
+  const deviceMap={};
+  allDevices.forEach(d=>{deviceMap[d.code]=d;});
+  Object.keys(SLD_RULES.topologyTemplates).forEach(key=>{
+    const template=SLD_RULES.topologyTemplates[key];
+    const layout=bsElecCalcLayout(key,template,deviceMap);
+    topologies[key]={diagramType:key,description:template.description,links:template.links,busbarSegments:template.busbarSegments,circuitDesignations:template.circuitDesignations,layout,deviceMap};
+  });
+  return topologies;
+}
+
+function bsElecDrawSymbol(device,x,y){
+  if(!device.symbolDef) return '<g transform="translate('+x+','+y+')"><rect x="-12" y="-12" width="24" height="24" rx="2" fill="none" stroke="#e06070" stroke-width="1.5"/><text x="0" y="4" text-anchor="middle" fill="#e06070" font-size="9">'+(device.symbolCode||device.code)+'</text></g>';
+  const sym=device.symbolDef;
+  let s='<g transform="translate('+x+','+y+')">';
+  const lw=sym.code==='BUS'?3:1.5;
+  sym.symbolPath.forEach(p=>{s+='<path d="'+p+'" stroke="#ddd" stroke-width="'+lw+'" fill="none"/>';});
+  const lbl=sym.labelPosition;
+  const labelText=device.code.replace(/_\d+/,'')+' '+(device.rating&&device.rating!=='-'?device.rating:'');
+  s+='<text x="'+lbl.x+'" y="'+lbl.y+'" text-anchor="'+lbl.anchor+'" fill="#aaa" font-size="10">'+labelText+'</text>';
+  s+='</g>';
+  return s;
+}
+
+function bsElecDrawConnection(conn){
+  const dash=conn.type==='communication'?' stroke-dasharray="6,3"':'';
+  const color=conn.type==='communication'?'#4488ff':conn.type==='grounding'?'#888':'#555';
+  const lw=conn.type==='communication'?1:1.5;
+  return '<line x1="'+conn.x1+'" y1="'+conn.y1+'" x2="'+conn.x2+'" y2="'+conn.y2+'" stroke="'+color+'" stroke-width="'+lw+'"'+dash+'/>';
+}
+
+function bsElecDrawBusbar(bus){
+  let s='<line x1="'+bus.x+'" y1="'+bus.y+'" x2="'+(bus.x+bus.width)+'" y2="'+bus.y+'" stroke="#ddd" stroke-width="3"/>';
+  s+='<text x="'+(bus.x+bus.width/2)+'" y="'+(bus.y-8)+'" text-anchor="middle" fill="#ff9800" font-size="12" font-weight="bold">'+bus.voltage+'</text>';
+  return s;
+}
+
+function bsElecDrawCircuitLabel(cd,layout){
+  const firstDev=cd.devices[0];
+  const node=layout.nodes.find(n=>n.code===firstDev);
+  if(!node) return '';
+  return '<text x="'+(node.x-30)+'" y="'+node.y+'" text-anchor="middle" fill="#ff9800" font-size="11" font-weight="bold">'+cd.circuit+'</text>';
+}
+
+function bsElecRenderTitleBlock(svgStr,diagramType,engModel){
+  const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
+  const vb=tpl.viewBox.split(' ');
+  const w=parseInt(vb[2]);const h=parseInt(vb[3]);
+  const of=tpl.outerFrameOffset;const inf=tpl.innerFrameOffset;
+  const tbW=tpl.titleBlockWidth;const tbH=tpl.titleBlockHeight;
+  const tbX=w-of-inf-tbW;const tbY=h-of-inf-tbH;
+  const numRule=TITLE_BLOCK_TEMPLATE.diagramNumberRule;
+  const diagNum=numRule.prefix+'-'+numRule.types[diagramType]+'-V1';
+  const diagNames={'10kv_primary':'10kV供配电系统单线图','lv_distribution':'0.4kV低压配电单线图','charger_wiring':'充电模块接线图','dc_system':'电池仓DC系统图'};
+  let tb='';
+  tb+='<rect x="'+(of)+'" y="'+(of)+'" width="'+(w-2*of)+'" height="'+(h-2*of)+'" fill="none" stroke="#ddd" stroke-width="2"/>';
+  tb+='<rect x="'+(of+inf)+'" y="'+(of+inf)+'" width="'+(w-2*of-2*inf)+'" height="'+(h-2*of-2*inf)+'" fill="none" stroke="#888" stroke-width="0.5"/>';
+  tb+='<rect x="'+tbX+'" y="'+tbY+'" width="'+tbW+'" height="'+tbH+'" fill="none" stroke="#ddd" stroke-width="1"/>';
+  const rows=[
+    ['项目名称',engModel.projectName||'换电站项目（待命名）'],
+    ['图名',diagNames[diagramType]||diagramType],
+    ['图号',diagNum],
+    ['比例','NTS'],
+    ['阶段','方案设计'],
+    ['设计','AI辅助设计'],
+    ['审核',''],
+    ['日期',new Date().toISOString().split('T')[0]]
+  ];
+  const rowH=tbH/4;const col1W=80;const col2W=tbW-col1W;
+  rows.forEach((r,i)=>{
+    const ry=tbY+(i%4)*rowH;const rx=tbX+(i<4?0:tbW/2);
+    const actualRy=i<4?ry:tbY+(i%4)*rowH;
+    const actualRx=i<4?tbX:tbX+tbW/2;
+    tb+='<rect x="'+actualRx+'" y="'+actualRy+'" width="'+col1W+'" height="'+rowH+'" fill="none" stroke="#555" stroke-width="0.5"/>';
+    tb+='<rect x="'+(actualRx+col1W)+'" y="'+actualRy+'" width="'+(col2W/2- col1W)+'" height="'+rowH+'" fill="none" stroke="#555" stroke-width="0.5"/>';
+    tb+='<text x="'+(actualRx+4)+'" y="'+(actualRy+rowH/2+4)+'" fill="#888" font-size="9">'+r[0]+'</text>';
+    tb+='<text x="'+(actualRx+col1W+4)+'" y="'+(actualRy+rowH/2+4)+'" fill="#ddd" font-size="10">'+r[1]+'</text>';
+  });
+  return svgStr.replace('</svg>',tb+'</svg>');
+}
+
+function bsElecRenderDiagram(containerId,topology,symbolMap,engModel){
+  const c=document.getElementById(containerId);if(!c) return;
+  const tpl=TITLE_BLOCK_TEMPLATE.A3_landscape;
+  let s='<svg viewBox="'+tpl.viewBox+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px">';
+  s+='<defs><marker id="arrowElec" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#555"/></marker></defs>';
+  const devMap=topology.deviceMap||{};
+  topology.layout.busbars.forEach(b=>{s+=bsElecDrawBusbar(b);});
+  topology.layout.connections.forEach(cn=>{s+=bsElecDrawConnection(cn);});
+  topology.layout.nodes.forEach(n=>{
+    const dev=devMap[n.code];
+    if(dev) s+=bsElecDrawSymbol(dev,n.x,n.y);
+    else s+='<g transform="translate('+n.x+','+n.y+')"><text x="0" y="0" text-anchor="middle" fill="#aaa" font-size="10">'+(n.label||n.code)+'</text></g>';
+  });
+  topology.circuitDesignations.forEach(cd=>{s+=bsElecDrawCircuitLabel(cd,topology.layout);});
+  s+='</svg>';
+  s=bsElecRenderTitleBlock(s,topology.diagramType,engModel);
+  c.innerHTML=s;
+}
+
 function bsRenderArchDiagramSvg(containerId,data){
   const c=document.getElementById(containerId);if(!c) return;
   const p=data.inputParams;const r=data;
