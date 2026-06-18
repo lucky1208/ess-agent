@@ -731,7 +731,7 @@ ACC AC一体柜专题
 <div class="diagram-svg" id="mgCommSvg"></div>
 </div>
 <div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title">微网保护配置图</h3><div class="diagram-actions"><button onclick="downloadMGDiagram('mgProtectSvg','微网保护配置图.svg')">下载 SVG</button></div></div>
+<div class="diagram-header"><h3 class="diagram-title">微网并离网保护与控制综合图</h3><div class="diagram-actions"><button onclick="downloadMGDiagram('mgProtectSvg','微网并离网保护与控制综合图.svg')">下载 SVG</button></div></div>
 <div class="diagram-svg" id="mgProtectSvg"></div>
 </div>
 <div class="diagram-container">
@@ -980,7 +980,7 @@ ACC AC一体柜专题
 </div>
 </div>
 <div class="acc-section">
-<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_protection"></span>五、微网保护配置</span></h3>
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_protection"></span>五、电气二次接线图</span></h3>
 <div class="mermaid-wrap" id="mm-5"></div>
 </div>
 <div class="acc-section">
@@ -998,6 +998,10 @@ ACC AC一体柜专题
 <tr><td>保护</td><td>孤岛检测</td><td>&lt;2s</td><td>IEEE 1547</td></tr>
 <tr><td></td><td>并离网切换</td><td>&lt;20ms</td><td>关键负荷不断电</td></tr>
 </table>
+</div>
+<div class="acc-section">
+<h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span data-i18n="mg_arch_logic"></span>八、微网并离网控制逻辑图</span></h3>
+<div class="mermaid-wrap" id="mm-12"></div>
 </div>
 </div>
 
@@ -1722,7 +1726,7 @@ ACC AC一体柜专题
 function loadMermaid(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';s.onload=function(){mermaid.initialize({startOnLoad:false,theme:'dark',themeVariables:{primaryColor:'#185FA5',primaryTextColor:'#FAFAF5',primaryBorderColor:'#3a3e45',lineColor:'#C2C0B6',secondaryColor:'#2A2E33',tertiaryColor:'#22262B',fontFamily:'-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',fontSize:'13px'},layout:'dagre',flowchart:{htmlLabels:false,curve:'basis'},sequence:{actorMargin:50,messageMargin:40}});};document.head.appendChild(s);}
 loadMermaid();
 
-const SVG_MAP={'mm-1':'microgrid_arch_topology_1.svg','mm-2':'microgrid_arch_acdc_2.svg','mm-3':'microgrid_arch_4types_3.svg','mm-4':'microgrid_mode_switch_4.svg','mm-5':'microgrid_protection_5.svg','mm-6':'microgrid_comms_network_6.svg','mm-7':'ems_arch_4layers_mm7.svg','mm-8':'ems_comms_protocols_mm8.svg','mm-9':'ems_eblock_internal_mm9.svg','mm-10':'ems_dispatch_layers_mm10.svg','mm-11':'ems_network_topology_mm11.svg'};
+const SVG_MAP={'mm-1':'microgrid_arch_topology_1.svg','mm-2':'microgrid_arch_acdc_2.svg','mm-3':'microgrid_arch_4types_3.svg','mm-4':'microgrid_mode_switch_4.svg','mm-5':'microgrid_secondary_diagram.svg','mm-6':'microgrid_comms_network_6.svg','mm-7':'ems_arch_4layers_mm7.svg','mm-8':'ems_comms_protocols_mm8.svg','mm-9':'ems_eblock_internal_mm9.svg','mm-10':'ems_dispatch_layers_mm10.svg','mm-11':'ems_network_topology_mm11.svg','mm-12':'microgrid_grid_off_logic.svg'};
 
 const MERMAID_DEFS = {
   'mm-1': `<svg width="100%" viewBox="0 0 680 520" role="img" style="" xmlns="http://www.w3.org/2000/svg">
@@ -2837,7 +2841,7 @@ aidc_dw_title:'图纸汇总 Agent',aidc_dw_desc:'所有AIDC图纸集中展示与
 aidc_dw_arch:'AIDC系统架构图',aidc_dw_wiring:'AIDC电气一次接线图',aidc_dw_dual:'AIDC双路供电拓扑图',aidc_dw_liquid:'AIDC液冷管路图',
 ess_layout:'平面布置图',ess_cable:'电缆走向图',ess_principle:'PCS-BESS电气原理图',
 lang_btn_zh:'中文',lang_btn_en:'English',lang_btn_ar:'العربية',
-mg_arch_panorama:'微网(Microgrid) 架构全景图',mg_arch_ac_topo:'一、微网电力拓扑总览（交流微网）',mg_arch_hybrid:'二、交直流混合微网架构（推荐方案）',mg_arch_topo_compare:'三、四种典型微网拓扑对比',mg_arch_mode_switch:'四、微网运行模式切换',mg_arch_protection:'五、微网保护配置',mg_arch_comm:'六、通信控制网络',mg_arch_params:'七、关键参数速查',
+mg_arch_panorama:'微网(Microgrid) 架构全景图',mg_arch_ac_topo:'一、微网电力拓扑总览（交流微网）',mg_arch_hybrid:'二、交直流混合微网架构（推荐方案）',mg_arch_topo_compare:'三、四种典型微网拓扑对比',mg_arch_mode_switch:'四、微网运行模式切换',mg_arch_protection:'五、电气二次接线图',mg_arch_comm:'六、通信控制网络',mg_arch_params:'七、关键参数速查',mg_arch_logic:'八、微网并离网控制逻辑图',
 mg_ems_arch_title:'eBlock 微网能量管理系统(EMS)架构',mg_ems_overview:'一、总体架构（四层）',mg_ems_protocol:'二、通信协议 & 连接总线',mg_ems_eblock:'三、单台eBlock内部架构',mg_ems_delay:'四、关键通信时延（时序图）',mg_ems_network:'五、网络拓扑',
 mg_schedule_title:'微网调度优化',mg_schedule_obj:'一、优化目标函数',mg_schedule_constraints:'二、约束条件',mg_schedule_layers:'三、调度策略层级',mg_schedule_scenarios:'四、典型调度场景',
 mg_sw_pill_dispatch:'调度',mg_sw_pill_trading:'交易',mg_sw_pill_datacenter:'数据中台',
@@ -2971,7 +2975,7 @@ aidc_dw_title:'Drawing Summary Agent',aidc_dw_desc:'All AIDC drawings centralize
 aidc_dw_arch:'AIDC System Architecture',aidc_dw_wiring:'AIDC Single-line Diagram',aidc_dw_dual:'AIDC Dual-feed Power Topology',aidc_dw_liquid:'AIDC Liquid Cooling Diagram',
 ess_layout:'Floor Plan',ess_cable:'Cable Routing',ess_principle:'PCS-BESS Schematic',
 lang_btn_zh:'Chinese',lang_btn_en:'English',lang_btn_ar:'Arabic',
-mg_arch_panorama:'Microgrid Architecture Overview',mg_arch_ac_topo:'1. Microgrid Power Topology Overview (AC Microgrid)',mg_arch_hybrid:'2. AC/DC Hybrid Microgrid Architecture (Recommended)',mg_arch_topo_compare:'3. Four Typical Microgrid Topology Comparison',mg_arch_mode_switch:'4. Microgrid Operation Mode Switching',mg_arch_protection:'5. Microgrid Protection Configuration',mg_arch_comm:'6. Communication & Control Network',mg_arch_params:'7. Key Parameters Quick Reference',
+mg_arch_panorama:'Microgrid Architecture Overview',mg_arch_ac_topo:'1. Microgrid Power Topology Overview (AC Microgrid)',mg_arch_hybrid:'2. AC/DC Hybrid Microgrid Architecture (Recommended)',mg_arch_topo_compare:'3. Four Typical Microgrid Topology Comparison',mg_arch_mode_switch:'4. Microgrid Operation Mode Switching',mg_arch_protection:'5. Microgrid Electrical Secondary Wiring Diagram',mg_arch_comm:'6. Communication & Control Network',mg_arch_params:'7. Key Parameters Quick Reference',mg_arch_logic:'8. Microgrid Grid-Connected/Islanded Control Logic Diagram',
 mg_ems_arch_title:'eBlock Microgrid EMS Architecture',mg_ems_overview:'1. Overall Architecture (4 Layers)',mg_ems_protocol:'2. Communication Protocols & Bus',mg_ems_eblock:'3. Single eBlock Internal Architecture',mg_ems_delay:'4. Key Communication Latency (Sequence Diagram)',mg_ems_network:'5. Network Topology',
 mg_schedule_title:'Microgrid Dispatch Optimization',mg_schedule_obj:'1. Optimization Objective Function',mg_schedule_constraints:'2. Constraints',mg_schedule_layers:'3. Dispatch Strategy Hierarchy',mg_schedule_scenarios:'4. Typical Dispatch Scenarios',
 mg_sw_pill_dispatch:'Dispatch',mg_sw_pill_trading:'Trading',mg_sw_pill_datacenter:'Data Platform',
@@ -3105,7 +3109,7 @@ aidc_dw_title:'وكيل ملخص الرسوم',aidc_dw_desc:'عرض وتحميل
 aidc_dw_arch:'هيكل نظام AIDC',aidc_dw_wiring:'مخطط التوصيل أحادي الخط AIDC',aidc_dw_dual:'طوبولوجيا الطاقة المزدوجة AIDC',aidc_dw_liquid:'مخطط التبريد السائل AIDC',
 ess_layout:'مخطط الأرضية',ess_cable:'توجيه الكابلات',ess_principle:'مخطط PCS-BESS',
 lang_btn_zh:'الصينية',lang_btn_en:'الإنجليزية',lang_btn_ar:'العربية',
-mg_arch_panorama:'نظرة شاملة على بنية الشبكة المصغرة',mg_arch_ac_topo:'1. نظرة عامة على طوبولوجيا طاقة الشبكة المصغرة (شبكة مصغرة AC)',mg_arch_hybrid:'2. بنية الشبكة المصغرة الهجينة AC/DC (موصى بها)',mg_arch_topo_compare:'3. مقارنة أربع طوبولوجيات نموذجية للشبكة المصغرة',mg_arch_mode_switch:'4. تبديل وضع تشغيل الشبكة المصغرة',mg_arch_protection:'5. تكوين حماية الشبكة المصغرة',mg_arch_comm:'6. شبكة الاتصال والتحكم',mg_arch_params:'7. مرجع سريع للمعلمات الرئيسية',
+mg_arch_panorama:'نظرة شاملة على بنية الشبكة المصغرة',mg_arch_ac_topo:'1. نظرة عامة على طوبولوجيا طاقة الشبكة المصغرة (شبكة مصغرة AC)',mg_arch_hybrid:'2. بنية الشبكة المصغرة الهجينة AC/DC (موصى بها)',mg_arch_topo_compare:'3. مقارنة أربع طوبولوجيات نموذجية للشبكة المصغرة',mg_arch_mode_switch:'4. تبديل وضع تشغيل الشبكة المصغرة',mg_arch_protection:'5. مخطط التوصيلات الثانوية للشبكة المصغرة',mg_arch_comm:'6. شبكة الاتصال والتحكم',mg_arch_params:'7. مرجع سريع للمعلمات الرئيسية',mg_arch_logic:'8. مخطط منطق التحكم في الشبكة/الجزيرة للشبكة المصغرة',
 mg_ems_arch_title:'بنية نظام إدارة طاقة الشبكة المصغرة eBlock',mg_ems_overview:'1. البنية العامة (4 طبقات)',mg_ems_protocol:'2. بروتوكولات الاتصال وناقل الربط',mg_ems_eblock:'3. البنية الداخلية لوحدة eBlock واحدة',mg_ems_delay:'4. زمن الاتصال الرئيسي (مخطط التسلسل)',mg_ems_network:'5. طوبولوجيا الشبكة',
 mg_schedule_title:'تحسين توزيع الشبكة المصغرة',mg_schedule_obj:'1. دالة الهدف التحسينية',mg_schedule_constraints:'2. القيود',mg_schedule_layers:'3. التسلسل الهرمي لاستراتيجية التوزيع',mg_schedule_scenarios:'4. سيناريوهات التوزيع النموذجية',
 mg_sw_pill_dispatch:'التوزيع',mg_sw_pill_trading:'التداول',mg_sw_pill_datacenter:'منصة البيانات',
@@ -10756,43 +10760,274 @@ function mgDrawEcon(R){
 
 function mgDrawProtectSvg(R){
   const T=R.topology||{},S=R.sizing||{};
-  const W=800,H=500;
-  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">`;
-  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">微网保护配置图</text>`;
-  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="#80b0e0" font-size="10">${R.projName||''} | ${T.name||''} | GB/T 36558</text>`;
-  const cx=W/2;let y=70;
-  const drawBox=(x,y,w,h,label,sub,color)=>{s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${color}22" stroke="${color}" stroke-width="1.5"/>`;s+=`<text x="${x+w/2}" y="${y+16}" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold">${label}</text>`;if(sub)s+=`<text x="${x+w/2}" y="${y+30}" text-anchor="middle" fill="${color}aa" font-size="7">${sub}</text>`;};
-  drawBox(cx-80,y,160,40,'PCC并网点',T.voltage||'10kV','#4a90d9');
-  y+=50;
-  s+=`<line x1="${cx}" y1="${y-10}" x2="${cx}" y2="${y}" stroke="#4a90d9" stroke-width="2"/>`;
-  s+=`<text x="${W/2}" y="${y-2}" fill="#e8a838" font-size="9" font-weight="bold">保护配置</text>`;
-  y+=10;
+  const W=960,H=1100;
+  const C_RED='#ef4444',C_YEL='#fbbf24',C_CYAN='#06b6d4',C_PUR='#a855f7',C_GRN='#10b981',C_ORG='#fb923c',C_LIME='#84cc16',C_GRAY='#94a3b8',C_DGRAY='#64748b';
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0a0e1a;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif">`;
+  s+=`<defs><marker id="pArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round"/></marker></defs>`;
+  // ══ 标题 ══
+  s+=`<text x="${W/2}" y="28" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" letter-spacing="2">微网并离网保护与控制综合图</text>`;
+  s+=`<text x="${W/2}" y="46" text-anchor="middle" fill="${C_DGRAY}" font-size="10" letter-spacing="1">${R.projName||'微网项目'} | ${T.name||'交直流混合微网'} | ${T.voltage||'10kV'} 并网 | GB/T 14285 · GB/T 36558 · IEEE 1547</text>`;
+
+  // ════════════════════════════════════════
+  // 区域 Ⅰ: 保护整定值表 (y=56-220, h=164)
+  // ════════════════════════════════════════
+  s+=`<rect x="20" y="56" width="920" height="12" rx="3" fill="${C_GRN}" fill-opacity="0.18"/>`;
+  s+=`<text x="480" y="65" text-anchor="middle" fill="${C_GRN}" font-size="9" letter-spacing="3">Ⅰ 区 · 微网并离网保护整定值表（GB/T 14285-2023 · 调度部门确认）</text>`;
+  s+=`<rect x="20" y="76" width="920" height="148" rx="6" fill="#0f1729" stroke="#334155" stroke-width="1"/>`;
+  // 表头
+  const cols1=[{x:60,l:'序号',w:60},{x:160,l:'保护名称',w:90},{x:250,l:'ANSI',w:60},{x:340,l:'动作值（整定）',w:200},{x:540,l:'延时',w:70},{x:630,l:'出口方式',w:140},{x:790,l:'备注',w:140}];
+  cols1.forEach(c=>{s+=`<text x="${c.x}" y="94" text-anchor="middle" fill="${C_GRAY}" font-size="9" font-weight="600">${c.l}</text>`;});
+  s+=`<line x1="20" y1="100" x2="940" y2="100" stroke="#334155" stroke-width="0.8"/>`;
+  // 竖线
+  [80,180,260,460,580,720,930].forEach(x=>{s+=`<line x1="${x}" y1="76" x2="${x}" y2="224" stroke="#334155" stroke-width="0.5"/>`;});
+  // 整定值数据
   const prots=[
-    {code:'27',name:'欠压保护',set:'U<85%Un',time:'0.5s',color:'#e06070'},
-    {code:'59',name:'过压保护',set:'U>115%Un',time:'0.5s',color:'#e06070'},
-    {code:'81U',name:'高频保护',set:'f>51.5Hz',time:'0.2s',color:'#e06070'},
-    {code:'81D',name:'低频保护',set:'f<49.5Hz',time:'0.2s',color:'#e06070'},
-    {code:'25',name:'同期检测',set:'ΔU<10% Δf<0.5Hz',time:'-',color:'#50c878'},
-    {code:'32',name:'逆功率',set:'P<0 阈值3%',time:'500ms',color:'#e8a838'}
+    {n:'差动保护',a:'87',v:'I_d>0.3In · k=0.3',d:'瞬时',o:'跳QF1/QF2',m:'比率差动',c:C_RED},
+    {n:'速断保护',a:'50',v:'I>6In（无时限）',d:'0ms',o:'跳QF1',m:'最快响应',c:C_PUR},
+    {n:'过流 II 段',a:'51',v:'I>1.5In（定时限）',d:'1.0s',o:'跳QF1',m:'主保护段',c:C_YEL},
+    {n:'零序过流',a:'64',v:'3I₀>0.3A',d:'1.5s',o:'跳+告警',m:'接地故障',c:C_LIME},
+    {n:'过电压',a:'59',v:'U>115%Un',d:'0.5s',o:'停PCS',m:'过压异常',c:C_CYAN},
+    {n:'欠电压',a:'27',v:'U<85%Un',d:'0.5s',o:'停PCS',m:'欠压异常',c:C_CYAN},
+    {n:'频率异常',a:'81U/D',v:'f>51.5Hz / <49.5Hz',d:'0.2s',o:'停PCS',m:'频偏越限',c:C_GRN},
+    {n:'逆功率',a:'32',v:'P<-3%Pn',d:'500ms',o:'停PCS',m:'防反送电网',c:C_ORG}
   ];
-  const cols=3,colW=220,rowH=50;
-  const startX=cx-cols*colW/2+colW/2;
   prots.forEach((p,i)=>{
-    const col=i%cols,row=Math.floor(i/cols);
-    const x=startX+col*colW,yy=y+row*(rowH+10);
-    s+=`<rect x="${x-90}" y="${yy}" width="180" height="${rowH}" rx="4" fill="${p.color}15" stroke="${p.color}" stroke-width="1"/>`;
-    s+=`<text x="${x}" y="${yy+16}" text-anchor="middle" fill="${p.color}" font-size="10" font-weight="bold">${p.code} ${p.name}</text>`;
-    s+=`<text x="${x}" y="${yy+30}" text-anchor="middle" fill="${p.color}aa" font-size="8">整定: ${p.set}</text>`;
-    s+=`<text x="${x}" y="${yy+42}" text-anchor="middle" fill="#6080a0" font-size="7">延时: ${p.time}</text>`;
+    const ry=104+i*15;
+    if(i%2===0)s+=`<rect x="20" y="${ry-9}" width="920" height="14" fill="rgba(255,255,255,0.02)"/>`;
+    s+=`<text x="60" y="${ry+1}" text-anchor="middle" fill="${C_DGRAY}" font-size="8">${i+1}</text>`;
+    s+=`<text x="160" y="${ry+1}" text-anchor="middle" fill="${p.c}" font-size="8" font-weight="600">${p.n}</text>`;
+    s+=`<text x="250" y="${ry+1}" text-anchor="middle" fill="${p.c}" font-size="8">${p.a}</text>`;
+    s+=`<text x="340" y="${ry+1}" text-anchor="middle" fill="#e2e8f0" font-size="8">${p.v}</text>`;
+    s+=`<text x="540" y="${ry+1}" text-anchor="middle" fill="${C_GRAY}" font-size="8">${p.d}</text>`;
+    s+=`<text x="630" y="${ry+1}" text-anchor="middle" fill="${C_RED}" font-size="8">${p.o}</text>`;
+    s+=`<text x="790" y="${ry+1}" text-anchor="middle" fill="${C_DGRAY}" font-size="8">${p.m}</text>`;
   });
-  y+=Math.ceil(prots.length/cols)*(rowH+10)+20;
-  s+=`<text x="${W/2}" y="${y}" text-anchor="middle" fill="#50c878" font-size="11" font-weight="bold">防孤岛三重保障</text>`;
-  y+=20;
-  const islands=['AFD频率偏移(主动)','电压偏移(+10%/-15%)','df/dt>2Hz/s(频变化率)'];
-  islands.forEach((item,i)=>{
-    s+=`<text x="${W/2}" y="${y+i*18}" text-anchor="middle" fill="#50c878" font-size="9">${i+1}. ${item}</text>`;
+
+  // ════════════════════════════════════════
+  // 区域 Ⅱ: 梯形图(左) + 状态机(右) (y=232-700, h=468)
+  // ════════════════════════════════════════
+  s+=`<rect x="20" y="232" width="920" height="12" rx="3" fill="${C_GRN}" fill-opacity="0.18"/>`;
+  s+=`<text x="480" y="241" text-anchor="middle" fill="${C_GRN}" font-size="9" letter-spacing="3">Ⅱ 区 · 梯形图控制逻辑（L1~L7）+ EMS 控制状态机（S0~S5）</text>`;
+
+  // ── 左侧: 梯形图 ──
+  s+=`<rect x="20" y="252" width="460" height="10" rx="2" fill="${C_GRN}" fill-opacity="0.12"/>`;
+  s+=`<text x="250" y="259" text-anchor="middle" fill="${C_GRN}" font-size="8" letter-spacing="2">梯形图（Ladder Diagram）</text>`;
+  // 左母线
+  s+=`<line x1="40" y1="276" x2="40" y2="694" stroke="${C_GRAY}" stroke-width="3"/>`;
+  // 右母线
+  s+=`<line x1="470" y1="276" x2="470" y2="694" stroke="${C_GRAY}" stroke-width="3"/>`;
+  // 7 个梯级
+  const rungs=[
+    {y:300,lbl:'L1',col:C_GRN,no:['U_OK','f_OK'],name:['电压正常','频率正常'],coil:'M1',coilN:'GRID_NORM'},
+    {y:350,lbl:'L2',col:'#378ADD',no:['M1','SOC_OK','SYN_OK'],name:['电网正常','SOC 20~95%','同期就绪'],coil:'Q1',coilN:'PQ 并网模式'},
+    {y:410,lbl:'L3',col:C_RED,or:true,no:['87_OUT','50_OUT'],name:['差动出口','速断出口'],coil:'TRIP',coilN:'跳闸出口线圈',big:true},
+    {y:478,lbl:'L4',col:'#f59e0b',no:['TRIP','STS_OPN'],name:['跳闸信号','STS<20ms分断'],coil:'Q2',coilN:'V/f 离网模式'},
+    {y:548,lbl:'L5',col:C_PUR,no:['SOC_LOW'],name:['SOC<10%'],timer:'T1',timerN:'60s 延时',coil:'Q3',coilN:'停止充放电'},
+    {y:608,lbl:'L6',col:C_ORG,no:['P_REV'],name:['逆功率检测'],timer:'T2',timerN:'500ms',coil:'Q4',coilN:'限功率输出'},
+    {y:668,lbl:'L7',col:C_GRN,no:['GRID_REST','SYN_RDY'],name:['电网恢复','同期允许'],timer:'T3',timerN:'300s',coil:'Q5',coilN:'重合并网'}
+  ];
+  rungs.forEach(r=>{
+    s+=`<text x="28" y="${r.y+4}" text-anchor="end" fill="${C_DGRAY}" font-size="8">${r.lbl}</text>`;
+    s+=`<line x1="40" y1="${r.y}" x2="100" y2="${r.y}" stroke="${r.col}" stroke-width="1.5"/>`;
+    let cursor=100;
+    r.no.forEach((n,i)=>{
+      s+=`<line x1="${cursor}" y1="${r.y-8}" x2="${cursor}" y2="${r.y+8}" stroke="${r.col}" stroke-width="1.5"/>`;
+      s+=`<line x1="${cursor+20}" y1="${r.y-8}" x2="${cursor+20}" y2="${r.y+8}" stroke="${r.col}" stroke-width="1.5"/>`;
+      s+=`<text x="${cursor+10}" y="${r.y-11}" text-anchor="middle" fill="${r.col}" font-size="8">${n}</text>`;
+      s+=`<text x="${cursor+10}" y="${r.y+18}" text-anchor="middle" fill="${C_DGRAY}" font-size="7">${r.name[i]||''}</text>`;
+      cursor+=20;
+      if(cursor<340){s+=`<line x1="${cursor}" y1="${r.y}" x2="${cursor+20}" y2="${r.y}" stroke="${r.col}" stroke-width="1.5"/>`;cursor+=20;}
+    });
+    if(r.timer){
+      s+=`<rect x="${cursor}" y="${r.y-10}" width="40" height="20" rx="3" fill="none" stroke="${r.col}" stroke-width="1.2"/>`;
+      s+=`<text x="${cursor+20}" y="${r.y+3}" text-anchor="middle" fill="${r.col}" font-size="8">${r.timer}</text>`;
+      s+=`<text x="${cursor+20}" y="${r.y+18}" text-anchor="middle" fill="${C_DGRAY}" font-size="7">${r.timerN}</text>`;
+      cursor+=40;
+      s+=`<line x1="${cursor}" y1="${r.y}" x2="${cursor+10}" y2="${r.y}" stroke="${r.col}" stroke-width="1.5"/>`;
+      cursor+=10;
+    }
+    // OR 并联 (L3 用)
+    if(r.or){
+      s+=`<line x1="40" y1="${r.y+30}" x2="100" y2="${r.y+30}" stroke="${r.col}" stroke-width="1.5"/>`;
+      s+=`<line x1="100" y1="${r.y+22}" x2="100" y2="${r.y+38}" stroke="${r.col}" stroke-width="1.5"/>`;
+      s+=`<line x1="120" y1="${r.y+22}" x2="120" y2="${r.y+38}" stroke="${r.col}" stroke-width="1.5"/>`;
+      s+=`<text x="110" y="${r.y+19}" text-anchor="middle" fill="${r.col}" font-size="8">50_OUT</text>`;
+      s+=`<line x1="120" y1="${r.y+30}" x2="340" y2="${r.y+30}" stroke="${r.col}" stroke-width="1.5"/>`;
+      s+=`<line x1="40" y1="${r.y}" x2="40" y2="${r.y+30}" stroke="${r.col}" stroke-width="1.5"/>`;
+      s+=`<line x1="340" y1="${r.y}" x2="340" y2="${r.y+30}" stroke="${r.col}" stroke-width="1.5"/>`;
+      cursor=340;
+    }
+    // 线圈
+    const coilR=r.big?14:12;
+    s+=`<circle cx="380" cy="${r.y+ (r.or?15:0)}" r="${coilR}" fill="${r.big?'rgba(239,68,68,0.15)':'none'}" stroke="${r.col}" stroke-width="${r.big?2:1.5}"/>`;
+    s+=`<text x="380" y="${r.y+ (r.or?18:3)}" text-anchor="middle" fill="${r.col}" font-size="${r.big?9:8}" font-weight="${r.big?700:400}">${r.coil}</text>`;
+    s+=`<text x="380" y="${r.y+ (r.or?34:17)}" text-anchor="middle" fill="${C_DGRAY}" font-size="7">${r.coilN}</text>`;
+    s+=`<line x1="${cursor}" y1="${r.y+ (r.or?15:0)}" x2="368" y2="${r.y+ (r.or?15:0)}" stroke="${r.col}" stroke-width="1.5"/>`;
+    s+=`<line x1="392" y1="${r.y+ (r.or?15:0)}" x2="470" y2="${r.y+ (r.or?15:0)}" stroke="${r.col}" stroke-width="1.5"/>`;
   });
-  s+=`<text x="${W/2}" y="${H-20}" text-anchor="middle" fill="#6080a0" font-size="8">级差配合: 速断<过流<过负荷 Δt≥0.3s | BMS三级: 预警→停机→急停</text>`;
+
+  // ── 右侧: 状态机 S0~S5 ──
+  s+=`<rect x="490" y="252" width="450" height="10" rx="2" fill="#378ADD" fill-opacity="0.18"/>`;
+  s+=`<text x="715" y="259" text-anchor="middle" fill="#378ADD" font-size="8" letter-spacing="2">EMS 控制状态机（State Machine）</text>`;
+  // S0 待机
+  s+=`<ellipse cx="715" cy="296" rx="70" ry="22" fill="rgba(100,116,139,0.2)" stroke="#64748b" stroke-width="1.5"/>`;
+  s+=`<text x="715" y="293" text-anchor="middle" fill="${C_GRAY}" font-size="10" font-weight="600">S0: 待机</text>`;
+  s+=`<text x="715" y="306" text-anchor="middle" fill="${C_DGRAY}" font-size="8">STANDBY</text>`;
+  // S1 PQ 并网
+  s+=`<rect x="620" y="346" width="190" height="46" rx="8" fill="rgba(55,138,221,0.15)" stroke="#378ADD" stroke-width="2"/>`;
+  s+=`<text x="715" y="366" text-anchor="middle" fill="#378ADD" font-size="11" font-weight="600">S1: PQ 并网运行</text>`;
+  s+=`<text x="715" y="380" text-anchor="middle" fill="${C_GRAY}" font-size="8">GRID_CONNECTED · PCS 恒功率</text>`;
+  // S2 V/f 离网
+  s+=`<rect x="620" y="412" width="190" height="46" rx="8" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="2"/>`;
+  s+=`<text x="715" y="432" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="600">S2: V/f 离网运行</text>`;
+  s+=`<text x="715" y="446" text-anchor="middle" fill="${C_GRAY}" font-size="8">ISLANDED · PCS 恒压恒频</text>`;
+  // S3 故障停机
+  s+=`<rect x="620" y="478" width="190" height="46" rx="8" fill="rgba(239,68,68,0.15)" stroke="${C_RED}" stroke-width="2"/>`;
+  s+=`<text x="715" y="498" text-anchor="middle" fill="${C_RED}" font-size="11" font-weight="600">S3: 故障停机</text>`;
+  s+=`<text x="715" y="512" text-anchor="middle" fill="${C_GRAY}" font-size="8">FAULT · 等待复位确认</text>`;
+  // S4 SOC 保护
+  s+=`<rect x="620" y="544" width="190" height="46" rx="8" fill="rgba(168,85,247,0.15)" stroke="${C_PUR}" stroke-width="2"/>`;
+  s+=`<text x="715" y="564" text-anchor="middle" fill="${C_PUR}" font-size="11" font-weight="600">S4: SOC 保护</text>`;
+  s+=`<text x="715" y="578" text-anchor="middle" fill="${C_GRAY}" font-size="8">SOC_LIMIT · 限充放电功率</text>`;
+  // S5 同期重合
+  s+=`<rect x="620" y="610" width="190" height="46" rx="8" fill="rgba(16,185,129,0.15)" stroke="${C_GRN}" stroke-width="2"/>`;
+  s+=`<text x="715" y="630" text-anchor="middle" fill="${C_GRN}" font-size="11" font-weight="600">S5: 同期重合</text>`;
+  s+=`<text x="715" y="644" text-anchor="middle" fill="${C_GRAY}" font-size="8">RESYNCING · 等待同期允许</text>`;
+  // 状态转移箭头
+  s+=`<line x1="715" y1="318" x2="715" y2="346" stroke="#378ADD" stroke-width="1.5" marker-end="url(#pArr)"/>`;
+  s+=`<rect x="660" y="325" width="110" height="12" rx="3" fill="#0a0e1a"/>`;
+  s+=`<text x="715" y="334" text-anchor="middle" fill="#378ADD" font-size="7">电网正常 &amp; 初始化OK</text>`;
+  s+=`<path d="M715 392 L715 412" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#pArr)"/>`;
+  s+=`<rect x="634" y="396" width="162" height="12" rx="3" fill="#0a0e1a"/>`;
+  s+=`<text x="715" y="405" text-anchor="middle" fill="#f59e0b" font-size="7">电网故障/保护动作 &lt;20ms</text>`;
+  s+=`<path d="M620 369 L560 369 L560 567 L620 567" stroke="${C_PUR}" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#pArr)"/>`;
+  s+=`<text x="548" y="468" text-anchor="middle" fill="${C_PUR}" font-size="7" transform="rotate(-90,548,468)">SOC&lt;10% 或 &gt;95%</text>`;
+  s+=`<path d="M810 369 L870 369 L870 501 L810 501" stroke="${C_RED}" stroke-width="1.5" fill="none" marker-end="url(#pArr)"/>`;
+  s+=`<text x="882" y="435" text-anchor="middle" fill="${C_RED}" font-size="7" transform="rotate(90,882,435)">差动/速断故障</text>`;
+  s+=`<path d="M715 458 L715 478" stroke="${C_RED}" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#pArr)"/>`;
+  s+=`<rect x="634" y="461" width="162" height="12" rx="3" fill="#0a0e1a"/>`;
+  s+=`<text x="715" y="470" text-anchor="middle" fill="${C_RED}" font-size="7">严重故障 → 停机</text>`;
+  s+=`<path d="M620 435 L560 435 L560 633 L620 633" stroke="${C_GRN}" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#pArr)"/>`;
+  s+=`<text x="548" y="534" text-anchor="middle" fill="${C_GRN}" font-size="7" transform="rotate(-90,548,534)">电网恢复正常</text>`;
+  s+=`<path d="M715 610 L715 595 L860 595 L860 369 L810 369" stroke="${C_GRN}" stroke-width="1.5" fill="none" marker-end="url(#pArr)"/>`;
+  s+=`<text x="860" y="487" text-anchor="middle" fill="${C_GRN}" font-size="7" transform="rotate(90,860,487)">同期成功 → 重合并网</text>`;
+  s+=`<path d="M810 501 L930 501 L930 296 L785 296" stroke="#64748b" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#pArr)"/>`;
+  s+=`<rect x="878" y="392" width="90" height="12" rx="3" fill="#0a0e1a"/>`;
+  s+=`<text x="928" y="401" text-anchor="middle" fill="#64748b" font-size="7">手动复位+确认</text>`;
+  s+=`<path d="M810 567 L850 567 L850 369 L810 369" stroke="${C_PUR}" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#pArr)"/>`;
+  s+=`<text x="858" y="468" text-anchor="middle" fill="${C_PUR}" font-size="7" transform="rotate(90,858,468)">SOC恢复正常范围</text>`;
+
+  // ════════════════════════════════════════
+  // 区域 Ⅲ: 防孤岛三重保障 + 时序图 (y=706-944, h=238)
+  // ════════════════════════════════════════
+  s+=`<rect x="20" y="706" width="920" height="12" rx="3" fill="${C_ORG}" fill-opacity="0.18"/>`;
+  s+=`<text x="480" y="715" text-anchor="middle" fill="${C_ORG}" font-size="9" letter-spacing="3">Ⅲ 区 · 防孤岛三重保障（AND 逻辑）+ 保护级差配合时序</text>`;
+
+  // 左侧: 防孤岛
+  s+=`<rect x="20" y="726" width="460" height="10" rx="2" fill="${C_ORG}" fill-opacity="0.15"/>`;
+  s+=`<text x="250" y="733" text-anchor="middle" fill="${C_ORG}" font-size="8" letter-spacing="2">防孤岛三重保障</text>`;
+  s+=`<rect x="40" y="744" width="120" height="42" rx="5" fill="rgba(251,146,60,0.1)" stroke="${C_ORG}" stroke-width="1.2"/>`;
+  s+=`<text x="100" y="762" text-anchor="middle" fill="${C_ORG}" font-size="10" font-weight="600">主动法 AFD</text>`;
+  s+=`<text x="100" y="776" text-anchor="middle" fill="${C_DGRAY}" font-size="7">频率偏移注入</text>`;
+  s+=`<rect x="180" y="744" width="120" height="42" rx="5" fill="rgba(251,146,60,0.1)" stroke="${C_ORG}" stroke-width="1.2"/>`;
+  s+=`<text x="240" y="762" text-anchor="middle" fill="${C_ORG}" font-size="10" font-weight="600">被动法 U/f</text>`;
+  s+=`<text x="240" y="776" text-anchor="middle" fill="${C_DGRAY}" font-size="7">电压/频率越限</text>`;
+  s+=`<rect x="320" y="744" width="120" height="42" rx="5" fill="rgba(251,146,60,0.1)" stroke="${C_ORG}" stroke-width="1.2"/>`;
+  s+=`<text x="380" y="762" text-anchor="middle" fill="${C_ORG}" font-size="10" font-weight="600">df/dt &gt; 2Hz/s</text>`;
+  s+=`<text x="380" y="776" text-anchor="middle" fill="${C_DGRAY}" font-size="7">频率变化率</text>`;
+  s+=`<line x1="100" y1="786" x2="100" y2="810" stroke="${C_ORG}" stroke-width="1.2"/>`;
+  s+=`<line x1="240" y1="786" x2="240" y2="810" stroke="${C_ORG}" stroke-width="1.2"/>`;
+  s+=`<line x1="380" y1="786" x2="380" y2="810" stroke="${C_ORG}" stroke-width="1.2"/>`;
+  s+=`<line x1="100" y1="810" x2="380" y2="810" stroke="${C_ORG}" stroke-width="1.5"/>`;
+  s+=`<line x1="240" y1="810" x2="240" y2="830" stroke="${C_ORG}" stroke-width="1.5" marker-end="url(#pArr)"/>`;
+  s+=`<rect x="160" y="830" width="160" height="32" rx="5" fill="rgba(239,68,68,0.15)" stroke="${C_RED}" stroke-width="1.5"/>`;
+  s+=`<text x="240" y="846" text-anchor="middle" fill="${C_RED}" font-size="11" font-weight="600">防孤岛跳闸</text>`;
+  s+=`<text x="240" y="857" text-anchor="middle" fill="${C_DGRAY}" font-size="7">⩽ 2s 检测响应</text>`;
+  s+=`<text x="40" y="892" fill="${C_DGRAY}" font-size="8">说明:主动 AFD + 被动 U/f + 频变化率三重判据,任一触发 2s 内必跳闸。AFD 失效时被动法兜底。</text>`;
+  s+=`<text x="40" y="906" fill="${C_DGRAY}" font-size="8">依据:IEEE 1547.1-2020 · GB/T 19939-2013 · UL 1741-SB。</text>`;
+
+  // 右侧: 时序图
+  s+=`<rect x="490" y="726" width="450" height="10" rx="2" fill="${C_GRN}" fill-opacity="0.15"/>`;
+  s+=`<text x="715" y="733" text-anchor="middle" fill="${C_GRN}" font-size="8" letter-spacing="2">保护级差配合时序</text>`;
+  s+=`<line x1="510" y1="800" x2="910" y2="800" stroke="${C_DGRAY}" stroke-width="1.5"/>`;
+  s+=`<polygon points="910,796 918,800 910,804" fill="${C_DGRAY}"/>`;
+  s+=`<text x="922" y="804" fill="${C_DGRAY}" font-size="8">t(ms)</text>`;
+  // 时间刻度
+  [0,500,1000,1500,2000,2500,3000].forEach((t,i)=>{
+    const x=510+i*66.67;
+    s+=`<line x1="${x}" y1="800" x2="${x}" y2="805" stroke="${C_DGRAY}" stroke-width="1"/>`;
+    s+=`<text x="${x}" y="816" text-anchor="middle" fill="${C_DGRAY}" font-size="7">${t}</text>`;
+  });
+  // 速断 50 @ 0ms
+  s+=`<line x1="510" y1="756" x2="510" y2="800" stroke="${C_PUR}" stroke-width="2"/>`;
+  s+=`<text x="510" y="748" text-anchor="middle" fill="${C_PUR}" font-size="8">0</text>`;
+  s+=`<text x="510" y="738" text-anchor="middle" fill="${C_PUR}" font-size="7">速断 50</text>`;
+  // 差动 87 @ 20ms
+  s+=`<line x1="514" y1="766" x2="514" y2="800" stroke="${C_RED}" stroke-width="2"/>`;
+  s+=`<text x="514" y="758" text-anchor="middle" fill="${C_RED}" font-size="8">20</text>`;
+  s+=`<text x="514" y="892" text-anchor="middle" fill="${C_RED}" font-size="7">差动 87</text>`;
+  // 过流 51 @ 1000ms
+  s+=`<line x1="677" y1="756" x2="677" y2="800" stroke="${C_YEL}" stroke-width="2"/>`;
+  s+=`<text x="677" y="748" text-anchor="middle" fill="${C_YEL}" font-size="8">1000</text>`;
+  s+=`<text x="677" y="738" text-anchor="middle" fill="${C_YEL}" font-size="7">过流 51</text>`;
+  // 过负荷 @ 3000ms
+  s+=`<line x1="910" y1="756" x2="910" y2="800" stroke="${C_ORG}" stroke-width="2"/>`;
+  s+=`<text x="910" y="748" text-anchor="middle" fill="${C_ORG}" font-size="8">3000</text>`;
+  s+=`<text x="910" y="738" text-anchor="middle" fill="${C_ORG}" font-size="7">过负荷</text>`;
+  s+=`<text x="510" y="892" fill="${C_DGRAY}" font-size="8">Δt ≥ 300ms 级差: 速断 &lt; 差动 &lt; 过流 &lt; 过负荷, 避免保护失配越级跳闸。</text>`;
+  s+=`<text x="510" y="906" fill="${C_DGRAY}" font-size="8">BMS 三级保护: 预警(80%SOC)→ 停机(95%)→ 急停(98%)。</text>`;
+
+  // ════════════════════════════════════════
+  // 底部图例 + 标准依据 + 图号 (y=950-1080, h=130)
+  // ════════════════════════════════════════
+  s+=`<rect x="20" y="950" width="920" height="130" rx="6" fill="none" stroke="#334155" stroke-width="0.5"/>`;
+  s+=`<text x="480" y="970" text-anchor="middle" fill="${C_GRAY}" font-size="11" font-weight="600">图例 · 元件符号说明</text>`;
+  s+=`<line x1="40" y1="978" x2="920" y2="978" stroke="#334155" stroke-width="0.5"/>`;
+  // 常开触点
+  s+=`<line x1="50" y1="996" x2="66" y2="996" stroke="${C_GRAY}" stroke-width="1.2"/>`;
+  s+=`<line x1="66" y1="990" x2="66" y2="1002" stroke="${C_GRAY}" stroke-width="1.2"/>`;
+  s+=`<line x1="82" y1="990" x2="82" y2="1002" stroke="${C_GRAY}" stroke-width="1.2"/>`;
+  s+=`<line x1="82" y1="996" x2="98" y2="996" stroke="${C_GRAY}" stroke-width="1.2"/>`;
+  s+=`<text x="104" y="1000" fill="${C_GRAY}" font-size="9">常开触点 NO</text>`;
+  // 线圈
+  s+=`<circle cx="220" cy="996" r="10" fill="none" stroke="${C_GRAY}" stroke-width="1.2"/>`;
+  s+=`<text x="236" y="1000" fill="${C_GRAY}" font-size="9">输出线圈 Coil</text>`;
+  // 定时器
+  s+=`<rect x="340" y="989" width="28" height="14" rx="2" fill="none" stroke="${C_GRAY}" stroke-width="1.2"/>`;
+  s+=`<text x="354" y="1000" text-anchor="middle" fill="${C_GRAY}" font-size="8">TON</text>`;
+  s+=`<text x="376" y="1000" fill="${C_GRAY}" font-size="9">延时定时器</text>`;
+  // 状态框
+  s+=`<rect x="480" y="989" width="60" height="14" rx="2" fill="rgba(55,138,221,0.15)" stroke="#378ADD" stroke-width="1"/>`;
+  s+=`<text x="510" y="1000" text-anchor="middle" fill="#378ADD" font-size="8">STATE</text>`;
+  s+=`<text x="546" y="1000" fill="${C_GRAY}" font-size="9">控制状态</text>`;
+  // OR 门
+  s+=`<path d="M680 996 L690 988 L700 996 L690 1004 Z" fill="none" stroke="${C_GRAY}" stroke-width="1.2"/>`;
+  s+=`<text x="708" y="1000" fill="${C_GRAY}" font-size="9">OR 门(或)</text>`;
+  // AND 门
+  s+=`<path d="M780 988 L780 1004 L800 996 Z" fill="none" stroke="${C_GRAY}" stroke-width="1.2"/>`;
+  s+=`<text x="808" y="1000" fill="${C_GRAY}" font-size="9">AND 门(与)</text>`;
+  // 第二行颜色说明
+  s+=`<line x1="50" y1="1020" x2="66" y2="1020" stroke="${C_RED}" stroke-width="2"/>`;
+  s+=`<text x="72" y="1024" fill="${C_DGRAY}" font-size="8">差动/跳闸</text>`;
+  s+=`<line x1="160" y1="1020" x2="176" y2="1020" stroke="${C_YEL}" stroke-width="2"/>`;
+  s+=`<text x="182" y="1024" fill="${C_DGRAY}" font-size="8">过流/CT</text>`;
+  s+=`<line x1="240" y1="1020" x2="256" y2="1020" stroke="${C_CYAN}" stroke-width="2"/>`;
+  s+=`<text x="262" y="1024" fill="${C_DGRAY}" font-size="8">PT/同期</text>`;
+  s+=`<line x1="330" y1="1020" x2="346" y2="1020" stroke="${C_PUR}" stroke-width="2"/>`;
+  s+=`<text x="352" y="1024" fill="${C_DGRAY}" font-size="8">速断/保护</text>`;
+  s+=`<line x1="440" y1="1020" x2="456" y2="1020" stroke="${C_GRN}" stroke-width="2"/>`;
+  s+=`<text x="462" y="1024" fill="${C_DGRAY}" font-size="8">合闸/正常</text>`;
+  s+=`<line x1="560" y1="1020" x2="576" y2="1020" stroke="${C_ORG}" stroke-width="2"/>`;
+  s+=`<text x="582" y="1024" fill="${C_DGRAY}" font-size="8">逆功率/防孤岛</text>`;
+  s+=`<line x1="700" y1="1020" x2="716" y2="1020" stroke="${C_LIME}" stroke-width="2"/>`;
+  s+=`<text x="722" y="1024" fill="${C_DGRAY}" font-size="8">接地</text>`;
+  s+=`<line x1="780" y1="1020" x2="796" y2="1020" stroke="${C_GRAY}" stroke-width="2"/>`;
+  s+=`<text x="802" y="1024" fill="${C_DGRAY}" font-size="8">中性文字</text>`;
+  // 标准依据 + 图号
+  s+=`<text x="40" y="1052" fill="${C_DGRAY}" font-size="8">依据:GB/T 14285-2023 继电保护 · GB/T 36558-2022 储能系统 · IEEE 1547-2018 并网 · IEEE 1547.1-2020 测试 · UL 1741-SB</text>`;
+  s+=`<text x="40" y="1068" fill="${C_DGRAY}" font-size="8">控制策略层级:L0 安全保护(不可覆盖) &gt; L1 系统约束 &gt; L2 模式运行(互斥) &gt; L3 策略叠加(可叠加)</text>`;
+  s+=`<text x="920" y="1068" text-anchor="end" fill="#475569" font-size="8">图号:2CD-MG-PROT-001 | Rev.A</text>`;
+
   s+=`</svg>`;
   mgById('mgProtectSvg').innerHTML=s;
 }

@@ -1,0 +1,526 @@
+<svg viewBox="0 0 960 1120" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0a0e1a;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif">
+  <defs>
+    <!-- 箭头 -->
+    <marker id="pArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round"/>
+    </marker>
+    <!-- 虚线箭头（光耦信号） -->
+    <marker id="pArrD" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#06b6d4" stroke-width="1.2"/>
+    </marker>
+    <!-- 跳闸箭头（红） -->
+    <marker id="pArrT" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+    </marker>
+  </defs>
+
+  <!-- ══ 标题 ══ -->
+  <text x="480" y="28" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" letter-spacing="2">微网储能系统电气二次接线图</text>
+  <text x="480" y="46" text-anchor="middle" fill="#64748b" font-size="10" letter-spacing="1">美国Fremont光储充 1.4MWh | 10 并网 | GB/T 14285 · GB/T 40032 | 继电保护二次回路</text>
+
+  <!-- ══════════════════════════════════════
+       区域一：交流采样回路（顶部）
+       CT → 保护装置 TA 线圈
+       PT → 保护装置 TV 线圈
+       ══════════════════════════════════════ -->
+  <rect x="20" y="56" width="920" height="12" rx="3" fill="#fbbf24" fill-opacity="0.18"/>
+  <text x="480" y="65" text-anchor="middle" fill="#fbbf24" font-size="9" letter-spacing="3">Ⅰ 区 · 交流采样回路（AC 100V / AC 5A 二次侧）</text>
+
+  <!-- 主回路母线（示意） -->
+  <line x1="80" y1="92" x2="880" y2="92" stroke="#ef4444" stroke-width="3.5"/>
+  <text x="480" y="84" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">10 一次系统母线（示意）</text>
+  <circle cx="200" cy="92" r="3.5" fill="#ef4444"/>
+  <circle cx="480" cy="92" r="3.5" fill="#ef4444"/>
+  <circle cx="760" cy="92" r="3.5" fill="#ef4444"/>
+
+  <!-- ── CT1（A相电流互感器，x=160）── -->
+  <!-- CT 标准符号：圆内×，一次侧穿过 -->
+  <line x1="200" y1="92" x2="200" y2="106" stroke="#ef4444" stroke-width="2"/>
+  <circle cx="200" cy="118" r="10" fill="none" stroke="#fbbf24" stroke-width="1.8"/>
+  <line x1="196" y1="114" x2="204" y2="122" stroke="#fbbf24" stroke-width="1.2"/>
+  <line x1="204" y1="114" x2="196" y2="122" stroke="#fbbf24" stroke-width="1.2"/>
+  <line x1="200" y1="128" x2="200" y2="140" stroke="#ef4444" stroke-width="2"/>
+  <text x="215" y="122" fill="#fbbf24" font-size="9">TA1</text>
+  <text x="215" y="133" fill="#64748b" font-size="8">200/5A</text>
+  <!-- CT二次侧引出 -->
+  <line x1="200" y1="128" x2="200" y2="166" stroke="#fbbf24" stroke-width="1.5"/>
+  <!-- CT二次侧端子排 X1:1 -->
+  <rect x="192" y="166" width="16" height="10" rx="2" fill="none" stroke="#fbbf24" stroke-width="1"/>
+  <text x="200" y="174" text-anchor="middle" fill="#fbbf24" font-size="7">X1:1</text>
+  <text x="175" y="174" fill="#64748b" font-size="7">Ia</text>
+  <line x1="200" y1="176" x2="200" y2="190" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#pArr)"/>
+
+  <!-- ── CT2（B相，x=240）── -->
+  <line x1="240" y1="92" x2="240" y2="106" stroke="#ef4444" stroke-width="2"/>
+  <circle cx="240" cy="118" r="10" fill="none" stroke="#fbbf24" stroke-width="1.8"/>
+  <line x1="236" y1="114" x2="244" y2="122" stroke="#fbbf24" stroke-width="1.2"/>
+  <line x1="244" y1="114" x2="236" y2="122" stroke="#fbbf24" stroke-width="1.2"/>
+  <line x1="240" y1="128" x2="240" y2="140" stroke="#ef4444" stroke-width="2"/>
+  <text x="255" y="122" fill="#fbbf24" font-size="9">TA2</text>
+  <text x="255" y="133" fill="#64748b" font-size="8">200/5A</text>
+  <line x1="240" y1="128" x2="240" y2="166" stroke="#fbbf24" stroke-width="1.5"/>
+  <rect x="232" y="166" width="16" height="10" rx="2" fill="none" stroke="#fbbf24" stroke-width="1"/>
+  <text x="240" y="174" text-anchor="middle" fill="#fbbf24" font-size="7">X1:2</text>
+  <text x="215" y="174" fill="#64748b" font-size="7">Ib</text>
+  <line x1="240" y1="176" x2="240" y2="190" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#pArr)"/>
+
+  <!-- ── CT3（C相，x=280）── -->
+  <line x1="280" y1="92" x2="280" y2="106" stroke="#ef4444" stroke-width="2"/>
+  <circle cx="280" cy="118" r="10" fill="none" stroke="#fbbf24" stroke-width="1.8"/>
+  <line x1="276" y1="114" x2="284" y2="122" stroke="#fbbf24" stroke-width="1.2"/>
+  <line x1="284" y1="114" x2="276" y2="122" stroke="#fbbf24" stroke-width="1.2"/>
+  <line x1="280" y1="128" x2="280" y2="140" stroke="#ef4444" stroke-width="2"/>
+  <text x="295" y="122" fill="#fbbf24" font-size="9">TA3</text>
+  <text x="295" y="133" fill="#64748b" font-size="8">200/5A</text>
+  <line x1="280" y1="128" x2="280" y2="166" stroke="#fbbf24" stroke-width="1.5"/>
+  <rect x="272" y="166" width="16" height="10" rx="2" fill="none" stroke="#fbbf24" stroke-width="1"/>
+  <text x="280" y="174" text-anchor="middle" fill="#fbbf24" font-size="7">X1:3</text>
+  <text x="255" y="174" fill="#64748b" font-size="7">Ic</text>
+  <line x1="280" y1="176" x2="280" y2="190" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#pArr)"/>
+
+  <!-- CT 公共 N 端接地 -->
+  <line x1="200" y1="150" x2="320" y2="150" stroke="#84cc16" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="320" y1="140" x2="320" y2="165" stroke="#84cc16" stroke-width="1.2"/>
+  <line x1="314" y1="165" x2="326" y2="165" stroke="#84cc16" stroke-width="1.5"/>
+  <line x1="316" y1="168" x2="324" y2="168" stroke="#84cc16" stroke-width="1.2"/>
+  <line x1="318" y1="171" x2="322" y2="171" stroke="#84cc16" stroke-width="1"/>
+  <text x="328" y="158" fill="#84cc16" font-size="8">PE(N)</text>
+
+  <!-- ── PT 电压互感器（x=480）── -->
+  <!-- PT 符号：圆内十字 -->
+  <line x1="480" y1="92" x2="480" y2="106" stroke="#ef4444" stroke-width="2"/>
+  <circle cx="480" cy="118" r="10" fill="none" stroke="#06b6d4" stroke-width="1.8"/>
+  <line x1="480" y1="111" x2="480" y2="125" stroke="#06b6d4" stroke-width="1.2"/>
+  <line x1="473" y1="118" x2="487" y2="118" stroke="#06b6d4" stroke-width="1.2"/>
+  <line x1="480" y1="128" x2="480" y2="150" stroke="#ef4444" stroke-width="2"/>
+  <text x="495" y="116" fill="#06b6d4" font-size="9">TV1</text>
+  <text x="495" y="127" fill="#64748b" font-size="8">10/100V</text>
+  <text x="495" y="137" fill="#64748b" font-size="8">0.2级</text>
+  <!-- PT 二次侧三相引出 -->
+  <line x1="460" y1="140" x2="500" y2="140" stroke="#06b6d4" stroke-width="1"/>
+  <line x1="460" y1="140" x2="460" y2="166" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="480" y1="150" x2="480" y2="166" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="500" y1="140" x2="500" y2="166" stroke="#06b6d4" stroke-width="1.5"/>
+  <rect x="452" y="166" width="16" height="10" rx="2" fill="none" stroke="#06b6d4" stroke-width="1"/>
+  <text x="460" y="174" text-anchor="middle" fill="#06b6d4" font-size="7">X2:1</text>
+  <text x="440" y="174" fill="#64748b" font-size="7">Ua</text>
+  <rect x="472" y="166" width="16" height="10" rx="2" fill="none" stroke="#06b6d4" stroke-width="1"/>
+  <text x="480" y="174" text-anchor="middle" fill="#06b6d4" font-size="7">X2:2</text>
+  <text x="460" y="185" fill="#64748b" font-size="7">Ub</text>
+  <rect x="492" y="166" width="16" height="10" rx="2" fill="none" stroke="#06b6d4" stroke-width="1"/>
+  <text x="500" y="174" text-anchor="middle" fill="#06b6d4" font-size="7">X2:3</text>
+  <text x="504" y="174" fill="#64748b" font-size="7">Uc</text>
+  <line x1="460" y1="176" x2="460" y2="190" stroke="#06b6d4" stroke-width="1.5" marker-end="url(#pArr)"/>
+  <line x1="480" y1="176" x2="480" y2="190" stroke="#06b6d4" stroke-width="1.5" marker-end="url(#pArr)"/>
+  <line x1="500" y1="176" x2="500" y2="190" stroke="#06b6d4" stroke-width="1.5" marker-end="url(#pArr)"/>
+
+  <!-- PT 二次侧接地 -->
+  <line x1="500" y1="155" x2="560" y2="155" stroke="#84cc16" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="560" y1="148" x2="560" y2="163" stroke="#84cc16" stroke-width="1.2"/>
+  <line x1="554" y1="163" x2="566" y2="163" stroke="#84cc16" stroke-width="1.5"/>
+  <line x1="556" y1="166" x2="564" y2="166" stroke="#84cc16" stroke-width="1.2"/>
+  <line x1="558" y1="169" x2="562" y2="169" stroke="#84cc16" stroke-width="1"/>
+  <text x="568" y="158" fill="#84cc16" font-size="8">PE(N)</text>
+
+  <!-- ══════════════════════════════════════
+       区域二：微机保护装置（核心功能块）
+       ══════════════════════════════════════ -->
+  <rect x="20" y="200" width="920" height="12" rx="3" fill="#a855f7" fill-opacity="0.18"/>
+  <text x="480" y="209" text-anchor="middle" fill="#a855f7" font-size="9" letter-spacing="3">Ⅱ 区 · 微机保护装置（NR PCS9611 / 南瑞继保）</text>
+
+  <!-- 保护装置外框 -->
+  <rect x="40" y="220" width="880" height="320" rx="8" fill="#0f1729" stroke="#a855f7" stroke-width="2"/>
+  <text x="480" y="240" text-anchor="middle" fill="#a855f7" font-size="12" font-weight="700">NR PCS9611 微机保护装置</text>
+  <line x1="56" y1="248" x2="904" y2="248" stroke="#334155" stroke-width="0.5"/>
+
+  <!-- ── 交流量采集板 ── -->
+  <rect x="60" y="256" width="200" height="90" rx="5" fill="#0a0e1a" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="160" y="274" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">交流量采集板</text>
+  <line x1="76" y1="280" x2="244" y2="280" stroke="#334155" stroke-width="0.5"/>
+  <text x="76" y="294" fill="#94a3b8" font-size="9">Ia Ib Ic  →  A/D 转换</text>
+  <text x="76" y="308" fill="#94a3b8" font-size="9">Ua Ub Uc → 电压采样</text>
+  <text x="76" y="322" fill="#94a3b8" font-size="9">P · Q · cos φ 计算</text>
+  <text x="76" y="336" fill="#64748b" font-size="8">采样率 ≥ 1200Hz/周</text>
+  <!-- CT/PT 信号进入采集板 -->
+  <line x1="200" y1="190" x2="200" y2="256" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#pArr)"/>
+  <line x1="240" y1="190" x2="240" y2="256" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#pArr)"/>
+  <line x1="280" y1="190" x2="180" y2="256" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="460" y1="190" x2="100" y2="256" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="480" y1="190" x2="120" y2="256" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="500" y1="190" x2="140" y2="256" stroke="#06b6d4" stroke-width="1.5"/>
+
+  <!-- ── 保护逻辑 CPU 板 ── -->
+  <rect x="280" y="256" width="240" height="270" rx="5" fill="#0a0e1a" stroke="#00e5ff" stroke-width="2"/>
+  <text x="400" y="276" text-anchor="middle" fill="#00e5ff" font-size="11" font-weight="700">保护逻辑 CPU 板</text>
+  <line x1="296" y1="283" x2="504" y2="283" stroke="#334155" stroke-width="0.5"/>
+
+  <!-- 各保护功能 -->
+  <!-- 差动保护 87 -->
+  <rect x="296" y="290" width="208" height="34" rx="3" fill="rgba(239,68,68,0.12)" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="330" y="305" fill="#ef4444" font-size="10" font-weight="600">⑧7 差动保护</text>
+  <text x="400" y="315" text-anchor="middle" fill="#ef4444" font-size="8">比率制动 k=0.3 · 差动速断 6In</text>
+
+  <!-- 过流保护 51 -->
+  <rect x="296" y="330" width="208" height="34" rx="3" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="330" y="345" fill="#fbbf24" font-size="10" font-weight="600">51 过流保护</text>
+  <text x="400" y="355" text-anchor="middle" fill="#fbbf24" font-size="8">定时限 I&gt;1.2In · t=1.0s</text>
+
+  <!-- 速断保护 50 -->
+  <rect x="296" y="370" width="208" height="34" rx="3" fill="rgba(168,85,247,0.12)" stroke="#a855f7" stroke-width="1.2"/>
+  <text x="330" y="385" fill="#a855f7" font-size="10" font-weight="600">50 速断保护</text>
+  <text x="400" y="395" text-anchor="middle" fill="#a855f7" font-size="8">无时限电流速断 I&gt;6In</text>
+
+  <!-- 欠/过压 27/59 -->
+  <rect x="296" y="410" width="100" height="34" rx="3" fill="rgba(6,182,212,0.12)" stroke="#06b6d4" stroke-width="1.2"/>
+  <text x="346" y="425" text-anchor="middle" fill="#06b6d4" font-size="9" font-weight="600">27/59</text>
+  <text x="346" y="435" text-anchor="middle" fill="#06b6d4" font-size="8">欠/过压</text>
+
+  <!-- 频率保护 81 -->
+  <rect x="404" y="410" width="100" height="34" rx="3" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-width="1.2"/>
+  <text x="454" y="425" text-anchor="middle" fill="#10b981" font-size="9" font-weight="600">81U/D</text>
+  <text x="454" y="435" text-anchor="middle" fill="#10b981" font-size="8">高/低频率</text>
+
+  <!-- 逆功率 32 -->
+  <rect x="296" y="450" width="100" height="34" rx="3" fill="rgba(251,146,60,0.12)" stroke="#fb923c" stroke-width="1.2"/>
+  <text x="346" y="465" text-anchor="middle" fill="#fb923c" font-size="9" font-weight="600">32 逆功率</text>
+  <text x="346" y="475" text-anchor="middle" fill="#fb923c" font-size="8">P&lt;0 ·  3%Pn</text>
+
+  <!-- 防孤岛 79/25 -->
+  <rect x="404" y="450" width="100" height="34" rx="3" fill="rgba(250,204,21,0.12)" stroke="#facc15" stroke-width="1.2"/>
+  <text x="454" y="465" text-anchor="middle" fill="#facc15" font-size="9" font-weight="600">79/25</text>
+  <text x="454" y="475" text-anchor="middle" fill="#facc15" font-size="8">重合/同期</text>
+
+  <!-- 接地保护 64 -->
+  <rect x="296" y="490" width="208" height="28" rx="3" fill="rgba(132,204,22,0.12)" stroke="#84cc16" stroke-width="1.2"/>
+  <text x="400" y="504" text-anchor="middle" fill="#84cc16" font-size="9" font-weight="600">64 接地保护 · 零序 3I₀&gt;0.3A · t=1.5s</text>
+
+  <!-- 从采集板进入CPU板 -->
+  <line x1="260" y1="300" x2="280" y2="300" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#pArr)"/>
+  <text x="268" y="296" fill="#64748b" font-size="7">AI</text>
+
+  <!-- ── 有功/无功测控板 ── -->
+  <rect x="540" y="256" width="200" height="90" rx="5" fill="#0a0e1a" stroke="#06b6d4" stroke-width="1.5"/>
+  <text x="640" y="274" text-anchor="middle" fill="#06b6d4" font-size="10" font-weight="600">有功/无功测控板</text>
+  <line x1="556" y1="280" x2="724" y2="280" stroke="#334155" stroke-width="0.5"/>
+  <text x="556" y="294" fill="#94a3b8" font-size="9">P · Q · U · I · f 计算</text>
+  <text x="556" y="308" fill="#94a3b8" font-size="9">功率因数 cos φ 补偿</text>
+  <text x="556" y="322" fill="#94a3b8" font-size="9">0.5S 级关口电能计量</text>
+  <text x="556" y="336" fill="#64748b" font-size="8">RS485 → EMS 上送</text>
+
+  <!-- ── 通信板 ── -->
+  <rect x="540" y="360" width="200" height="70" rx="5" fill="#0a0e1a" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="640" y="378" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">通信管理板</text>
+  <line x1="556" y1="384" x2="724" y2="384" stroke="#334155" stroke-width="0.5"/>
+  <text x="556" y="398" fill="#94a3b8" font-size="9">IEC 61850 GOOSE 报文</text>
+  <text x="556" y="412" fill="#94a3b8" font-size="9">IEC 104 上行遥信遥测</text>
+  <text x="556" y="422" fill="#64748b" font-size="8">光纤 · 100Mbps</text>
+
+  <!-- ── 开入开出板 ── -->
+  <rect x="540" y="444" width="200" height="88" rx="5" fill="#0a0e1a" stroke="#10b981" stroke-width="1.5"/>
+  <text x="640" y="462" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">开入 / 开出板</text>
+  <line x1="556" y1="468" x2="724" y2="468" stroke="#334155" stroke-width="0.5"/>
+  <text x="556" y="482" fill="#94a3b8" font-size="9">DI：QF 位置 · 手合/手跳</text>
+  <text x="556" y="496" fill="#94a3b8" font-size="9">DI：远方/就地切换</text>
+  <text x="556" y="510" fill="#ef4444" font-size="9">DO：跳QF(保护出口)</text>
+  <text x="556" y="522" fill="#10b981" font-size="9">DO：合QF(重合出口)</text>
+
+  <!-- ── 电源板 ── -->
+  <rect x="756" y="256" width="152" height="70" rx="5" fill="#0a0e1a" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="832" y="274" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="600">电源板</text>
+  <line x1="772" y1="280" x2="892" y2="280" stroke="#334155" stroke-width="0.5"/>
+  <text x="772" y="294" fill="#94a3b8" font-size="9">DC 220V 操作电源</text>
+  <text x="772" y="308" fill="#64748b" font-size="8">电源监视 · 掉电告警</text>
+
+  <!-- ══════════════════════════════════════
+       区域三：直流操作回路（跳合闸回路）
+       ══════════════════════════════════════ -->
+  <rect x="20" y="548" width="920" height="12" rx="3" fill="#ef4444" fill-opacity="0.15"/>
+  <text x="480" y="557" text-anchor="middle" fill="#ef4444" font-size="9" letter-spacing="3">Ⅲ 区 · 直流操作回路（DC 220V 跳合闸回路）</text>
+
+  <!-- DC 220V 正极（+）总线 -->
+  <line x1="40" y1="574" x2="920" y2="574" stroke="#ef4444" stroke-width="2"/>
+  <text x="28" y="578" text-anchor="end" fill="#ef4444" font-size="10" font-weight="700">+220V</text>
+  <!-- DC 220V 负极（-）总线（底部） -->
+  <line x1="40" y1="740" x2="920" y2="740" stroke="#60a5fa" stroke-width="2"/>
+  <text x="28" y="744" text-anchor="end" fill="#60a5fa" font-size="10" font-weight="700">−220V</text>
+
+  <!-- ── 跳闸回路 1（差动保护出口）── -->
+  <!-- +220V → KTP1 跳闸压板 → TJR1触点 → QF1跳闸线圈 → -220V -->
+  <!-- 跳闸压板（竖线+横杠） -->
+  <line x1="120" y1="574" x2="120" y2="594" stroke="#ef4444" stroke-width="1.8"/>
+  <line x1="113" y1="590" x2="127" y2="590" stroke="#ef4444" stroke-width="2.5"/>
+  <line x1="113" y1="600" x2="127" y2="600" stroke="#ef4444" stroke-width="1.2"/>
+  <line x1="120" y1="600" x2="120" y2="614" stroke="#ef4444" stroke-width="1.8"/>
+  <text x="132" y="596" fill="#ef4444" font-size="9">KTP1</text>
+  <text x="132" y="607" fill="#64748b" font-size="8">差动跳压板</text>
+
+  <!-- 保护继电器触点 TJR1（常开触点符号）-->
+  <line x1="120" y1="614" x2="120" y2="630" stroke="#ef4444" stroke-width="1.8"/>
+  <line x1="112" y1="630" x2="128" y2="630" stroke="#ef4444" stroke-width="1.5"/><!-- 静触点 -->
+  <line x1="128" y1="630" x2="136" y2="622" stroke="#ef4444" stroke-width="1.5"/><!-- 动触点斜线 -->
+  <line x1="136" y1="622" x2="136" y2="646" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="140" y="634" fill="#ef4444" font-size="9">TJR1</text>
+  <text x="140" y="644" fill="#64748b" font-size="8">差动出口</text>
+
+  <!-- QF1 跳闸线圈 -->
+  <line x1="120" y1="646" x2="120" y2="662" stroke="#ef4444" stroke-width="1.8"/>
+  <rect x="108" y="662" width="24" height="16" rx="2" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="120" y="673" text-anchor="middle" fill="#ef4444" font-size="8">TQ</text><!-- 跳圈 -->
+  <text x="136" y="672" fill="#ef4444" font-size="9">QF1</text>
+  <text x="136" y="682" fill="#64748b" font-size="8">跳闸线圈</text>
+  <line x1="120" y1="678" x2="120" y2="740" stroke="#ef4444" stroke-width="1.8"/>
+
+  <!-- ── 跳闸回路 2（过流保护出口）── -->
+  <line x1="240" y1="574" x2="240" y2="594" stroke="#ef4444" stroke-width="1.8"/>
+  <line x1="233" y1="590" x2="247" y2="590" stroke="#fbbf24" stroke-width="2.5"/>
+  <line x1="233" y1="600" x2="247" y2="600" stroke="#fbbf24" stroke-width="1.2"/>
+  <line x1="240" y1="600" x2="240" y2="614" stroke="#fbbf24" stroke-width="1.8"/>
+  <text x="252" y="596" fill="#fbbf24" font-size="9">KTP2</text>
+  <text x="252" y="607" fill="#64748b" font-size="8">过流跳压板</text>
+  <line x1="240" y1="614" x2="240" y2="630" stroke="#fbbf24" stroke-width="1.8"/>
+  <line x1="232" y1="630" x2="248" y2="630" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="248" y1="630" x2="256" y2="622" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="256" y1="622" x2="256" y2="646" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="260" y="634" fill="#fbbf24" font-size="9">TJR2</text>
+  <text x="260" y="644" fill="#64748b" font-size="8">过流出口</text>
+  <line x1="240" y1="646" x2="240" y2="662" stroke="#fbbf24" stroke-width="1.8"/>
+  <rect x="228" y="662" width="24" height="16" rx="2" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="240" y="673" text-anchor="middle" fill="#fbbf24" font-size="8">TQ</text>
+  <text x="256" y="672" fill="#fbbf24" font-size="9">QF2</text>
+  <line x1="240" y1="678" x2="240" y2="740" stroke="#fbbf24" stroke-width="1.8"/>
+
+  <!-- ── 跳闸回路 3（逆功率/防孤岛出口）── -->
+  <line x1="360" y1="574" x2="360" y2="594" stroke="#ef4444" stroke-width="1.8"/>
+  <line x1="353" y1="590" x2="367" y2="590" stroke="#fb923c" stroke-width="2.5"/>
+  <line x1="353" y1="600" x2="367" y2="600" stroke="#fb923c" stroke-width="1.2"/>
+  <line x1="360" y1="600" x2="360" y2="614" stroke="#fb923c" stroke-width="1.8"/>
+  <text x="372" y="596" fill="#fb923c" font-size="9">KTP3</text>
+  <text x="372" y="607" fill="#64748b" font-size="8">防孤岛压板</text>
+  <line x1="360" y1="614" x2="360" y2="630" stroke="#fb923c" stroke-width="1.8"/>
+  <line x1="352" y1="630" x2="368" y2="630" stroke="#fb923c" stroke-width="1.5"/>
+  <line x1="368" y1="630" x2="376" y2="622" stroke="#fb923c" stroke-width="1.5"/>
+  <line x1="376" y1="622" x2="376" y2="646" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="380" y="634" fill="#fb923c" font-size="9">TJR3</text>
+  <text x="380" y="644" fill="#64748b" font-size="8">32逆功率</text>
+  <line x1="360" y1="646" x2="360" y2="662" stroke="#fb923c" stroke-width="1.8"/>
+  <rect x="348" y="662" width="24" height="16" rx="2" fill="none" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="360" y="673" text-anchor="middle" fill="#fb923c" font-size="8">TQ</text>
+  <text x="376" y="672" fill="#fb923c" font-size="9">QF3</text>
+  <line x1="360" y1="678" x2="360" y2="740" stroke="#fb923c" stroke-width="1.8"/>
+
+  <!-- ── 合闸回路（同期合闸）── -->
+  <line x1="520" y1="574" x2="520" y2="594" stroke="#10b981" stroke-width="1.8"/>
+  <!-- 合闸压板（绿色） -->
+  <line x1="513" y1="590" x2="527" y2="590" stroke="#10b981" stroke-width="2.5"/>
+  <line x1="513" y1="600" x2="527" y2="600" stroke="#10b981" stroke-width="1.2"/>
+  <line x1="520" y1="600" x2="520" y2="614" stroke="#10b981" stroke-width="1.8"/>
+  <text x="532" y="596" fill="#10b981" font-size="9">KHB1</text>
+  <text x="532" y="607" fill="#64748b" font-size="8">合闸压板</text>
+  <!-- 同期检定继电器触点 -->
+  <line x1="520" y1="614" x2="520" y2="630" stroke="#10b981" stroke-width="1.8"/>
+  <line x1="512" y1="630" x2="528" y2="630" stroke="#10b981" stroke-width="1.5"/>
+  <line x1="528" y1="630" x2="536" y2="622" stroke="#10b981" stroke-width="1.5"/>
+  <line x1="536" y1="622" x2="536" y2="646" stroke="#10b981" stroke-width="1.5"/>
+  <text x="540" y="634" fill="#10b981" font-size="9">SYN-K</text>
+  <text x="540" y="644" fill="#64748b" font-size="8">25同期接点</text>
+  <!-- 合闸线圈 -->
+  <line x1="520" y1="646" x2="520" y2="662" stroke="#10b981" stroke-width="1.8"/>
+  <rect x="508" y="662" width="24" height="16" rx="2" fill="none" stroke="#10b981" stroke-width="1.5"/>
+  <text x="520" y="673" text-anchor="middle" fill="#10b981" font-size="8">HQ</text>
+  <text x="536" y="672" fill="#10b981" font-size="9">QF1合圈</text>
+  <line x1="520" y1="678" x2="520" y2="740" stroke="#10b981" stroke-width="1.8"/>
+
+  <!-- ── 信号回路（光字牌）── -->
+  <line x1="680" y1="574" x2="680" y2="600" stroke="#06b6d4" stroke-width="1.5"/>
+  <!-- 信号继电器触点 -->
+  <line x1="672" y1="600" x2="688" y2="600" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="688" y1="600" x2="696" y2="592" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="696" y1="592" x2="696" y2="618" stroke="#06b6d4" stroke-width="1.5"/>
+  <text x="700" y="608" fill="#06b6d4" font-size="9">SJR</text>
+  <text x="700" y="618" fill="#64748b" font-size="8">信号继电器</text>
+  <line x1="680" y1="618" x2="680" y2="640" stroke="#06b6d4" stroke-width="1.5"/>
+  <!-- 光字牌（指示灯） -->
+  <circle cx="680" cy="653" r="10" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+  <text x="680" y="657" text-anchor="middle" fill="#06b6d4" font-size="8">⊙</text>
+  <text x="694" y="654" fill="#06b6d4" font-size="9">保护动作</text>
+  <text x="694" y="664" fill="#64748b" font-size="8">光字牌/蜂鸣</text>
+  <line x1="680" y1="663" x2="680" y2="740" stroke="#06b6d4" stroke-width="1.5"/>
+
+  <!-- ── 事故信号到 EMS（光耦隔离）── -->
+  <line x1="800" y1="574" x2="800" y2="600" stroke="#a78bfa" stroke-width="1.5"/>
+  <!-- 光耦符号（两个三角+竖线） -->
+  <polygon points="792,600 808,600 800,614" fill="none" stroke="#a78bfa" stroke-width="1.2"/>
+  <line x1="808" y1="616" x2="808" y2="622" stroke="#a78bfa" stroke-width="1.2"/>
+  <polygon points="800,622 816,614 816,630" fill="none" stroke="#a78bfa" stroke-width="1.2"/>
+  <text x="820" y="616" fill="#a78bfa" font-size="9">光耦</text>
+  <text x="820" y="626" fill="#64748b" font-size="8">隔离输出</text>
+  <line x1="808" y1="630" x2="808" y2="650" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#pArrD)"/>
+  <text x="814" y="648" fill="#a78bfa" font-size="9">→ EMS</text>
+  <text x="814" y="658" fill="#64748b" font-size="8">遥信 DI</text>
+  <line x1="800" y1="740" x2="800" y2="700" stroke="#a78bfa" stroke-width="1.5"/>
+
+  <!-- ── 正负极汇接（T型节点）── -->
+  <circle cx="120" cy="574" r="3" fill="#ef4444"/>
+  <circle cx="240" cy="574" r="3" fill="#ef4444"/>
+  <circle cx="360" cy="574" r="3" fill="#ef4444"/>
+  <circle cx="520" cy="574" r="3" fill="#ef4444"/>
+  <circle cx="680" cy="574" r="3" fill="#ef4444"/>
+  <circle cx="800" cy="574" r="3" fill="#ef4444"/>
+  <circle cx="120" cy="740" r="3" fill="#60a5fa"/>
+  <circle cx="240" cy="740" r="3" fill="#60a5fa"/>
+  <circle cx="360" cy="740" r="3" fill="#60a5fa"/>
+  <circle cx="520" cy="740" r="3" fill="#60a5fa"/>
+  <circle cx="680" cy="740" r="3" fill="#60a5fa"/>
+  <circle cx="800" cy="740" r="3" fill="#60a5fa"/>
+
+  <!-- 负极到 PE 接地 -->
+  <line x1="920" y1="740" x2="940" y2="740" stroke="#84cc16" stroke-width="1.2"/>
+  <line x1="934" y1="733" x2="946" y2="733" stroke="#84cc16" stroke-width="1.5"/>
+  <line x1="936" y1="736" x2="944" y2="736" stroke="#84cc16" stroke-width="1.2"/>
+  <line x1="938" y1="739" x2="942" y2="739" stroke="#84cc16" stroke-width="1"/>
+
+  <!-- ══════════════════════════════════════
+       区域四：整定值表
+       ══════════════════════════════════════ -->
+  <rect x="20" y="756" width="920" height="12" rx="3" fill="#10b981" fill-opacity="0.15"/>
+  <text x="480" y="765" text-anchor="middle" fill="#10b981" font-size="9" letter-spacing="3">Ⅳ 区 · 保护整定值表（GB/T 36558 · 调度部门确认）</text>
+
+  <rect x="20" y="776" width="920" height="188" rx="6" fill="#0f1729" stroke="#334155" stroke-width="1"/>
+  <!-- 表头 -->
+  <line x1="20" y1="800" x2="940" y2="800" stroke="#334155" stroke-width="0.8"/>
+  <text x="60" y="792" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">序号</text>
+  <text x="130" y="792" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">保护名称</text>
+  <text x="220" y="792" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">ANSI</text>
+  <text x="330" y="792" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">动作值（整定）</text>
+  <text x="460" y="792" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">延时</text>
+  <text x="580" y="792" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">出口方式</text>
+  <text x="720" y="792" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">备注</text>
+  <!-- 竖线分隔 -->
+  <line x1="80" y1="776" x2="80" y2="964" stroke="#334155" stroke-width="0.5"/>
+  <line x1="180" y1="776" x2="180" y2="964" stroke="#334155" stroke-width="0.5"/>
+  <line x1="260" y1="776" x2="260" y2="964" stroke="#334155" stroke-width="0.5"/>
+  <line x1="400" y1="776" x2="400" y2="964" stroke="#334155" stroke-width="0.5"/>
+  <line x1="520" y1="776" x2="520" y2="964" stroke="#334155" stroke-width="0.5"/>
+  <line x1="640" y1="776" x2="640" y2="964" stroke="#334155" stroke-width="0.5"/>
+
+  <!-- 数据行 -->
+  <rect x="20" y="806" width="920" height="14" fill="rgba(255,255,255,0.02)"/>
+    <text x="60" y="816" text-anchor="middle" fill="#64748b" font-size="8">1</text>
+    <text x="130" y="816" text-anchor="middle" fill="#ef4444" font-size="8" font-weight="600">差动保护</text>
+    <text x="220" y="816" text-anchor="middle" fill="#ef4444" font-size="8">87</text>
+    <text x="330" y="816" text-anchor="middle" fill="#e2e8f0" font-size="8">I_d &gt; 0.3In · k=0.3 · 速断6In</text>
+    <text x="460" y="816" text-anchor="middle" fill="#94a3b8" font-size="8">瞬时</text>
+    <text x="580" y="816" text-anchor="middle" fill="#ef4444" font-size="8">跳 QF1/QF2</text>
+    <text x="790" y="816" text-anchor="middle" fill="#64748b" font-size="8">比率差动，防CT饱和</text><rect x="20" y="820" width="920" height="14" fill="rgba(0,0,0,0)"/>
+    <text x="60" y="830" text-anchor="middle" fill="#64748b" font-size="8">2</text>
+    <text x="130" y="830" text-anchor="middle" fill="#a855f7" font-size="8" font-weight="600">过流 I 段</text>
+    <text x="220" y="830" text-anchor="middle" fill="#a855f7" font-size="8">50</text>
+    <text x="330" y="830" text-anchor="middle" fill="#e2e8f0" font-size="8">I &gt; 6In（速断）</text>
+    <text x="460" y="830" text-anchor="middle" fill="#94a3b8" font-size="8">0ms</text>
+    <text x="580" y="830" text-anchor="middle" fill="#ef4444" font-size="8">跳 QF1</text>
+    <text x="790" y="830" text-anchor="middle" fill="#64748b" font-size="8">无时限速断，最快响应</text><rect x="20" y="834" width="920" height="14" fill="rgba(255,255,255,0.02)"/>
+    <text x="60" y="844" text-anchor="middle" fill="#64748b" font-size="8">3</text>
+    <text x="130" y="844" text-anchor="middle" fill="#fbbf24" font-size="8" font-weight="600">过流 II 段</text>
+    <text x="220" y="844" text-anchor="middle" fill="#fbbf24" font-size="8">51</text>
+    <text x="330" y="844" text-anchor="middle" fill="#e2e8f0" font-size="8">I &gt; 1.5In（定时限）</text>
+    <text x="460" y="844" text-anchor="middle" fill="#94a3b8" font-size="8">1.0s</text>
+    <text x="580" y="844" text-anchor="middle" fill="#ef4444" font-size="8">跳 QF1</text>
+    <text x="790" y="844" text-anchor="middle" fill="#64748b" font-size="8">过流保护主段</text><rect x="20" y="848" width="920" height="14" fill="rgba(0,0,0,0)"/>
+    <text x="60" y="858" text-anchor="middle" fill="#64748b" font-size="8">4</text>
+    <text x="130" y="858" text-anchor="middle" fill="#fbbf24" font-size="8" font-weight="600">过流 III 段</text>
+    <text x="220" y="858" text-anchor="middle" fill="#fbbf24" font-size="8">51</text>
+    <text x="330" y="858" text-anchor="middle" fill="#e2e8f0" font-size="8">I &gt; 1.2In（反时限）</text>
+    <text x="460" y="858" text-anchor="middle" fill="#94a3b8" font-size="8">3.0s</text>
+    <text x="580" y="858" text-anchor="middle" fill="#ef4444" font-size="8">告警→跳</text>
+    <text x="790" y="858" text-anchor="middle" fill="#64748b" font-size="8">过负荷保护</text><rect x="20" y="862" width="920" height="14" fill="rgba(255,255,255,0.02)"/>
+    <text x="60" y="872" text-anchor="middle" fill="#64748b" font-size="8">5</text>
+    <text x="130" y="872" text-anchor="middle" fill="#84cc16" font-size="8" font-weight="600">零序过流</text>
+    <text x="220" y="872" text-anchor="middle" fill="#84cc16" font-size="8">64</text>
+    <text x="330" y="872" text-anchor="middle" fill="#e2e8f0" font-size="8">3I₀ &gt; 0.3A</text>
+    <text x="460" y="872" text-anchor="middle" fill="#94a3b8" font-size="8">1.5s</text>
+    <text x="580" y="872" text-anchor="middle" fill="#ef4444" font-size="8">跳 QF1+告警</text>
+    <text x="790" y="872" text-anchor="middle" fill="#64748b" font-size="8">接地故障保护</text><rect x="20" y="876" width="920" height="14" fill="rgba(0,0,0,0)"/>
+    <text x="60" y="886" text-anchor="middle" fill="#64748b" font-size="8">6</text>
+    <text x="130" y="886" text-anchor="middle" fill="#06b6d4" font-size="8" font-weight="600">过电压</text>
+    <text x="220" y="886" text-anchor="middle" fill="#06b6d4" font-size="8">59</text>
+    <text x="330" y="886" text-anchor="middle" fill="#e2e8f0" font-size="8">U &gt; 115%Un</text>
+    <text x="460" y="886" text-anchor="middle" fill="#94a3b8" font-size="8">0.5s</text>
+    <text x="580" y="886" text-anchor="middle" fill="#ef4444" font-size="8">停 PCS</text>
+    <text x="790" y="886" text-anchor="middle" fill="#64748b" font-size="8">过压异常</text><rect x="20" y="890" width="920" height="14" fill="rgba(255,255,255,0.02)"/>
+    <text x="60" y="900" text-anchor="middle" fill="#64748b" font-size="8">7</text>
+    <text x="130" y="900" text-anchor="middle" fill="#06b6d4" font-size="8" font-weight="600">欠电压</text>
+    <text x="220" y="900" text-anchor="middle" fill="#06b6d4" font-size="8">27</text>
+    <text x="330" y="900" text-anchor="middle" fill="#e2e8f0" font-size="8">U &lt; 85%Un</text>
+    <text x="460" y="900" text-anchor="middle" fill="#94a3b8" font-size="8">0.5s</text>
+    <text x="580" y="900" text-anchor="middle" fill="#ef4444" font-size="8">停 PCS</text>
+    <text x="790" y="900" text-anchor="middle" fill="#64748b" font-size="8">欠压异常</text><rect x="20" y="904" width="920" height="14" fill="rgba(0,0,0,0)"/>
+    <text x="60" y="914" text-anchor="middle" fill="#64748b" font-size="8">8</text>
+    <text x="130" y="914" text-anchor="middle" fill="#10b981" font-size="8" font-weight="600">高频</text>
+    <text x="220" y="914" text-anchor="middle" fill="#10b981" font-size="8">81U</text>
+    <text x="330" y="914" text-anchor="middle" fill="#e2e8f0" font-size="8">f &gt; 51.5Hz</text>
+    <text x="460" y="914" text-anchor="middle" fill="#94a3b8" font-size="8">0.2s</text>
+    <text x="580" y="914" text-anchor="middle" fill="#ef4444" font-size="8">停 PCS</text>
+    <text x="790" y="914" text-anchor="middle" fill="#64748b" font-size="8">频率越上限</text><rect x="20" y="918" width="920" height="14" fill="rgba(255,255,255,0.02)"/>
+    <text x="60" y="928" text-anchor="middle" fill="#64748b" font-size="8">9</text>
+    <text x="130" y="928" text-anchor="middle" fill="#10b981" font-size="8" font-weight="600">低频</text>
+    <text x="220" y="928" text-anchor="middle" fill="#10b981" font-size="8">81D</text>
+    <text x="330" y="928" text-anchor="middle" fill="#e2e8f0" font-size="8">f &lt; 49.5Hz</text>
+    <text x="460" y="928" text-anchor="middle" fill="#94a3b8" font-size="8">0.2s</text>
+    <text x="580" y="928" text-anchor="middle" fill="#ef4444" font-size="8">停 PCS</text>
+    <text x="790" y="928" text-anchor="middle" fill="#64748b" font-size="8">频率越下限</text><rect x="20" y="932" width="920" height="14" fill="rgba(0,0,0,0)"/>
+    <text x="60" y="942" text-anchor="middle" fill="#64748b" font-size="8">10</text>
+    <text x="130" y="942" text-anchor="middle" fill="#fb923c" font-size="8" font-weight="600">逆功率</text>
+    <text x="220" y="942" text-anchor="middle" fill="#fb923c" font-size="8">32</text>
+    <text x="330" y="942" text-anchor="middle" fill="#e2e8f0" font-size="8">P &lt; −3%Pn</text>
+    <text x="460" y="942" text-anchor="middle" fill="#94a3b8" font-size="8">500ms</text>
+    <text x="580" y="942" text-anchor="middle" fill="#ef4444" font-size="8">停 PCS</text>
+    <text x="790" y="942" text-anchor="middle" fill="#64748b" font-size="8">防反送电网</text>
+
+  <!-- ── 图例 ── -->
+  <rect x="20" y="970" width="920" height="140" rx="6" fill="none" stroke="#334155" stroke-width="0.5"/>
+  <text x="480" y="988" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">图例 · 元件符号说明</text>
+  <line x1="40" y1="998" x2="920" y2="998" stroke="#334155" stroke-width="0.5"/>
+
+  <!-- CT 符号示例 -->
+  <circle cx="60" cy="1018" r="8" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="56" y1="1014" x2="64" y2="1022" stroke="#fbbf24" stroke-width="1"/>
+  <line x1="64" y1="1014" x2="56" y2="1022" stroke="#fbbf24" stroke-width="1"/>
+  <text x="74" y="1022" fill="#94a3b8" font-size="9">电流互感器 CT(TA)</text>
+
+  <!-- PT 符号示例 -->
+  <circle cx="230" cy="1018" r="8" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="230" y1="1012" x2="230" y2="1024" stroke="#06b6d4" stroke-width="1"/>
+  <line x1="224" y1="1018" x2="236" y2="1018" stroke="#06b6d4" stroke-width="1"/>
+  <text x="244" y="1022" fill="#94a3b8" font-size="9">电压互感器 PT(TV)</text>
+
+  <!-- 常开触点 -->
+  <line x1="390" y1="1014" x2="406" y2="1014" stroke="#94a3b8" stroke-width="1.2"/>
+  <line x1="406" y1="1014" x2="414" y2="1008" stroke="#94a3b8" stroke-width="1.2"/>
+  <line x1="414" y1="1008" x2="414" y2="1024" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="420" y="1022" fill="#94a3b8" font-size="9">常开触点（继电器出口）</text>
+
+  <!-- 跳闸线圈 -->
+  <rect x="560" y="1010" width="20" height="14" rx="2" fill="none" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="570" y="1020" text-anchor="middle" fill="#ef4444" font-size="8">TQ</text>
+  <text x="586" y="1022" fill="#94a3b8" font-size="9">跳闸线圈 TQ / 合闸线圈 HQ</text>
+
+  <!-- 光耦 -->
+  <polygon points="710,1010 726,1010 718,1020" fill="none" stroke="#a78bfa" stroke-width="1"/>
+  <text x="732" y="1022" fill="#94a3b8" font-size="9">光电耦合器（信号隔离）</text>
+
+  <!-- 压板 -->
+  <line x1="843" y1="1010" x2="857" y2="1010" stroke="#10b981" stroke-width="2.5"/>
+  <line x1="843" y1="1020" x2="857" y2="1020" stroke="#10b981" stroke-width="1.2"/>
+  <text x="862" y="1022" fill="#94a3b8" font-size="9">保护投退压板</text>
+
+  <!-- 接地 -->
+  <line x1="48" y1="1056" x2="48" y2="1068" stroke="#84cc16" stroke-width="1.2"/>
+  <line x1="42" y1="1068" x2="54" y2="1068" stroke="#84cc16" stroke-width="1.5"/>
+  <line x1="44" y1="1071" x2="52" y2="1071" stroke="#84cc16" stroke-width="1.2"/>
+  <line x1="46" y1="1074" x2="50" y2="1074" stroke="#84cc16" stroke-width="1"/>
+  <text x="60" y="1072" fill="#94a3b8" font-size="9">保护接地（PE）</text>
+  <text x="220" y="1072" fill="#64748b" font-size="9">直流回路：+端（红）/ −端（蓝）| 交流回路：CT 二次（橙）/ PT 二次（青）</text>
+  <text x="680" y="1072" fill="#475569" font-size="8">本图为示意，整定值须由有资质的继保专业人员确认</text>
+  <text x="40" y="1100" fill="#475569" font-size="8">依据：GB/T 14285-2023 · GB/T 36558-2022 · NB/T 42135 · 国家电网 Q/GDW 680</text>
+  <text x="750" y="1100" text-anchor="end" fill="#475569" font-size="8">图号：2CD-MG-001 | Rev.A</text>
+  </svg>
