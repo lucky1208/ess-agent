@@ -1599,6 +1599,7 @@ ACC AC一体柜专题
 <button class="btn btn-primary" onclick="bsGenerateSolution()" data-i18n="bs_gen_btn" style="width:100%;padding:12px;font-size:14px;margin-bottom:16px">生成换电方案</button>
 <div class="success-msg" id="bsSuccessMsg" data-i18n="bs_success_msg" style="display:none">方案已生成！请切换到其他标签查看换电流程、充电策略、站内布局等详情</div>
 <div id="bsSolutionBrief" style="font-size:12px;color:var(--text2);line-height:1.8"></div>
+<div id="bsAnalysisLog" style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border);font-family:monospace;display:none;max-height:400px;overflow-y:auto;margin-top:12px;font-size:12px"></div>
 </div>
 
 
@@ -36306,30 +36307,83 @@ function bsValidateParams(){
   return ok;
 }
 
-function bsParseNatural(){
+async function bsParseNatural(){
   const txt=document.getElementById('bsNaturalInput').value.trim();
   if(!txt){alert(bsGetText('bs_nl_ph'));return;}
-  let filled=0;
-  const truckKw=['重卡','卡车','货车','truck'];
-  const carKw=['乘用车','轿车','蔚来','NIO','car'];
-  const bikeKw=['两轮车','电动车','bike','scooter'];
-  if(truckKw.some(k=>txt.includes(k))){document.getElementById('bsVehicleType').value='bs_vehicle_truck_sany';bsOnVehicleChange();filled++;}
-  else if(carKw.some(k=>txt.includes(k))){document.getElementById('bsVehicleType').value='bs_vehicle_car_nio_es6';bsOnVehicleChange();filled++;}
-  else if(bikeKw.some(k=>txt.includes(k))){document.getElementById('bsVehicleType').value='bs_vehicle_bike_tower';bsOnVehicleChange();filled++;}
-  const vMatch=txt.match(/(\d+)\s*辆/);if(vMatch){document.getElementById('bsVehicleCount').value=vMatch[1];filled++;}
-  const kwhMatch=txt.match(/(\d+)\s*kWh/i);if(kwhMatch){document.getElementById('bsBatteryCapacity').value=kwhMatch[1];filled++;}
-  const swapMatch=txt.match(/(\d+)\s*次/);if(swapMatch){document.getElementById('bsSwapPerDay').value=swapMatch[1];filled++;}
-  const kvMatch=txt.match(/(\d+)\s*kV/i);if(kvMatch){document.getElementById('bsVoltage').value=kvMatch[1];filled++;}
-  if(txt.includes('谷电优先')){document.getElementById('bsChargingStrategy').value='off_peak_first';filled++;}
-  if(txt.includes('恒功率')){document.getElementById('bsChargingStrategy').value='constant_power';filled++;}
-  if(txt.includes('动态')){document.getElementById('bsChargingStrategy').value='dynamic';filled++;}
-  const kmMatch=txt.match(/(\d+)\s*km/);if(kmMatch){document.getElementById('bsServiceRadius').value=kmMatch[1];filled++;}
-  const m2Match=txt.match(/(\d+)\s*m[²2]|\d+\s*平米/);if(m2Match){document.getElementById('bsLandArea').value=m2Match[1];filled++;}
-  const feeMatch=txt.match(/(\d+)\s*%/);if(feeMatch&&(txt.includes('费率')||txt.includes('服务费'))){document.getElementById('bsServiceFeeRate').value=feeMatch[1];filled++;}
-  if(txt.includes('平电价')){const pm=txt.match(/平电价[：:]?\s*(\d+\.?\d*)/);if(pm){document.getElementById('bsPriceFlat').value=pm[1];filled++;}}
-  bsCalcDemand();
-  if(filled===0){alert(bsGetText('bs_no_result'));return;}
-  bsGenerateSolution();
+  const providerEl=document.getElementById('bsLlmProvider');
+  const provider=providerEl?providerEl.value:'local';
+  const tip=document.createElement('div');
+  tip.style.cssText='position:fixed;top:20px;right:20px;background:#185FA5;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:999';
+  tip.textContent=provider==='local'?'本地规则识别参数...':'AI正在识别换电参数...';
+  document.body.appendChild(tip);
+  try{
+    let filled=0;
+    if(provider==='local'){
+      const truckKw=['重卡','卡车','货车','truck'];
+      const carKw=['乘用车','轿车','蔚来','NIO','car'];
+      const bikeKw=['两轮车','电动车','bike','scooter'];
+      if(truckKw.some(k=>txt.includes(k))){document.getElementById('bsVehicleType').value='bs_vehicle_truck_sany';bsOnVehicleChange();filled++;}
+      else if(carKw.some(k=>txt.includes(k))){document.getElementById('bsVehicleType').value='bs_vehicle_car_nio_es6';bsOnVehicleChange();filled++;}
+      else if(bikeKw.some(k=>txt.includes(k))){document.getElementById('bsVehicleType').value='bs_vehicle_bike_tower';bsOnVehicleChange();filled++;}
+      const vMatch=txt.match(/(\d+)\s*辆/);if(vMatch){document.getElementById('bsVehicleCount').value=vMatch[1];filled++;}
+      const kwhMatch=txt.match(/(\d+)\s*kWh/i);if(kwhMatch){document.getElementById('bsBatteryCapacity').value=kwhMatch[1];filled++;}
+      const swapMatch=txt.match(/(\d+)\s*次/);if(swapMatch){document.getElementById('bsSwapPerDay').value=swapMatch[1];filled++;}
+      const kvMatch=txt.match(/(\d+)\s*kV/i);if(kvMatch){document.getElementById('bsVoltage').value=kvMatch[1];filled++;}
+      if(txt.includes('谷电优先')){document.getElementById('bsChargingStrategy').value='off_peak_first';filled++;}
+      if(txt.includes('恒功率')){document.getElementById('bsChargingStrategy').value='constant_power';filled++;}
+      if(txt.includes('动态')){document.getElementById('bsChargingStrategy').value='dynamic';filled++;}
+      const kmMatch=txt.match(/(\d+)\s*km/);if(kmMatch){document.getElementById('bsServiceRadius').value=kmMatch[1];filled++;}
+      const m2Match=txt.match(/(\d+)\s*m[²2]|\d+\s*平米/);if(m2Match){document.getElementById('bsLandArea').value=m2Match[1];filled++;}
+      const feeMatch=txt.match(/(\d+)\s*%/);if(feeMatch&&(txt.includes('费率')||txt.includes('服务费'))){document.getElementById('bsServiceFeeRate').value=feeMatch[1];filled++;}
+      if(txt.includes('平电价')){const pm=txt.match(/平电价[：:]?\s*(\d+\.?\d*)/);if(pm){document.getElementById('bsPriceFlat').value=pm[1];filled++;}}
+    }else{
+      const messages=[
+        {role:'system',content:'你是换电站参数提取助手。从用户自然语言描述中提取换电站参数，返回JSON：{"vehicleType":"bs_vehicle_truck_sany","batteryCapacity":282,"vehicleCount":50,"swapPerDay":3,"dailySwapDemand":150,"swapBayCount":2,"chargingPower":60,"voltage":10,"pricePeak":0.85,"priceValley":0.35,"chargingStrategy":"off_peak_first","serviceRadius":5,"landArea":500,"serviceFeeRate":20}。无法识别的字段不返回。'+getLangInstruction()},
+        {role:'user',content:txt}
+      ];
+      const data=await callLLM(messages);
+      const content=data.choices?.[0]?.message?.content||'';
+      const jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+      const params=JSON.parse(jsonStr);
+      function sv(id,val){const el=document.getElementById(id);if(el&&val!=null){el.value=val;filled++;}}
+      if(params.vehicleType){sv('bsVehicleType',params.vehicleType);bsOnVehicleChange();}
+      if(params.batteryCapacity)sv('bsBatteryCapacity',params.batteryCapacity);
+      if(params.vehicleCount)sv('bsVehicleCount',params.vehicleCount);
+      if(params.swapPerDay)sv('bsSwapPerDay',params.swapPerDay);
+      if(params.dailySwapDemand)sv('bsDailySwapDemand',params.dailySwapDemand);
+      if(params.swapBayCount)sv('bsSwapBayCount',params.swapBayCount);
+      if(params.chargingPower)sv('bsChargingPower',params.chargingPower);
+      if(params.voltage)sv('bsVoltage',params.voltage);
+      if(params.pricePeak)sv('bsPricePeak',params.pricePeak);
+      if(params.priceValley)sv('bsPriceValley',params.priceValley);
+      if(params.chargingStrategy)sv('bsChargingStrategy',params.chargingStrategy);
+      if(params.serviceRadius)sv('bsServiceRadius',params.serviceRadius);
+      if(params.landArea)sv('bsLandArea',params.landArea);
+      if(params.serviceFeeRate)sv('bsServiceFeeRate',params.serviceFeeRate);
+    }
+    bsCalcDemand();
+    if(filled===0){tip.textContent='未能识别参数';tip.style.background='#D4A017';setTimeout(()=>tip.remove(),3000);return;}
+    tip.textContent=(provider==='local'?'正则':'AI')+'识别完成，填充了'+filled+'个参数，正在生成方案...';
+    tip.style.background='#0F6E56';
+    setTimeout(()=>bsGenerateSolution(),500);
+  }catch(e){
+    console.warn('BS parse failed, using regex fallback',e);
+    let filled=0;
+    const truckKw=['重卡','卡车','货车','truck'];
+    const carKw=['乘用车','轿车','蔚来','NIO','car'];
+    const bikeKw=['两轮车','电动车','bike','scooter'];
+    if(truckKw.some(k=>txt.includes(k))){document.getElementById('bsVehicleType').value='bs_vehicle_truck_sany';bsOnVehicleChange();filled++;}
+    else if(carKw.some(k=>txt.includes(k))){document.getElementById('bsVehicleType').value='bs_vehicle_car_nio_es6';bsOnVehicleChange();filled++;}
+    else if(bikeKw.some(k=>txt.includes(k))){document.getElementById('bsVehicleType').value='bs_vehicle_bike_tower';bsOnVehicleChange();filled++;}
+    const vMatch=txt.match(/(\d+)\s*辆/);if(vMatch){document.getElementById('bsVehicleCount').value=vMatch[1];filled++;}
+    const kwhMatch=txt.match(/(\d+)\s*kWh/i);if(kwhMatch){document.getElementById('bsBatteryCapacity').value=kwhMatch[1];filled++;}
+    const swapMatch=txt.match(/(\d+)\s*次/);if(swapMatch){document.getElementById('bsSwapPerDay').value=swapMatch[1];filled++;}
+    bsCalcDemand();
+    tip.textContent='AI识别失败，正则提取'+filled+'个参数';
+    tip.style.background='#D4A017';
+    setTimeout(()=>bsGenerateSolution(),500);
+  }
+  setTimeout(()=>tip.remove(),4000);
 }
 
 function bsCalcChargingRack(params){
@@ -36499,8 +36553,161 @@ function bsCalcEconomics(params,equipmentList,rackResult,powerResult){
   return{equipmentTotal:Math.round(equipmentTotal),installFee,designFee,contingency,totalInvestment,annualOperatingCost:annualOpCost,annualRevenue,annualSwapRevenue,annualTradingRevenue,arbitrageRevenue,demandRespRevenue,vppRevenue,annualProfit,paybackYears,irr:Math.round(irr*10)/10,npv:Math.round(npv)};
 }
 
-function bsGenerateSolution(){
+const BS_SYSTEM_PROMPT = `你是一个换电站(Battery Swap Station)解决方案AI智能体，由华为云码道CodeArts驱动。
+
+## 你的职责
+根据用户提供的车辆信息、换电需求、电价参数等，给出完整的换电站配置方案。
+
+## 换电站核心架构
+1. 换电工位：车辆驶入→定位→机器人拆装电池→驶出，单车换电3-8分钟
+2. 充电架：多仓位并行充电，支持谷电优先/恒功率/动态策略
+3. 电池池：在线+充电中+备用三级流转，确保随时有满电电池可换
+4. 电力系统：10kV/0.4kV接入，变压器容量需覆盖峰值充电功率
+5. 运营系统：EMS调度、OCPP通信、计费、光储充协同
+
+## 车型分类
+- 重卡：三一/徐工/比亚迪Q3，电池282-422kWh，换电5-6min
+- 乘用车：蔚来ES6/ET5，电池75-100kWh，换电3-5min
+- 两轮车：铁塔换电，电池48V/60V，换电1min
+
+## 设计遵循规范
+- GB/T 40032-2021 电动汽车换电安全要求
+- GB/T 33341-2016 电动汽车换电设施术语
+- NB/T 10900-2022 电动汽车电池更换站设计规范
+- GB 50053-2013 10kV及以下变电所设计规范
+- GB/T 18487.1 电动汽车传导充电系统
+
+## 关键设计原则
+1. 充电架仓位 = ceil(日换电次数 × 单次充电时间 / 24h) + 换电工位数
+2. 电池总数 = 仓位数 + 换电工位数 + 备用(10-15%)
+3. 变压器容量 ≥ 峰值充电功率 / 功率因数(0.9) + 辅助用电
+4. 谷电优先策略：在谷电时段集中充电，降低运营成本
+5. 能力裕度 ≥ 20%，确保高峰期不排队
+6. IRR ≥ 8%，回收期 ≤ 8年 方具备投资价值
+
+## 输出格式要求
+你必须返回严格的JSON（不要markdown代码块），包含以下字段：
+{
+  "summary": "方案概述文字",
+  "stationScale": {"level":"大型站","bays":4,"slots":80,"batteries":96,"area":800},
+  "swapThroughput": {"dailyThroughput":200,"peakThroughputPerHour":30,"capacityMargin":25},
+  "chargingRack": {"actualSlots":80,"utilization":0.85},
+  "battery": {"totalBatteries":96,"readyBatteryRate":65,"turnoverRatio":"1:1.2"},
+  "powerCapacity": {"peakPower":2400,"transformerCount":2,"transformerUnitCapacity":1600},
+  "chargingStrategy": {"mode":"off_peak_first","chargeWindow":"23:00-07:00","peakAvoid":true},
+  "economics": {"totalInvestment":1200,"annualRevenue":280,"annualProfit":150,"paybackYears":5.2,"irr":18.5},
+  "equipmentList": [{"categoryKey":"bs_cat_mech","items":[{"name":"换电机器人","model":"RG-300","quantity":4,"unit":"台","unitPrice":35,"subtotal":140}]}],
+  "warnings": ["能力裕度<20%"]
+}
+`;
+
+function bsBuildUserPrompt(){
+  const vEl=document.getElementById('bsVehicleType');
+  const params={
+    vehicleId:vEl.value,
+    vehicleName:vEl.selectedOptions[0].text,
+    stationType:document.getElementById('bsStationType').value,
+    batteryCapacity:document.getElementById('bsBatteryCapacity').value,
+    batteryVoltage:document.getElementById('bsBatteryVoltage').value,
+    batteryType:document.getElementById('bsBatteryType').value,
+    vehicleCount:document.getElementById('bsVehicleCount').value,
+    swapPerDay:document.getElementById('bsSwapPerDay').value,
+    dailySwapDemand:document.getElementById('bsDailySwapDemand').value,
+    swapBayCount:document.getElementById('bsSwapBayCount').value,
+    chargingPower:document.getElementById('bsChargingPower').value,
+    voltage:document.getElementById('bsVoltage').value,
+    pricePeak:document.getElementById('bsPricePeak').value,
+    priceValley:document.getElementById('bsPriceValley').value,
+    chargingStrategy:document.getElementById('bsChargingStrategy').value,
+    projName:document.getElementById('bsProjName').value,
+    region:document.getElementById('bsRegion').value,
+    budget:document.getElementById('bsBudget').value,
+    serviceRadius:document.getElementById('bsServiceRadius').value||5,
+    landArea:document.getElementById('bsLandArea').value||0,
+    serviceFeeRate:document.getElementById('bsServiceFeeRate').value||20,
+    priceFlat:document.getElementById('bsPriceFlat').value||0.60
+  };
+  let prompt='## 换电站项目信息\n';
+  prompt+=`- 项目名称: ${params.projName}\n- 区域: ${params.region}\n- 预算: ${params.budget}万元\n\n`;
+  prompt+='## 车辆与电池\n';
+  prompt+=`- 车型: ${params.vehicleName} (${params.vehicleId})\n- 电池容量: ${params.batteryCapacity}kWh\n- 电池电压: ${params.batteryVoltage}V\n- 电池类型: ${params.batteryType}\n- 服务车辆数: ${params.vehicleCount}辆\n\n`;
+  prompt+='## 换电需求\n';
+  prompt+=`- 站型: ${params.stationType}\n- 日换电次数: ${params.dailySwapDemand}次\n- 每车换电频次: ${params.swapPerDay}次/日\n- 换电工位: ${params.swapBayCount}个\n\n`;
+  prompt+='## 电力与充电\n';
+  prompt+=`- 充电功率: ${params.chargingPower}kW/仓\n- 接入电压: ${params.voltage}kV\n- 充电策略: ${params.chargingStrategy}\n\n`;
+  prompt+='## 电价\n';
+  prompt+=`- 峰电价: ${params.pricePeak}元/kWh\n- 谷电价: ${params.priceValley}元/kWh\n- 平电价: ${params.priceFlat}元/kWh\n\n`;
+  prompt+='## 其他\n';
+  prompt+=`- 服务半径: ${params.serviceRadius}km\n- 占地面积: ${params.landArea}m²\n- 服务费率: ${params.serviceFeeRate}%\n\n`;
+  prompt+='请根据以上信息，给出完整的换电站配置方案。';
+  return prompt;
+}
+
+async function bsGenerateSolution(){
   if(!bsValidateParams()) return;
+  const btn=document.querySelector('[onclick="bsGenerateSolution()"]');
+  const origText=btn?btn.innerHTML:'';
+  if(btn){btn.innerHTML='<span class="spinner"></span> 分析中...';btn.disabled=true;}
+  _currentLogId='bsAnalysisLog';_streamLogReasoningEl=null;_streamLogContentEl=null;
+  const logEl=document.getElementById('bsAnalysisLog');
+  if(logEl){logEl.innerHTML='';logEl.style.display='block';}
+  const addLog=(msg,type)=>{
+    if(!logEl) return;
+    const d=document.createElement('div');
+    d.style.cssText='font-size:12px;padding:2px 0;color:'+(type==='step'?'#80b0e0':type==='ok'?'#50c878':type==='warn'?'#e8a838':'#C2C0B6')+';word-break:break-all;';
+    d.textContent=msg;
+    logEl.appendChild(d);
+    logEl.scrollTop=logEl.scrollHeight;
+  };
+  const providerEl=document.getElementById('bsLlmProvider');
+  const provider=providerEl?providerEl.value:'local';
+  try{
+    if(provider==='local'){
+      addLog('[本地规则引擎] 启动换电站方案计算...','step');
+    }else{
+      addLog('['+provider.toUpperCase()+'] 构建换电领域Prompt...','step');
+      const userPrompt=bsBuildUserPrompt();
+      addLog('─── 发送给LLM的完整输入 ───','step');
+      userPrompt.split('\n').forEach(line=>{if(line.trim()) addLog(line,'');});
+      addLog('─── 输入结束 ───','step');
+      addLog('调用'+provider.toUpperCase()+' API (SSE流式)...','step');
+      _streamLogReasoningEl=null;
+      _streamLogContentEl=null;
+      const messages=[
+        {role:'system',content:BS_SYSTEM_PROMPT+getLangInstruction()},
+        {role:'user',content:userPrompt}
+      ];
+      const data=await callLLM(messages,true);
+      addLog('流式响应完成, tokens: '+(data.usage?.total_tokens||'?'),'ok');
+      const msg=data.choices?.[0]?.message;
+      const reasoningContent=msg?.reasoning_content||'';
+      const content=msg?.content||'';
+      if(reasoningContent&&!_streamLogReasoningEl){
+        addLog('─── AI思考过程 ───','step');
+        reasoningContent.split('\n').forEach(line=>{if(line.trim()) addLog(line,'');});
+        addLog('─── 思考结束 ───','step');
+      }
+      addLog('解析LLM输出JSON...','step');
+      let llmResult;
+      try{
+        let jsonStr=content.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+        if(!jsonStr.startsWith('{')){const jm=jsonStr.match(/\{[\s\S]*\}/);if(jm) jsonStr=jm[0];}
+        addLog('JSON长度: '+jsonStr.length+'字符','step');
+        llmResult=JSON.parse(jsonStr);
+        addLog('JSON解析成功 ✓','ok');
+      }catch(e){
+        addLog('JSON.parse失败: '+e.message+', fallback到规则引擎','warn');
+      }
+      if(llmResult){
+        addLog('LLM方案生成完成，合并本地计算结果...','step');
+      }
+    }
+  }catch(e){
+    console.error('BS LLM error:',e);
+    addLog('LLM调用失败: '+e.message,'warn');
+    addLog('Fallback到本地规则引擎...','warn');
+  }
+  addLog('本地规则引擎计算中...','step');
   const params={
     vehicleId:document.getElementById('bsVehicleType').value,
     vehicleName:document.getElementById('bsVehicleType').selectedOptions[0].text,
@@ -36567,9 +36774,12 @@ function bsGenerateSolution(){
   if(throughput.capacityMargin<20) warnings.push('能力裕度: <20%');
   if(economics.irr<5) warnings.push('IRR: <5%');
   if(economics.paybackYears>15) warnings.push('回收期: >15年');
-  LAST_BS_RESULT={id:'BS-'+Date.now(),projectName:params.projName,region:params.region,vehicleId:params.vehicleId,vehicleName:params.vehicleName,stationType:params.stationType,inputParams:params,swapThroughput:throughput,chargingRack:rackResult,battery,powerCapacity:power,stationStructure:structure,swapProcess:process,chargingStrategy:strategy,equipmentList,economics,mechanical,electrical,opsSchedule,socSchedule,inventory,shiftPlan,stationScale,batteryPool,chargingSystem,batteryRotation,batteryLifeMgmt,assetOverview,sohDistribution,degradation,retirement,cascading,warnings};
+  LAST_BS_RESULT={id:'BS-'+Date.now(),projectName:params.projName,region:params.region,vehicleId:params.vehicleId,vehicleName:params.vehicleName,stationType:params.stationType,inputParams:params,swapThroughput:throughput,chargingRack:rackResult,battery,powerCapacity:power,stationStructure:structure,swapProcess:process,chargingStrategy:strategy,equipmentList,economics,mechanical,electrical,opsSchedule,socSchedule,inventory,shiftPlan,stationScale,batteryPool,chargingSystem,batteryRotation,batteryLifeMgmt,assetOverview,sohDistribution,degradation,retirement,cascading,warnings,_llmSource:provider!=='local'};
+  addLog('换电站方案计算完成 ✓','ok');
+  addLog('工位: '+stationScale.bays+' | 仓位: '+rackResult.actualSlots+' | 电池: '+battery.totalBatteries+'块 | 变压器: '+power.transformerCount+'×'+power.transformerUnitCapacity+'kVA','step');
   document.getElementById('bsSuccessMsg').style.display='block';
   bsRenderBrief();
+  if(btn){btn.innerHTML=origText;btn.disabled=false;}
 }
 
 function bsRenderBrief(){
