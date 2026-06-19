@@ -1723,27 +1723,65 @@ ACC AC一体柜专题
 
 <div id="page-ch-elec" class="charging-content" style="display:none;padding:24px 32px">
 <div class="sec-title" data-i18n="ch_elec_title">电气设计 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="ch_elec_desc">基于IEC 60617/61851标准生成工程级原理图，支持欧标/国标移动充电桩、固定式超充堆电气设计</div>
-<div style="display:flex;gap:8px;margin-bottom:12px">
-<div class="bs-elec-tab active" onclick="chElecSwitchDiagram('mobile_eu')">欧标移动充电桩原理图</div>
-<div class="bs-elec-tab" onclick="chElecSwitchDiagram('power_cabinet')">超充堆一次图</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px" data-i18n="ch_elec_desc">基于IEC 60617/61851标准生成工程级原理图, 内置 28 步上电-充电子流程动画. 支持欧标移动桩/国标一体式/液冷超充堆/充电站一次图.</div>
+<div style="display:flex;gap:8px;margin-bottom:12px" id="chElecTabs">
+<div class="bs-elec-tab active" onclick="chElecSwitchDiagram('mobile_eu')">欧标移动桩 (28 步动画)</div>
+<div class="bs-elec-tab" onclick="chElecSwitchDiagram('gb_integrated')">国标一体式直流</div>
+<div class="bs-elec-tab" onclick="chElecSwitchDiagram('liquid_cooling')">液冷超充堆</div>
+<div class="bs-elec-tab" onclick="chElecSwitchDiagram('station_sld')">充电站一次图</div>
 </div>
-<div class="diagram-container">
-<div class="diagram-header"><h3 class="diagram-title" id="chElecTitle">欧标移动充电桩电气原理图 (150A欧标补电座+DC/DC充电模块)</h3></div>
-<div class="diagram-svg" id="chElecSvg" style="min-height:520px"></div>
+<div style="display:grid;grid-template-columns:1fr 360px;gap:16px">
+<div>
+<div class="diagram-container" style="margin-bottom:0">
+<div class="diagram-header">
+<h3 class="diagram-title" id="chElecTitle">欧标移动充电桩 - 完整电气原理图 (28 步交互)</h3>
+<div class="diagram-actions">
+<button onclick="chElecFullscreen()" title="全屏查看">⛶ 全屏</button>
+<button onclick="chElecPrint()">🖨 打印</button>
+<button onclick="chElecDownloadSvg()">⬇ SVG</button>
 </div>
-<div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div class="acc-section" style="margin-bottom:0"><h3>核心元器件清单 (BOM提取)</h3>
-<div id="chElecBom" style="font-size:12px;color:var(--text2);line-height:1.8"></div></div>
-<div class="acc-section" style="margin-bottom:0"><h3>标准与协议映射</h3>
-<div style="font-size:12px;color:var(--text2);line-height:1.8">
+</div>
+<div id="chElecSvg" style="width:100%;height:640px;background:#0a0e1a;border-radius:8px;overflow:hidden;position:relative">
+<iframe id="chElecIframe" src="charging_schematic_detail.html" style="width:100%;height:100%;border:0;background:#0a0e1a"></iframe>
+</div>
+</div>
+<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div class="acc-section" style="margin-bottom:0"><h3>关键电气参数</h3>
+<div id="chElecParams" style="font-size:12px;line-height:1.8"></div>
+</div>
+<div class="acc-section" style="margin-bottom:0"><h3>保护与接地</h3>
+<div id="chElecProtection" style="font-size:12px;line-height:1.8"></div>
+</div>
+</div>
+</div>
+<div>
+<div class="acc-section" style="margin-bottom:12px">
+<h3 style="color:#8B5CF6">📋 元件清单 (BOM)</h3>
+<div id="chElecBom" style="font-size:11px;line-height:1.8;max-height:280px;overflow-y:auto"></div>
+</div>
+<div class="acc-section" style="margin-bottom:12px">
+<h3 style="color:#06b6d4">📐 标准映射</h3>
+<div style="font-size:11px;line-height:1.7">
 • IEC 61851-1/23 (欧标充电系统)<br>
 • IEC 60617 (电气符号标准)<br>
 • OCPP 1.6J / 2.0.1 (通信协议)<br>
-• ISO 15118 (即插即充V2G)<br>
-• DIN 70121 (CCS通信)<br>
-• GB/T 27930 (国标BMS通信)
-</div></div>
+• ISO 15118 (即插即充 V2G)<br>
+• DIN 70121 (CCS 通信)<br>
+• GB/T 27930 (国标 BMS 通信)<br>
+• GB/T 18487.1 (国标充电系统)
+</div>
+</div>
+<div class="acc-section" style="margin-bottom:0">
+<h3 style="color:#f59e0b">💡 操作提示</h3>
+<div style="font-size:11px;line-height:1.7;color:var(--text2)">
+<b>左键拖动</b>: 平移原理图<br>
+<b>滚轮</b>: 缩放 (5%-400%)<br>
+<b>点击左侧步骤</b>: 跳转该步骤<br>
+<b>▶ 自动播放</b>: 按顺序演示 28 步<br>
+<b>1×/2×/4×</b>: 调节流速
+</div>
+</div>
+</div>
 </div>
 </div>
 
@@ -4389,151 +4427,536 @@ function chGenerateDesign(){
 
 function chElecSwitchDiagram(type){
   const titleEl=document.getElementById('chElecTitle');
-  const svgEl=document.getElementById('chElecSvg');
+  const iframe=document.getElementById('chElecIframe');
   const bomEl=document.getElementById('chElecBom');
-  if(!titleEl||!svgEl||!bomEl) return;
+  const paramsEl=document.getElementById('chElecParams');
+  const protectionEl=document.getElementById('chElecProtection');
+  if(!titleEl||!bomEl||!paramsEl||!protectionEl) return;
   document.querySelectorAll('#chElecTabs .bs-elec-tab').forEach(t=>t.classList.remove('active'));
   const tabs=document.querySelectorAll('#chElecTabs .bs-elec-tab');
-  if(tabs[0]&&type==='mobile_eu')tabs[0].classList.add('active');
-  if(tabs[1]&&type==='power_cabinet')tabs[1].classList.add('active');
+  const idx=['mobile_eu','gb_integrated','liquid_cooling','station_sld'].indexOf(type);
+  if(idx>=0&&tabs[idx]) tabs[idx].classList.add('active');
+
   if(type==='mobile_eu'){
-    titleEl.textContent='欧标移动充电桩电气原理图 (150A欧标补电座+DC/DC充电模块)';
-    let s='<svg viewBox="0 0 800 660" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">';
-    s+='<text x="400" y="22" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">储能充电桩电气原理图 (欧标 150A 移动)</text>';
-    s+='<rect x="20" y="40" width="200" height="600" rx="6" fill="none" stroke="#334155" stroke-width="0.5"/>';
-    s+='<text x="120" y="58" text-anchor="middle" fill="#94a3b8" font-size="10">AC 主回路 / PCS</text>';
-    s+='<rect x="40" y="70" width="160" height="32" rx="4" fill="#1e3a5f" stroke="#4a90d9"/>';
-    s+='<text x="120" y="90" text-anchor="middle" fill="#4a90d9" font-size="11">AC Input L1/L2/L3/N/PE</text>';
-    s+='<line x1="120" y1="102" x2="120" y2="118" stroke="#4a90d9" stroke-width="2"/>';
-    s+='<rect x="50" y="118" width="140" height="28" rx="4" fill="#1e3a5f" stroke="#f59e0b"/>';
-    s+='<text x="120" y="137" text-anchor="middle" fill="#f59e0b" font-size="10">浪涌 SPD 3P+N</text>';
-    s+='<line x1="120" y1="146" x2="120" y2="162" stroke="#4a90d9" stroke-width="2"/>';
-    s+='<rect x="50" y="162" width="140" height="28" rx="4" fill="#1e3a5f" stroke="#e06070"/>';
-    s+='<text x="120" y="181" text-anchor="middle" fill="#e06070" font-size="10">漏电继电器</text>';
-    s+='<line x1="120" y1="190" x2="120" y2="206" stroke="#4a90d9" stroke-width="2"/>';
-    s+='<rect x="40" y="206" width="160" height="40" rx="4" fill="#3d1820" stroke="#e06070"/>';
-    s+='<text x="120" y="224" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">22kW PCS 模块</text>';
-    s+='<text x="120" y="238" text-anchor="middle" fill="#e06070" font-size="9">AC/DC PFC 整流</text>';
-    s+='<line x1="120" y1="246" x2="120" y2="266" stroke="#f59e0b" stroke-width="2"/>';
-    s+='<rect x="40" y="266" width="160" height="56" rx="4" fill="#0d2a15" stroke="#50c878"/>';
-    s+='<text x="120" y="284" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">电池箱 (BMS+BCU)</text>';
-    s+='<text x="120" y="298" text-anchor="middle" fill="#50c878" font-size="9">K1 总正 / K2 总负</text>';
-    s+='<text x="120" y="311" text-anchor="middle" fill="#50c878" font-size="9">K3 预充 30R / FU1-3</text>';
-    s+='<line x1="120" y1="322" x2="120" y2="340" stroke="#f59e0b" stroke-width="2"/>';
-    s+='<rect x="40" y="340" width="160" height="40" rx="4" fill="#3d1820" stroke="#e06070"/>';
-    s+='<text x="120" y="358" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">30kW DC/DC 模块</text>';
-    s+='<text x="120" y="372" text-anchor="middle" fill="#e06070" font-size="9">M1~M2 隔离升压</text>';
-    s+='<line x1="120" y1="380" x2="120" y2="396" stroke="#f59e0b" stroke-width="2"/>';
-    s+='<rect x="50" y="396" width="140" height="28" rx="4" fill="#1e3a5f" stroke="#4a90d9"/>';
-    s+='<text x="120" y="415" text-anchor="middle" fill="#4a90d9" font-size="10">K4 充电接触器</text>';
-    s+='<line x1="120" y1="424" x2="120" y2="442" stroke="#f59e0b" stroke-width="2"/>';
-    s+='<rect x="40" y="442" width="160" height="60" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/>';
-    s+='<text x="120" y="460" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">150A 欧标充电枪</text>';
-    s+='<text x="120" y="474" text-anchor="middle" fill="#8B5CF6" font-size="9">DC+/DC-/PE/CP/PP</text>';
-    s+='<text x="120" y="488" text-anchor="middle" fill="#8B5CF6" font-size="9">电子锁 + 反馈</text>';
-    s+='<rect x="260" y="40" width="200" height="600" rx="6" fill="none" stroke="#334155" stroke-width="0.5"/>';
-    s+='<text x="360" y="58" text-anchor="middle" fill="#94a3b8" font-size="10">控制 / 通信</text>';
-    s+='<rect x="280" y="70" width="160" height="30" rx="4" fill="#1a1a3f" stroke="#a0a0ff"/>';
-    s+='<text x="360" y="89" text-anchor="middle" fill="#a0a0ff" font-size="10">24V/12V 开关电源</text>';
-    s+='<rect x="280" y="115" width="160" height="60" rx="4" fill="#1a1a3f" stroke="#a0a0ff"/>';
-    s+='<text x="360" y="135" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">VCU / 主控板</text>';
-    s+='<text x="360" y="150" text-anchor="middle" fill="#a0a0ff" font-size="9">继电器 K1-K10 控制</text>';
-    s+='<text x="360" y="163" text-anchor="middle" fill="#a0a0ff" font-size="9">绝缘检测 RS1/RS2</text>';
-    s+='<rect x="280" y="190" width="160" height="36" rx="4" fill="#1a1a3f" stroke="#50c878"/>';
-    s+='<text x="360" y="213" text-anchor="middle" fill="#50c878" font-size="10">SECC (桩端控制器)</text>';
-    s+='<rect x="280" y="240" width="160" height="36" rx="4" fill="#1a1a3f" stroke="#4a90d9"/>';
-    s+='<text x="360" y="263" text-anchor="middle" fill="#4a90d9" font-size="10">EVCC (车载控制器)</text>';
-    s+='<rect x="280" y="290" width="160" height="50" rx="4" fill="#1a1a3f" stroke="#f59e0b"/>';
-    s+='<text x="360" y="310" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">4G 路由器 + 三合一天线</text>';
-    s+='<text x="360" y="325" text-anchor="middle" fill="#f59e0b" font-size="9">OCPP 1.6J / 2.0.1</text>';
-    s+='<rect x="280" y="355" width="160" height="60" rx="4" fill="#1a1a3f" stroke="#e8a838"/>';
-    s+='<text x="360" y="375" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">OCPP / 后台</text>';
-    s+='<text x="360" y="390" text-anchor="middle" fill="#e8a838" font-size="9">中电联 / 海外平台</text>';
-    s+='<text x="360" y="403" text-anchor="middle" fill="#e8a838" font-size="9">SaaS 运营 / 计费</text>';
-    s+='<line x1="220" y1="226" x2="280" y2="145" stroke="#a0a0ff" stroke-width="1" stroke-dasharray="4,2"/>';
-    s+='<line x1="220" y1="294" x2="280" y2="145" stroke="#a0a0ff" stroke-width="1" stroke-dasharray="4,2"/>';
-    s+='<line x1="220" y1="360" x2="280" y2="210" stroke="#a0a0ff" stroke-width="1" stroke-dasharray="4,2"/>';
-    s+='<line x1="220" y1="472" x2="280" y2="210" stroke="#a0a0ff" stroke-width="1" stroke-dasharray="4,2"/>';
-    s+='<line x1="440" y1="145" x2="440" y2="315" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2"/>';
-    s+='<line x1="440" y1="315" x2="440" y2="375" stroke="#e8a838" stroke-width="1" stroke-dasharray="4,2"/>';
-    s+='<rect x="490" y="40" width="290" height="600" rx="6" fill="none" stroke="#334155" stroke-width="0.5"/>';
-    s+='<text x="635" y="58" text-anchor="middle" fill="#94a3b8" font-size="10">关键信号 / 继电器拓扑</text>';
-    s+='<rect x="510" y="75" width="250" height="90" rx="4" fill="#0f1729" stroke="#a0a0ff"/>';
-    s+='<text x="520" y="93" fill="#a0a0ff" font-size="10" font-weight="700">A. 接触器清单</text>';
-    s+='<text x="520" y="110" fill="#c2c0b6" font-size="9">K1 总正 (200A-24V) | K2 总负 (200A-24V)</text>';
-    s+='<text x="520" y="124" fill="#c2c0b6" font-size="9">K3 预充 (50A-24V + 200W 30R 电阻)</text>';
-    s+='<text x="520" y="138" fill="#c2c0b6" font-size="9">K4 充电 | K5 加热 | K6 AC 输入</text>';
-    s+='<text x="520" y="152" fill="#c2c0b6" font-size="9">K7/K8 整车 DC 接触器 (150A)</text>';
-    s+='<rect x="510" y="180" width="250" height="90" rx="4" fill="#0f1729" stroke="#f59e0b"/>';
-    s+='<text x="520" y="198" fill="#f59e0b" font-size="10" font-weight="700">B. 关键模块 (供电链)</text>';
-    s+='<text x="520" y="215" fill="#c2c0b6" font-size="9">FU1/FU2/FU3 直流快熔 (200A)</text>';
-    s+='<text x="520" y="229" fill="#c2c0b6" font-size="9">K9/K10 PCS DC 输出 200A-24V</text>';
-    s+='<text x="520" y="243" fill="#c2c0b6" font-size="9">KM1 AC 三相 | KM2 N线 (NCHB-40/11)</text>';
-    s+='<text x="520" y="257" fill="#c2c0b6" font-size="9">直流电表 DV | 三合一天线</text>';
-    s+='<rect x="510" y="285" width="250" height="80" rx="4" fill="#0f1729" stroke="#50c878"/>';
-    s+='<text x="520" y="303" fill="#50c878" font-size="10" font-weight="700">C. 通信矩阵</text>';
-    s+='<text x="520" y="320" fill="#c2c0b6" font-size="9">SECC ↔ EVCC (CAN + PLC HomePlug)</text>';
-    s+='<text x="520" y="334" fill="#c2c0b6" font-size="9">VCU ↔ BCU (CAN 内网, ON 档唤醒)</text>';
-    s+='<text x="520" y="348" fill="#c2c0b6" font-size="9">SECC ↔ OCPP (4G/以太网 ↔ 平台)</text>';
-    s+='<rect x="510" y="380" width="250" height="100" rx="4" fill="#0f1729" stroke="#e06070"/>';
-    s+='<text x="520" y="398" fill="#e06070" font-size="10" font-weight="700">D. 安全保护</text>';
-    s+='<text x="520" y="415" fill="#c2c0b6" font-size="9">PE 接地 | N 零线单独走 KM2</text>';
-    s+='<text x="520" y="429" fill="#c2c0b6" font-size="9">CP 控制确认 | PP 缆径识别</text>';
-    s+='<text x="520" y="443" fill="#c2c0b6" font-size="9">绝缘监测 RS1/RS2 双向注入</text>';
-    s+='<text x="520" y="457" fill="#c2c0b6" font-size="9">电子锁+反馈防意外脱落</text>';
-    s+='<rect x="510" y="495" width="250" height="130" rx="4" fill="#0f1729" stroke="#8B5CF6"/>';
-    s+='<text x="520" y="513" fill="#8B5CF6" font-size="10" font-weight="700">E. 启动时序 (28 步)</text>';
-    s+='<text x="520" y="528" fill="#c2c0b6" font-size="9">0 上电 → 1 微合 → 2 VCU 启动</text>';
-    s+='<text x="520" y="542" fill="#c2c0b6" font-size="9">3 BCU 自检 → 4 预充母线</text>';
-    s+='<text x="520" y="556" fill="#c2c0b6" font-size="9">5 待充 → 6 AC/DC/BC 8 EVCC 鉴权</text>';
-    s+='<text x="520" y="570" fill="#c2c0b6" font-size="9">9 K4 合闸 → 10 DC 补电</text>';
-    s+='<text x="520" y="584" fill="#c2c0b6" font-size="9">12 AC 补电 (KM1/KM2/K9/K10/K6)</text>';
-    s+='<text x="520" y="598" fill="#c2c0b6" font-size="9">19 整车 EV → 23 30kW DC/DC</text>';
-    s+='<text x="520" y="612" fill="#c2c0b6" font-size="9">25 闭锁 → 27 急停统一处理</text>';
+    titleEl.textContent='欧标移动充电桩 - 完整电气原理图 (28 步交互)';
+    if(iframe){iframe.style.display='block';iframe.src='charging_schematic_detail.html?step=0';}
+    const svgBox=document.getElementById('chElecSvg');
+    if(svgBox&&svgBox.querySelector('svg')) svgBox.querySelector('svg').style.display='none';
+    bomEl.innerHTML=chEuBomHtml();
+    paramsEl.innerHTML=chEuParamsHtml();
+    protectionEl.innerHTML=chEuProtectionHtml();
+  }else if(type==='gb_integrated'){
+    titleEl.textContent='国标一体式直流充电桩原理图 (GB/T 27930)';
+    if(iframe) iframe.style.display='none';
+    let s='<svg viewBox="0 0 900 660" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0a0e1a;font-family:-apple-system,sans-serif">';
+    s+='<text x="450" y="22" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">国标一体式直流充电桩 - 60kW (GB/T 27930)</text>';
+    s+='<rect x="20" y="40" width="860" height="600" rx="6" fill="none" stroke="#334155" stroke-width="0.5"/>';
+    s+='<text x="450" y="58" text-anchor="middle" fill="#94a3b8" font-size="10">三相 AC 380V → DC 200-750V / 60kW 双枪</text>';
+    s+='<rect x="40" y="70" width="120" height="40" rx="4" fill="#1e3a5f" stroke="#4a90d9"/>';
+    s+='<text x="100" y="92" text-anchor="middle" fill="#4a90d9" font-size="10">三相 AC L1/L2/L3/N/PE</text>';
+    s+='<line x1="100" y1="110" x2="100" y2="128" stroke="#4a90d9" stroke-width="2.5"/>';
+    s+='<rect x="40" y="128" width="120" height="32" rx="4" fill="#1e3a5f" stroke="#f59e0b"/>';
+    s+='<text x="100" y="148" text-anchor="middle" fill="#f59e0b" font-size="10">进线断路器 QF1</text>';
+    s+='<rect x="40" y="172" width="120" height="32" rx="4" fill="#1e3a5f" stroke="#f59e0b"/>';
+    s+='<text x="100" y="192" text-anchor="middle" fill="#f59e0b" font-size="10">浪涌保护器 SPD</text>';
+    s+='<rect x="40" y="216" width="120" height="32" rx="4" fill="#1e3a5f" stroke="#e06070"/>';
+    s+='<text x="100" y="236" text-anchor="middle" fill="#e06070" font-size="10">漏电保护 RCD</text>';
+    s+='<rect x="40" y="260" width="120" height="36" rx="4" fill="#1e3a5f" stroke="#e8a838"/>';
+    s+='<text x="100" y="278" text-anchor="middle" fill="#e8a838" font-size="10">智能电表 0.5S</text>';
+    s+='<line x1="100" y1="296" x2="100" y2="316" stroke="#4a90d9" stroke-width="2.5"/>';
+    s+='<rect x="40" y="316" width="120" height="60" rx="4" fill="#3d1820" stroke="#e06070"/>';
+    s+='<text x="100" y="340" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">30kW AC/DC 模块</text>';
+    s+='<text x="100" y="354" text-anchor="middle" fill="#e06070" font-size="9">× 2 并联 = 60kW</text>';
+    s+='<text x="100" y="368" text-anchor="middle" fill="#e06070" font-size="9">PFC 三相整流</text>';
+    s+='<line x1="100" y1="376" x2="100" y2="396" stroke="#f59e0b" stroke-width="2.5"/>';
+    s+='<rect x="40" y="396" width="120" height="32" rx="4" fill="#1e3a5f" stroke="#4a90d9"/>';
+    s+='<text x="100" y="416" text-anchor="middle" fill="#4a90d9" font-size="10">直流母线电容 DC-Link</text>';
+    s+='<line x1="100" y1="428" x2="100" y2="448" stroke="#f59e0b" stroke-width="2.5"/>';
+    s+='<rect x="40" y="448" width="120" height="60" rx="4" fill="#3d1820" stroke="#e06070"/>';
+    s+='<text x="100" y="472" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">DC/DC 隔离变换</text>';
+    s+='<text x="100" y="486" text-anchor="middle" fill="#e06070" font-size="9">高频隔离变压器</text>';
+    s+='<text x="100" y="500" text-anchor="middle" fill="#e06070" font-size="9">200-750V 输出</text>';
+    s+='<line x1="100" y1="508" x2="100" y2="528" stroke="#f59e0b" stroke-width="2.5"/>';
+    s+='<rect x="40" y="528" width="120" height="32" rx="4" fill="#1e3a5f" stroke="#4a90d9"/>';
+    s+='<text x="100" y="548" text-anchor="middle" fill="#4a90d9" font-size="10">输出接触器 K1</text>';
+    s+='<line x1="100" y1="560" x2="100" y2="580" stroke="#f59e0b" stroke-width="2.5"/>';
+    s+='<rect x="40" y="580" width="120" height="50" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/>';
+    s+='<text x="100" y="600" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">国标充电枪</text>';
+    s+='<text x="100" y="614" text-anchor="middle" fill="#8B5CF6" font-size="9">双枪 (DC+/DC-/PE/S+/S-/CC1/CC2)</text>';
+    s+='<text x="100" y="626" text-anchor="middle" fill="#8B5CF6" font-size="9">GB/T 20234.3</text>';
+    s+='<rect x="220" y="70" width="280" height="280" rx="4" fill="#0f1729" stroke="#a0a0ff"/>';
+    s+='<text x="230" y="90" fill="#a0a0ff" font-size="11" font-weight="700">充电控制器 (CCU)</text>';
+    s+='<line x1="220" y1="98" x2="500" y2="98" stroke="#334155" stroke-width="0.5"/>';
+    s+='<text x="230" y="116" fill="#c2c0b6" font-size="10">• 主控 CPU: STM32F407 + CPLD</text>';
+    s+='<text x="230" y="134" fill="#c2c0b6" font-size="10">• BMS 通信: CAN 隔离 (GB/T 27930)</text>';
+    s+='<text x="230" y="152" fill="#c2c0b6" font-size="10">• 鉴权: RFID + 密码 + 即插即充</text>';
+    s+='<text x="230" y="170" fill="#c2c0b6" font-size="10">• 电表通信: RS485 (DL/T 645)</text>';
+    s+='<text x="230" y="188" fill="#c2c0b6" font-size="10">• 触摸屏: 7寸 1024×600</text>';
+    s+='<text x="230" y="206" fill="#c2c0b6" font-size="10">• 状态指示: 三色灯 + 蜂鸣器</text>';
+    s+='<text x="230" y="224" fill="#c2c0b6" font-size="10">• 紧急停机: 急停按钮 + 安全门锁</text>';
+    s+='<text x="230" y="242" fill="#c2c0b6" font-size="10">• 温度监测: 枪头 NTC + 散热器 KTY</text>';
+    s+='<text x="230" y="260" fill="#c2c0b6" font-size="10">• 风扇控制: PWM 调速</text>';
+    s+='<text x="230" y="278" fill="#c2c0b6" font-size="10">• 锁枪驱动: 12V 电磁锁</text>';
+    s+='<text x="230" y="296" fill="#c2c0b6" font-size="10">• 接触器控制: K1/K2/K3 + 状态反馈</text>';
+    s+='<text x="230" y="314" fill="#c2c0b6" font-size="10">• CC 信号: 1kHz PWM 调制</text>';
+    s+='<text x="230" y="332" fill="#c2c0b6" font-size="10">• CP 检测: 12V/6V/PWM</text>';
+    s+='<rect x="220" y="370" width="280" height="160" rx="4" fill="#0f1729" stroke="#50c878"/>';
+    s+='<text x="230" y="390" fill="#50c878" font-size="11" font-weight="700">绝缘监测 + 保护</text>';
+    s+='line'+s;
+    s+='<text x="230" y="408" fill="#c2c0b6" font-size="10">• 直流绝缘检测: 平衡桥法</text>';
+    s+='<text x="230" y="426" fill="#c2c0b6" font-size="10">• 输出过压保护: TVS + 压敏电阻</text>';
+    s+='<text x="230" y="444" fill="#c2c0b6" font-size="10">• 输出过流保护: 霍尔传感器 + 软件</text>';
+    s+='<text x="230" y="462" fill="#c2c0b6" font-size="10">• 短路保护: IGBT 自保护 + 熔断器</text>';
+    s+='<text x="230" y="480" fill="#c2c0b6" font-size="10">• 过温保护: 多点 NTC + 降额运行</text>';
+    s+='<text x="230" y="498" fill="#c2c0b6" font-size="10">• 反接保护: 二极管桥式</text>';
+    s+='<text x="230" y="516" fill="#c2c0b6" font-size="10">• 接地保护: PE 持续监测</text>';
+    s+='<rect x="220" y="546" width="280" height="92" rx="4" fill="#0f1729" stroke="#f59e0b"/>';
+    s+='<text x="230" y="566" fill="#f59e0b" font-size="11" font-weight="700">通信接口</text>';
+    s+='<text x="230" y="584" fill="#c2c0b6" font-size="10">• CAN 1: 与车辆 BMS (GB/T 27930)</text>';
+    s+='<text x="230" y="602" fill="#c2c0b6" font-size="10">• CAN 2: 模块间均流通信</text>';
+    s+='<text x="230" y="620" fill="#c2c0b6" font-size="10">• RS485: 智能电表 (DL/T 645)</text>';
+    s+='<text x="630" y="92" fill="#f59e0b" font-size="11" font-weight="700">上行通信</text>';
+    s+='<text x="630" y="110" fill="#c2c0b6" font-size="10">• 4G/Ethernet: 后台系统</text>';
+    s+='<text x="630" y="128" fill="#c2c0b6" font-size="10">• OCPP 1.6J (海外)</text>';
+    s+='<text x="630" y="146" fill="#c2c0b6" font-size="10">• 中电联 T/CEC 102 (国内)</text>';
+    s+='<text x="630" y="164" fill="#c2c0b6" font-size="10">• OTA 远程升级</text>';
+    s+='<text x="630" y="182" fill="#c2c0b6" font-size="10">• 北斗/GPS 定位 (可选)</text>';
+    s+='<rect x="620" y="200" width="240" height="160" rx="4" fill="#0f1729" stroke="#06b6d4"/>';
+    s+='<text x="630" y="220" fill="#06b6d4" font-size="11" font-weight="700">辅助电源</text>';
+    s+='<text x="630" y="238" fill="#c2c0b6" font-size="10">• AC/DC 辅助: 220V→24V/12V/5V</text>';
+    s+='<text x="630" y="256" fill="#c2c0b6" font-size="10">• 24V: 接触器/风扇/锁枪</text>';
+    s+='<text x="630" y="274" fill="#c2c0b6" font-size="10">• 12V: 触摸屏/RFID/通信</text>';
+    s+='<text x="630" y="292" fill="#c2c0b6" font-size="10">• 5V: 主控/传感器</text>';
+    s+='<text x="630" y="310" fill="#c2c0b6" font-size="10">• 备用电池: 30min 应急停机</text>';
+    s+='<text x="630" y="328" fill="#c2c0b6" font-size="10">• 功率: 300W + 100W 冗余</text>';
+    s+='<rect x="620" y="380" width="240" height="240" rx="4" fill="#0f1729" stroke="#8B5CF6"/>';
+    s+='<text x="630" y="400" fill="#8B5CF6" font-size="11" font-weight="700">GB/T 27930 充电流程</text>';
+    s+='<text x="630" y="418" fill="#c2c0b6" font-size="10">阶段1 - 物理连接完成</text>';
+    s+='<text x="630" y="436" fill="#c2c0b6" font-size="10">  • 检测点 1: 12V 正常</text>';
+    s+='<text x="630" y="454" fill="#c2c0b6" font-size="10">  • 检测点 2: 绝缘电阻 > 100kΩ</text>';
+    s+='<text x="630" y="472" fill="#c2c0b6" font-size="10">阶段2 - 握手 (CHM/CRM)</text>';
+    s+='<text x="630" y="490" fill="#c2c0b6" font-size="10">  • 桩辨识 BMS 协议版本</text>';
+    s+='<text x="630" y="508" fill="#c2c0b6" font-size="10">阶段3 - 参数配置</text>';
+    s+='<text x="630" y="526" fill="#c2c0b6" font-size="10">  • 报文: CTS/CML/CRO</text>';
+    s+='<text x="630" y="544" fill="#c2c0b6" font-size="10">阶段4 - 充电就绪</text>';
+    s+='<text x="630" y="562" fill="#c2c0b6" font-size="10">  • K1 闭合, BST/CSO</text>';
+    s+='<text x="630" y="580" fill="#c2c0b6" font-size="10">阶段5 - 充电 (CCS/CCV/CST)</text>';
+    s+='<text x="630" y="598" fill="#c2c0b6" font-size="10">  • 实时调整电压/电流</text>';
+    s+='<text x="630" y="616" fill="#c2c0b6" font-size="10">阶段6 - 结束 (CSD/CEM)</text>';
     s+='</svg>';
-    svgEl.innerHTML=s;
-    bomEl.innerHTML='<table class="result-table" style="font-size:10px"><tr><th>代号</th><th>名称</th><th>规格</th></tr>'+
-    '<tr><td>SPD</td><td>浪涌保护器</td><td>3P+N 40kA</td></tr>'+
-    '<tr><td>KM1/KM2</td><td>三相/N线接触器</td><td>NCHB-40/11 24VS</td></tr>'+
-    '<tr><td>PCS</td><td>双向变流器</td><td>22kW AC/DC (PFC)</td></tr>'+
-    '<tr><td>K1/K2</td><td>主正/主负继电器</td><td>200A-24V DC</td></tr>'+
-    '<tr><td>K3</td><td>预充继电器</td><td>50A-24V + 200W/30R</td></tr>'+
-    '<tr><td>K4</td><td>充电接触器</td><td>200A-24V</td></tr>'+
-    '<tr><td>K5</td><td>加热接触器</td><td>200A-24V</td></tr>'+
-    '<tr><td>K6</td><td>AC输入接触器</td><td>200A-24V</td></tr>'+
-    '<tr><td>K7/K8</td><td>整车DC接触器</td><td>200A-24V × 2</td></tr>'+
-    '<tr><td>K9/K10</td><td>PCS DC输出</td><td>200A-24V × 2</td></tr>'+
-    '<tr><td>FU1-3</td><td>熔断器</td><td>直流快熔 200A</td></tr>'+
-    '<tr><td>DC/DC</td><td>充电模块</td><td>30kW × 2 (M1/M2)</td></tr>'+
-    '<tr><td>RS1/RS2</td><td>绝缘监测</td><td>双向注入</td></tr>'+
-    '<tr><td>EVCC/SECC</td><td>充控板</td><td>CCS2 / OCPP</td></tr>'+
-    '<tr><td>电源</td><td>4500W-24V + 300W-12V</td><td>双路开关电源</td></tr>'+
-    '</table>';
-  }else if(type==='power_cabinet'){
-    titleEl.textContent='600kW 液冷超充堆一次接线图 (分体式)';
-    let s2='<svg viewBox="0 0 800 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">';
-    s2+='<text x="400" y="22" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">600kW 液冷超充堆一次接线图</text>';
-    s2+='<rect x="60" y="60" width="120" height="40" rx="4" fill="#1e3a5f" stroke="#4a90d9"/><text x="120" y="85" text-anchor="middle" fill="#4a90d9" font-size="11">10kV 进线</text>';
-    s2+='<rect x="60" y="140" width="120" height="40" rx="4" fill="#1e3a5f" stroke="#e8a838"/><text x="120" y="165" text-anchor="middle" fill="#e8a838" font-size="11">1000kVA 变压器</text>';
-    s2+='<rect x="240" y="140" width="120" height="40" rx="4" fill="#3d1820" stroke="#e06070"/><text x="300" y="165" text-anchor="middle" fill="#e06070" font-size="11">AC 配电柜</text>';
-    s2+='<rect x="420" y="100" width="120" height="60" rx="4" fill="#3d1820" stroke="#e06070"/><text x="480" y="125" text-anchor="middle" fill="#fff" font-size="10">AC/DC 整流柜</text><text x="480" y="140" text-anchor="middle" fill="#e06070" font-size="9">150kW × 4</text>';
-    s2+='<rect x="420" y="190" width="120" height="60" rx="4" fill="#0d2a15" stroke="#50c878"/><text x="480" y="215" text-anchor="middle" fill="#fff" font-size="10">DC/DC 液冷柜</text><text x="480" y="230" text-anchor="middle" fill="#50c878" font-size="9">150kW × 4</text>';
-    s2+='<rect x="600" y="140" width="120" height="80" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/><text x="660" y="170" text-anchor="middle" fill="#8B5CF6" font-size="11">充电终端</text><text x="660" y="188" text-anchor="middle" fill="#8B5CF6" font-size="9">双枪 480kW</text><text x="660" y="202" text-anchor="middle" fill="#8B5CF6" font-size="9">单枪 720kW</text>';
-    s2+='<line x1="120" y1="100" x2="120" y2="140" stroke="#4a90d9" stroke-width="2"/>';
-    s2+='<line x1="180" y1="160" x2="240" y2="160" stroke="#4a90d9" stroke-width="2"/>';
-    s2+='<line x1="360" y1="160" x2="420" y2="130" stroke="#4a90d9" stroke-width="2"/>';
-    s2+='<line x1="480" y1="160" x2="480" y2="190" stroke="#f59e0b" stroke-width="2"/>';
-    s2+='<line x1="540" y1="220" x2="600" y2="180" stroke="#f59e0b" stroke-width="2"/>';
-    s2+='<text x="400" y="340" text-anchor="middle" fill="#94a3b8" font-size="11">功率分配 (PDU): 4×AC/DC + 4×DC/DC 串联, 总输出 600kW</text>';
-    s2+='<text x="400" y="360" text-anchor="middle" fill="#94a3b8" font-size="11">CDU 液冷循环: 12L/min, 乙二醇水溶液, ≤30℃ 温升</text>';
-    s2+='<text x="400" y="380" text-anchor="middle" fill="#94a3b8" font-size="11">液冷枪线: 菲尼克斯 CCS2 / 国标液冷</text>';
-    s2+='<text x="400" y="400" text-anchor="middle" fill="#94a3b8" font-size="11">散热方式: 冷板直贴 IGBT + 液冷枪线循环</text>';
-    s2+='<text x="400" y="430" text-anchor="middle" fill="#475569" font-size="9">依据: GB/T 27930 · IEC 61851-23 · GB/T 18487.1</text>';
+    let svgBox2=document.getElementById('chElecSvg');
+    let oldIframe=svgBox2.querySelector('iframe');
+    if(oldIframe){oldIframe.style.display='none';}
+    let oldSvg=svgBox2.querySelector('svg');
+    if(oldSvg) oldSvg.remove();
+    svgBox2.insertAdjacentHTML('beforeend',s);
+    bomEl.innerHTML=chGbBomHtml();
+    paramsEl.innerHTML=chGbParamsHtml();
+    protectionEl.innerHTML=chGbProtectionHtml();
+  }else if(type==='liquid_cooling'){
+    titleEl.textContent='液冷超充堆 - 720kW (双枪 480 + 单枪 720)';
+    if(iframe) iframe.style.display='none';
+    let s2='<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0a0e1a">';
+    s2+='<text x="450" y="22" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">液冷超充堆 - 720kW 全液冷拓扑</text>';
+    s2+='<rect x="20" y="40" width="860" height="540" rx="6" fill="none" stroke="#334155" stroke-width="0.5"/>';
+    s2+='<rect x="40" y="60" width="100" height="40" rx="4" fill="#1e3a5f" stroke="#4a90d9"/>';
+    s2+='<text x="90" y="82" text-anchor="middle" fill="#4a90d9" font-size="10">10kV 进线</text>';
+    s2+='line1'+'';
+    s2+='<rect x="40" y="120" width="100" height="40" rx="4" fill="#1e3a5f" stroke="#e8a838"/>';
+    s2+='<text x="90" y="142" text-anchor="middle" fill="#e8a838" font-size="10">1600kVA 干变</text>';
+    s2+='<rect x="40" y="180" width="100" height="40" rx="4" fill="#3d1820" stroke="#e06070"/>';
+    s2+='<text x="90" y="202" text-anchor="middle" fill="#e06070" font-size="10">AC 配电柜</text>';
+    s2+='<rect x="220" y="120" width="120" height="40" rx="4" fill="#3d1820" stroke="#e06070"/>';
+    s2+='<text x="280" y="142" text-anchor="middle" fill="#e06070" font-size="10">PFC 整流模块</text>';
+    s2+='<text x="280" y="156" text-anchor="middle" fill="#e06070" font-size="9">180kW × 4</text>';
+    s2+='<rect x="380" y="120" width="120" height="40" rx="4" fill="#0d2a15" stroke="#50c878"/>';
+    s2+='<text x="440" y="142" text-anchor="middle" fill="#50c878" font-size="10">DC/DC 液冷模块</text>';
+    s2+='<text x="440" y="156" text-anchor="middle" fill="#50c878" font-size="9">180kW × 4 (液冷板)</text>';
+    s2+='<rect x="540" y="60" width="160" height="40" rx="4" fill="#0f1729" stroke="#06b6d4"/>';
+    s2+='<text x="620" y="82" text-anchor="middle" fill="#06b6d4" font-size="10">CDU 冷量分配单元</text>';
+    s2+='<text x="620" y="96" text-anchor="middle" fill="#06b6d4" font-size="9">15kW 制冷 / 12L/min</text>';
+    s2+='<rect x="540" y="120" width="160" height="40" rx="4" fill="#0f1729" stroke="#06b6d4"/>';
+    s2+='<text x="620" y="142" text-anchor="middle" fill="#06b6d4" font-size="10">功率模块液冷板</text>';
+    s2+='<text x="620" y="156" text-anchor="middle" fill="#06b6d4" font-size="9">IGBT/SiC 直贴</text>';
+    s2+='<rect x="540" y="180" width="160" height="40" rx="4" fill="#0f1729" stroke="#06b6d4"/>';
+    s2+='<text x="620" y="202" text-anchor="middle" fill="#06b6d4" font-size="10">变压器冷板</text>';
+    s2+='<text x="620" y="216" text-anchor="middle" fill="#06b6d4" font-size="9">绕组直贴冷却</text>';
+    s2+='<rect x="730" y="100" width="140" height="60" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/>';
+    s2+='<text x="800" y="122" text-anchor="middle" fill="#8B5CF6" font-size="11" font-weight="700">液冷枪线</text>';
+    s2+='<text x="800" y="138" text-anchor="middle" fill="#8B5CF6" font-size="9">CCS2 / 国标 双枪</text>';
+    s2+='<text x="800" y="152" text-anchor="middle" fill="#8B5CF6" font-size="9">720kW 单枪</text>';
+    s2+='<line x1="90" y1="100" x2="90" y2="120" stroke="#4a90d9" stroke-width="2"/>';
+    s2+='<line x1="90" y1="160" x2="90" y2="180" stroke="#4a90d9" stroke-width="2"/>';
+    s2+='<line x1="140" y1="200" x2="220" y2="140" stroke="#4a90d9" stroke-width="2"/>';
+    s2+='<line x1="340" y1="140" x2="380" y2="140" stroke="#f59e0b" stroke-width="2.5"/>';
+    s2+='<line x1="500" y1="140" x2="540" y2="80" stroke="#06b6d4" stroke-width="2"/>';
+    s2+='<line x1="500" y1="140" x2="540" y2="140" stroke="#06b6d4" stroke-width="2"/>';
+    s2+='<line x1="500" y1="140" x2="540" y2="200" stroke="#06b6d4" stroke-width="2"/>';
+    s2+='<line x1="500" y1="140" x2="730" y2="125" stroke="#8B5CF6" stroke-width="2.5"/>';
+    s2+='<line x1="620" y1="100" x2="620" y2="120" stroke="#06b6d4" stroke-width="1.5"/>';
+    s2+='<line x1="620" y1="160" x2="620" y2="180" stroke="#06b6d4" stroke-width="1.5"/>';
+    s2+='<rect x="40" y="260" width="380" height="80" rx="4" fill="#0f1729" stroke="#06b6d4"/>';
+    s2+='<text x="50" y="280" fill="#06b6d4" font-size="11" font-weight="700">液冷循环系统</text>';
+    s2+='<text x="50" y="298" fill="#c2c0b6" font-size="10">• 循环介质: 50% 乙二醇水溶液</text>';
+    s2+='<text x="50" y="314" fill="#c2c0b6" font-size="10">• 流量: 12 L/min | 工作压力: 4 bar</text>';
+    s2+='<text x="50" y="330" fill="#c2c0b6" font-size="10">• 进水 ≤35℃ / 回水 ≤65℃ / 温升 ≤30℃</text>';
+    s2+='<rect x="430" y="260" width="200" height="80" rx="4" fill="#0f1729" stroke="#06b6d4"/>';
+    s2+='<text x="440" y="280" fill="#06b6d4" font-size="11" font-weight="700">管路设计</text>';
+    s2+='<text x="440" y="298" fill="#c2c0b6" font-size="10">• DN20-DN32 不锈钢</text>';
+    s2+='<text x="440" y="314" fill="#c2c0b6" font-size="10">• EPDM 密封圈</text>';
+    s2+='<text x="440" y="330" fill="#c2c0b6" font-size="10">• 泄漏传感器 + 自动关断</text>';
+    s2+='<rect x="640" y="260" width="240" height="80" rx="4" fill="#0f1729" stroke="#06b6d4"/>';
+    s2+='<text x="650" y="280" fill="#06b6d4" font-size="11" font-weight="700">监测保护</text>';
+    s2+='<text x="650" y="298" fill="#c2c0b6" font-size="10">• 进/出水温度 + 压力</text>';
+    s2+='<text x="650" y="314" fill="#c2c0b6" font-size="10">• 流量计 + 电导率</text>';
+    s2+='<text x="650" y="330" fill="#c2c0b6" font-size="10">• 漏液检测 + 自动告警</text>';
+    s2+='<rect x="40" y="360" width="380" height="200" rx="4" fill="#0f1729" stroke="#f59e0b"/>';
+    s2+='<text x="50" y="380" fill="#f59e0b" font-size="11" font-weight="700">功率分配策略</text>';
+    s2+='<text x="50" y="398" fill="#c2c0b6" font-size="10">• 双枪同时: 480kW + 240kW</text>';
+    s2+='<text x="50" y="416" fill="#c2c0b6" font-size="10">• 单枪满载: 720kW (4 模块全功率)</text>';
+    s2+='<text x="50" y="434" fill="#c2c0b6" font-size="10">• 智能均流: 模块自动负载均衡</text>';
+    s2+='<text x="50" y="452" fill="#c2c0b6" font-size="10">• 动态降额: 温度/电网异常降功率</text>';
+    s2+='<text x="50" y="470" fill="#c2c0b6" font-size="10">• 模块冗余: N+1 配置 (5 模块运行)</text>';
+    s2+='<text x="50" y="488" fill="#c2c0b6" font-size="10">• 休眠策略: 低负载自动关模块</text>';
+    s2+='<text x="50" y="506" fill="#c2c0b6" font-size="10">• 故障模块自动旁路</text>';
+    s2+='<text x="50" y="524" fill="#c2c0b6" font-size="10">• SiC 器件: 97% 峰值效率</text>';
+    s2+='<text x="50" y="542" fill="#c2c0b6" font-size="10">• 总谐波 THDi < 3%</text>';
+    s2+='<rect x="430" y="360" width="450" height="200" rx="4" fill="#0f1729" stroke="#50c878"/>';
+    s2+='<text x="440" y="380" fill="#50c878" font-size="11" font-weight="700">液冷枪线技术参数</text>';
+    s2+='<text x="440" y="398" fill="#c2c0b6" font-size="10">• 持续电流: 600A (单枪), 800A (峰值)</text>';
+    s2+='<text x="440" y="416" fill="#c2c0b6" font-size="10">• 电压等级: 1000V DC</text>';
+    s2+='<text x="440" y="434" fill="#c2c0b6" font-size="10">• 线径: 80mm² (主), 25mm² (信号)</text>';
+    s2+='<text x="440" y="452" fill="#c2c0b6" font-size="10">• 冷却通道: 双回路 (进/出)</text>';
+    s2+='<text x="440" y="470" fill="#c2c0b6" font-size="10">• 重量: < 8kg (柔性电缆)</text>';
+    s2+='<text x="440" y="488" fill="#c2c0b6" font-size="10">• 弯曲半径: > 200mm</text>';
+    s2+='<text x="440" y="506" fill="#c2c0b6" font-size="10">• 接口: CCS2 / 国标 / NACS</text>';
+    s2+='<text x="440" y="524" fill="#c2c0b6" font-size="10">• IP 防护: IP67 (插合状态)</text>';
+    s2+='<text x="440" y="542" fill="#c2c0b6" font-size="10">• 电子锁 + 温度实时监测</text>';
     s2+='</svg>';
-    svgEl.innerHTML=s2;
-    bomEl.innerHTML='<p>超充堆 BOM: 1000kVA 变压器 + AC 配电柜 + 4×150kW AC/DC 整流柜 + 4×150kW DC/DC 液冷柜 + CDU + 双枪液冷终端 + 液冷管线 (DN20-32)。</p>';
+    let sb=document.getElementById('chElecSvg');
+    let oi=sb.querySelector('iframe');if(oi) oi.style.display='none';
+    let os=sb.querySelector('svg');if(os) os.remove();
+    sb.insertAdjacentHTML('beforeend',s2);
+    bomEl.innerHTML=chLcBomHtml();
+    paramsEl.innerHTML=chLcParamsHtml();
+    protectionEl.innerHTML=chLcProtectionHtml();
+  }else if(type==='station_sld'){
+    titleEl.textContent='充电站一次系统图 (10kV / 0.4kV / 充电堆)';
+    if(iframe) iframe.style.display='none';
+    let s3='<svg viewBox="0 0 900 640" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0a0e1a">';
+    s3+='<text x="450" y="22" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">充电站一次系统图 (示例: 8 堆 / 16 枪 / 4.8MW)</text>';
+    s3+='<rect x="40" y="60" width="120" height="60" rx="4" fill="#1e3a5f" stroke="#4a90d9"/>';
+    s3+='<text x="100" y="86" text-anchor="middle" fill="#4a90d9" font-size="11">10kV 电网</text>';
+    s3+='<text x="100" y="104" text-anchor="middle" fill="#4a90d9" font-size="10">市电/专线</text>';
+    s3+='<line x1="160" y1="90" x2="200" y2="90" stroke="#4a90d9" stroke-width="3"/>';
+    s3+='<rect x="200" y="60" width="120" height="60" rx="4" fill="#1e3a5f" stroke="#f59e0b"/>';
+    s3+='<text x="260" y="86" text-anchor="middle" fill="#f59e0b" font-size="11">10kV 进线柜</text>';
+    s3+='<text x="260" y="104" text-anchor="middle" fill="#f59e0b" font-size="10">QF + 计量</text>';
+    s3+='<line x1="320" y1="90" x2="360" y2="90" stroke="#4a90d9" stroke-width="3"/>';
+    s3+='<rect x="360" y="60" width="140" height="60" rx="4" fill="#1e3a5f" stroke="#e8a838"/>';
+    s3+='<text x="430" y="86" text-anchor="middle" fill="#e8a838" font-size="11">5MVA 升压变压器</text>';
+    s3+='<text x="430" y="104" text-anchor="middle" fill="#e8a838" font-size="10">10/0.4kV Dyn11</text>';
+    s3+='<line x1="500" y1="90" x2="540" y2="90" stroke="#4a90d9" stroke-width="3"/>';
+    s3+='<rect x="540" y="60" width="100" height="60" rx="4" fill="#1e3a5f" stroke="#f59e0b"/>';
+    s3+='<text x="590" y="86" text-anchor="middle" fill="#f59e0b" font-size="11">0.4kV 总柜</text>';
+    s3+='<text x="590" y="104" text-anchor="middle" fill="#f59e0b" font-size="10">主断路器</text>';
+    s3+='<line x1="640" y1="90" x2="680" y2="90" stroke="#4a90d9" stroke-width="3"/>';
+    s3+='<line x1="640" y1="120" x2="640" y2="160" stroke="#4a90d9" stroke-width="3"/>';
+    s3+='<line x1="640" y1="160" x2="60" y2="160" stroke="#4a90d9" stroke-width="2"/>';
+    s3+='<line x1="60" y1="160" x2="60" y2="200" stroke="#4a90d9" stroke-width="2"/>';
+    s3+='<line x1="60" y1="200" x2="170" y2="200" stroke="#4a90d9" stroke-width="2"/>';
+    s3+='<line x1="60" y1="200" x2="60" y2="280" stroke="#4a90d9" stroke-width="2"/>';
+    s3+='<line x1="60" y1="280" x2="170" y2="280" stroke="#4a90d9" stroke-width="2"/>';
+    s3+='<line x1="60" y1="280" x2="60" y2="360" stroke="#4a90d9" stroke-width="2"/>';
+    s3+='<line x1="60" y1="360" x2="170" y2="360" stroke="#4a90d9" stroke-width="2"/>';
+    s3+='<line x1="60" y1="360" x2="60" y2="440" stroke="#4a90d9" stroke-width="2"/>';
+    s3+='<line x1="60" y1="440" x2="170" y2="440" stroke="#4a90d9" stroke-width="2"/>';
+    s3+='<rect x="170" y="180" width="180" height="40" rx="4" fill="#3d1820" stroke="#e06070"/>';
+    s3+='<text x="260" y="204" text-anchor="middle" fill="#e06070" font-size="11">充电堆 1 (600kW 液冷)</text>';
+    s3+='<rect x="170" y="260" width="180" height="40" rx="4" fill="#3d1820" stroke="#e06070"/>';
+    s3+='<text x="260" y="284" text-anchor="middle" fill="#e06070" font-size="11">充电堆 2 (600kW 液冷)</text>';
+    s3+='<rect x="170" y="340" width="180" height="40" rx="4" fill="#3d1820" stroke="#e06070"/>';
+    s3+='<text x="260" y="364" text-anchor="middle" fill="#e06070" font-size="11">充电堆 3 (600kW 液冷)</text>';
+    s3+='<rect x="170" y="420" width="180" height="40" rx="4" fill="#3d1820" stroke="#e06070"/>';
+    s3+='<text x="260" y="444" text-anchor="middle" fill="#e06070" font-size="11">充电堆 4 (600kW 液冷)</text>';
+    s3+='<rect x="170" y="500" width="180" height="40" rx="4" fill="#3d1820" stroke="#e06070"/>';
+    s3+='<text x="260" y="524" text-anchor="middle" fill="#e06070" font-size="11">充电堆 5 (600kW 液冷)</text>';
+    s3+='<line x1="350" y1="200" x2="400" y2="200" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<line x1="350" y1="280" x2="400" y2="280" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<line x1="350" y1="360" x2="400" y2="360" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<line x1="350" y1="440" x2="400" y2="440" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<line x1="350" y1="520" x2="400" y2="520" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<rect x="400" y="180" width="100" height="380" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/>';
+    s3+='<text x="450" y="200" text-anchor="middle" fill="#8B5CF6" font-size="11">直流母线</text>';
+    s3+='<text x="450" y="216" text-anchor="middle" fill="#8B5CF6" font-size="9">200-1000V DC</text>';
+    s3+='<line x1="450" y1="220" x2="450" y2="540" stroke="#8B5CF6" stroke-width="3"/>';
+    s3+='<text x="450" y="280" text-anchor="middle" fill="#8B5CF6" font-size="9">↓</text>';
+    s3+='<text x="450" y="370" text-anchor="middle" fill="#8B5CF6" font-size="9">↓</text>';
+    s3+='<text x="450" y="460" text-anchor="middle" fill="#8B5CF6" font-size="9">↓</text>';
+    s3+='<line x1="500" y1="200" x2="560" y2="200" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<line x1="500" y1="280" x2="560" y2="280" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<line x1="500" y1="360" x2="560" y2="360" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<line x1="500" y1="440" x2="560" y2="440" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<line x1="500" y1="520" x2="560" y2="520" stroke="#f59e0b" stroke-width="2"/>';
+    s3+='<rect x="560" y="180" width="120" height="40" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/>';
+    s3+='<text x="620" y="204" text-anchor="middle" fill="#8B5CF6" font-size="10">液冷双枪 480kW</text>';
+    s3+='<rect x="560" y="260" width="120" height="40" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/>';
+    s3+='<text x="620" y="284" text-anchor="middle" fill="#8B5CF6" font-size="10">液冷双枪 480kW</text>';
+    s3+='<rect x="560" y="340" width="120" height="40" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/>';
+    s3+='<text x="620" y="364" text-anchor="middle" fill="#8B5CF6" font-size="10">液冷双枪 480kW</text>';
+    s3+='<rect x="560" y="420" width="120" height="40" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/>';
+    s3+='<text x="620" y="444" text-anchor="middle" fill="#8B5CF6" font-size="10">液冷双枪 480kW</text>';
+    s3+='<rect x="560" y="500" width="120" height="40" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/>';
+    s3+='<text x="620" y="524" text-anchor="middle" fill="#8B5CF6" font-size="10">液冷双枪 480kW</text>';
+    s3+='<rect x="40" y="580" width="850" height="50" rx="4" fill="#0f1729" stroke="#a0a0ff"/>';
+    s3+='<text x="50" y="600" fill="#a0a0ff" font-size="11" font-weight="700">站控系统</text>';
+    s3+='<text x="50" y="618" fill="#c2c0b6" font-size="10">EMS 站控 SCADA | OCPP 网关 | 4G/以太网 | 计费/监控/需量管理 | 储能协同 (光伏 + 储能 + 充电)</text>';
+    s3+='</svg>';
+    let sb2=document.getElementById('chElecSvg');
+    let oi2=sb2.querySelector('iframe');if(oi2) oi2.style.display='none';
+    let os2=sb2.querySelector('svg');if(os2) os2.remove();
+    sb2.insertAdjacentHTML('beforeend',s3);
+    bomEl.innerHTML=chSldBomHtml();
+    paramsEl.innerHTML=chSldParamsHtml();
+    protectionEl.innerHTML=chSldProtectionHtml();
   }
 }
+
+function chEuBomHtml(){
+  return '<table class="result-table" style="font-size:10px">'+
+  '<tr><th>代号</th><th>名称</th><th>规格</th></tr>'+
+  '<tr><td>SPD</td><td>浪涌保护器</td><td>3P+N 40kA</td></tr>'+
+  '<tr><td>KM1/KM2</td><td>三相/N线接触器</td><td>NCHB-40/11 24VS</td></tr>'+
+  '<tr><td>PCS</td><td>双向变流器</td><td>22kW AC/DC (PFC)</td></tr>'+
+  '<tr><td>K1/K2</td><td>主正/主负继电器</td><td>200A-24V DC</td></tr>'+
+  '<tr><td>K3</td><td>预充继电器</td><td>50A-24V + 200W/30R</td></tr>'+
+  '<tr><td>K4</td><td>充电接触器</td><td>200A-24V</td></tr>'+
+  '<tr><td>K5</td><td>加热接触器</td><td>200A-24V</td></tr>'+
+  '<tr><td>K6</td><td>AC输入接触器</td><td>200A-24V</td></tr>'+
+  '<tr><td>K7/K8</td><td>整车DC接触器</td><td>200A-24V × 2</td></tr>'+
+  '<tr><td>K9/K10</td><td>PCS DC输出</td><td>200A-24V × 2</td></tr>'+
+  '<tr><td>FU1-3</td><td>熔断器</td><td>直流快熔 200A</td></tr>'+
+  '<tr><td>DC/DC</td><td>充电模块</td><td>30kW × 2 (M1/M2)</td></tr>'+
+  '<tr><td>RS1/RS2</td><td>绝缘监测</td><td>双向注入</td></tr>'+
+  '<tr><td>EVCC/SECC</td><td>充控板</td><td>CCS2 / OCPP</td></tr>'+
+  '<tr><td>电源</td><td>4500W-24V + 300W-12V</td><td>双路开关电源</td></tr>'+
+  '</table>';
+}
+
+function chEuParamsHtml(){
+  return '<table class="result-table" style="font-size:10px">'+
+  '<tr><th>参数</th><th>值</th></tr>'+
+  '<tr><td>AC 输入</td><td>380V 三相 / 50Hz / 22kW</td></tr>'+
+  '<tr><td>电池侧 DC</td><td>200-450V / 60-100Ah</td></tr>'+
+  '<tr><td>DC/DC 输出</td><td>200-750V / 60A max</td></tr>'+
+  '<tr><td>整车充电</td><td>200-750V / 150A 欧标</td></tr>'+
+  '<tr><td>电网侧充电</td><td>22kW 三相 PFC</td></tr>'+
+  '<tr><td>电子锁</td><td>12V / 24V 双电源</td></tr>'+
+  '<tr><td>通信</td><td>CAN × 3 + 4G + WiFi</td></tr>'+
+  '<tr><td>重量</td><td>约 200 kg (集成)</td></tr>'+
+  '<tr><td>防护等级</td><td>IP54 (户外增强版)</td></tr>'+
+  '</table>';
+}
+
+function chEuProtectionHtml(){
+  return '<b style="color:#e06070">多级保护:</b><br>'+
+  '① 漏电继电器 (RCD 30mA)<br>'+
+  '② 浪涌保护器 (SPD Type 2)<br>'+
+  '③ 直流快熔 (FU1-3)<br>'+
+  '④ 预充电阻 (30R/200W)<br>'+
+  '⑤ 绝缘监测 (RS1/RS2 双向)<br>'+
+  '⑥ 电子锁+反馈防脱落<br>'+
+  '⑦ VCU 急停响应 < 100ms<br>'+
+  '⑧ 急停按钮 (硬件级)<br>'+
+  '⑨ 温感+烟感多重监测';
+}
+
+function chGbBomHtml(){
+  return '<table class="result-table" style="font-size:10px">'+
+  '<tr><th>代号</th><th>名称</th><th>规格</th></tr>'+
+  '<tr><td>QF1</td><td>进线断路器</td><td>3P 100A</td></tr>'+
+  '<tr><td>SPD</td><td>浪涌保护器</td><td>3P+N 40kA</td></tr>'+
+  '<tr><td>RCD</td><td>漏电保护</td><td>30mA Type B</td></tr>'+
+  '<tr><td>AC/DC×2</td><td>PFC 整流模块</td><td>30kW × 2</td></tr>'+
+  '<tr><td>DC-Link</td><td>直流母线电容</td><td>450V/2200μF</td></tr>'+
+  '<tr><td>DC/DC</td><td>隔离 DC/DC</td><td>30kW 移相全桥</td></tr>'+
+  '<tr><td>K1</td><td>输出接触器</td><td>200A DC</td></tr>'+
+  '<tr><td>CCU</td><td>充电控制器</td><td>STM32F407</td></tr>'+
+  '<tr><td>CC 信号</td><td>1kHz PWM</td><td>GB/T 18487</td></tr>'+
+  '<tr><td>枪头</td><td>国标双枪</td><td>GB/T 20234.3</td></tr>'+
+  '</table>';
+}
+
+function chGbParamsHtml(){
+  return '<table class="result-table" style="font-size:10px">'+
+  '<tr><th>参数</th><th>值</th></tr>'+
+  '<tr><td>输入</td><td>380V 三相 50Hz</td></tr>'+
+  '<tr><td>输出</td><td>200-750V DC</td></tr>'+
+  '<tr><td>单枪功率</td><td>60kW (恒功率)</td></tr>'+
+  '<tr><td>双枪模式</td><td>30kW+30kW / 60kW+60kW</td></tr>'+
+  '<tr><td>效率</td><td>≥ 95% (峰值)</td></tr>'+
+  '<tr><td>功率因数</td><td>≥ 0.99</td></tr>'+
+  '<tr><td>THDi</td><td>≤ 5%</td></tr>'+
+  '<tr><td>冷却</td><td>强制风冷</td></tr>'+
+  '<tr><td>防护</td><td>IP54</td></tr>'+
+  '<tr><td>噪声</td><td>≤ 65 dB</td></tr>'+
+  '</table>';
+}
+
+function chGbProtectionHtml(){
+  return '<b style="color:#e06070">多级保护:</b><br>'+
+  '① 输入过/欠压保护<br>'+
+  '② 输出过压/欠压保护<br>'+
+  '③ 输出过流/短路保护<br>'+
+  '④ 过温保护 (降额/停机)<br>'+
+  '⑤ 反接保护 (二极管桥)<br>'+
+  '⑥ 急停按钮 (硬件级)<br>'+
+  '⑦ 绝缘检测 (启动前)<br>'+
+  '⑧ CC 信号异常保护<br>'+
+  '⑨ 通信超时保护';
+}
+
+function chLcBomHtml(){
+  return '<table class="result-table" style="font-size:10px">'+
+  '<tr><th>设备</th><th>规格</th></tr>'+
+  '<tr><td>干式变压器</td><td>1600kVA 10/0.4kV</td></tr>'+
+  '<tr><td>PFC 整流模块</td><td>180kW × 4 (SiC)</td></tr>'+
+  '<tr><td>DC/DC 液冷模块</td><td>180kW × 4 (液冷板)</td></tr>'+
+  '<tr><td>CDU 冷量分配</td><td>15kW 制冷 + 12L/min</td></tr>'+
+  '<tr><td>功率模块冷板</td><td>IGBT/SiC 直贴</td></tr>'+
+  '<tr><td>变压器冷板</td><td>绕组直贴冷却</td></tr>'+
+  '<tr><td>液冷枪线</td><td>CCS2/国标 600A</td></tr>'+
+  '<tr><td>循环泵</td><td>12L/min 4bar</td></tr>'+
+  '<tr><td>膨胀罐</td><td>5L 不锈钢</td></tr>'+
+  '<tr><td>压力传感器</td><td>0-10 bar</td></tr>'+
+  '<tr><td>温度传感器</td><td>PT100 × 6</td></tr>'+
+  '<tr><td>流量计</td><td>电磁/超声波</td></tr>'+
+  '<tr><td>漏液检测</td><td>点式 + 线式</td></tr>'+
+  '<tr><td>管路</td><td>DN20-DN32 不锈钢</td></tr>'+
+  '</table>';
+}
+
+function chLcParamsHtml(){
+  return '<table class="result-table" style="font-size:10px">'+
+  '<tr><th>参数</th><th>值</th></tr>'+
+  '<tr><td>最大功率</td><td>720kW (单枪)</td></tr>'+
+  '<tr><td>双枪模式</td><td>480kW + 240kW</td></tr>'+
+  '<tr><td>CDU 冷量</td><td>15kW</td></tr>'+
+  '<tr><td>流量</td><td>12 L/min</td></tr>'+
+  '<tr><td>工作压力</td><td>4 bar</td></tr>'+
+  '<tr><td>进水温度</td><td>≤ 35℃</td></tr>'+
+  '<tr><td>出水温度</td><td>≤ 65℃</td></tr>'+
+  '<tr><td>温升</td><td>≤ 30℃</td></tr>'+
+  '<tr><td>管径</td><td>DN20-DN32</td></tr>'+
+  '<tr><td>循环介质</td><td>50% 乙二醇水溶液</td></tr>'+
+  '<tr><td>枪线电流</td><td>600A 持续 / 800A 峰值</td></tr>'+
+  '<tr><td>枪线电压</td><td>1000V DC</td></tr>'+
+  '<tr><td>效率</td><td>≥ 97% (SiC)</td></tr>'+
+  '<tr><td>噪声</td><td>≤ 60 dB</td></tr>'+
+  '</table>';
+}
+
+function chLcProtectionHtml(){
+  return '<b style="color:#e06070">多级保护:</b><br>'+
+  '① 进/出水温度监测<br>'+
+  '② 系统压力监测<br>'+
+  '③ 流量监测 (电磁/超声)<br>'+
+  '④ 漏液检测 + 自动关断<br>'+
+  '⑤ 模块过温降额<br>'+
+  '⑥ 模块故障旁路<br>'+
+  '⑦ N+1 冗余配置<br>'+
+  '⑧ 急停 + 安全门锁<br>'+
+  '⑨ 三色灯 + 蜂鸣告警';
+}
+
+function chSldBomHtml(){
+  return '<table class="result-table" style="font-size:10px">'+
+  '<tr><th>类别</th><th>设备</th><th>规格</th></tr>'+
+  '<tr><td>高压</td><td>10kV 进线柜</td><td>KYN28A-12</td></tr>'+
+  '<tr><td>高压</td><td>变压器</td><td>SCB13-5000/10</td></tr>'+
+  '<tr><td>低压</td><td>0.4kV 总柜</td><td>4000A 主母线</td></tr>'+
+  '<tr><td>低压</td><td>电容补偿柜</td><td>1200 kvar</td></tr>'+
+  '<tr><td>充电堆</td><td>5 × 600kW</td><td>液冷超充堆</td></tr>'+
+  '<tr><td>枪线</td><td>10 × 双枪</td><td>液冷 CCS2</td></tr>'+
+  '<tr><td>保护</td><td>综合保护</td><td>差动/过流/接地</td></tr>'+
+  '<tr><td>监控</td><td>EMS 站控</td><td>SCADA + OCPP</td></tr>'+
+  '<tr><td>计量</td><td>关口表</td><td>0.2S 双向</td></tr>'+
+  '<tr><td>通信</td><td>4G + 光纤</td><td>100Mbps</td></tr>'+
+  '</table>';
+}
+
+function chSldParamsHtml(){
+  return '<table class="result-table" style="font-size:10px">'+
+  '<tr><th>参数</th><th>值</th></tr>'+
+  '<tr><td>总容量</td><td>4.8MW (5堆 × 960kVA)</td></tr>'+
+  '<tr><td>充电堆数</td><td>5 台</td></tr>'+
+  '<tr><td>终端数</td><td>10 枪 (双枪)</td></tr>'+
+  '<tr><td>接入电压</td><td>10kV</td></tr>'+
+  '<tr><td>变压器</td><td>5MVA Dyn11</td></tr>'+
+  '<tr><td>功率因数</td><td>≥ 0.95 (补偿后)</td></tr>'+
+  '<tr><td>占地面积</td><td>约 200 m²</td></tr>'+
+  '<tr><td>整站效率</td><td>≥ 95%</td></tr>'+
+  '<tr><td>年充电量</td><td>约 800 万 kWh</td></tr>'+
+  '<tr><td>服务车型</td><td>乘用车/物流车/出租车</td></tr>'+
+  '</table>';
+}
+
+function chSldProtectionHtml(){
+  return '<b style="color:#e06070">整站保护配置:</b><br>'+
+  '① 10kV: 差动 + 过流 + 速断<br>'+
+  '② 变压器: 温度 + 油位/气体<br>'+
+  '③ 0.4kV: 短路 + 漏电 + 缺相<br>'+
+  '④ 充电堆: 过/欠压 + 过流<br>'+
+  '⑤ 直流母线: 绝缘监测<br>'+
+  '⑥ 防雷: 3P+N SPD × 2 级<br>'+
+  '⑦ 接地: 总等电位 + 局部等电位<br>'+
+  '⑧ 消防: 烟感 + 灭火器<br>'+
+  '⑨ 视频: AI 行为分析';
+}
+
+function chElecFullscreen(){
+  const iframe=document.getElementById('chElecIframe');
+  if(iframe&&iframe.src&&iframe.style.display!=='none'){
+    window.open(iframe.src,'_blank');
+  }else{
+    const svg=document.querySelector('#chElecSvg svg');
+    if(svg){
+      const w=window.open('','_blank');
+      w.document.write('<html><head><title>原理图</title></head><body style="margin:0;background:#0a0e1a">'+svg.outerHTML+'</body></html>');
+    }
+  }
+}
+
+function chElecPrint(){
+  const iframe=document.getElementById('chElecIframe');
+  if(iframe&&iframe.style.display!=='none'){
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  }else{
+    window.print();
+  }
+}
+
+function chElecDownloadSvg(){
+  let svgContent;
+  const iframe=document.getElementById('chElecIframe');
+  if(iframe&&iframe.style.display!=='none'){
+    alert('iframe 内 SVG 请使用充电原理图详情页内的"下载"功能');
+    return;
+  }
+  const svg=document.querySelector('#chElecSvg svg');
+  if(!svg){alert('当前没有 SVG');return;}
+  svgContent=new XMLSerializer().serializeToString(svg);
+  const blob=new Blob([svgContent],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='charging_schematic.svg';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
 
 function chDrawSwArch(){
   const el=document.getElementById('chSwArchSvg');
