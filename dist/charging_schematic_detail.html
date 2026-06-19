@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>移动储能充电桩充放电过程课件 V8</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  height:100vh;overflow:hidden;display:flex;flex-direction:column;
+  background:#0d1117;color:#e6edf3;
+  font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;
+}
+.topbar{
+  height:48px;flex-shrink:0;display:flex;align-items:center;gap:14px;
+  padding:8px 16px;background:linear-gradient(135deg,#0f3460,#1a1a2e);
+  border-bottom:1px solid #30363d;z-index:20;
+}
+.topbar h1{font-size:14px;font-weight:700;color:#58a6ff;letter-spacing:.5px}
+.badge{
+  display:flex;align-items:center;gap:7px;font-size:11px;color:#00d4ff;
+  padding:4px 12px;border:1px solid #00d4ff40;border-radius:20px;background:#00d4ff12;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:#3fb950;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.38;transform:scale(.8)}}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:11px;color:#8b949e}
+.btn-sm{
+  border:1px solid #30363d;background:#21262d;color:#c9d1d9;
+  border-radius:5px;padding:5px 11px;font-size:11px;cursor:pointer;transition:all .2s;
+}
+.btn-sm:hover{border-color:#58a6ff;color:#58a6ff;background:#1f3a5c}
+.btn-sm.on{border-color:#58a6ff;color:#58a6ff;background:#1f3a5c}
+.main{flex:1;min-height:0;display:flex;overflow:hidden}
+.sidebar{
+  width:280px;flex-shrink:0;background:#161b22;border-right:1px solid #30363d;
+  display:flex;flex-direction:column;overflow-y:auto;z-index:10;
+}
+.sidebar-title{
+  padding:13px 14px 9px;font-size:12px;font-weight:800;color:#58a6ff;
+  border-bottom:1px solid #21262d;letter-spacing:.5px;text-transform:uppercase;
+}
+.flow-section{padding:11px 12px 8px;border-bottom:1px solid #21262d}
+.flow-section-title{
+  font-size:11px;font-weight:800;color:#f0883e;margin-bottom:8px;
+  display:flex;align-items:center;gap:7px;
+}
+.flow-section-title::before{
+  content:"";display:inline-block;width:3px;height:13px;background:#f0883e;border-radius:2px;
+}
+.step-btn{
+  width:100%;text-align:left;border:1px solid #30363d;border-radius:6px;
+  background:#0d1117;color:#c9d1d9;padding:9px 10px;margin-bottom:7px;
+  cursor:pointer;transition:all .22s;position:relative;overflow:hidden;
+  font-size:11px;line-height:1.42;
+}
+.step-btn:hover{border-color:#58a6ff;background:#1f3a5c22}
+.step-btn.active{border-color:#3fb950;background:#14381f;box-shadow:0 0 12px #3fb9502f}
+.step-btn.done{border-color:#2f6f46}
+.step-btn.active::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#3fb950;
+}
+.step-num{
+  display:inline-block;font-size:10px;font-weight:800;color:#58a6ff;
+  background:#30363d;border-radius:3px;padding:1px 6px;margin-bottom:4px;
+}
+.step-btn.active .step-num{background:#3fb95022;color:#3fb950}
+.step-desc{color:#8b949e;font-size:10px;margin-top:3px}
+.step-status{display:flex;align-items:center;gap:6px;margin-top:5px;color:#8b949e;font-size:10px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#30363d}
+.step-btn.active .status-dot{background:#3fb950;animation:pulse 1s infinite}
+.detail{
+  padding:12px 14px;border-bottom:1px solid #21262d;background:#0d1117;
+}
+.detail-kicker{font-size:10px;color:#8b949e;margin-bottom:6px;letter-spacing:.5px}
+.detail-title{font-size:13px;font-weight:800;color:#e6edf3;margin-bottom:7px}
+.detail-body{font-size:11px;color:#c9d1d9;line-height:1.62}
+.detail-points{margin-top:8px;padding-left:14px;color:#8b949e;font-size:10.5px;line-height:1.55}
+.detail-points li{margin-bottom:4px}
+.legend-section{padding:12px 14px 16px}
+.legend-title{font-size:10px;color:#8b949e;margin-bottom:7px;font-weight:700}
+.leg{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:10px;color:#c9d1d9}
+.leg-line{width:25px;height:4px;border-radius:3px;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.diagram-wrap{flex:1;min-width:0;overflow:hidden;position:relative;cursor:grab;background:#f7f7f7}
+.diagram-wrap.grabbing{cursor:grabbing}
+#stage{
+  display:none;
+}
+.stage-note{
+  max-width:min(560px,64vw);padding:9px 12px;border-radius:7px;
+  background:rgba(13,17,23,.88);border:1px solid rgba(88,166,255,.32);
+  color:#dbeafe;box-shadow:0 14px 35px rgba(0,0,0,.22);backdrop-filter:blur(5px);
+}
+.stage-note h2{font-size:13px;color:#58a6ff;margin-bottom:5px}
+.stage-note p{font-size:11px;line-height:1.55;color:#c9d1d9}
+#dc,#ov,#hl-overlay{position:absolute;left:0;top:0;transform-origin:0 0}
+#dc{z-index:1}
+#dc img{display:block;width:4526.4038px;height:3485.167px;user-select:none;-webkit-user-drag:none}
+#ov{z-index:3;pointer-events:none}
+#hl-overlay{z-index:2;pointer-events:none}
+.flow-halo{fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:.13;filter:url(#sig-glow)}
+.flow-line{fill:none;stroke-linecap:round;stroke-linejoin:round;filter:url(#sig-glow)}
+.flow-dot{filter:url(#dot-glow);opacity:.95}
+.component-tag{
+  display:none;
+  position:absolute;z-index:6;pointer-events:none;white-space:nowrap;
+  font-size:10px;font-weight:800;letter-spacing:.2px;color:#0d1117;
+  background:#f0f6fc;border:1px solid rgba(13,17,23,.25);
+  padding:3px 7px;border-radius:4px;box-shadow:0 6px 18px rgba(0,0,0,.25);
+}
+.pin-label{
+  position:absolute;z-index:6;pointer-events:none;white-space:nowrap;
+  font-size:10px;font-weight:800;color:#e6edf3;background:rgba(0,0,0,.74);
+  border:1px solid rgba(255,255,255,.28);border-radius:4px;padding:3px 7px;
+}
+.hint{
+  position:absolute;right:14px;bottom:12px;z-index:7;pointer-events:none;
+  font-size:10px;color:#6e7681;background:rgba(255,255,255,.9);
+  border:1px solid #d0d7de;border-radius:5px;padding:5px 8px;
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>移动储能充电桩电气原理图课件 V8</h1>
+  <div class="badge"><span class="dot"></span>充放电流程动态讲解</div>
+  <div class="topbar-right">
+    速度
+    <button class="btn-sm" data-speed="0.55">慢</button>
+    <button class="btn-sm on" data-speed="1">正常</button>
+    <button class="btn-sm" data-speed="1.7">快</button>
+    <button class="btn-sm" id="autoBtn">自动播放</button>
+    <button class="btn-sm" id="homeBtn">全图</button>
+  </div>
+</div>
+
+<div class="main">
+  <aside class="sidebar">
+    <div class="sidebar-title">流程导航</div>
+    <div id="stepList"></div>
+    <div class="detail">
+      <div class="detail-kicker">当前讲解</div>
+      <div class="detail-title" id="detailTitle">选择左侧步骤开始</div>
+      <div class="detail-body" id="detailBody">课件会自动缩放到相关区域，流动线表示信号或能量方向，元器件外框表示本步骤参与的关键对象。</div>
+      <ul class="detail-points" id="detailPoints"></ul>
+    </div>
+    <div class="legend-section">
+      <div class="legend-title">图例</div>
+      <div class="leg"><span class="leg-line" style="background:#00d4ff;color:#00d4ff"></span>CP/PP/通信握手</div>
+      <div class="leg"><span class="leg-line" style="background:#b86bff;color:#b86bff"></span>控制与 CAN 指令</div>
+      <div class="leg"><span class="leg-line" style="background:#ffb000;color:#ffb000"></span>交流补电能量</div>
+      <div class="leg"><span class="leg-line" style="background:#ff4040;color:#ff4040"></span>DC+ 正母线</div>
+      <div class="leg"><span class="leg-line" style="background:#3d7bff;color:#3d7bff"></span>DC- 负母线</div>
+      <div class="leg"><span class="leg-line" style="background:#3fb950;color:#3fb950"></span>电池侧充电能量</div>
+    </div>
+  </aside>
+
+  <main class="diagram-wrap" id="wrap">
+    <div id="dc">
+      <img id="diagramImg" alt="移动储能充电桩电气原理图">
+    </div>
+    <svg id="hl-overlay" xmlns="http://www.w3.org/2000/svg"
+      width="4526.4038" height="3485.167" viewBox="0 0 4526.4039 3485.1669"
+      style="width:4526.4038px;height:3485.167px">
+      <defs>
+        <filter id="hl-glow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <g id="hlGroup"></g>
+    </svg>
+    <svg id="ov" xmlns="http://www.w3.org/2000/svg"
+      width="4526.4038" height="3485.167" viewBox="0 0 4526.4039 3485.1669"
+      style="width:4526.4038px;height:3485.167px">
+      <defs>
+        <filter id="sig-glow" x="-120%" y="-120%" width="340%" height="340%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="dot-glow" x="-500%" y="-500%" width="1100%" height="1100%">
+          <feGaussianBlur stdDeviation="8" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <g id="flowGroup"></g>
+    </svg>
+    <div id="stage">
+      <div class="stage-note">
+        <h2 id="stageTitle">充放电讲解待开始</h2>
+        <p id="stageText">点击左侧步骤，按“插枪识别、通信许可、接触器动作、能量流向、监控停机”的顺序讲解。</p>
+      </div>
+    </div>
+    <div id="tagLayer"></div>
+    <div class="hint">滚轮缩放，拖拽平移</div>
+  </main>
+</div>
+
+<script>
+const SVG_W = 4526.4039;
+const SVG_H = 3485.1669;
+const fallbackSvg = "file:///E:/%E9%87%8F%E4%BA%A7%E9%A1%B9%E7%9B%AE%E8%B5%84%E6%96%99/%E9%87%8F%E4%BA%A7%E9%A1%B9%E7%9B%AE%E8%B5%84%E6%96%99/%E7%94%B5%E6%B0%94%E5%8E%9F%E7%90%86%E5%9B%BE/jiangjie0505.svg";
+const img = document.getElementById("diagramImg");
+img.onerror = () => { img.onerror = null; img.src = fallbackSvg; };
+img.src = "jiangjie0505.svg";
+
+const C = {
+  cp:"#00d4ff",
+  can:"#b86bff",
+  ac:"#ffb000",
+  dcP:"#ff4040",
+  dcN:"#3d7bff",
+  batt:"#3fb950",
+  sense:"#f0883e",
+  pe:"#9da7b3"
+};
+
+const components = {
+  socket:{label:"顶部150A欧标补电座",x:2185,y:585,w:330,h:360,color:C.cp},
+  socketCp:{label:"补电座 CP/PP/PE",x:2260,y:625,w:205,h:120,color:C.cp},
+  socketAc:{label:"补电座 L1/L2/L3/N/PE",x:2255,y:690,w:210,h:145,color:C.ac},
+  socketDc:{label:"补电座 DC+/DC-",x:2260,y:840,w:185,h:105,color:C.dcP},
+  lock:{label:"电子锁与反馈",x:2460,y:850,w:210,h:125,color:C.sense},
+  leakage:{label:"漏电继电器",x:2875,y:740,w:270,h:150,color:C.ac},
+  surge:{label:"浪涌3P+N/PE",x:3490,y:840,w:310,h:210,color:C.ac},
+  km1:{label:"KM1 三相交流接触器",x:2995,y:1010,w:250,h:370,color:C.ac},
+  km2:{label:"KM2 N线接触器",x:3170,y:900,w:210,h:245,color:C.ac},
+  pcs:{label:"22kW PCS AC/DC模块",x:3135,y:1220,w:420,h:260,color:C.ac},
+  k9:{label:"K9 PCS DC+隔离",x:3200,y:1395,w:160,h:210,color:C.dcP},
+  k10:{label:"K10 PCS DC-隔离",x:3030,y:1395,w:170,h:210,color:C.dcN},
+  fu3:{label:"FU3 PCS侧熔断器",x:3250,y:1510,w:100,h:120,color:C.sense},
+  k6:{label:"K6 AC补电接触器",x:1645,y:1450,w:285,h:95,color:C.ac},
+  k4:{label:"K4 DC补电接触器",x:2055,y:2135,w:315,h:135,color:C.cp},
+  k1:{label:"K1 总正接触器",x:1645,y:1540,w:300,h:92,color:C.dcP},
+  k2:{label:"K2 总负接触器",x:1635,y:2245,w:300,h:95,color:C.dcN},
+  k3:{label:"K3 预充+30R",x:1640,y:1625,w:385,h:110,color:C.sense},
+  k5:{label:"K5 电池加热接触器",x:1425,y:1660,w:300,h:130,color:C.sense},
+  bcu:{label:"BCU 电池控制单元",x:1540,y:1500,w:680,h:780,color:C.batt},
+  vcu:{label:"VCU/主板",x:2040,y:1745,w:420,h:260,color:C.can},
+  evcc:{label:"EVCC 补电通信",x:2150,y:2025,w:145,h:145,color:C.cp},
+  secc:{label:"SECC 对外充电通信",x:2290,y:2025,w:155,h:145,color:C.cp},
+  ocpp:{label:"OCPP/路由器",x:2450,y:2010,w:390,h:190,color:C.sense},
+  batteries:{label:"三包电池箱 1P192S",x:780,y:1600,w:440,h:535,color:C.batt},
+  bus:{label:"高压总正/总负母线",x:1120,y:1515,w:320,h:880,color:C.dcP},
+  rs1:{label:"RS1 输出侧分流器",x:2880,y:1615,w:160,h:225,color:C.sense},
+  rs2:{label:"RS2 电池侧分流器",x:1400,y:2185,w:175,h:120,color:C.sense},
+  dcModule:{label:"30kW DC/DC M1~M2",x:3030,y:1685,w:560,h:330,color:C.batt},
+  k7:{label:"K7 输出DC+接触器",x:3195,y:2230,w:185,h:290,color:C.dcP},
+  k8:{label:"K8 输出DC-接触器",x:3015,y:2230,w:190,h:290,color:C.dcN},
+  fu2:{label:"FU2 输出熔断器",x:3200,y:2380,w:150,h:150,color:C.sense},
+  outputGun:{label:"底部150A欧标直流充电枪",x:2790,y:2480,w:700,h:560,color:C.cp},
+  low24:{label:"4500W-24V辅助电源",x:2600,y:1760,w:330,h:210,color:C.batt},
+  low12:{label:"300W-12V开关电源",x:2600,y:1985,w:340,h:210,color:C.batt},
+  start:{label:"启停按钮/按钮开关",x:1450,y:2520,w:560,h:440,color:C.sense},
+  hmi:{label:"屏幕/刷卡器/声光交互",x:1880,y:2410,w:760,h:700,color:C.sense},
+  fan:{label:"风扇/温控负载",x:2680,y:2180,w:360,h:430,color:C.sense},
+  emergency:{label:"急停/联锁输入",x:2150,y:1885,w:250,h:80,color:C.sense},
+  fuses:{label:"FU1/FU2/FU3 保护",x:1320,y:1510,w:2100,h:1000,color:C.sense}
+};
+
+const steps = [
+  {
+    code:"Step 0", section:"0. 整机结构总览",
+    title:"三条能量路径总览",
+    desc:"储能电池、补电入口、对外直流输出的整体关系",
+    focus:{x:700,y:520,w:3300,h:2520},
+    components:["batteries","bcu","vcu","evcc","secc","pcs","dcModule","socket","outputGun"],
+    flows:[
+      {label:"AC补电路径",color:C.ac,width:5,points:[[2280,720],[3050,720],[3050,1180],[3300,1180],[3300,1360],[3150,1500],[1850,1500],[1850,1700],[1040,1700]]},
+      {label:"DC补电路径",color:C.cp,width:5,points:[[2290,880],[2290,2145],[2170,2145],[1850,2145],[1040,2145]]},
+      {label:"对外EV充电路径",color:C.batt,width:5,points:[[1040,1720],[2880,1720],[3200,1850],[3200,2320],[3170,2700]]}
+    ],
+    body:"整机有三条主线：顶部补电座输入 AC 经 PCS 给电池补电；顶部补电座输入 DC 经 K4 给电池补电；三包电池经 30kW DC/DC、K7/K8 从底部直流枪给外部 EV 充电。",
+    points:["顶部150A补电座是复合入口：AC脚、DC脚、CP/PP/PE、电子锁反馈都在这里。","EVCC用于本机被外部DC桩补电，SECC用于本机给外部EV充电。","VCU/主板做整机协调，BCU做电池安全许可。"]
+  },
+  {
+    code:"Step 1", section:"一、系统上电与待机",
+    title:"微断合闸，低压系统具备上电条件",
+    desc:"微断/按钮开关让低压电源链路进入可启动状态",
+    focus:{x:1400,y:1700,w:1600,h:1350},
+    components:["start","low24","low12","hmi"],
+    flows:[
+      {label:"24V辅助供电",color:C.batt,width:5,points:[[2760,1860],[2760,1940],[2350,1940],[2250,1940],[1900,1940]]},
+      {label:"12V控制供电",color:C.sense,width:4,points:[[2760,2085],[2760,2140],[2460,2140],[2300,2140],[2300,2460]]}
+    ],
+    body:"合上微断后，整机不再是零功耗断电状态，低压电源链路具备启动条件。此时还不代表高压母线已经接通，只是为VCU、BCU、屏幕、通信模块和接触器线圈供电做准备。",
+    points:["4500W-24V主要支撑24V母线和较大低压负载。","300W-12V给通信、屏幕、控制类小功率设备供电。","高压接触器仍保持断开，等待控制器自检。"]
+  },
+  {
+    code:"Step 2", section:"一、系统上电与待机",
+    title:"按下启停按钮，VCU/主板启动",
+    desc:"主板开始调度屏幕、刷卡器、OCPP、EVCC、SECC",
+    focus:{x:1450,y:1850,w:1450,h:1250},
+    components:["start","vcu","hmi","ocpp","evcc","secc"],
+    flows:[
+      {label:"启停信号",color:C.sense,width:4,points:[[1660,2700],[1660,2380],[2050,2380],[2050,1900],[2160,1900]]},
+      {label:"主板唤醒通信模块",color:C.can,width:4,points:[[2250,1890],[2250,2050],[2200,2050],[2370,2050],[2550,2050]]}
+    ],
+    body:"按下启停按钮后，VCU/主板进入工作状态。它不是功率模块，而是整机调度中心，负责模式选择、人机交互、后台授权、EVCC/SECC通信和接触器联锁。",
+    points:["VCU和图中主板是同一个控制板。","屏幕、刷卡器、OCPP/路由器进入可交互状态。","EVCC和SECC上电待命，但只有对应模式下才参与会话。"]
+  },
+  {
+    code:"Step 3", section:"一、系统上电与待机",
+    title:"BCU自检三包电池",
+    desc:"确认电压、温度、SOC、绝缘、通信和电流采样",
+    focus:{x:760,y:1450,w:1550,h:980},
+    components:["batteries","bcu","rs2","k5"],
+    flows:[
+      {label:"电池通信",color:C.can,width:4,points:[[805,1750],[950,1750],[950,1900],[1500,1900],[1620,1900]]},
+      {label:"电池侧电流反馈",color:C.sense,width:4,points:[[1480,2230],[1680,2230],[1680,1980],[1820,1980]]}
+    ],
+    body:"BCU负责电池安全许可。它检查三包电池箱的单体状态、总压、温度、SOC、绝缘、通信，以及RS2电池侧分流器反馈。未通过自检时，后续补电或放电都不能闭合功率接触器。",
+    points:["三包电池串成整机高压电池架。","RS2用于电池侧总电流采样。","低温时BCU可通过K5管理电池加热回路。"]
+  },
+  {
+    code:"Step 4", section:"一、系统上电与待机",
+    title:"高压母线预充",
+    desc:"K2总负、K3预充、K1总正按顺序建立母线",
+    focus:{x:1300,y:1450,w:850,h:1000},
+    components:["k1","k2","k3","bcu","bus"],
+    flows:[
+      {label:"先闭合K2总负",color:C.dcN,width:5,points:[[1685,2290],[1500,2290],[1500,2240],[1200,2240]]},
+      {label:"K3+30R预充",color:C.sense,width:5,points:[[1720,1665],[1900,1665],[1980,1665],[1980,1550]]},
+      {label:"后闭合K1总正",color:C.dcP,width:5,points:[[1720,1580],[1500,1580],[1300,1580],[1150,1580]]}
+    ],
+    body:"需要建立高压母线时，BCU按预充逻辑动作：先接入负极侧，再通过K3和30R电阻给母线电容预充。母线电压达到阈值后闭合K1总正，最后退出预充支路。",
+    points:["预充用于避免母线电容瞬时冲击。","K1/K2/K3属于电池高压主回路。","预充完成前不允许对外输出或接入补电功率。"]
+  },
+  {
+    code:"Step 5", section:"一、系统上电与待机",
+    title:"进入待机状态",
+    desc:"控制器在线，功率接触器按模式等待",
+    focus:{x:1450,y:1420,w:2100,h:1050},
+    components:["vcu","bcu","evcc","secc","ocpp","k4","k6","k7","k8","k9","k10","km1","km2"],
+    flows:[
+      {label:"待机协调",color:C.can,width:4,points:[[1850,1855],[2150,1855],[2250,1900],[2350,2050],[2600,2050]]}
+    ],
+    body:"待机状态下，VCU/主板、BCU、EVCC、SECC、OCPP均在线，但功率通道不会乱闭合。K4、K6、K7/K8、K9/K10、KM1/KM2都必须等待对应模式、自检和联锁条件满足。",
+    points:["待机不是高压输出状态。","接触器动作由模式和安全许可共同决定。","急停、绝缘、通信异常会阻止进入功率流程。"]
+  },
+  {
+    code:"Step 6", section:"二、DC补电：外部直流桩给本机电池补电",
+    title:"外部欧标DC枪插入顶部补电座",
+    desc:"顶部补电座DC+/DC-/CP/PP/PE和电子锁建立连接",
+    focus:{x:2140,y:560,w:650,h:1680},
+    components:["socket","socketCp","socketDc","lock","evcc"],
+    flows:[
+      {label:"CP连接确认",color:C.cp,width:5,points:[[2372,666],[2372,605],[2114,605],[2114,2172],[2258,2172],[2258,2135]]},
+      {label:"PP容量识别",color:C.pe,width:4,points:[[2302,665],[2302,620],[2095,620],[2095,2110],[2245,2110]]},
+      {label:"电子锁反馈",color:C.sense,width:4,points:[[2470,910],[2520,910],[2520,2050],[2265,2050]]}
+    ],
+    body:"外部直流桩的欧标直流枪插到顶部150A补电座后，先建立连接识别和锁止反馈。此时本机相当于被充电车辆，不能把DC+、DC-直接接入电池，必须先完成通信和BCU许可。",
+    points:["CP/PP/PE用于连接、安全和容量识别。","电子锁确认枪已可靠锁止。","DC补电用EVCC进入车端通信角色。"]
+  },
+  {
+    code:"Step 7", section:"二、DC补电：外部直流桩给本机电池补电",
+    title:"EVCC与外部直流桩握手",
+    desc:"EVCC把补电请求传给VCU/BCU",
+    focus:{x:1500,y:1850,w:1050,h:520},
+    components:["evcc","vcu","bcu","socketCp"],
+    flows:[
+      {label:"EVCC补电会话",color:C.cp,width:5,points:[[2258,2135],[2210,2135],[2210,2050],[2250,2050]]},
+      {label:"补电请求到VCU",color:C.can,width:4,points:[[2240,2050],[2240,1900],[2170,1900]]},
+      {label:"VCU转BCU许可",color:C.can,width:4,points:[[2170,1900],[2050,1900],[2050,1855],[1900,1855]]}
+    ],
+    body:"EVCC负责与外部直流桩完成补电通信，并把外部桩能力、连接状态、请求电压电流等信息传给VCU/主板，再由VCU协调BCU判断电池是否允许补电。",
+    points:["DC补电时EVCC是关键通信控制器。","VCU负责整机模式判断。","BCU最终决定电池能否接收补电电流。"]
+  },
+  {
+    code:"Step 8", section:"二、DC补电：外部直流桩给本机电池补电",
+    title:"BCU判断是否允许补电",
+    desc:"检查SOC、温度、绝缘、总压、故障和RS2电流",
+    focus:{x:780,y:1450,w:1480,h:980},
+    components:["bcu","batteries","rs2","k1","k2","k3"],
+    flows:[
+      {label:"电池状态反馈",color:C.can,width:4,points:[[1000,1750],[1500,1750],[1620,1850]]},
+      {label:"RS2电流反馈",color:C.sense,width:4,points:[[1480,2230],[1700,2230],[1700,1980],[1850,1980]]}
+    ],
+    body:"BCU检查电池箱状态：SOC、单体电压、温度、绝缘、总压、通信、总正/总负和预充状态。只有电池允许充电时，才会给DC补电接触器K4闭合许可。",
+    points:["外部桩允许输出不等于本机允许接收。","BCU限制最大补电电流。","异常时保持K4断开。"]
+  },
+  {
+    code:"Step 9", section:"二、DC补电：外部直流桩给本机电池补电",
+    title:"闭合DC补电接触器K4",
+    desc:"K4是外部DC补电进入电池补电链路的关键开关",
+    focus:{x:1850,y:1900,w:600,h:460},
+    components:["k4","evcc","vcu","bcu"],
+    flows:[
+      {label:"K4闭合命令",color:C.can,width:5,points:[[1880,1855],[2060,1855],[2060,2180],[2215,2180]]},
+      {label:"K4接通补电链路",color:C.cp,width:5,points:[[2215,2180],[2215,2145],[2100,2145]]}
+    ],
+    body:"K4由外部DC补电流程触发。它不是对外输出接触器，而是外部直流桩通过顶部补电座给图纸中电池箱补电时的接触器。",
+    points:["K4闭合前，顶部DC+、DC-不能进入电池补电通道。","K4闭合需要EVCC会话和BCU许可同时成立。","故障或停止时K4优先断开。"]
+  },
+  {
+    code:"Step 10", section:"二、DC补电：外部直流桩给本机电池补电",
+    title:"外部DC能量进入电池",
+    desc:"顶部DC+/DC-经K4进入电池侧补电链路",
+    focus:{x:760,y:720,w:1750,h:1620},
+    components:["socketDc","k4","bcu","batteries","rs2"],
+    flows:[
+      {label:"DC+补电",color:C.dcP,width:6,points:[[2288,880],[2288,1595],[2050,1595],[2050,1705],[1160,1705],[1040,1705]]},
+      {label:"DC-补电",color:C.dcN,width:6,points:[[2382,876],[2382,2050],[2200,2050],[2200,2245],[1500,2245],[1040,2245],[1040,2070]]},
+      {label:"BCU限流监控",color:C.sense,width:4,points:[[1480,2230],[1750,2230],[1750,1980],[1900,1980]]}
+    ],
+    body:"K4闭合后，外部直流桩的DC+、DC-通过顶部补电座进入电池补电链路。BCU根据电池状态限制电流，并持续监控总压、总流、温度和SOC。",
+    points:["DC补电不经过22kW PCS。","能量来自外部直流桩，目标是给三包电池补电。","RS2参与电池侧充电电流闭环。"]
+  },
+  {
+    code:"Step 11", section:"二、DC补电：外部直流桩给本机电池补电",
+    title:"DC补电停止",
+    desc:"先降流，再断开K4，最后释放会话/电子锁",
+    focus:{x:1850,y:1850,w:760,h:560},
+    components:["evcc","k4","bcu","socketDc","lock"],
+    flows:[
+      {label:"停止请求",color:C.cp,width:4,points:[[2258,2135],[2210,2135],[2210,2050]]},
+      {label:"断开K4",color:C.can,width:4,points:[[1900,1855],[2050,1855],[2050,2180],[2215,2180]]}
+    ],
+    body:"DC补电结束、充满或故障时，EVCC与外部桩协商停止输出，BCU撤销充电许可。正确顺序是先降流，再断开K4，最后释放锁止并提示拔枪。",
+    points:["不能带大电流直接拉开连接。","故障停机会优先断开K4。","停机状态需要同步到VCU和屏幕。"]
+  },
+  {
+    code:"Step 12", section:"三、AC补电：外部三相交流经PCS给电池补电",
+    title:"外部欧标AC枪插入顶部补电座",
+    desc:"L1/L2/L3/N/PE和电子锁反馈建立连接",
+    focus:{x:2160,y:560,w:720,h:520},
+    components:["socket","socketAc","lock"],
+    flows:[
+      {label:"三相+N识别",color:C.ac,width:5,points:[[2280,724],[2305,775],[2367,775],[2390,728]]},
+      {label:"PE接地确认",color:C.pe,width:4,points:[[2333,695],[2490,695],[2490,900]]}
+    ],
+    body:"AC补电同样从顶部150A欧标补电座进入，但使用的是L1、L2、L3、N、PE这一组端子。电子锁和反馈确认插头可靠连接后，VCU才允许进入AC侧检测。",
+    points:["AC补电和DC补电共用顶部补电座，但走不同端子和不同功率链路。","KM1负责三相，KM2负责N线。","PE和漏电保护是AC输入许可前提。"]
+  },
+  {
+    code:"Step 13", section:"三、AC补电：外部三相交流经PCS给电池补电",
+    title:"AC侧安全检测",
+    desc:"PE、漏电继电器、浪涌3P+N完成输入保护",
+    focus:{x:2800,y:700,w:1100,h:480},
+    components:["leakage","surge","socketAc"],
+    flows:[
+      {label:"漏电检测",color:C.ac,width:5,points:[[2390,730],[3000,730],[3000,820]]},
+      {label:"PE保护",color:C.pe,width:4,points:[[2330,695],[3600,695],[3600,900],[3790,900]]},
+      {label:"浪涌/输入保护",color:C.sense,width:4,points:[[3150,920],[3500,920],[3650,920]]}
+    ],
+    body:"三相交流进入功率模块前，需要确认PE、漏电继电器和浪涌保护状态正常。任一安全条件不满足，KM1/KM2都不能闭合。",
+    points:["漏电继电器用于AC输入侧接地故障保护。","浪涌3P+N保护输入侧过电压冲击。","AC补电必须先过安全检测再合闸。"]
+  },
+  {
+    code:"Step 14", section:"三、AC补电：外部三相交流经PCS给电池补电",
+    title:"闭合KM1/KM2",
+    desc:"KM1接L1/L2/L3，KM2接N线",
+    focus:{x:2950,y:880,w:560,h:520},
+    components:["km1","km2","vcu"],
+    flows:[
+      {label:"L1/L2/L3经KM1",color:C.ac,width:6,points:[[2280,724],[3000,724],[3000,1130],[3155,1130]]},
+      {label:"N经KM2",color:C.pe,width:5,points:[[2390,728],[3200,728],[3200,1000],[3260,1000]]},
+      {label:"主板合闸命令",color:C.can,width:4,points:[[2250,1900],[2500,1900],[2500,1190],[3060,1190]]}
+    ],
+    body:"AC补电启动时，VCU/主板在安全条件满足后控制KM1和KM2闭合。KM1接入从补电座来的L1、L2、L3三相交流电，KM2接入N线。",
+    points:["KM1不是DC侧接触器，它是三相交流输入开关。","KM2负责N线接入。","合闸前PCS和BCU都要处于可补电状态。"]
+  },
+  {
+    code:"Step 15", section:"三、AC补电：外部三相交流经PCS给电池补电",
+    title:"三相交流进入22kW PCS",
+    desc:"PCS把AC整流成受控DC",
+    focus:{x:3020,y:1160,w:620,h:380},
+    components:["km1","km2","pcs"],
+    flows:[
+      {label:"AC输入PCS",color:C.ac,width:6,points:[[3155,1130],[3270,1130],[3270,1260],[3330,1260]]},
+      {label:"N线入PCS",color:C.pe,width:4,points:[[3260,1000],[3260,1290],[3350,1290]]}
+    ],
+    body:"KM1/KM2闭合后，外部三相交流进入22kW PCS模块。PCS负责AC/DC整流，并按BCU/VCU给出的补电目标控制输出电压和电流。",
+    points:["说明书对应AC输入22kW。","PCS是AC补电的能量变换核心。","PCS输出还需要后级K9/K10和K6接通后才能进入电池补电链路。"]
+  },
+  {
+    code:"Step 16", section:"三、AC补电：外部三相交流经PCS给电池补电",
+    title:"闭合K9/K10",
+    desc:"PCS DC输出正负极隔离接触器接通",
+    focus:{x:2970,y:1360,w:520,h:360},
+    components:["k9","k10","fu3","pcs"],
+    flows:[
+      {label:"PCS DC+",color:C.dcP,width:6,points:[[3310,1370],[3310,1460],[3280,1460]]},
+      {label:"PCS DC-",color:C.dcN,width:6,points:[[3210,1370],[3210,1460],[3110,1460]]}
+    ],
+    body:"K9/K10是PCS DC输出正负极隔离接触器。它们闭合后，PCS整流出来的DC+、DC-才允许接入后级DC链路，FU3提供PCS侧熔断保护。",
+    points:["K9/K10不是对外EV输出接触器。","K9/K10只服务于PCS DC输出隔离。","FU3是PCS输出侧保护元件。"]
+  },
+  {
+    code:"Step 17", section:"三、AC补电：外部三相交流经PCS给电池补电",
+    title:"闭合K6，进入电池补电通道",
+    desc:"K6是AC补电整流后进入电池箱的接触器",
+    focus:{x:760,y:1360,w:2650,h:1100},
+    components:["k6","k9","k10","pcs","bcu","batteries","rs2"],
+    flows:[
+      {label:"PCS整流DC+",color:C.dcP,width:6,points:[[3280,1460],[3000,1460],[3000,1570],[1900,1570],[1720,1495],[1160,1495],[1040,1705]]},
+      {label:"PCS整流DC-",color:C.dcN,width:6,points:[[3110,1460],[3110,2090],[2300,2090],[2300,2245],[1500,2245],[1040,2245],[1040,2070]]},
+      {label:"K6接入补电",color:C.ac,width:5,points:[[1720,1495],[1850,1495],[1850,1700]]}
+    ],
+    body:"K6用于AC补电路径：外部交流经KM1/KM2和PCS整流后，K6闭合，整流后的能量进入电池箱补电通道。BCU继续限制充电电流并监控电池状态。",
+    points:["K6与AC补电链路绑定。","K6闭合前，PCS输出不能进入电池补电通道。","RS2监控电池侧充电电流。"]
+  },
+  {
+    code:"Step 18", section:"三、AC补电：外部三相交流经PCS给电池补电",
+    title:"AC补电停止",
+    desc:"PCS降流停机后，依次断K6、K9/K10、KM1/KM2",
+    focus:{x:1500,y:900,w:2100,h:850},
+    components:["pcs","k6","k9","k10","km1","km2","bcu"],
+    flows:[
+      {label:"停止命令",color:C.can,width:4,points:[[1850,1855],[2200,1855],[2200,1500],[3300,1500]]},
+      {label:"PCS降流",color:C.sense,width:4,points:[[3330,1310],[3330,1460],[3250,1460],[1720,1495]]}
+    ],
+    body:"AC补电结束时，先让PCS降流并停机，再断开K6切断电池补电通道，随后断开K9/K10隔离PCS DC输出，最后断开KM1/KM2切断AC输入。",
+    points:["正常停机顺序用于减少冲击和拉弧风险。","故障停机可直接撤销许可并断开关键接触器。","停机状态需要回到待机，等待下次模式选择。"]
+  },
+  {
+    code:"Step 19", section:"四、对外EV直流充电",
+    title:"底部150A直流枪插入EV",
+    desc:"底部枪端CP/PP/PE/DC+/DC-建立连接",
+    focus:{x:2700,y:2350,w:900,h:700},
+    components:["outputGun","secc"],
+    flows:[
+      {label:"枪端CP",color:C.cp,width:5,points:[[2938,2545],[2938,2350],[2360,2350],[2360,2130]]},
+      {label:"PP/PE识别",color:C.pe,width:4,points:[[3055,2528],[3055,2350],[2390,2350],[2390,2110]]}
+    ],
+    body:"对外EV充电时，使用底部150A欧标直流充电枪。本机此时是充电桩，先通过枪端CP/PP/PE确认车辆连接、枪线状态和接地安全。",
+    points:["底部直流枪是对外输出口，不是补电入口。","连接识别完成后SECC才进入充电会话。","DC+、DC-在K7/K8闭合前不能对外输出功率。"]
+  },
+  {
+    code:"Step 20", section:"四、对外EV直流充电",
+    title:"SECC与EV建立充电会话",
+    desc:"SECC负责桩端通信，VCU协调整机状态",
+    focus:{x:2100,y:1880,w:760,h:420},
+    components:["secc","vcu","ocpp","outputGun"],
+    flows:[
+      {label:"SECC-车辆协议",color:C.cp,width:5,points:[[2360,2130],[2360,2050],[2380,2050]]},
+      {label:"SECC上报VCU",color:C.can,width:4,points:[[2360,2050],[2360,1900],[2260,1900]]},
+      {label:"后台状态联动",color:C.sense,width:4,points:[[2360,2050],[2550,2050],[2700,2050]]}
+    ],
+    body:"SECC负责和车辆建立充电会话，获取车辆需求电压、电流和状态。VCU/主板根据SECC、OCPP授权、BCU状态共同决定是否进入功率准备。",
+    points:["SECC是对外EV充电的通信主角。","OCPP不承载功率，但决定授权和订单状态。","VCU负责把SECC和BCU流程串起来。"]
+  },
+  {
+    code:"Step 21", section:"四、对外EV直流充电",
+    title:"用户授权与后台确认",
+    desc:"屏幕/刷卡器/OCPP/路由器完成启动许可",
+    focus:{x:1850,y:1980,w:1050,h:1180},
+    components:["hmi","ocpp","vcu","secc"],
+    flows:[
+      {label:"刷卡/触屏授权",color:C.sense,width:4,points:[[2250,2600],[2550,2600],[2550,2100]]},
+      {label:"OCPP后台确认",color:C.sense,width:4,points:[[2550,2100],[2750,2100],[2750,1860]]},
+      {label:"启动许可回VCU",color:C.can,width:4,points:[[2550,2100],[2250,2100],[2250,1900]]}
+    ],
+    body:"用户通过刷卡、屏幕或后台授权启动充电。OCPP/路由器处理订单和联网状态，授权通过后VCU才允许进入对外功率输出准备。",
+    points:["授权链路不是功率链路，但会决定是否启动。","屏幕负责用户交互和状态提示。","后台异常时，应阻止进入充电输出。"]
+  },
+  {
+    code:"Step 22", section:"四、对外EV直流充电",
+    title:"BCU判断电池允许放电",
+    desc:"SOC、温度、绝缘和高压母线状态满足后才允许输出",
+    focus:{x:780,y:1450,w:1500,h:1000},
+    components:["bcu","batteries","rs2","k1","k2","k3"],
+    flows:[
+      {label:"放电许可",color:C.can,width:4,points:[[1900,1855],[2050,1855],[2050,1930],[2250,1930]]},
+      {label:"电池侧放电监控",color:C.sense,width:4,points:[[1040,2070],[1480,2230],[1750,2230],[1850,1980]]}
+    ],
+    body:"对外充电前，BCU必须确认三包电池可以放电，并按需要完成高压母线预充。电池SOC过低、温度异常、绝缘异常或接触器反馈异常时，不允许启动DC/DC输出。",
+    points:["车辆请求不能越过电池安全限制。","BCU决定放电电流上限。","K1/K2/K3建立母线后，DC/DC才有输入条件。"]
+  },
+  {
+    code:"Step 23", section:"四、对外EV直流充电",
+    title:"启动30kW DC/DC M1~M2",
+    desc:"电池母线能量进入DC/DC，按车辆需求调压限流",
+    focus:{x:2580,y:1580,w:1100,h:520},
+    components:["dcModule","rs1","bcu","vcu"],
+    flows:[
+      {label:"电池母线DC+",color:C.dcP,width:6,points:[[1160,1705],[2400,1705],[2400,1760],[3050,1760],[3210,1820]]},
+      {label:"电池母线DC-",color:C.dcN,width:6,points:[[1040,2245],[2400,2245],[2400,1900],[3050,1900],[3210,1900]]},
+      {label:"模块控制",color:C.can,width:4,points:[[2250,1900],[2600,1900],[3000,1900]]}
+    ],
+    body:"30kW DC/DC充电模块M1~M2是对外EV直流充电的功率调节核心。两路30kW组合形成整机60kW输出能力，模块根据SECC获得的车辆需求调节输出电压和电流。",
+    points:["DC/DC不是补电用PCS。","它把电池母线电压变成车辆请求的直流输出。","RS1监测输出侧电流。"]
+  },
+  {
+    code:"Step 24", section:"四、对外EV直流充电",
+    title:"输出电压匹配，闭合K7/K8",
+    desc:"K7/K8经FU2把DC/DC输出送到底部直流枪",
+    focus:{x:2960,y:2150,w:600,h:900},
+    components:["k7","k8","fu2","outputGun","dcModule"],
+    flows:[
+      {label:"输出DC+",color:C.dcP,width:6,points:[[3240,1845],[3240,2230],[3270,2230],[3270,2480],[3258,2535]]},
+      {label:"输出DC-",color:C.dcN,width:6,points:[[3135,1845],[3135,2230],[3095,2230],[3095,2480],[3190,2540]]},
+      {label:"K7/K8合闸许可",color:C.can,width:4,points:[[2250,1900],[3000,1900],[3000,2320],[3180,2320]]}
+    ],
+    body:"DC/DC输出电压与车辆需求匹配后，VCU/主板才允许闭合K7/K8。K7/K8是对外EV输出接触器，经FU2后把DC+、DC-送到底部直流枪。",
+    points:["K7/K8只用于对外EV输出。","FU2保护输出回路。","合闸前应完成输出侧电压匹配，避免冲击。"]
+  },
+  {
+    code:"Step 25", section:"四、对外EV直流充电",
+    title:"充电运行闭环",
+    desc:"SECC、BCU、RS1、RS2、OCPP持续闭环监控",
+    focus:{x:1320,y:1580,w:2300,h:1000},
+    components:["secc","bcu","rs1","rs2","ocpp","dcModule","k7","k8"],
+    flows:[
+      {label:"车辆需求",color:C.cp,width:4,points:[[2360,2130],[2360,2050],[2250,1900]]},
+      {label:"输出电流RS1",color:C.sense,width:4,points:[[2960,1720],[2960,1990],[2470,1990],[2360,2050]]},
+      {label:"电池电流RS2",color:C.sense,width:4,points:[[1480,2230],[1750,2230],[1850,1980]]}
+    ],
+    body:"充电运行时，SECC持续跟车辆通信，BCU持续保护电池，RS1监控输出侧电流，RS2监控电池侧电流，OCPP记录订单和状态。任何一条链路异常都会触发降流或停机。",
+    points:["车辆请求决定目标输出，BCU决定电池可承受范围。","RS1/RS2共同判断能量流是否正常。","OCPP负责后台状态和计费记录。"]
+  },
+  {
+    code:"Step 26", section:"四、对外EV直流充电",
+    title:"对外充电停止",
+    desc:"降流、停DC/DC、断K7/K8、结束SECC会话",
+    focus:{x:2140,y:1700,w:1450,h:1260},
+    components:["secc","dcModule","k7","k8","outputGun","ocpp"],
+    flows:[
+      {label:"停止请求",color:C.cp,width:4,points:[[2360,2130],[2360,2050],[2250,1900]]},
+      {label:"DC/DC降流停机",color:C.sense,width:4,points:[[2250,1900],[3000,1900],[3210,1845]]},
+      {label:"断开K7/K8",color:C.can,width:4,points:[[2250,1900],[3000,1900],[3000,2320],[3180,2320]]}
+    ],
+    body:"正常停止时，应先按车辆/用户请求降流，停止30kW DC/DC输出，再断开K7/K8，最后结束SECC会话并提示用户拔枪。这样可以减少拉弧和输出冲击。",
+    points:["不要带大电流直接断枪。","停机状态要同步到屏幕和OCPP后台。","故障停止会更快撤销输出许可。"]
+  },
+  {
+    code:"Step 27", section:"五、异常保护统一说明",
+    title:"故障与急停保护",
+    desc:"急停、漏电、熔断、过流、绝缘和通信异常撤销功率许可",
+    focus:{x:1300,y:700,w:2500,h:1900},
+    components:["emergency","leakage","fuses","bcu","vcu","k4","k6","k7","k8","k9","k10","km1","km2"],
+    flows:[
+      {label:"急停/故障输入",color:C.sense,width:5,points:[[2190,1925],[2250,1925],[2250,1900]]},
+      {label:"撤销接触器许可",color:C.can,width:5,points:[[2250,1900],[2050,1900],[2050,2180],[1720,1495],[3180,2320],[3180,1460]]},
+      {label:"保护切断功率",color:C.sense,width:4,points:[[2940,825],[3060,1120],[3250,1510],[3260,2400]]}
+    ],
+    body:"急停、漏电、过流、熔断、绝缘异常、过温、通信中断或控制器故障时，VCU/主板和BCU会撤销功率许可，断开对应路径上的接触器：DC补电断K4，AC补电断K6/K9/K10/KM1/KM2，对外EV充电断K7/K8并停止DC/DC。",
+    points:["保护动作要按当前模式切断对应功率路径。","FU1/FU2/FU3提供熔断保护，漏电继电器保护AC输入侧。","课件结尾应强调：安全联锁比功率输出优先级更高。"]
+  }
+];
+
+Object.assign(components, {
+  socket:{...components.socket,x:2208,y:610,w:285,h:340},
+  socketCp:{...components.socketCp,x:2268,y:625,w:190,h:105},
+  socketAc:{...components.socketAc,x:2264,y:688,w:190,h:135},
+  socketDc:{...components.socketDc,x:2262,y:842,w:180,h:95},
+  lock:{...components.lock,x:2490,y:858,w:160,h:112},
+  leakage:{...components.leakage,x:2868,y:748,w:275,h:150},
+  surge:{...components.surge,x:3495,y:830,w:270,h:190},
+  km1:{...components.km1,x:2998,y:1000,w:245,h:330},
+  km2:{...components.km2,x:3188,y:906,w:185,h:220},
+  pcs:{...components.pcs,x:3138,y:1228,w:382,h:178},
+  k9:{...components.k9,x:3198,y:1398,w:130,h:190},
+  k10:{...components.k10,x:3030,y:1398,w:145,h:190},
+  fu3:{...components.fu3,x:3252,y:1508,w:78,h:110},
+  k6:{...components.k6,x:1648,y:1454,w:276,h:82},
+  k4:{...components.k4,x:2070,y:2148,w:275,h:112},
+  k1:{...components.k1,x:1648,y:1544,w:276,h:82},
+  k2:{...components.k2,x:1640,y:2255,w:280,h:82},
+  k3:{...components.k3,x:1646,y:1630,w:355,h:96},
+  k5:{...components.k5,x:1428,y:1664,w:285,h:112},
+  bcu:{...components.bcu,x:1548,y:1498,w:665,h:640},
+  vcu:{...components.vcu,x:2054,y:1752,w:398,h:232},
+  evcc:{...components.evcc,x:2172,y:2040,w:122,h:128},
+  secc:{...components.secc,x:2305,y:2040,w:132,h:128},
+  ocpp:{...components.ocpp,x:2462,y:2015,w:310,h:168},
+  batteries:{...components.batteries,x:805,y:1635,w:360,h:475},
+  bus:{...components.bus,x:1135,y:1528,w:310,h:830},
+  rs1:{...components.rs1,x:2898,y:1638,w:125,h:190},
+  rs2:{...components.rs2,x:1408,y:2206,w:145,h:88},
+  dcModule:{...components.dcModule,x:3148,y:1745,w:430,h:210},
+  k7:{...components.k7,x:3198,y:2230,w:160,h:275},
+  k8:{...components.k8,x:3028,y:2230,w:160,h:275},
+  fu2:{...components.fu2,x:3210,y:2388,w:110,h:130},
+  outputGun:{...components.outputGun,x:2868,y:2500,w:520,h:520},
+  low24:{...components.low24,x:2658,y:1772,w:190,h:160},
+  low12:{...components.low12,x:2658,y:2012,w:190,h:160},
+  start:{...components.start,x:1510,y:2575,w:470,h:350},
+  hmi:{...components.hmi,x:1878,y:2420,w:740,h:590},
+  fan:{...components.fan,x:2688,y:2205,w:310,h:360},
+  emergency:{...components.emergency,x:2168,y:1910,w:185,h:45}
+});
+
+const flowOverrides = {
+  0:[
+    {color:C.ac,width:5,points:[[2280,724],[2280,690],[3060,690],[3060,1080],[3150,1080],[3150,1245],[3330,1245]]},
+    {color:C.dcP,width:5,points:[[2288,881],[2288,1595],[1710,1595],[1710,1575],[1163,1575]]},
+    {color:C.batt,width:5,points:[[1163,1575],[2960,1575],[2960,1720],[3180,1720],[3180,1845],[3270,1845],[3270,2535]]}
+  ],
+  1:[
+    {color:C.dcP,width:4,points:[[2752,1857],[2752,1932],[2672,1932]]},
+    {color:C.dcN,width:4,points:[[2730,1857],[2730,1932],[2729,1932]]},
+    {color:C.dcP,width:4,points:[[2668,2080],[2668,2124],[2667,2124]]},
+    {color:C.dcN,width:4,points:[[2730,2080],[2730,2124],[2723,2124]]}
+  ],
+  2:[],
+  3:[
+    {color:C.can,width:4,points:[[805,1748],[805,1900],[1548,1900]]},
+    {color:C.sense,width:4,points:[[1448,2347],[1448,2268],[1665,2268]]}
+  ],
+  4:[
+    {color:C.dcN,width:5,points:[[1694,2269],[1694,2351],[1173,2351]]},
+    {color:C.sense,width:5,points:[[1707,1652],[1765,1652],[1765,1593],[1739,1593]]},
+    {color:C.dcP,width:5,points:[[1710,1574],[1374,1574],[1374,1579],[1163,1579]]}
+  ],
+  5:[],
+  6:[
+    {color:C.cp,width:5,points:[[2372,666],[2372,605],[2114,605],[2114,2172],[2258,2172],[2258,2135]]},
+    {color:C.pe,width:4,points:[[2302,665],[2302,620],[2095,620],[2095,2110],[2245,2110]]},
+    {color:C.sense,width:4,points:[[2470,910],[2520,910],[2520,2050],[2265,2050]]}
+  ],
+  7:[
+    {color:C.cp,width:5,points:[[2258,2135],[2258,2104],[2199,2104]]},
+    {color:C.can,width:4,points:[[2199,2104],[2199,1964],[2047,1964],[2047,1950]]},
+    {color:C.can,width:4,points:[[2047,1950],[1938,1950],[1938,1921],[1925,1921]]}
+  ],
+  8:[
+    {color:C.can,width:4,points:[[805,1748],[805,1900],[1548,1900]]},
+    {color:C.sense,width:4,points:[[1448,2347],[1448,2268],[1665,2268]]}
+  ],
+  9:[
+    {color:C.can,width:4,points:[[1925,1921],[2047,1921],[2047,2180],[2215,2180]]}
+  ],
+  10:[
+    {color:C.dcP,width:6,points:[[2288,881],[2288,1595],[1710,1595],[1710,1575],[1163,1575],[1163,1715],[1040,1715]]},
+    {color:C.dcN,width:6,points:[[2381,876],[2381,2269],[1694,2269],[1694,2351],[1173,2351],[1173,2070],[1040,2070]]}
+  ],
+  11:[
+    {color:C.cp,width:4,points:[[2258,2135],[2258,2104],[2199,2104]]},
+    {color:C.can,width:4,points:[[1925,1921],[2047,1921],[2047,2180],[2215,2180]]}
+  ],
+  12:[
+    {color:C.ac,width:5,points:[[2278,724],[2304,775],[2367,775],[2390,728]]},
+    {color:C.pe,width:4,points:[[2333,695],[2490,695],[2490,900]]}
+  ],
+  13:[
+    {color:C.ac,width:5,points:[[2278,724],[2278,680],[2941,680],[2941,824]]},
+    {color:C.pe,width:4,points:[[2333,695],[3770,695],[3770,879]]},
+    {color:C.sense,width:4,points:[[2941,824],[3151,824],[3151,1080]]}
+  ],
+  14:[
+    {color:C.ac,width:6,points:[[2278,724],[2278,680],[3062,680],[3062,1124],[3151,1124]]},
+    {color:C.pe,width:5,points:[[2390,728],[2390,700],[3230,700],[3230,1002]]},
+    {color:C.can,width:4,points:[[2274,1914],[3151,1914],[3151,1080]]}
+  ],
+  15:[
+    {color:C.ac,width:6,points:[[3062,1124],[3062,1279],[3167,1279],[3324,1279]]},
+    {color:C.pe,width:4,points:[[3230,1002],[3230,1306],[3324,1306]]}
+  ],
+  16:[
+    {color:C.dcP,width:6,points:[[3281,1309],[3281,1464],[3275,1464]]},
+    {color:C.dcN,width:6,points:[[3167,1309],[3167,1467],[3100,1467]]}
+  ],
+  17:[
+    {color:C.dcP,width:6,points:[[3275,1464],[3275,1542],[3066,1542],[3066,1575],[1710,1575],[1163,1575],[1163,1715],[1040,1715]]},
+    {color:C.dcN,width:6,points:[[3100,1467],[3100,2269],[1694,2269],[1694,2351],[1173,2351],[1173,2070],[1040,2070]]}
+  ],
+  18:[
+    {color:C.sense,width:4,points:[[3324,1306],[3275,1464],[1710,1575]]}
+  ],
+  19:[
+    {color:C.cp,width:5,points:[[2938,2545],[2860,2380],[2360,2380],[2360,2130]]},
+    {color:C.pe,width:4,points:[[3055,2528],[3055,2360],[2388,2360],[2388,2107]]}
+  ],
+  20:[
+    {color:C.cp,width:5,points:[[2360,2130],[2360,2102],[2321,2102]]},
+    {color:C.can,width:4,points:[[2321,2102],[2321,1887],[2274,1887]]},
+    {color:C.sense,width:4,points:[[2321,2102],[2549,2102],[2549,1884],[2819,1884]]}
+  ],
+  21:[
+    {color:C.sense,width:4,points:[[2285,1961],[2260,1979],[2258,1884],[2549,1884]]}
+  ],
+  22:[
+    {color:C.can,width:4,points:[[1925,1921],[2047,1921],[2047,1950],[2274,1950]]},
+    {color:C.sense,width:4,points:[[1448,2347],[1448,2268],[1665,2268]]}
+  ],
+  23:[
+    {color:C.dcP,width:6,points:[[1163,1575],[2960,1575],[2960,1760],[3152,1760],[3320,1760]]},
+    {color:C.dcN,width:6,points:[[1173,2351],[3152,2351],[3152,1830],[3320,1830]]},
+    {color:C.can,width:4,points:[[2274,1914],[2672,1914],[2672,1888]]}
+  ],
+  24:[
+    {color:C.dcP,width:6,points:[[3320,1826],[3320,2338],[3278,2338],[3278,2534],[3259,2534]]},
+    {color:C.dcN,width:6,points:[[3152,1830],[3152,2338],[3096,2338],[3096,2540],[3189,2540]]},
+    {color:C.can,width:4,points:[[2274,1914],[3096,1914],[3096,2338]]}
+  ],
+  25:[
+    {color:C.cp,width:4,points:[[2938,2545],[2860,2380],[2360,2380],[2360,2130]]},
+    {color:C.sense,width:4,points:[[2980,1689],[2980,1795],[2969,1795]]},
+    {color:C.sense,width:4,points:[[1448,2347],[1448,2268],[1665,2268]]}
+  ],
+  26:[
+    {color:C.cp,width:4,points:[[2360,2130],[2360,2102],[2321,2102]]},
+    {color:C.sense,width:4,points:[[3320,1826],[3320,2338],[3278,2338]]}
+  ],
+  27:[
+    {color:C.sense,width:5,points:[[2194,1925],[2274,1925],[2274,1914]]},
+    {color:C.can,width:5,points:[[2274,1914],[2047,1914],[2047,2180],[2215,2180]]},
+    {color:C.sense,width:4,points:[[2941,824],[3062,1124],[3275,1542],[3282,2429]]}
+  ]
+};
+Object.entries(flowOverrides).forEach(([idx, flows]) => {
+  if (steps[idx]) steps[idx].flows = flows;
+});
+
+const wrap = document.getElementById("wrap");
+const dc = document.getElementById("dc");
+const ov = document.getElementById("ov");
+const hlOv = document.getElementById("hl-overlay");
+const flowGroup = document.getElementById("flowGroup");
+const hlGroup = document.getElementById("hlGroup");
+const tagLayer = document.getElementById("tagLayer");
+const stepList = document.getElementById("stepList");
+let sc = .34, px = -260, py = -170, dragging = false, lx = 0, ly = 0;
+let spd = 1, raf = null, activeFlows = [], activeTags = [];
+let currentStep = -1, autoTimer = null;
+
+function buildSteps(){
+  let lastSection = "";
+  steps.forEach((step, i) => {
+    if(step.section !== lastSection){
+      const sec = document.createElement("div");
+      sec.className = "flow-section";
+      sec.innerHTML = `<div class="flow-section-title">${step.section}</div>`;
+      stepList.appendChild(sec);
+      lastSection = step.section;
+    }
+    const sec = stepList.lastElementChild;
+    const btn = document.createElement("button");
+    btn.className = "step-btn";
+    btn.id = `step-${i}`;
+    btn.innerHTML = `<span class="step-num">${step.code || ("Step " + (i+1))}</span><br>${step.title}<div class="step-desc">${step.desc}</div><div class="step-status"><span class="status-dot"></span><span>${i===0 ? "点击执行" : "等待中"}</span></div>`;
+    btn.addEventListener("click", () => runStep(i));
+    sec.appendChild(btn);
+  });
+}
+
+function applyT(){
+  const t = `translate(${px}px,${py}px) scale(${sc})`;
+  dc.style.transform = t;
+  ov.style.transform = t;
+  hlOv.style.transform = t;
+  updateTagPositions();
+}
+function s2s(x,y){ return [x*sc + px, y*sc + py]; }
+function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+function fitWhole(){
+  const pad = 34;
+  const sx = (wrap.clientWidth - pad*2) / SVG_W;
+  const sy = (wrap.clientHeight - pad*2) / SVG_H;
+  sc = Math.min(sx, sy);
+  px = (wrap.clientWidth - SVG_W*sc) / 2;
+  py = (wrap.clientHeight - SVG_H*sc) / 2;
+  applyT();
+}
+
+function focusOn(box){
+  const padX = 220, padY = 170;
+  const next = Math.min(
+    wrap.clientWidth / (box.w + padX),
+    wrap.clientHeight / (box.h + padY)
+  );
+  sc = clamp(next, .22, .95);
+  px = wrap.clientWidth/2 - (box.x + box.w/2)*sc;
+  py = wrap.clientHeight/2 - (box.y + box.h/2)*sc;
+  applyT();
+}
+
+wrap.addEventListener("mousedown", e => {
+  dragging = true; lx = e.clientX; ly = e.clientY; wrap.classList.add("grabbing");
+});
+window.addEventListener("mouseup", () => { dragging = false; wrap.classList.remove("grabbing"); });
+window.addEventListener("mousemove", e => {
+  if(!dragging) return;
+  px += e.clientX - lx; py += e.clientY - ly; lx = e.clientX; ly = e.clientY;
+  applyT();
+});
+wrap.addEventListener("wheel", e => {
+  e.preventDefault();
+  const r = wrap.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const d = e.deltaY > 0 ? .88 : 1.14;
+  px = mx - (mx - px) * d;
+  py = my - (my - py) * d;
+  sc = clamp(sc * d, .05, 4);
+  applyT();
+},{passive:false});
+window.addEventListener("resize", () => currentStep >= 0 ? focusOn(steps[currentStep].focus) : fitWhole());
+
+function clearVisuals(){
+  if(raf) cancelAnimationFrame(raf);
+  raf = null; activeFlows = []; activeTags = [];
+  flowGroup.innerHTML = ""; hlGroup.innerHTML = ""; tagLayer.innerHTML = "";
+}
+
+function pointsToD(points){
+  return points.map((p,i) => `${i ? "L" : "M"} ${p[0]} ${p[1]}`).join(" ");
+}
+
+function makeSvg(tag, attrs){
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+  return el;
+}
+
+function addFlow(segment, order){
+  const d = pointsToD(segment.points);
+  const halo = makeSvg("path", {
+    d, class:"flow-halo", stroke:segment.color, "stroke-width":(segment.width || 5) + 8
+  });
+  const line = makeSvg("path", {
+    d, class:"flow-line", stroke:segment.color, "stroke-width":segment.width || 5
+  });
+  const dot = makeSvg("circle", {
+    r:segment.width ? segment.width + 1 : 6, class:"flow-dot", fill:"#ffffff"
+  });
+  flowGroup.appendChild(halo);
+  flowGroup.appendChild(line);
+  flowGroup.appendChild(dot);
+  const len = line.getTotalLength();
+  line.style.strokeDasharray = `${Math.min(120, len*.18)} ${len}`;
+  halo.style.strokeDasharray = `${Math.min(135, len*.2)} ${len}`;
+  activeFlows.push({line, halo, dot, len, order, reverse:segment.reverse});
+}
+
+function addHighlight(id){
+  const c = components[id];
+  if(!c) return;
+  const rect = makeSvg("rect", {
+    x:c.x, y:c.y, width:c.w, height:c.h, rx:c.rx ?? 3,
+    fill:"none", stroke:c.color || C.batt, "stroke-width":2.2,
+    filter:"url(#hl-glow)", opacity:.82
+  });
+  const shade = makeSvg("rect", {
+    x:c.x, y:c.y, width:c.w, height:c.h, rx:c.rx ?? 3,
+    fill:c.color || C.batt, opacity:.025
+  });
+  hlGroup.appendChild(shade);
+  hlGroup.appendChild(rect);
+  const tag = document.createElement("div");
+  tag.className = "component-tag";
+  tag.textContent = c.label;
+  tagLayer.appendChild(tag);
+  activeTags.push({el:tag,x:c.x,y:c.y});
+}
+
+function updateTagPositions(){
+  activeTags.forEach(t => {
+    const [x,y] = s2s(t.x, t.y);
+    t.el.style.left = `${x}px`;
+    t.el.style.top = `${y - 24}px`;
+  });
+}
+
+function animate(ts){
+  activeFlows.forEach(f => {
+    const phase = ((ts/1000*spd) + f.order*.18) % 1;
+    const p = f.reverse ? 1 - phase : phase;
+    const dash = Math.min(150, f.len*.22);
+    const offset = f.len - phase * (f.len + dash);
+    f.line.style.strokeDashoffset = offset;
+    f.halo.style.strokeDashoffset = offset;
+    const pt = f.line.getPointAtLength(clamp(p * f.len, 0, f.len));
+    f.dot.setAttribute("cx", pt.x);
+    f.dot.setAttribute("cy", pt.y);
+  });
+  raf = requestAnimationFrame(animate);
+}
+
+function setStepButtonState(index){
+  document.querySelectorAll(".step-btn").forEach((btn, i) => {
+    btn.classList.toggle("active", i === index);
+    btn.classList.toggle("done", i < index);
+    const status = btn.querySelector(".step-status span:last-child");
+    if(i === index) status.textContent = "动态演示中";
+    else if(i < index) status.textContent = "已讲解";
+    else status.textContent = "等待中";
+  });
+}
+
+function updateText(step){
+  document.getElementById("detailTitle").textContent = step.title;
+  document.getElementById("detailBody").textContent = step.body;
+  const ul = document.getElementById("detailPoints");
+  ul.innerHTML = "";
+  step.points.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = p;
+    ul.appendChild(li);
+  });
+  document.getElementById("stageTitle").textContent = step.title;
+  document.getElementById("stageText").textContent = step.body;
+}
+
+function runStep(index){
+  currentStep = index;
+  const step = steps[index];
+  clearVisuals();
+  setStepButtonState(index);
+  updateText(step);
+  step.components.forEach(addHighlight);
+  step.flows.forEach(addFlow);
+  focusOn(step.focus);
+  raf = requestAnimationFrame(animate);
+}
+
+function setSpeed(v, btn){
+  spd = v;
+  document.querySelectorAll("[data-speed]").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+}
+
+function toggleAuto(){
+  const btn = document.getElementById("autoBtn");
+  if(autoTimer){
+    clearInterval(autoTimer); autoTimer = null; btn.classList.remove("on"); btn.textContent = "自动播放";
+    return;
+  }
+  btn.classList.add("on"); btn.textContent = "停止播放";
+  const start = currentStep >= 0 ? currentStep : 0;
+  runStep(start);
+  autoTimer = setInterval(() => {
+    const next = (currentStep + 1) % steps.length;
+    runStep(next);
+  }, 7600 / spd);
+}
+
+document.querySelectorAll("[data-speed]").forEach(btn => {
+  btn.addEventListener("click", () => setSpeed(Number(btn.dataset.speed), btn));
+});
+document.getElementById("autoBtn").addEventListener("click", toggleAuto);
+document.getElementById("homeBtn").addEventListener("click", fitWhole);
+
+buildSteps();
+fitWhole();
+const initialStep = Number(new URLSearchParams(location.search).get("step") ?? 0);
+setTimeout(() => runStep(Number.isFinite(initialStep) && steps[initialStep] ? initialStep : 0), 350);
+</script>
+</body>
+</html>
