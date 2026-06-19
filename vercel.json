@@ -1,6 +1,8 @@
 {
   "buildCommand": null,
   "outputDirectory": "dist",
+  "cleanUrls": false,
+  "trailingSlash": false,
   "functions": {
     "api/*.js": {
       "maxDuration": 300

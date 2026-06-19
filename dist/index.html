@@ -4439,7 +4439,7 @@ function chElecSwitchDiagram(type){
 
   if(type==='mobile_eu'){
     titleEl.textContent='欧标移动充电桩 - 完整电气原理图 (28 步交互)';
-    if(iframe){iframe.style.display='block';iframe.src='charging_schematic_detail.html?step=0';}
+    if(iframe){iframe.style.display='block';iframe.src=window.location.origin+'/charging_schematic_detail.html?step=0&v='+(window.CHARGING_DETAIL_VER||1);}
     const svgBox=document.getElementById('chElecSvg');
     if(svgBox&&svgBox.querySelector('svg')) svgBox.querySelector('svg').style.display='none';
     bomEl.innerHTML=chEuBomHtml();
