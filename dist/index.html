@@ -244,9 +244,9 @@ select.form-input{appearance:auto}
 <nav class="category-tabs">
 <div class="category-tab active" onclick="switchCategory('ess')" data-i18n="cat_ess">储能方案智能体</div>
 <div class="category-tab" onclick="switchCategory('microgrid')" data-i18n="cat_mg">微网交付智能体</div>
-<div class="category-tab" onclick="switchCategory('aidc')" data-i18n="cat_aidc">AIDC方案智能体</div>
-<div class="category-tab" onclick="switchCategory('battery_swap')" data-i18n="cat_bs">换电方案智能体</div>
+<div class="category-tab" onclick="switchCategory('aidc')" data-i18n="cat_aidc">AIDC 方案智能体</div>
 <div class="category-tab" onclick="switchCategory('charging')" data-i18n="cat_charging">充电方案智能体</div>
+<div class="category-tab" onclick="switchCategory('battery_swap')" data-i18n="cat_bs">换电方案智能体</div>
 </nav>
 
 <div id="essNav">
@@ -4008,7 +4008,7 @@ window._ESS_COMPLIANCE_READY=true;
 function switchCategory(cat){
 
   document.querySelectorAll('.category-tab').forEach(t=>t.classList.remove('active'));
-  const catIdx=cat==='ess'?0:cat==='microgrid'?1:cat==='aidc'?2:cat==='battery_swap'?3:cat==='charging'?4:0;
+  const catIdx=cat==='ess'?0:cat==='microgrid'?1:cat==='aidc'?2:cat==='charging'?3:cat==='battery_swap'?4:0;
   document.querySelectorAll('.category-tab')[catIdx].classList.add('active');
   const essNav=document.getElementById('essNav');
   const mgNav=document.getElementById('microgridNav');
@@ -4053,18 +4053,6 @@ function switchCategory(cat){
     document.querySelectorAll('.bs-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
     showAidcPage('aidc-design');
-  }else if(cat==='battery_swap'){
-    essNav.style.display='none';
-    mgNav.style.display='none';
-    aidcNav.style.display='none';
-    if(bsNav)bsNav.style.display='block';
-    if(chNav)chNav.style.display='none';
-    if(mc)mc.style.display='none';
-    document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
-    document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
-    document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
-    document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
-    bsShowPage('bs-design');
   }else if(cat==='charging'){
     essNav.style.display='none';
     mgNav.style.display='none';
@@ -4077,6 +4065,18 @@ function switchCategory(cat){
     document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.bs-content').forEach(t=>t.style.display='none');
     showChargingPage('ch-design');
+  }else if(cat==='battery_swap'){
+    essNav.style.display='none';
+    mgNav.style.display='none';
+    aidcNav.style.display='none';
+    if(bsNav)bsNav.style.display='block';
+    if(chNav)chNav.style.display='none';
+    if(mc)mc.style.display='none';
+    document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
+    bsShowPage('bs-design');
   }
 }
 
