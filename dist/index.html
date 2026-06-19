@@ -35446,157 +35446,17 @@ function chElecSwitchDiagram(type){
   }else if(type==='liquid_cooling'){
     titleEl.textContent='液冷超充堆 - 720kW (双枪 480 + 单枪 720)';
     if(iframe) iframe.style.display='none';
-    let s2='<svg viewBox="0 0 1180 720" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0a0e1a;font-family:-apple-system,\'Segoe UI\',sans-serif">';
-    s2+='<defs>';
-    s2+='<marker id="arrP" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 Z" fill="#06b6d4"/></marker>';
-    s2+='<marker id="arrW" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 Z" fill="#e2a3ff"/></marker>';
-    s2+='</defs>';
-    s2+='<text x="590" y="22" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">液冷超充堆 720kW — 主功率拓扑 + 液冷循环 P&amp;ID</text>';
-    s2+='<text x="590" y="40" text-anchor="middle" fill="#94a3b8" font-size="10">AC 380V → PFC整流 → 直流母线 1000V → DC/DC(液冷SiC) → 输出接触器 → 液冷枪线 ｜ 50%乙二醇 12L/min 闭式循环</text>';
-    s2+='<rect x="16" y="52" width="1148" height="380" rx="8" fill="none" stroke="#1e293b" stroke-width="1"/>';
-    s2+='<text x="28" y="70" fill="#64748b" font-size="10" font-weight="700">① 主功率回路 (POWER)</text>';
-    s2+='<rect x="16" y="450" width="1148" height="252" rx="8" fill="none" stroke="#1e293b" stroke-width="1"/>';
-    s2+='<text x="28" y="468" fill="#64748b" font-size="10" font-weight="700">② 液冷循环系统 (COOLANT P&amp;ID)</text>';
-    // busbars
-    s2+='<line x1="60" y1="120" x2="1120" y2="120" stroke="#4a90d9" stroke-width="4"/>';
-    s2+='<text x="1124" y="116" fill="#4a90d9" font-size="9">AC</text>';
-    s2+='<line x1="430" y1="260" x2="1120" y2="260" stroke="#f59e0b" stroke-width="4"/>';
-    s2+='<text x="1124" y="256" fill="#f59e0b" font-size="9">DC+</text>';
-    s2+='<line x1="430" y1="300" x2="1120" y2="300" stroke="#94a3b8" stroke-width="4"/>';
-    s2+='<text x="1124" y="296" fill="#94a3b8" font-size="9">DC-</text>';
-    // power nodes (vertical taps with junction dots)
-    function dot(x,y,c){s2+='<circle cx="'+x+'" cy="'+y+'" r="3.5" fill="'+c+'"/>';}
-    function vtap(x,c){s2+='<line x1="'+x+'" y1="120" x2="'+x+'" y2="260" stroke="'+c+'" stroke-width="2.5"/>';dot(x,120,'#4a90d9');dot(x,260,'#f59e0b');}
-    // source 10kV/AC
-    s2+='<text x="44" y="96" fill="#4a90d9" font-size="9">10kV</text>';
-    s2+='<circle cx="50" cy="120" r="6" fill="#1e3a5f" stroke="#4a90d9" stroke-width="2"/>';
-    // AC input breaker symbol (QF) on bus feed
-    s2+='<line x1="50" y1="120" x2="110" y2="120" stroke="#4a90d9" stroke-width="3"/>';
-    s2+='<line x1="110" y1="116" x2="124" y2="124" stroke="#f59e0b" stroke-width="2.5"/>';
-    s2+='<text x="117" y="108" fill="#f59e0b" font-size="8">QF1</text>';
-    // AC cabinet
-    s2+='<rect x="150" y="100" width="120" height="44" rx="4" fill="#1e3a5f" stroke="#4a90d9"/>';
-    s2+='<text x="210" y="120" text-anchor="middle" fill="#4a90d9" font-size="10" font-weight="700">AC 配电柜</text>';
-    s2+='<text x="210" y="134" text-anchor="middle" fill="#7fb3e6" font-size="8">QF2+SPD+计量</text>';
-    // transformer
-    s2+='<line x1="270" y1="122" x2="320" y2="122" stroke="#4a90d9" stroke-width="3"/>';
-    s2+='<circle cx="332" cy="122" r="10" fill="none" stroke="#e8a838" stroke-width="2"/>';
-    s2+='<circle cx="344" cy="122" r="10" fill="none" stroke="#e8a838" stroke-width="2"/>';
-    s2+='<text x="338" y="150" text-anchor="middle" fill="#e8a838" font-size="8">T1 1600kVA 10/0.4kV</text>';
-    s2+='<line x1="354" y1="122" x2="430" y2="120" stroke="#4a90d9" stroke-width="3"/>';
-    // PFC rectifier module stack (4x)
-    s2+='<rect x="400" y="138" width="60" height="124" rx="4" fill="#3d1820" stroke="#e06070"/>';
-    s2+='<text x="430" y="154" text-anchor="middle" fill="#e06070" font-size="9" font-weight="700">PFC 整流</text>';
-    for(let i=0;i<4;i++){s2+='<rect x="412" y="'+(166+i*22)+'" width="36" height="16" rx="2" fill="#5a2230" stroke="#e06070"/>';s2+='<text x="430" y="'+(178+i*22)+'" text-anchor="middle" fill="#ffb3bd" font-size="7">M'+(i+1)+'</text>';}
-    s2+='<text x="430" y="276" text-anchor="middle" fill="#e06070" font-size="8">180kW×4 AC/DC</text>';
-    vtap(430,'#e06070');
-    // DC bus cap
-    s2+='<line x1="430" y1="300" x2="430" y2="316" stroke="#94a3b8" stroke-width="2"/>';
-    s2+='<line x1="416" y1="316" x2="444" y2="316" stroke="#94a3b8" stroke-width="2.5"/>';
-    s2+='<line x1="422" y1="316" x2="422" y2="332" stroke="#94a3b8" stroke-width="2.5"/>';
-    s2+='<line x1="438" y1="316" x2="438" y2="332" stroke="#94a3b8" stroke-width="2.5"/>';
-    s2+='<text x="452" y="328" fill="#94a3b8" font-size="8">C DC-Link</text>';
-    // DC/DC liquid cooled modules (4) - tapped from DC bus
-    function dcdc(x,label){
-      s2+='<rect x="'+(x-26)+'" y="138" width="52" height="120" rx="4" fill="#0d2a15" stroke="#50c878"/>';
-      s2+='<text x="'+x+'" y="156" text-anchor="middle" fill="#50c878" font-size="8" font-weight="700">'+label+'</text>';
-      s2+='<rect x="'+(x-18)+'" y="168" width="36" height="80" rx="3" fill="#103a1f" stroke="#2fae6e"/>';
-      s2+='<path d="M'+(x-12)+',180 q12,-12 24,0 q12,12 0,24 q-12,12 -24,0 q-12,-12 0,-24" fill="none" stroke="#06b6d4" stroke-width="1.5"/>';
-      s2+='<text x="'+x+'" y="282" text-anchor="middle" fill="#50c878" font-size="7">液冷板</text>';
-      s2+='<line x1="'+x+'" y1="120" x2="'+x+'" y2="260" stroke="#50c878" stroke-width="2.5"/>';
-      s2+='<line x1="'+x+'" y1="258" x2="'+x+'" y2="300" stroke="#94a3b8" stroke-width="2"/>';
-      dot(x,120,'#4a90d9');dot(x,260,'#f59e0b');dot(x,300,'#94a3b8');
-    }
-    dcdc(640,'DC/DC1');
-    dcdc(760,'DC/DC2');
-    dcdc(880,'DC/DC3');
-    dcdc(1000,'DC/DC4');
-    // output contactor + fuse per gun line
-    function feeder(x,label,kw){
-      // branch up to DC+ bus
-      s2+='<line x1="'+x+'" y1="260" x2="'+x+'" y2="346" stroke="#f59e0b" stroke-width="2.5"/>';
-      s2+='<line x1="'+x+'" y1="300" x2="'+x+'" y2="346" stroke="#94a3b8" stroke-width="2"/>';
-      // fuse
-      s2+='<rect x="'+(x-7)+'" y="346" width="14" height="14" fill="#3a2a10" stroke="#f59e0b"/>';
-      s2+='<line x1="'+x+'" y1="346" x2="'+x+'" y2="360" stroke="#f59e0b" stroke-width="1"/>';
-      s2+='<text x="'+(x+10)+'" y="356" fill="#f59e0b" font-size="7">FU</text>';
-      // contactor symbol
-      s2+='<line x1="'+x+'" y1="360" x2="'+x+'" y2="374" stroke="#f59e0b" stroke-width="2"/>';
-      s2+='<line x1="'+(x-7)+'" y1="374" x2="'+(x+7)+'" y2="384" stroke="#8B5CF6" stroke-width="2.5"/>';
-      s2+='<text x="'+(x+10)+'" y="384" fill="#8B5CF6" font-size="7">K'+label+'</text>';
-      s2+='<line x1="'+x+'" y1="384" x2="'+x+'" y2="404" stroke="#f59e0b" stroke-width="2.5"/>';
-      // gun
-      s2+='<rect x="'+(x-30)+'" y="404" width="60" height="22" rx="3" fill="#2d1e3f" stroke="#8B5CF6"/>';
-      s2+='<text x="'+x+'" y="419" text-anchor="middle" fill="#e2a3ff" font-size="8" font-weight="700">'+kw+'</text>';
-    }
-    feeder(640,'A','枪A 480kW');
-    feeder(760,'B','枪B 480kW');
-    feeder(880,'C','枪C 600kW');
-    feeder(1000,'D','枪D 600kW');
-    // PE bus
-    s2+='<line x1="60" y1="426" x2="1120" y2="426" stroke="#6b7280" stroke-width="2" stroke-dasharray="6,4"/>';
-    s2+='<text x="1124" y="430" fill="#6b7280" font-size="9">PE</text>';
-    for(const px of [640,760,880,1000]){s2+='<line x1="'+px+'" y1="426" x2="'+px+'" y2="426" stroke="#6b7280" stroke-width="1"/>';}
-    // legend power
-    s2+='<g transform="translate(560,84)">';
-    s2+='<rect x="0" y="0" width="540" height="26" rx="4" fill="#0f1729" stroke="#1e293b"/>';
-    s2+='<circle cx="16" cy="13" r="3.5" fill="#4a90d9"/><text x="26" y="17" fill="#94a3b8" font-size="9">节点</text>';
-    s2+='<line x1="64" y1="13" x2="92" y2="13" stroke="#4a90d9" stroke-width="4"/><text x="98" y="17" fill="#94a3b8" font-size="9">AC</text>';
-    s2+='<line x1="128" y1="13" x2="156" y2="13" stroke="#f59e0b" stroke-width="4"/><text x="162" y="17" fill="#94a3b8" font-size="9">DC+</text>';
-    s2+='<line x1="200" y1="13" x2="228" y2="13" stroke="#94a3b8" stroke-width="4"/><text x="234" y="17" fill="#94a3b8" font-size="9">DC-</text>';
-    s2+='<line x1="272" y1="13" x2="300" y2="13" stroke="#06b6d4" stroke-width="2"/><text x="306" y="17" fill="#94a3b8" font-size="9">冷却液</text>';
-    s2+='<line x1="352" y1="9" x2="366" y2="17" stroke="#f59e0b" stroke-width="2.5"/><text x="372" y="17" fill="#94a3b8" font-size="9">QF/接触器</text>';
-    s2+='<line x1="448" y1="13" x2="476" y2="13" stroke="#6b7280" stroke-width="2" stroke-dasharray="5,3"/><text x="482" y="17" fill="#94a3b8" font-size="9">PE</text>';
-    s2+='</g>';
-    // ===== Coolant P&ID =====
-    // CDU
-    s2+='<rect x="60" y="500" width="150" height="90" rx="6" fill="#0f1729" stroke="#06b6d4"/>';
-    s2+='<text x="135" y="520" text-anchor="middle" fill="#06b6d4" font-size="11" font-weight="700">CDU 冷量分配单元</text>';
-    s2+='<text x="135" y="538" text-anchor="middle" fill="#7fdbe6" font-size="9">压缩机 15kW 制冷</text>';
-    s2+='<text x="135" y="554" text-anchor="middle" fill="#7fdbe6" font-size="9">换热板换 + 膨胀罐 5L</text>';
-    s2+='<text x="135" y="572" text-anchor="middle" fill="#7fdbe6" font-size="9">水温≤35℃ / 压力 4bar</text>';
-    // pump (circle with P)
-    s2+='<circle cx="280" cy="545" r="16" fill="#0f1729" stroke="#06b6d4" stroke-width="2"/>';
-    s2+='<text x="280" y="550" text-anchor="middle" fill="#06b6d4" font-size="11" font-weight="700">P</text>';
-    s2+='<text x="280" y="580" text-anchor="middle" fill="#7fdbe6" font-size="8">循环泵 12L/min</text>';
-    // supply manifold
-    s2+='<line x1="210" y1="545" x2="264" y2="545" stroke="#06b6d4" stroke-width="3" marker-end="url(#arrP)"/>';
-    s2+='<rect x="320" y="530" width="760" height="8" rx="3" fill="#06b6d4" opacity="0.55"/>';
-    s2+='<text x="700" y="524" text-anchor="middle" fill="#06b6d4" font-size="9">供水母管 DN32 (去热)</text>';
-    s2+='<line x1="296" y1="545" x2="320" y2="534" stroke="#06b6d4" stroke-width="3"/>';
-    // 4 cold plates (modules)
-    function cplate(x,label){
-      s2+='<line x1="'+x+'" y1="538" x2="'+x+'" y2="568" stroke="#06b6d4" stroke-width="2"/>';
-      s2+='<rect x="'+(x-32)+'" y="568" width="64" height="44" rx="4" fill="#0d2a15" stroke="#2fae6e"/>';
-      s2+='<text x="'+x+'" y="586" text-anchor="middle" fill="#50c878" font-size="9" font-weight="700">'+label+'</text>';
-      s2+='<text x="'+x+'" y="600" text-anchor="middle" fill="#9be8bf" font-size="8">液冷板/SiC</text>';
-      s2+='<line x1="'+x+'" y1="612" x2="'+x+'" y2="642" stroke="#e2a3ff" stroke-width="2" marker-end="url(#arrW)"/>';
-    }
-    cplate(420,'DC/DC1');
-    cplate(620,'DC/DC2');
-    cplate(820,'DC/DC3');
-    cplate(1020,'DC/DC4');
-    // return manifold (warm)
-    s2+='<rect x="320" y="642" width="760" height="8" rx="3" fill="#e2a3ff" opacity="0.5"/>';
-    s2+='<text x="700" y="664" text-anchor="middle" fill="#e2a3ff" font-size="9">回水母管 DN32 (吸热后 ≤65℃)</text>';
-    // return to CDU
-    s2+='<line x1="320" y1="646" x2="135" y2="646" stroke="#e2a3ff" stroke-width="3"/>';
-    s2+='<line x1="135" y1="646" x2="135" y2="590" stroke="#e2a3ff" stroke-width="3" marker-end="url(#arrW)"/>';
-    // sensors on return
-    s2+='<circle cx="240" cy="646" r="6" fill="#1e3a5f" stroke="#06b6d4"/>';
-    s2+='<text x="240" y="650" text-anchor="middle" fill="#7fdbe6" font-size="7">T</text>';
-    s2+='<circle cx="190" cy="646" r="6" fill="#1e3a5f" stroke="#06b6d4"/>';
-    s2+='<text x="190" y="650" text-anchor="middle" fill="#7fdbe6" font-size="7">Q</text>';
-    // coolant spec note
-    s2+='<rect x="40" y="672" width="1100" height="22" rx="4" fill="#0f1729" stroke="#1e293b"/>';
-    s2+='<text x="50" y="687" fill="#c2c0b6" font-size="9">介质 50%乙二醇 ｜ 流量12L/min ｜ 进≤35℃/出≤65℃/温升≤30℃ ｜ EPDM密封+漏液检测+自动关断 ｜ 管径DN20-DN32 不锈钢 ｜ 电导率<5μS/cm</text>';
-    s2+='</svg>';
     let sb=document.getElementById('chElecSvg');
     let oi=sb.querySelector('iframe');if(oi) oi.style.display='none';
     let os=sb.querySelector('svg');if(os) os.remove();
     let ogw=sb.querySelector('.gb-schematic-wrap');if(ogw) ogw.remove();
-    sb.insertAdjacentHTML('beforeend',s2);
-    if(window._chDiagramLight){let nsvg=sb.querySelector('svg');if(nsvg) nsvg.style.filter='invert(1) hue-rotate(180deg) brightness(1.1)';}
+    let lcWrap=document.createElement('div');
+    lcWrap.className='gb-schematic-wrap';
+    lcWrap.style.cssText='width:100%;height:100%;position:absolute;inset:0;background:#f5f6f8';
+    lcWrap.innerHTML='<img src="images/liquid_cooling_schematic.svg" alt="液冷超充储能电气图" style="width:100%;height:100%;object-fit:contain;display:block" draggable="false"/>';
+    sb.appendChild(lcWrap);
+    enableGbPanZoom(lcWrap);
+    if(window._chDiagramLight){lcWrap.style.filter='invert(1) hue-rotate(180deg) brightness(1.1)';}
     bomEl.innerHTML=chLcBomHtml();
     paramsEl.innerHTML=chLcParamsHtml();
     protectionEl.innerHTML=chLcProtectionHtml();
