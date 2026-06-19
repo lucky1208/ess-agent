@@ -35425,6 +35425,8 @@ function chElecSwitchDiagram(type){
     if(iframe){iframe.style.display='block';loadChargingSchematicIframe(iframe);}
     const svgBox=document.getElementById('chElecSvg');
     if(svgBox&&svgBox.querySelector('svg')) svgBox.querySelector('svg').style.display='none';
+    // Clear previous diagram renders
+    let oldGw=svgBox.querySelector('.gb-schematic-wrap');if(oldGw) oldGw.remove();
     bomEl.innerHTML=chEuBomHtml();
     paramsEl.innerHTML=chEuParamsHtml();
     protectionEl.innerHTML=chEuProtectionHtml();
