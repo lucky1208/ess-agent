@@ -1,30 +1,15 @@
-﻿fix(deploy): 改用 inline ES module 打包 IEC 符号库,绕开 Vercel 文件系统限制
+﻿fix(deploy): Plan B round 2 - client-render-svg.js inline 进 index.html
 
-之前两次修复(b31142b 用 api/_iec_symbols_svg/, affd8b4 用
-vercel.json includeFiles="iec_symbols_svg/**") 都没让 ess-agent.com
-生产环境的 L5 SLD 显示真 IEC 矢量符号,仍是 5 个空矩形。
+ff28854 commit 把 client-render-svg.js 作为独立 .js 文件部署到
+dist/client-render-svg.js,期望浏览器通过 <script src="client-render-svg.js">
+加载。但 Vercel CDN 返回 404 NOT_FOUND — 这个独立 .js 没被 serve。
 
-根因:Vercel serverless function 默认只打包 函数入口文件本身 + node_modules,
-不会把 api/ 下其他文件 或 includeFiles 路径自动打进 function bundle。
-resolveIecDir() 运行时找不到 iec_symbols_svg/,fallback 到 [?] 占位符。
+虽然 dist/index.html 被部署了,但其它 dist/ 下的文件路径访问不到
+(curl https://www.ess-agent.com/client-render-svg.js 404)。
 
-最终方案:把 373 个 SVG 内联到一个 ES module 文件(api/_iec_symbols_inline.mjs,
-3.1 MB),api/render_svg.js 用 static import('./_iec_symbols_inline.mjs')
-加载。Static import 走 Vercel 函数打包路径,保证 inline mjs 100% 进 function
-bundle,不依赖任何文件系统 IO。
+修复:把 dist/client-render-svg.js (3.1 MB) 的完整内容 inline 进
+dist/index.html 和 index.html 的 <script> 块(放在 mermaid 之后)。
+HTML 总大小:3.2 MB -> 6.4 MB,首次加载多 2-3 秒,但绝对可用。
 
-改动:
-1. tools/build_inline_iec_symbols.py — 新增:扫描 iec_symbols_svg/ 生成
-   api/_iec_symbols_inline.mjs (export const IEC_SYMBOLS_INDEX + IEC_SYMBOLS_FILES)
-2. api/_iec_symbols_inline.mjs — 新增 (3.1 MB, auto-generated)
-3. api/render_svg.js — top-level await import + loadIecSymbol() 优先读 INLINE_FILES
-4. 删除冗余:api/_iec_symbols_svg/ + dist/_iec_symbols_svg/ + dist/iec_symbols_svg/
-   (inline 方案不再需要这些目录)
-5. .gitignore — 加 nul (Windows 保留名)
-
-本地 smoke 验证 (PRJ INLINE-TEST, 2000kWh / 1000kW / 10kV):
-  svg_len=74989, symbols=5, layers=6, components=7
-  has <path>: true, has data:image/png;base64: false
-
-预期 Vercel:刷新 ess-agent.com (Ctrl+Shift+R 硬刷新) 后,L5 SLD 出现
-真 IEC 矢量符号 (断路器/变压器/电池/PCS/电网),不再是 5 个空矩形。
+工具: tools/inline_client_renderer.js (idempotent,可重跑)
+dist/client-render-svg.js 保留在 repo,作为 source-of-truth 和 trace。
