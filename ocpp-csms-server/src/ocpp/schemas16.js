@@ -1,0 +1,43 @@
+module.exports = {
+  ChangeAvailability: { type: 'object', properties: { connectorId: { type: 'integer' }, type: { type: 'string', enum: ['Inoperative', 'Operative'] } }, required: ['connectorId', 'type'] },
+  ChangeConfiguration: { type: 'object', properties: { key: { type: 'string' }, value: { type: 'string' } }, required: ['key', 'value'] },
+  ClearCache: { type: 'object', properties: {}, required: [] },
+  DataTransfer: { type: 'object', properties: { vendorId: { type: 'string' }, messageId: { type: 'string' }, data: { type: 'string' } }, required: ['vendorId'] },
+  GetConfiguration: { type: 'object', properties: { key: { type: 'array', items: { type: 'string' } } }, required: [] },
+  RemoteStartTransaction: { type: 'object', properties: { connectorId: { type: 'integer' }, idTag: { type: 'string' } }, required: ['idTag'] },
+  RemoteStopTransaction: { type: 'object', properties: { transactionId: { type: 'integer' } }, required: ['transactionId'] },
+  Reset: { type: 'object', properties: { type: { type: 'string', enum: ['Hard', 'Soft'] } }, required: ['type'] },
+  UnlockConnector: { type: 'object', properties: { connectorId: { type: 'integer' } }, required: ['connectorId'] },
+  GetDiagnostics: { type: 'object', properties: { location: { type: 'string' }, retries: { type: 'integer' }, retryInterval: { type: 'integer' } }, required: ['location'] },
+  UpdateFirmware: { type: 'object', properties: { location: { type: 'string' }, retrieveDate: { type: 'string' }, retries: { type: 'integer' } }, required: ['location'] },
+  GetLocalListVersion: { type: 'object', properties: {}, required: [] },
+  SendLocalList: { type: 'object', properties: { listVersion: { type: 'integer' }, localAuthorizationList: { type: 'array' }, updateType: { type: 'string', enum: ['Differential', 'Full'] } }, required: ['listVersion', 'updateType'] },
+  ReserveNow: { type: 'object', properties: { connectorId: { type: 'integer' }, expiryDate: { type: 'string' }, idTag: { type: 'string' }, reservationId: { type: 'integer' } }, required: ['connectorId', 'expiryDate', 'idTag', 'reservationId'] },
+  CancelReservation: { type: 'object', properties: { reservationId: { type: 'integer' } }, required: ['reservationId'] },
+  ClearChargingProfile: { type: 'object', properties: { id: { type: 'integer' }, connectorId: { type: 'integer' }, chargingProfilePurpose: { type: 'string', enum: ['ChargePointMaxProfile', 'TxDefaultProfile', 'TxProfile'] }, stackLevel: { type: 'integer' } }, required: [] },
+  GetCompositeSchedule: { type: 'object', properties: { connectorId: { type: 'integer' }, duration: { type: 'integer' }, chargingRateUnit: { type: 'string', enum: ['A', 'W'] } }, required: ['connectorId', 'duration'] },
+  SetChargingProfile: { type: 'object', properties: { connectorId: { type: 'integer' }, csChargingProfiles: { type: 'object' } }, required: ['connectorId', 'csChargingProfiles'] },
+  TriggerMessage: { type: 'object', properties: { requestedMessage: { type: 'string', enum: ['BootNotification', 'DiagnosticsStatusNotification', 'FirmwareStatusNotification', 'Heartbeat', 'MeterValues', 'StatusNotification'] }, connectorId: { type: 'integer' } }, required: ['requestedMessage'] }
+};
+
+module.exports.ACTIONS = [
+  { name: 'ChangeAvailability', dir: 'CS→CP', desc: '改变充电桩可用性' },
+  { name: 'ChangeConfiguration', dir: 'CS→CP', desc: '修改配置项' },
+  { name: 'ClearCache', dir: 'CS→CP', desc: '清除鉴权缓存' },
+  { name: 'DataTransfer', dir: 'CS↔CP', desc: '自定义数据传输' },
+  { name: 'GetConfiguration', dir: 'CS→CP', desc: '获取配置项' },
+  { name: 'RemoteStartTransaction', dir: 'CS→CP', desc: '远程启动充电' },
+  { name: 'RemoteStopTransaction', dir: 'CS→CP', desc: '远程停止充电' },
+  { name: 'Reset', dir: 'CS→CP', desc: '重启充电桩' },
+  { name: 'UnlockConnector', dir: 'CS→CP', desc: '解锁充电枪' },
+  { name: 'GetDiagnostics', dir: 'CS→CP', desc: '获取诊断信息' },
+  { name: 'UpdateFirmware', dir: 'CS→CP', desc: '固件升级' },
+  { name: 'GetLocalListVersion', dir: 'CS→CP', desc: '获取本地白名单版本' },
+  { name: 'SendLocalList', dir: 'CS→CP', desc: '下发本地白名单' },
+  { name: 'ReserveNow', dir: 'CS→CP', desc: '预约充电' },
+  { name: 'CancelReservation', dir: 'CS→CP', desc: '取消预约' },
+  { name: 'ClearChargingProfile', dir: 'CS→CP', desc: '清除充电曲线' },
+  { name: 'GetCompositeSchedule', dir: 'CS→CP', desc: '获取复合充电计划' },
+  { name: 'SetChargingProfile', dir: 'CS→CP', desc: '设置充电曲线' },
+  { name: 'TriggerMessage', dir: 'CS→CP', desc: '触发消息上报' }
+];

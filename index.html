@@ -1846,7 +1846,13 @@ ACC AC一体柜专题
 </div>
 <div id="chProtoContent">
 <div id="chProtoOcpp">
-<div class="ocpp-debug-breadcrumb"><span>Home</span><span class="ocpp-debug-bc-sep">/</span><span>Debug Center</span><span class="ocpp-debug-bc-sep">/</span><span class="ocpp-debug-bc-active" id="ocppDebugBcAction">ChangeAvailability</span></div>
+<div class="ocpp-debug-breadcrumb"><span>Home</span><span class="ocpp-debug-bc-sep">/</span><span>Debug Center</span><span class="ocpp-debug-bc-sep">/</span><span class="ocpp-debug-bc-active" id="ocppDebugBcAction">ChangeAvailability</span><span style="margin-left:auto;display:flex;align-items:center;gap:6px"><span class="em-comm-dot" id="ocppDebugConnDot" style="background:var(--text2)"></span><span id="ocppDebugConnLabel" style="font-size:11px;color:var(--text2)">未连接</span></span></div>
+<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+<span class="mg-label" style="margin:0;white-space:nowrap">CSMS地址</span>
+<input class="mg-input" id="ocppDebugServerUrl" value="" placeholder="https://your-csms.railway.app" style="max-width:280px;font-size:11px">
+<button class="ocpp-debug-call-btn" style="padding:5px 12px;font-size:11px;background:var(--blue)" onclick="ocppDebugSaveConfig()">保存</button>
+<span id="ocppDebugWsUrl" style="font-size:10px;color:var(--text2);margin-left:8px;cursor:pointer" onclick="ocppDebugCopyWsUrl()" title="点击复制充电桩连接地址">wss://...</span>
+</div>
 <div class="ocpp-debug-ver-tabs">
 <div class="ocpp-debug-ver-tab active" onclick="ocppDebugSwitchVer('1.6J')">OCPP 1.6J</div>
 <div class="ocpp-debug-ver-tab" onclick="ocppDebugSwitchVer('2.0.1')">OCPP 2.0.1</div>
@@ -1859,7 +1865,7 @@ ACC AC一体柜专题
 </div>
 <div class="ocpp-debug-panel">
 <div class="ocpp-debug-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Request</div>
-<div class="ocpp-debug-req-row"><span class="mg-label" style="margin:0;white-space:nowrap">Product Code</span><input class="mg-input" id="ocppDebugProductCode" value="202323206050" style="max-width:200px"><button class="ocpp-debug-call-btn" onclick="ocppDebugCall()">Call</button></div>
+<div class="ocpp-debug-req-row"><span class="mg-label" style="margin:0;white-space:nowrap">充电桩</span><select class="mg-input" id="ocppDebugChargerSelect" style="max-width:200px"><option value="">-- 选择充电桩 --</option></select><button style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:11px;cursor:pointer" onclick="ocppDebugLoadChargers()" title="刷新列表">⟳</button><button class="ocpp-debug-call-btn" id="ocppDebugCallBtn" onclick="ocppDebugCall()">Call</button><label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);cursor:pointer;margin-left:6px"><input type="checkbox" id="ocppDebugSimMode" onchange="ocppDebugToggleSim()">模拟</label></div>
 <textarea class="ocpp-debug-req-textarea" id="ocppDebugReqBody" spellcheck="false"></textarea>
 <div class="ocpp-debug-panel-title" style="margin-top:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 6 2 12 8 18"/><polyline points="16 18 22 12 16 6"/></svg> Response</div>
 <div class="ocpp-debug-res-box" id="ocppDebugResBox"><span style="color:var(--text2)">Waiting for call...</span></div>
@@ -36217,8 +36223,14 @@ var OCPP_201_SCHEMAS={
 function ocppDebugInit(){
   if(!OCPP_DEBUG_STATE.inited){
     OCPP_DEBUG_STATE.inited=true;
+    var savedUrl=localStorage.getItem('ocpp_csms_url')||'';
+    var urlEl=document.getElementById('ocppDebugServerUrl');
+    if(urlEl&&savedUrl) urlEl.value=savedUrl;
     ocppDebugRenderActions();
     ocppDebugSelectAction(OCPP_DEBUG_STATE.action);
+    ocppDebugLoadChargers();
+    ocppDebugUpdateWsUrl();
+    if(savedUrl) ocppDebugInitSSE();
   }
 }
 
@@ -36316,21 +36328,154 @@ function ocppDebugGenTemplate(schema){
 }
 
 function ocppDebugCall(){
-  var pcEl=document.getElementById('ocppDebugProductCode');
+  var selEl=document.getElementById('ocppDebugChargerSelect');
   var reqEl=document.getElementById('ocppDebugReqBody');
   var resEl=document.getElementById('ocppDebugResBox');
-  if(!pcEl||!reqEl||!resEl) return;
-  var pc=pcEl.value.trim();
-  if(!/^[A-Za-z0-9_\-]+$/.test(pc)){resEl.innerHTML='<span style="color:var(--red)">Invalid Product Code</span>';resEl.className='ocpp-debug-res-box res-err';return;}
+  var simEl=document.getElementById('ocppDebugSimMode');
+  var callBtn=document.getElementById('ocppDebugCallBtn');
+  if(!reqEl||!resEl) return;
+  var chargerId=selEl?selEl.value:'';
+  var isSim=simEl?simEl.checked:false;
   var reqText=reqEl.value.trim();
   var payload;
   try{payload=JSON.parse(reqText);}catch(e){resEl.innerHTML='<span style="color:var(--red)">Invalid JSON: '+e.message+'</span>';resEl.className='ocpp-debug-res-box res-err';return;}
-  var uid=Date.now().toString()+Math.floor(Math.random()*1000).toString().padStart(3,'0');
-  var callMsg=[2,uid,OCPP_DEBUG_STATE.action,payload];
-  var callStr=JSON.stringify(callMsg,null,2);
-  var resBox=document.getElementById('ocppDebugResBox');
-  resBox.innerHTML='<div style="color:var(--text2);margin-bottom:8px">CALL sent:</div>'+ocppDebugHighlight(callStr)+'<div style="color:var(--text2);margin:10px 0 8px">Simulated CALLRESULT:</div>'+ocppDebugHighlight(JSON.stringify([3,uid,{status:'Accepted'}],null,2));
-  resBox.className='ocpp-debug-res-box res-ok';
+  if(isSim){
+    var uid=Date.now().toString()+Math.floor(Math.random()*1000).toString().padStart(3,'0');
+    var callMsg=[2,uid,OCPP_DEBUG_STATE.action,payload];
+    var callStr=JSON.stringify(callMsg,null,2);
+    resEl.innerHTML='<div style="color:var(--text2);margin-bottom:8px">CALL sent (模拟):</div>'+ocppDebugHighlight(callStr)+'<div style="color:var(--text2);margin:10px 0 8px">Simulated CALLRESULT:</div>'+ocppDebugHighlight(JSON.stringify([3,uid,{status:'Accepted'}],null,2));
+    resEl.className='ocpp-debug-res-box res-ok';
+    return;
+  }
+  if(!chargerId){resEl.innerHTML='<span style="color:var(--red)">请选择充电桩</span>';resEl.className='ocpp-debug-res-box res-err';return;}
+  var baseUrl=ocppDebugGetBaseUrl();
+  if(!baseUrl){resEl.innerHTML='<span style="color:var(--red)">请先配置CSMS地址</span>';resEl.className='ocpp-debug-res-box res-err';return;}
+  if(callBtn){callBtn.disabled=true;callBtn.textContent='Calling...';}
+  fetch(baseUrl+'/api/chargers/'+encodeURIComponent(chargerId)+'/command',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:OCPP_DEBUG_STATE.action,payload:payload})
+  }).then(function(r){return r.json();}).then(function(data){
+    if(callBtn){callBtn.disabled=false;callBtn.textContent='Call';}
+    if(data.status==='success'){
+      var uid2=Date.now().toString();
+      resEl.innerHTML='<div style="color:var(--green);margin-bottom:8px">CALLRESULT from '+chargerId+':</div>'+ocppDebugHighlight(JSON.stringify([3,uid2,data.response],null,2));
+      resEl.className='ocpp-debug-res-box res-ok';
+    }else{
+      resEl.innerHTML='<div style="color:var(--red);margin-bottom:8px">CALLERROR:</div>'+ocppDebugHighlight(JSON.stringify({error:data.message||'Unknown error'},null,2));
+      resEl.className='ocpp-debug-res-box res-err';
+    }
+  }).catch(function(e){
+    if(callBtn){callBtn.disabled=false;callBtn.textContent='Call';}
+    resEl.innerHTML='<span style="color:var(--red)">请求失败: '+e.message+'</span>';
+    resEl.className='ocpp-debug-res-box res-err';
+  });
+}
+
+function ocppDebugGetBaseUrl(){
+  var el=document.getElementById('ocppDebugServerUrl');
+  var url=el?el.value.trim():'';
+  if(!url) url=localStorage.getItem('ocpp_csms_url')||'';
+  return url.replace(/\/+$/,'');
+}
+
+function ocppDebugSaveConfig(){
+  var el=document.getElementById('ocppDebugServerUrl');
+  var url=el?el.value.trim():'';
+  if(url) localStorage.setItem('ocpp_csms_url',url);
+  ocppDebugLoadChargers();
+  ocppDebugUpdateWsUrl();
+  ocppDebugInitSSE();
+}
+
+function ocppDebugLoadChargers(){
+  var selEl=document.getElementById('ocppDebugChargerSelect');
+  if(!selEl) return;
+  var baseUrl=ocppDebugGetBaseUrl();
+  if(!baseUrl){
+    selEl.innerHTML='<option value="">-- 请先配置CSMS地址 --</option>';
+    ocppDebugSetConnStatus(false);
+    return;
+  }
+  fetch(baseUrl+'/api/chargers').then(function(r){return r.json();}).then(function(list){
+    var html='<option value="">-- 选择充电桩 ('+list.length+'台在线) --</option>';
+    list.forEach(function(c){
+      html+='<option value="'+c.id+'">'+c.id+' ('+c.status+', '+c.ip+')</option>';
+    });
+    selEl.innerHTML=html;
+    ocppDebugSetConnStatus(true);
+  }).catch(function(e){
+    selEl.innerHTML='<option value="">-- 无法连接服务器 --</option>';
+    ocppDebugSetConnStatus(false);
+  });
+}
+
+function ocppDebugSetConnStatus(connected){
+  var dot=document.getElementById('ocppDebugConnDot');
+  var label=document.getElementById('ocppDebugConnLabel');
+  if(dot) dot.style.background=connected?'#50c878':'var(--red)';
+  if(label) label.textContent=connected?'CSMS已连接':'CSMS未连接';
+}
+
+function ocppDebugUpdateWsUrl(){
+  var el=document.getElementById('ocppDebugWsUrl');
+  var selEl=document.getElementById('ocppDebugChargerSelect');
+  if(!el) return;
+  var baseUrl=ocppDebugGetBaseUrl();
+  if(!baseUrl){el.textContent='wss://...';return;}
+  var chargerId=selEl?selEl.value:'CP_001';
+  var wsUrl=baseUrl.replace(/^https?:/,baseUrl.startsWith('https')?'wss:':'ws:')+'/ocpp/'+chargerId;
+  el.textContent=wsUrl;
+  el.title='点击复制: '+wsUrl;
+}
+
+function ocppDebugCopyWsUrl(){
+  var el=document.getElementById('ocppDebugWsUrl');
+  if(!el) return;
+  var text=el.textContent;
+  if(navigator.clipboard){navigator.clipboard.writeText(text);}
+  else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+  el.style.color='var(--green)';
+  setTimeout(function(){el.style.color='';},1500);
+}
+
+var OCPP_DEBUG_SSE=null;
+function ocppDebugInitSSE(){
+  if(OCPP_DEBUG_SSE){OCPP_DEBUG_SSE.close();OCPP_DEBUG_SSE=null;}
+  var baseUrl=ocppDebugGetBaseUrl();
+  if(!baseUrl) return;
+  try{
+    OCPP_DEBUG_SSE=new EventSource(baseUrl+'/api/events');
+    OCPP_DEBUG_SSE.addEventListener('charger:online',function(e){
+      var data=JSON.parse(e.data);
+      ocppDebugLoadChargers();
+    });
+    OCPP_DEBUG_SSE.addEventListener('charger:offline',function(e){
+      ocppDebugLoadChargers();
+    });
+    OCPP_DEBUG_SSE.addEventListener('charger:message',function(e){
+      var data=JSON.parse(e.data);
+      var resEl=document.getElementById('ocppDebugResBox');
+      if(resEl&&data.direction==='CP→CS'){
+        var existing=resEl.innerHTML;
+        resEl.innerHTML=existing+'<div style="color:var(--orange);margin-top:8px;font-size:11px">[上报] '+data.id+' → '+data.action+':</div>'+ocppDebugHighlight(JSON.stringify(data.payload,null,2));
+      }
+    });
+    OCPP_DEBUG_SSE.onerror=function(){
+      ocppDebugSetConnStatus(false);
+    };
+  }catch(e){
+    console.warn('SSE init failed:',e);
+  }
+}
+
+function ocppDebugToggleSim(){
+  var simEl=document.getElementById('ocppDebugSimMode');
+  var selEl=document.getElementById('ocppDebugChargerSelect');
+  var callBtn=document.getElementById('ocppDebugCallBtn');
+  var isSim=simEl?simEl.checked:false;
+  if(selEl) selEl.disabled=isSim;
+  if(callBtn) callBtn.style.opacity=isSim?'0.8':'1';
 }
 
 function chDrawCooling(){
@@ -36380,6 +36525,9 @@ function chRenderSkills(){
 document.addEventListener('input',function(e){
   if(e.target&&(e.target.id==='chGunCount'||e.target.id==='chGunPower')){
     chCalcPower();
+  }
+  if(e.target&&e.target.id==='ocppDebugChargerSelect'){
+    ocppDebugUpdateWsUrl();
   }
 });
 
