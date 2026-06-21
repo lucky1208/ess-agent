@@ -36172,12 +36172,12 @@ function chSwTab(tab){
   document.getElementById('chSwArch').style.display=tab==='arch'?'':'none';
   document.getElementById('chSwSelect').style.display=tab==='select'?'':'none';
   document.getElementById('chSwDeploy').style.display=tab==='deploy'?'':'none';
-  if(tab==='arch') chDrawSwArch();
+  if(tab==='arch') chSwRenderArch();
   if(tab==='select') chSwRenderChecklists();
   if(tab==='deploy') chSwRenderProgress();
 }
 
-function chDrawSwArch(){
+function chSwRenderArch(){
   var el=document.getElementById('chSwArchSvg');
   if(!el) return;
   var layers=[
@@ -36393,8 +36393,7 @@ function chSwRenderProgress(){
 }
 
 function chDrawSwArch(){
-  var el=document.getElementById('chSwArchSvg');
-  if(!el) return;
+
   chSwTab('arch');
 }
 
