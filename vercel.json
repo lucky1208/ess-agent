@@ -5,7 +5,8 @@
   "trailingSlash": false,
   "functions": {
     "api/*.js": {
-      "maxDuration": 300
+      "maxDuration": 300,
+      "includeFiles": "iec_symbols_svg/**"
     }
   }
 }

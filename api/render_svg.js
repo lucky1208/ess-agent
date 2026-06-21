@@ -114,14 +114,17 @@ let IEC_CACHE = new Map();   // id -> { viewBox, innerSvg, w, h, name }
 let INDEX_LOAD_ATTEMPTED = false;
 
 function resolveIecDir() {
-  // (a) env override
+  // (a) env override (works on Vercel via project env var)
   if (process.env.IEC_SYMBOLS_DIR && fs.existsSync(process.env.IEC_SYMBOLS_DIR)) {
     return process.env.IEC_SYMBOLS_DIR;
   }
-  // (b) sibling at repo root:  ../../../AI auto-schematic/iec_symbols_svg
-  // (ess-platform layout: api/render_svg.js -> ess-platform/, then up to project root)
   const candidates = [];
-  // Walk up to 6 levels
+  // (b) Vercel production layout: cwd=/var/task, dist/ is the deployed bundle.
+  //     iec_symbols_svg/ is shipped inside dist/ (see scripts/sync-iec-to-dist.ps1).
+  candidates.push(path.join(process.cwd(), 'iec_symbols_svg'));
+  candidates.push(path.join(process.cwd(), 'dist', 'iec_symbols_svg'));
+  // (c) Local dev / sibling repos: walk up to 6 levels looking for iec_symbols_svg
+  //     (ess-platform layout: api/render_svg.js -> ess-platform/, then up to project root)
   let dir = __dirname;
   for (let i = 0; i < 6; i++) {
     dir = path.dirname(dir);
@@ -134,7 +137,7 @@ function resolveIecDir() {
       return c;
     }
   }
-  // (c) Fallback: just return the first plausible path so error message is helpful
+  // (d) Fallback: just return the first plausible path so error message is helpful
   return candidates[1] || candidates[0];
 }
 

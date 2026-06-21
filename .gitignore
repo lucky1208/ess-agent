@@ -7,3 +7,11 @@ _check*.js
 _v9_temp.html
 index_claude*.html
 .mavis/
+
+# IEC 库: PNG 备份目录 (跑 vectorize_iec_symbols.py 前会自动建)
+iec_symbols_svg_png_backup/
+
+# smoke 测试临时产物
+_vec_test.svg
+_smoke_arch_sample.svg
+_smoke_*_sample.svg
