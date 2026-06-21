@@ -119,11 +119,17 @@ function resolveIecDir() {
     return process.env.IEC_SYMBOLS_DIR;
   }
   const candidates = [];
-  // (b) Vercel production layout: cwd=/var/task, dist/ is the deployed bundle.
+  // (b) Vercel-safe: bundle with the function. api/_iec_symbols_svg/ is
+  //     automatically included in the function bundle (Vercel packs the whole
+  //     api/ directory tree). This is the most reliable path on Vercel —
+  //     vercel.json `includeFiles` is finicky across versions.
+  candidates.push(path.join(__dirname, '_iec_symbols_svg'));
+  candidates.push(path.join(__dirname, '..', '_iec_symbols_svg'));
+  // (c) Vercel production layout: cwd=/var/task, dist/ is the deployed bundle.
   //     iec_symbols_svg/ is shipped inside dist/ (see scripts/sync-iec-to-dist.ps1).
   candidates.push(path.join(process.cwd(), 'iec_symbols_svg'));
   candidates.push(path.join(process.cwd(), 'dist', 'iec_symbols_svg'));
-  // (c) Local dev / sibling repos: walk up to 6 levels looking for iec_symbols_svg
+  // (d) Local dev / sibling repos: walk up to 6 levels looking for iec_symbols_svg
   //     (ess-platform layout: api/render_svg.js -> ess-platform/, then up to project root)
   let dir = __dirname;
   for (let i = 0; i < 6; i++) {
@@ -132,13 +138,15 @@ function resolveIecDir() {
     candidates.push(path.join(dir, 'AI auto-schematic', 'iec_symbols_svg'));
     candidates.push(path.join(dir, 'AI-auto-schematic', 'iec_symbols_svg'));
   }
-  for (const c of candidates) {
-    if (fs.existsSync(path.join(c, 'iec_0013_T-Connection_(form_1).svg'))) {
-      return c;
-    }
+  // Log resolution for debugging on Vercel (visible in function logs)
+  const found = candidates.find(c => fs.existsSync(path.join(c, 'iec_0013_T-Connection_(form_1).svg')));
+  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    console.log('[resolveIecDir] cwd=' + process.cwd() + ' __dirname=' + __dirname);
+    console.log('[resolveIecDir] tried ' + candidates.length + ' paths, found=' + (found || 'NONE'));
   }
-  // (d) Fallback: just return the first plausible path so error message is helpful
-  return candidates[1] || candidates[0];
+  if (found) return found;
+  // (e) Fallback: just return the first plausible path so error message is helpful
+  return candidates[0];
 }
 
 function loadIecIndex() {

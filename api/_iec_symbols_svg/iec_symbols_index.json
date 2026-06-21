@@ -1,0 +1,5184 @@
+{
+  "name": "IEC 60617 Symbol Library",
+  "version": "1.0.0",
+  "description": "IEC 60617 Graphical Symbols for Electrical/Electronic Equipment",
+  "source": "iec-60617-symbols.pdf",
+  "format": "svg-embedded-png",
+  "render_dpi": 432,
+  "total_symbols": 373,
+  "categories": [
+    "conductor",
+    "general",
+    "load",
+    "machine",
+    "measuring",
+    "passive",
+    "protection",
+    "semiconductor",
+    "signal",
+    "source",
+    "switching",
+    "transformer"
+  ],
+  "symbols": [
+    {
+      "id": "iec_0001",
+      "name": "Group of Connections (Number of Connections Indicated)(form 1)",
+      "category": "conductor",
+      "filename": "iec_0001_Group_of_Connections_(Number_of_Connections_Indicated)(form_1).svg",
+      "width": 110.36,
+      "height": 36.44,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "连接"
+    },
+    {
+      "id": "iec_0002",
+      "name": "Group of Connections (Number of Connections Indicated) (form 2)",
+      "category": "conductor",
+      "filename": "iec_0002_Group_of_Connections_(Number_of_Connections_Indicated)_(form_2).svg",
+      "width": 93.92,
+      "height": 48.08,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "连接"
+    },
+    {
+      "id": "iec_0003",
+      "name": "3-Phase Circuit",
+      "category": "general",
+      "filename": "iec_0003_3-Phase_Circuit.svg",
+      "width": 111.56,
+      "height": 57.56,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "3-Phase Circuit"
+    },
+    {
+      "id": "iec_0004",
+      "name": "Flexible Connection",
+      "category": "conductor",
+      "filename": "iec_0004_Flexible_Connection.svg",
+      "width": 148.4,
+      "height": 28.16,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "连接"
+    },
+    {
+      "id": "iec_0005",
+      "name": "Screened Conductor",
+      "category": "conductor",
+      "filename": "iec_0005_Screened_Conductor.svg",
+      "width": 118.52,
+      "height": 38.12,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0006",
+      "name": "Twisted Connection",
+      "category": "conductor",
+      "filename": "iec_0006_Twisted_Connection.svg",
+      "width": 121.16,
+      "height": 46.4,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "连接"
+    },
+    {
+      "id": "iec_0007",
+      "name": "Conductors in a Cable",
+      "category": "conductor",
+      "filename": "iec_0007_Conductors_in_a_Cable.svg",
+      "width": 98.84,
+      "height": 90.32,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0008",
+      "name": "Coaxial Pair",
+      "category": "general",
+      "filename": "iec_0008_Coaxial_Pair.svg",
+      "width": 127.52,
+      "height": 42.32,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "Coaxial Pair"
+    },
+    {
+      "id": "iec_0009",
+      "name": "Coaxial Pair Connected to Terminals",
+      "category": "conductor",
+      "filename": "iec_0009_Coaxial_Pair_Connected_to_Terminals.svg",
+      "width": 125.6,
+      "height": 47.0,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "端子"
+    },
+    {
+      "id": "iec_0010",
+      "name": "Coaxial Pair with screen",
+      "category": "general",
+      "filename": "iec_0010_Coaxial_Pair_with_screen.svg",
+      "width": 116.72,
+      "height": 51.68,
+      "page": 1,
+      "standard": "IEC 60617",
+      "name_cn": "Coaxial Pair with screen"
+    },
+    {
+      "id": "iec_0011",
+      "name": "Terminal",
+      "category": "conductor",
+      "filename": "iec_0011_Terminal.svg",
+      "width": 31.04,
+      "height": 26.6,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "端子"
+    },
+    {
+      "id": "iec_0012",
+      "name": "Terminal Strip",
+      "category": "conductor",
+      "filename": "iec_0012_Terminal_Strip.svg",
+      "width": 114.8,
+      "height": 43.52,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "端子"
+    },
+    {
+      "id": "iec_0013",
+      "name": "T-Connection (form 1)",
+      "category": "conductor",
+      "filename": "iec_0013_T-Connection_(form_1).svg",
+      "width": 58.28,
+      "height": 36.92,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "连接"
+    },
+    {
+      "id": "iec_0014",
+      "name": "T-Connection (form 2)",
+      "category": "conductor",
+      "filename": "iec_0014_T-Connection_(form_2).svg",
+      "width": 57.8,
+      "height": 37.52,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "连接"
+    },
+    {
+      "id": "iec_0015",
+      "name": "Double junction of conductors (form 1)",
+      "category": "conductor",
+      "filename": "iec_0015_Double_junction_of_conductors_(form_1).svg",
+      "width": 64.04,
+      "height": 46.4,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0016",
+      "name": "Double junction of conductors (form 2)",
+      "category": "conductor",
+      "filename": "iec_0016_Double_junction_of_conductors_(form_2).svg",
+      "width": 53.96,
+      "height": 48.68,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0017",
+      "name": "Brancing",
+      "category": "general",
+      "filename": "iec_0017_Brancing.svg",
+      "width": 89.96,
+      "height": 46.88,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "Brancing"
+    },
+    {
+      "id": "iec_0018",
+      "name": "Neutral Point",
+      "category": "general",
+      "filename": "iec_0018_Neutral_Point.svg",
+      "width": 55.76,
+      "height": 56.84,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "Neutral Point"
+    },
+    {
+      "id": "iec_0019",
+      "name": "Neutral point of a generator (single-line representation)",
+      "category": "machine",
+      "filename": "iec_0019_Neutral_point_of_a_generator_(single-line_representation).svg",
+      "width": 112.28,
+      "height": 92.12,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "发电机",
+      "terminals": 3,
+      "terminal_positions": [
+        "U",
+        "V",
+        "W"
+      ]
+    },
+    {
+      "id": "iec_0020",
+      "name": "Neutral point of a generator (multi-line representation)",
+      "category": "machine",
+      "filename": "iec_0020_Neutral_point_of_a_generator_(multi-line_representation).svg",
+      "width": 112.88,
+      "height": 111.44,
+      "page": 2,
+      "standard": "IEC 60617",
+      "name_cn": "发电机",
+      "terminals": 3,
+      "terminal_positions": [
+        "U",
+        "V",
+        "W"
+      ]
+    },
+    {
+      "id": "iec_0021",
+      "name": "Contact, female(of a socket or plug) Socket",
+      "category": "switching",
+      "filename": "iec_0021_Contact,_female(of_a_socket_or_plug)_Socket.svg",
+      "width": 60.2,
+      "height": 41.72,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0022",
+      "name": "Contact, male (of a socket or plug) Plug",
+      "category": "switching",
+      "filename": "iec_0022_Contact,_male_(of_a_socket_or_plug)_Plug.svg",
+      "width": 68.48,
+      "height": 27.08,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0023",
+      "name": "Plug and socket",
+      "category": "conductor",
+      "filename": "iec_0023_Plug_and_socket.svg",
+      "width": 83.12,
+      "height": 36.92,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "插头"
+    },
+    {
+      "id": "iec_0024",
+      "name": "Plug and socket, multipole (multi-line representation)",
+      "category": "conductor",
+      "filename": "iec_0024_Plug_and_socket,_multipole_(multi-line_representation).svg",
+      "width": 114.8,
+      "height": 90.32,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "插头"
+    },
+    {
+      "id": "iec_0025",
+      "name": "Plug and socket, multipole (multi-line representation)",
+      "category": "conductor",
+      "filename": "iec_0025_Plug_and_socket,_multipole_(multi-line_representation).svg",
+      "width": 89.48,
+      "height": 41.72,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "插头"
+    },
+    {
+      "id": "iec_0026",
+      "name": "Connecting link, closed Test terminal, twin stud type (form 1)",
+      "category": "conductor",
+      "filename": "iec_0026_Connecting_link,_closed_Test_terminal,_twin_stud_type_(form_1).svg",
+      "width": 71.0,
+      "height": 27.68,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "端子"
+    },
+    {
+      "id": "iec_0027",
+      "name": "Connecting link, closed (form2)",
+      "category": "general",
+      "filename": "iec_0027_Connecting_link,_closed_(form2).svg",
+      "width": 72.32,
+      "height": 29.36,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "Connecting link, closed (form2)"
+    },
+    {
+      "id": "iec_0028",
+      "name": "Connecting link, open",
+      "category": "general",
+      "filename": "iec_0028_Connecting_link,_open.svg",
+      "width": 70.4,
+      "height": 36.44,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "Connecting link, open"
+    },
+    {
+      "id": "iec_0029",
+      "name": "Plug and socket-type connector, male-male U-link",
+      "category": "conductor",
+      "filename": "iec_0029_Plug_and_socket-type_connector,_male-male_U-link.svg",
+      "width": 66.56,
+      "height": 27.56,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "插头"
+    },
+    {
+      "id": "iec_0030",
+      "name": "Plug and socket-type connector, male-female U-link",
+      "category": "conductor",
+      "filename": "iec_0030_Plug_and_socket-type_connector,_male-female_U-link.svg",
+      "width": 84.32,
+      "height": 27.08,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "插头"
+    },
+    {
+      "id": "iec_0031",
+      "name": "Plug and socket-type connector, male-male with socket access",
+      "category": "conductor",
+      "filename": "iec_0031_Plug_and_socket-type_connector,_male-male_with_socket_access.svg",
+      "width": 60.32,
+      "height": 44.72,
+      "page": 3,
+      "standard": "IEC 60617",
+      "name_cn": "插头"
+    },
+    {
+      "id": "iec_0032",
+      "name": "Cable sealing end (multi-core cable)",
+      "category": "conductor",
+      "filename": "iec_0032_Cable_sealing_end_(multi-core_cable).svg",
+      "width": 117.92,
+      "height": 47.48,
+      "page": 4,
+      "standard": "IEC 60617",
+      "name_cn": "电缆"
+    },
+    {
+      "id": "iec_0033",
+      "name": "Cable sealing end (one-core cable)",
+      "category": "conductor",
+      "filename": "iec_0033_Cable_sealing_end_(one-core_cable).svg",
+      "width": 132.56,
+      "height": 52.28,
+      "page": 4,
+      "standard": "IEC 60617",
+      "name_cn": "电缆"
+    },
+    {
+      "id": "iec_0034",
+      "name": "Straight-through joint box (multi-line representation)",
+      "category": "conductor",
+      "filename": "iec_0034_Straight-through_joint_box_(multi-line_representation).svg",
+      "width": 125.0,
+      "height": 62.24,
+      "page": 4,
+      "standard": "IEC 60617",
+      "name_cn": "线路"
+    },
+    {
+      "id": "iec_0035",
+      "name": "Straight-through joint box (single-line representation)",
+      "category": "conductor",
+      "filename": "iec_0035_Straight-through_joint_box_(single-line_representation).svg",
+      "width": 142.04,
+      "height": 42.32,
+      "page": 4,
+      "standard": "IEC 60617",
+      "name_cn": "线路"
+    },
+    {
+      "id": "iec_0036",
+      "name": "Junction box (multi-line representation)",
+      "category": "conductor",
+      "filename": "iec_0036_Junction_box_(multi-line_representation).svg",
+      "width": 121.76,
+      "height": 71.6,
+      "page": 4,
+      "standard": "IEC 60617",
+      "name_cn": "线路"
+    },
+    {
+      "id": "iec_0037",
+      "name": "Junction box (single-line representation)",
+      "category": "conductor",
+      "filename": "iec_0037_Junction_box_(single-line_representation).svg",
+      "width": 123.68,
+      "height": 56.84,
+      "page": 4,
+      "standard": "IEC 60617",
+      "name_cn": "线路"
+    },
+    {
+      "id": "iec_0038",
+      "name": "Pressure-tight bulkhead cable gland",
+      "category": "conductor",
+      "filename": "iec_0038_Pressure-tight_bulkhead_cable_gland.svg",
+      "width": 118.04,
+      "height": 70.4,
+      "page": 4,
+      "standard": "IEC 60617",
+      "name_cn": "电缆"
+    },
+    {
+      "id": "iec_0039",
+      "name": "Replacing S00067",
+      "category": "general",
+      "filename": "iec_0039_Replacing_S00067.svg",
+      "width": 45.08,
+      "height": 33.8,
+      "page": 5,
+      "standard": "IEC 60617",
+      "name_cn": "Replacing S00067"
+    },
+    {
+      "id": "iec_0040",
+      "name": "5 steps shown.",
+      "category": "general",
+      "filename": "iec_0040_5_steps_shown..svg",
+      "width": 57.44,
+      "height": 46.52,
+      "page": 6,
+      "standard": "IEC 60617",
+      "name_cn": "5 steps shown."
+    },
+    {
+      "id": "iec_0041",
+      "name": "Earth, general symbol Earthing, general symbol; Ground (US), general symbol; Grounding (US), general symbol",
+      "category": "protection",
+      "filename": "iec_0041_Earth,_general_symbol_Earthing,_general_symbol;_Ground_(US),_general_symbol;_Gro.svg",
+      "width": 42.44,
+      "height": 47.48,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "接地"
+    },
+    {
+      "id": "iec_0042",
+      "name": "Functional equipotential bonding Functional bonding conductor; Functional bonding terminal",
+      "category": "conductor",
+      "filename": "iec_0042_Functional_equipotential_bonding_Functional_bonding_conductor;_Functional_bondin.svg",
+      "width": 48.8,
+      "height": 45.92,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0043",
+      "name": "Functional equipotential bonding Functional bonding conductor; Functional bonding terminal Simplified form",
+      "category": "conductor",
+      "filename": "iec_0043_Functional_equipotential_bonding_Functional_bonding_conductor;_Functional_bondin.svg",
+      "width": 47.6,
+      "height": 44.72,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0044",
+      "name": "Protective equipotential bonding Protective bonding conductor; Protective bonding terminal",
+      "category": "conductor",
+      "filename": "iec_0044_Protective_equipotential_bonding_Protective_bonding_conductor;_Protective_bondin.svg",
+      "width": 37.4,
+      "height": 41.72,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0045",
+      "name": "Fault Indication of assumed fault location",
+      "category": "general",
+      "filename": "iec_0045_Fault_Indication_of_assumed_fault_location.svg",
+      "width": 41.84,
+      "height": 46.88,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "Fault Indication of assumed fault location"
+    },
+    {
+      "id": "iec_0046",
+      "name": "Flashover Break-through",
+      "category": "general",
+      "filename": "iec_0046_Flashover_Break-through.svg",
+      "width": 38.72,
+      "height": 47.48,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "Flashover Break-through"
+    },
+    {
+      "id": "iec_0047",
+      "name": "Permanent Magnet Magnet, permanent",
+      "category": "general",
+      "filename": "iec_0047_Permanent_Magnet_Magnet,_permanent.svg",
+      "width": 41.84,
+      "height": 30.56,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "Permanent Magnet Magnet, permanent"
+    },
+    {
+      "id": "iec_0048",
+      "name": "Movable contact Sliding contact",
+      "category": "switching",
+      "filename": "iec_0048_Movable_contact_Sliding_contact.svg",
+      "width": 59.6,
+      "height": 29.96,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0049",
+      "name": "Test point indicator",
+      "category": "general",
+      "filename": "iec_0049_Test_point_indicator.svg",
+      "width": 24.68,
+      "height": 39.92,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "Test point indicator"
+    },
+    {
+      "id": "iec_0050",
+      "name": "Converter, general symbol Power converter; Signal converter; Measuring transducer; Repeater",
+      "category": "transformer",
+      "filename": "iec_0050_Converter,_general_symbol_Power_converter;_Signal_converter;_Measuring_transduce.svg",
+      "width": 70.4,
+      "height": 45.32,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "变换器"
+    },
+    {
+      "id": "iec_0051",
+      "name": "Contactor function",
+      "category": "switching",
+      "filename": "iec_0051_Contactor_function.svg",
+      "width": 41.24,
+      "height": 30.56,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "触点",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "main_1",
+        "main_2"
+      ]
+    },
+    {
+      "id": "iec_0052",
+      "name": "Circuit breaker function",
+      "category": "switching",
+      "filename": "iec_0052_Circuit_breaker_function.svg",
+      "width": 36.08,
+      "height": 33.56,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "断路器",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0053",
+      "name": "Disconnector (isolator) function",
+      "category": "switching",
+      "filename": "iec_0053_Disconnector_(isolator)_function.svg",
+      "width": 40.52,
+      "height": 38.12,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "隔离开关"
+    },
+    {
+      "id": "iec_0054",
+      "name": "Switch-disconnector function Isolating-switch function",
+      "category": "switching",
+      "filename": "iec_0054_Switch-disconnector_function_Isolating-switch_function.svg",
+      "width": 41.24,
+      "height": 29.96,
+      "page": 11,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0055",
+      "name": "Make contact, general symbol, switch, general symbol",
+      "category": "switching",
+      "filename": "iec_0055_Make_contact,_general_symbol,_switch,_general_symbol.svg",
+      "width": 35.48,
+      "height": 53.48,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0056",
+      "name": "Break contact",
+      "category": "switching",
+      "filename": "iec_0056_Break_contact.svg",
+      "width": 29.84,
+      "height": 57.44,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0057",
+      "name": "Change-over break before make contact",
+      "category": "switching",
+      "filename": "iec_0057_Change-over_break_before_make_contact.svg",
+      "width": 33.68,
+      "height": 57.44,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0058",
+      "name": "Change-over contact with off-position",
+      "category": "switching",
+      "filename": "iec_0058_Change-over_contact_with_off-position.svg",
+      "width": 47.6,
+      "height": 56.84,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0059",
+      "name": "Change-over make before break contact, both ways (form 1)",
+      "category": "switching",
+      "filename": "iec_0059_Change-over_make_before_break_contact,_both_ways_(form_1).svg",
+      "width": 32.96,
+      "height": 57.44,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0060",
+      "name": "Change-over make before break contact, both ways (form 1)",
+      "category": "switching",
+      "filename": "iec_0060_Change-over_make_before_break_contact,_both_ways_(form_1).svg",
+      "width": 40.52,
+      "height": 58.04,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0061",
+      "name": "Make contact delayed closing",
+      "category": "switching",
+      "filename": "iec_0061_Make_contact_delayed_closing.svg",
+      "width": 39.32,
+      "height": 56.84,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0062",
+      "name": "Make contact delayed opening",
+      "category": "switching",
+      "filename": "iec_0062_Make_contact_delayed_opening.svg",
+      "width": 40.64,
+      "height": 58.04,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0063",
+      "name": "Make contact, delayed opening",
+      "category": "switching",
+      "filename": "iec_0063_Make_contact,_delayed_opening.svg",
+      "width": 41.24,
+      "height": 58.04,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0064",
+      "name": "Break contact, delayed closing",
+      "category": "switching",
+      "filename": "iec_0064_Break_contact,_delayed_closing.svg",
+      "width": 40.64,
+      "height": 56.96,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0065",
+      "name": "Make contact, delayed",
+      "category": "switching",
+      "filename": "iec_0065_Make_contact,_delayed.svg",
+      "width": 39.92,
+      "height": 56.84,
+      "page": 12,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0066",
+      "name": "Contact assembly",
+      "category": "switching",
+      "filename": "iec_0066_Contact_assembly.svg",
+      "width": 88.76,
+      "height": 56.84,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0067",
+      "name": "Switch, manually operated, general symbol",
+      "category": "switching",
+      "filename": "iec_0067_Switch,_manually_operated,_general_symbol.svg",
+      "width": 47.6,
+      "height": 57.44,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0068",
+      "name": "Switch, manually operated, push-button, automatic return",
+      "category": "switching",
+      "filename": "iec_0068_Switch,_manually_operated,_push-button,_automatic_return.svg",
+      "width": 47.6,
+      "height": 57.44,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0069",
+      "name": "Switch, manually operated, pulling, automatic return",
+      "category": "switching",
+      "filename": "iec_0069_Switch,_manually_operated,_pulling,_automatic_return.svg",
+      "width": 47.6,
+      "height": 56.36,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0070",
+      "name": "Switch, maually operated, turning, stay-put",
+      "category": "switching",
+      "filename": "iec_0070_Switch,_maually_operated,_turning,_stay-put.svg",
+      "width": 46.88,
+      "height": 56.96,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0071",
+      "name": "Switch, maually operated with positive operation, push-button, automatic return Alarm switch",
+      "category": "switching",
+      "filename": "iec_0071_Switch,_maually_operated_with_positive_operation,_push-button,_automatic_return_.svg",
+      "width": 53.96,
+      "height": 56.36,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0072",
+      "name": "Switch, emergency stop",
+      "category": "switching",
+      "filename": "iec_0072_Switch,_emergency_stop.svg",
+      "width": 53.84,
+      "height": 56.84,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0073",
+      "name": "Position switch, make contact",
+      "category": "switching",
+      "filename": "iec_0073_Position_switch,_make_contact.svg",
+      "width": 26.6,
+      "height": 56.84,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0074",
+      "name": "Position switch, break contact",
+      "category": "switching",
+      "filename": "iec_0074_Position_switch,_break_contact.svg",
+      "width": 25.4,
+      "height": 55.88,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0075",
+      "name": "Position switch assembly",
+      "category": "switching",
+      "filename": "iec_0075_Position_switch_assembly.svg",
+      "width": 60.8,
+      "height": 56.84,
+      "page": 13,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0076",
+      "name": "Position switch, break contact, positive operation Limit switch",
+      "category": "switching",
+      "filename": "iec_0076_Position_switch,_break_contact,_positive_operation_Limit_switch.svg",
+      "width": 46.88,
+      "height": 56.36,
+      "page": 14,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0077",
+      "name": "Thermal switch, self-operating, break contat Bimetal break contact",
+      "category": "switching",
+      "filename": "iec_0077_Thermal_switch,_self-operating,_break_contat_Bimetal_break_contact.svg",
+      "width": 46.88,
+      "height": 57.44,
+      "page": 14,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0078",
+      "name": "Gas discharge tube with thermal element Starter for fluorescent lamp",
+      "category": "load",
+      "filename": "iec_0078_Gas_discharge_tube_with_thermal_element_Starter_for_fluorescent_lamp.svg",
+      "width": 45.08,
+      "height": 66.32,
+      "page": 14,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0079",
+      "name": "Contactor; Main make contact of a contactor",
+      "category": "switching",
+      "filename": "iec_0079_Contactor;_Main_make_contact_of_a_contactor.svg",
+      "width": 32.96,
+      "height": 56.84,
+      "page": 14,
+      "standard": "IEC 60617",
+      "name_cn": "触点",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "main_1",
+        "main_2"
+      ]
+    },
+    {
+      "id": "iec_0080",
+      "name": "Contactor with automatic tripping",
+      "category": "switching",
+      "filename": "iec_0080_Contactor_with_automatic_tripping.svg",
+      "width": 32.96,
+      "height": 56.84,
+      "page": 14,
+      "standard": "IEC 60617",
+      "name_cn": "触点",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "main_1",
+        "main_2"
+      ]
+    },
+    {
+      "id": "iec_0081",
+      "name": "Contactor, main break contact of a contactor",
+      "category": "switching",
+      "filename": "iec_0081_Contactor,_main_break_contact_of_a_contactor.svg",
+      "width": 26.0,
+      "height": 56.84,
+      "page": 14,
+      "standard": "IEC 60617",
+      "name_cn": "触点",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "main_1",
+        "main_2"
+      ]
+    },
+    {
+      "id": "iec_0082",
+      "name": "Circuit Breaker",
+      "category": "switching",
+      "filename": "iec_0082_Circuit_Breaker.svg",
+      "width": 40.52,
+      "height": 56.84,
+      "page": 14,
+      "standard": "IEC 60617",
+      "name_cn": "断路器",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0083",
+      "name": "Disconnector, Isolator",
+      "category": "switching",
+      "filename": "iec_0083_Disconnector,_Isolator.svg",
+      "width": 33.68,
+      "height": 57.44,
+      "page": 14,
+      "standard": "IEC 60617",
+      "name_cn": "隔离开关"
+    },
+    {
+      "id": "iec_0084",
+      "name": "Two-way disconnector, Two-way isolator",
+      "category": "switching",
+      "filename": "iec_0084_Two-way_disconnector,_Two-way_isolator.svg",
+      "width": 61.52,
+      "height": 56.36,
+      "page": 14,
+      "standard": "IEC 60617",
+      "name_cn": "隔离开关"
+    },
+    {
+      "id": "iec_0085",
+      "name": "Switch-dosconnector, On-load isolating switch",
+      "category": "switching",
+      "filename": "iec_0085_Switch-dosconnector,_On-load_isolating_switch.svg",
+      "width": 40.52,
+      "height": 57.44,
+      "page": 15,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0086",
+      "name": "Switch-disconnector, automatic release, On-load isolating switch, automatic release",
+      "category": "switching",
+      "filename": "iec_0086_Switch-disconnector,_automatic_release,_On-load_isolating_switch,_automatic_rele.svg",
+      "width": 40.52,
+      "height": 56.96,
+      "page": 15,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0087",
+      "name": "Disconnector, Isolator",
+      "category": "switching",
+      "filename": "iec_0087_Disconnector,_Isolator.svg",
+      "width": 61.52,
+      "height": 56.84,
+      "page": 15,
+      "standard": "IEC 60617",
+      "name_cn": "隔离开关"
+    },
+    {
+      "id": "iec_0088",
+      "name": "Trip-free mechanism",
+      "category": "general",
+      "filename": "iec_0088_Trip-free_mechanism.svg",
+      "width": 42.56,
+      "height": 39.32,
+      "page": 15,
+      "standard": "IEC 60617",
+      "name_cn": "Trip-free mechanism"
+    },
+    {
+      "id": "iec_0089",
+      "name": "Switch with positive opening",
+      "category": "switching",
+      "filename": "iec_0089_Switch_with_positive_opening.svg",
+      "width": 128.12,
+      "height": 66.8,
+      "page": 15,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0090",
+      "name": "Motor starter, general symbol",
+      "category": "machine",
+      "filename": "iec_0090_Motor_starter,_general_symbol.svg",
+      "width": 52.04,
+      "height": 46.88,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "电动机",
+      "terminals": 3,
+      "terminal_positions": [
+        "U",
+        "V",
+        "W"
+      ]
+    },
+    {
+      "id": "iec_0091",
+      "name": "Starter operating in steps",
+      "category": "general",
+      "filename": "iec_0091_Starter_operating_in_steps.svg",
+      "width": 51.32,
+      "height": 47.48,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "Starter operating in steps"
+    },
+    {
+      "id": "iec_0092",
+      "name": "Starter-regulator",
+      "category": "general",
+      "filename": "iec_0092_Starter-regulator.svg",
+      "width": 52.64,
+      "height": 63.44,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "Starter-regulator"
+    },
+    {
+      "id": "iec_0093",
+      "name": "Direct-on-line starter, reversing",
+      "category": "conductor",
+      "filename": "iec_0093_Direct-on-line_starter,_reversing.svg",
+      "width": 51.92,
+      "height": 47.48,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "线路"
+    },
+    {
+      "id": "iec_0094",
+      "name": "Star-delta starter",
+      "category": "general",
+      "filename": "iec_0094_Star-delta_starter.svg",
+      "width": 52.04,
+      "height": 47.48,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "Star-delta starter"
+    },
+    {
+      "id": "iec_0095",
+      "name": "Starter with auto-transformer",
+      "category": "transformer",
+      "filename": "iec_0095_Starter_with_auto-transformer.svg",
+      "width": 50.72,
+      "height": 47.48,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0096",
+      "name": "Starter-regulator with thyristor",
+      "category": "semiconductor",
+      "filename": "iec_0096_Starter-regulator_with_thyristor.svg",
+      "width": 50.72,
+      "height": 54.08,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0097",
+      "name": "Operating device, general symbol; Relay coil, general symbol Operating coil of a selector (form 1)",
+      "category": "passive",
+      "filename": "iec_0097_Operating_device,_general_symbol;_Relay_coil,_general_symbol_Operating_coil_of_a.svg",
+      "width": 41.84,
+      "height": 50.48,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "线圈",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "contact_1",
+        "contact_2"
+      ]
+    },
+    {
+      "id": "iec_0098",
+      "name": "Relay coil of a slow-releasing relay",
+      "category": "passive",
+      "filename": "iec_0098_Relay_coil_of_a_slow-releasing_relay.svg",
+      "width": 53.24,
+      "height": 54.68,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "线圈",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "contact_1",
+        "contact_2"
+      ]
+    },
+    {
+      "id": "iec_0099",
+      "name": "Relay coil of a slow-operating relay",
+      "category": "passive",
+      "filename": "iec_0099_Relay_coil_of_a_slow-operating_relay.svg",
+      "width": 55.16,
+      "height": 56.36,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "线圈",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "contact_1",
+        "contact_2"
+      ]
+    },
+    {
+      "id": "iec_0100",
+      "name": "Relay coil of a remanent relay (form 1)",
+      "category": "passive",
+      "filename": "iec_0100_Relay_coil_of_a_remanent_relay_(form_1).svg",
+      "width": 53.84,
+      "height": 56.36,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "线圈",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "contact_1",
+        "contact_2"
+      ]
+    },
+    {
+      "id": "iec_0101",
+      "name": "Relay coil of a remanent relay (form 2)",
+      "category": "passive",
+      "filename": "iec_0101_Relay_coil_of_a_remanent_relay_(form_2).svg",
+      "width": 60.92,
+      "height": 56.84,
+      "page": 16,
+      "standard": "IEC 60617",
+      "name_cn": "线圈",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "contact_1",
+        "contact_2"
+      ]
+    },
+    {
+      "id": "iec_0102",
+      "name": "Operating device of a thermal relay",
+      "category": "switching",
+      "filename": "iec_0102_Operating_device_of_a_thermal_relay.svg",
+      "width": 44.48,
+      "height": 45.92,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "继电器",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "contact_1",
+        "contact_2"
+      ]
+    },
+    {
+      "id": "iec_0103",
+      "name": "Voltage failure to frame; Frame potential in case of fault",
+      "category": "general",
+      "filename": "iec_0103_Voltage_failure_to_frame;_Frame_potential_in_case_of_fault.svg",
+      "width": 42.44,
+      "height": 29.36,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "Voltage failure to frame; Frame potential in case of fault"
+    },
+    {
+      "id": "iec_0104",
+      "name": "Earth fault current",
+      "category": "protection",
+      "filename": "iec_0104_Earth_fault_current.svg",
+      "width": 42.44,
+      "height": 29.96,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "接地"
+    },
+    {
+      "id": "iec_0105",
+      "name": "Fuse, general symbol",
+      "category": "switching",
+      "filename": "iec_0105_Fuse,_general_symbol.svg",
+      "width": 32.96,
+      "height": 57.44,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "熔断器",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0106",
+      "name": "Fuse ; strike fuse",
+      "category": "switching",
+      "filename": "iec_0106_Fuse_;_strike_fuse.svg",
+      "width": 46.88,
+      "height": 56.36,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "熔断器",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0107",
+      "name": "Fuse with alarm contact",
+      "category": "switching",
+      "filename": "iec_0107_Fuse_with_alarm_contact.svg",
+      "width": 55.16,
+      "height": 56.84,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "触点",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0108",
+      "name": "Fuse with separate alarm",
+      "category": "switching",
+      "filename": "iec_0108_Fuse_with_separate_alarm.svg",
+      "width": 54.56,
+      "height": 57.44,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "熔断器",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0109",
+      "name": "Three-pole switch with striker fuses",
+      "category": "switching",
+      "filename": "iec_0109_Three-pole_switch_with_striker_fuses.svg",
+      "width": 92.48,
+      "height": 74.0,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0110",
+      "name": "Fuse-switch",
+      "category": "switching",
+      "filename": "iec_0110_Fuse-switch.svg",
+      "width": 32.96,
+      "height": 57.44,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0111",
+      "name": "Fuse-disconnector; Fuse isolator",
+      "category": "switching",
+      "filename": "iec_0111_Fuse-disconnector;_Fuse_isolator.svg",
+      "width": 39.32,
+      "height": 56.96,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "隔离开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0112",
+      "name": "Fuse switch-disconnector; On-load isolating fuse switch",
+      "category": "switching",
+      "filename": "iec_0112_Fuse_switch-disconnector;_On-load_isolating_fuse_switch.svg",
+      "width": 39.92,
+      "height": 56.36,
+      "page": 17,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "line",
+        "load"
+      ]
+    },
+    {
+      "id": "iec_0113",
+      "name": "Spark gap",
+      "category": "protection",
+      "filename": "iec_0113_Spark_gap.svg",
+      "width": 32.96,
+      "height": 56.36,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "火花"
+    },
+    {
+      "id": "iec_0114",
+      "name": "Spark gap, double",
+      "category": "protection",
+      "filename": "iec_0114_Spark_gap,_double.svg",
+      "width": 39.92,
+      "height": 56.36,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "火花"
+    },
+    {
+      "id": "iec_0115",
+      "name": "Surge diverter; Lightning arrester",
+      "category": "protection",
+      "filename": "iec_0115_Surge_diverter;_Lightning_arrester.svg",
+      "width": 32.96,
+      "height": 57.44,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "浪涌"
+    },
+    {
+      "id": "iec_0116",
+      "name": "Protective gas discharge tube",
+      "category": "general",
+      "filename": "iec_0116_Protective_gas_discharge_tube.svg",
+      "width": 47.6,
+      "height": 56.36,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "Protective gas discharge tube"
+    },
+    {
+      "id": "iec_0117",
+      "name": "Protective gas discharge tube, symmetic",
+      "category": "general",
+      "filename": "iec_0117_Protective_gas_discharge_tube,_symmetic.svg",
+      "width": 54.56,
+      "height": 56.84,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "Protective gas discharge tube, symmetic"
+    },
+    {
+      "id": "iec_0118",
+      "name": "Generating station, planned",
+      "category": "general",
+      "filename": "iec_0118_Generating_station,_planned.svg",
+      "width": 47.0,
+      "height": 43.52,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "Generating station, planned"
+    },
+    {
+      "id": "iec_0119",
+      "name": "Generating station, in service or unspecified",
+      "category": "general",
+      "filename": "iec_0119_Generating_station,_in_service_or_unspecified.svg",
+      "width": 46.88,
+      "height": 43.52,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "Generating station, in service or unspecified"
+    },
+    {
+      "id": "iec_0120",
+      "name": "Combined electric and heat generated station, planned",
+      "category": "general",
+      "filename": "iec_0120_Combined_electric_and_heat_generated_station,_planned.svg",
+      "width": 47.0,
+      "height": 43.52,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "Combined electric and heat generated station, planned"
+    },
+    {
+      "id": "iec_0121",
+      "name": "Combined electric and heat generating station, in service or unspecified",
+      "category": "general",
+      "filename": "iec_0121_Combined_electric_and_heat_generating_station,_in_service_or_unspecified.svg",
+      "width": 46.88,
+      "height": 43.52,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "Combined electric and heat generating station, in service or unspecified"
+    },
+    {
+      "id": "iec_0122",
+      "name": "Substation, planned",
+      "category": "general",
+      "filename": "iec_0122_Substation,_planned.svg",
+      "width": 48.2,
+      "height": 44.12,
+      "page": 18,
+      "standard": "IEC 60617",
+      "name_cn": "Substation, planned"
+    },
+    {
+      "id": "iec_0123",
+      "name": "Substation, in service or unspecified",
+      "category": "general",
+      "filename": "iec_0123_Substation,_in_service_or_unspecified.svg",
+      "width": 46.88,
+      "height": 43.52,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "Substation, in service or unspecified"
+    },
+    {
+      "id": "iec_0124",
+      "name": "Hydroelectric generating station, planned",
+      "category": "general",
+      "filename": "iec_0124_Hydroelectric_generating_station,_planned.svg",
+      "width": 46.88,
+      "height": 43.52,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "Hydroelectric generating station, planned"
+    },
+    {
+      "id": "iec_0125",
+      "name": "Hydroelectric generating station, in service or unspecified",
+      "category": "general",
+      "filename": "iec_0125_Hydroelectric_generating_station,_in_service_or_unspecified.svg",
+      "width": 47.48,
+      "height": 44.12,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "Hydroelectric generating station, in service or unspecified"
+    },
+    {
+      "id": "iec_0126",
+      "name": "Thermoelectric generating station, planned coal thermoelectric generating station; lignite thermoelectric generating station; oil thermoelectric generating station; gas thermoelectric generating station",
+      "category": "general",
+      "filename": "iec_0126_Thermoelectric_generating_station,_planned_coal_thermoelectric_generating_statio.svg",
+      "width": 47.6,
+      "height": 44.12,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "Thermoelectric generating station, planned coal thermoelectric generating station; lignite thermoelectric generating station; oil thermoelectric generating station; gas thermoelectric generating station"
+    },
+    {
+      "id": "iec_0127",
+      "name": "Thermoelectric generating station, in service or unspecified thermoelectric generating station coal; thermoelectric generating station lignite; thermoelectric generating station oil; thermoelectric generating station gas",
+      "category": "general",
+      "filename": "iec_0127_Thermoelectric_generating_station,_in_service_or_unspecified_thermoelectric_gene.svg",
+      "width": 47.6,
+      "height": 44.72,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "Thermoelectric generating station, in service or unspecified thermoelectric generating station coal; thermoelectric generating station lignite; thermoelectric generating station oil; thermoelectric generating station gas"
+    },
+    {
+      "id": "iec_0128",
+      "name": "Nuclear energy generating station, planned",
+      "category": "general",
+      "filename": "iec_0128_Nuclear_energy_generating_station,_planned.svg",
+      "width": 46.28,
+      "height": 43.52,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "Nuclear energy generating station, planned"
+    },
+    {
+      "id": "iec_0129",
+      "name": "Nuclear energy generating station, in service or unspecified",
+      "category": "general",
+      "filename": "iec_0129_Nuclear_energy_generating_station,_in_service_or_unspecified.svg",
+      "width": 47.6,
+      "height": 43.52,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "Nuclear energy generating station, in service or unspecified"
+    },
+    {
+      "id": "iec_0130",
+      "name": "Geothermic generating station, planned",
+      "category": "general",
+      "filename": "iec_0130_Geothermic_generating_station,_planned.svg",
+      "width": 47.48,
+      "height": 43.52,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "Geothermic generating station, planned"
+    },
+    {
+      "id": "iec_0131",
+      "name": "Geothermic generating station, in service or unspecified",
+      "category": "general",
+      "filename": "iec_0131_Geothermic_generating_station,_in_service_or_unspecified.svg",
+      "width": 46.28,
+      "height": 43.52,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "Geothermic generating station, in service or unspecified"
+    },
+    {
+      "id": "iec_0132",
+      "name": "Solar generating station, planned",
+      "category": "source",
+      "filename": "iec_0132_Solar_generating_station,_planned.svg",
+      "width": 47.6,
+      "height": 44.12,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "太阳能"
+    },
+    {
+      "id": "iec_0133",
+      "name": "Solar generating station, in service or unspecified",
+      "category": "source",
+      "filename": "iec_0133_Solar_generating_station,_in_service_or_unspecified.svg",
+      "width": 47.0,
+      "height": 43.52,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "太阳能"
+    },
+    {
+      "id": "iec_0134",
+      "name": "Wind generator station, planned",
+      "category": "machine",
+      "filename": "iec_0134_Wind_generator_station,_planned.svg",
+      "width": 47.6,
+      "height": 43.52,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "发电机",
+      "terminals": 3,
+      "terminal_positions": [
+        "U",
+        "V",
+        "W"
+      ]
+    },
+    {
+      "id": "iec_0135",
+      "name": "Wind generator station, in service or unspecified",
+      "category": "machine",
+      "filename": "iec_0135_Wind_generator_station,_in_service_or_unspecified.svg",
+      "width": 48.2,
+      "height": 44.72,
+      "page": 19,
+      "standard": "IEC 60617",
+      "name_cn": "发电机",
+      "terminals": 3,
+      "terminal_positions": [
+        "U",
+        "V",
+        "W"
+      ]
+    },
+    {
+      "id": "iec_0136",
+      "name": "Underground Line",
+      "category": "conductor",
+      "filename": "iec_0136_Underground_Line.svg",
+      "width": 148.4,
+      "height": 29.96,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "线路"
+    },
+    {
+      "id": "iec_0137",
+      "name": "Submarine Line",
+      "category": "conductor",
+      "filename": "iec_0137_Submarine_Line.svg",
+      "width": 149.0,
+      "height": 29.36,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "线路"
+    },
+    {
+      "id": "iec_0138",
+      "name": "Overhead Line",
+      "category": "conductor",
+      "filename": "iec_0138_Overhead_Line.svg",
+      "width": 149.0,
+      "height": 37.04,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "线路"
+    },
+    {
+      "id": "iec_0139",
+      "name": "Line with a duct; Line within a pipe",
+      "category": "conductor",
+      "filename": "iec_0139_Line_with_a_duct;_Line_within_a_pipe.svg",
+      "width": 137.6,
+      "height": 43.52,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "线路"
+    },
+    {
+      "id": "iec_0140",
+      "name": "Manhole for underground chamber",
+      "category": "protection",
+      "filename": "iec_0140_Manhole_for_underground_chamber.svg",
+      "width": 130.04,
+      "height": 47.6,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "接地"
+    },
+    {
+      "id": "iec_0141",
+      "name": "Head end with local antenna",
+      "category": "signal",
+      "filename": "iec_0141_Head_end_with_local_antenna.svg",
+      "width": 43.04,
+      "height": 56.84,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "天线"
+    },
+    {
+      "id": "iec_0142",
+      "name": "Directional Coupler, General Symbol",
+      "category": "general",
+      "filename": "iec_0142_Directional_Coupler,_General_Symbol.svg",
+      "width": 79.28,
+      "height": 47.0,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "Directional Coupler, General Symbol"
+    },
+    {
+      "id": "iec_0143",
+      "name": "Neutral conductor",
+      "category": "conductor",
+      "filename": "iec_0143_Neutral_conductor.svg",
+      "width": 107.12,
+      "height": 35.96,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0144",
+      "name": "Protective conductor",
+      "category": "conductor",
+      "filename": "iec_0144_Protective_conductor.svg",
+      "width": 105.92,
+      "height": 36.56,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0145",
+      "name": "Combined protective & neutral conductor",
+      "category": "conductor",
+      "filename": "iec_0145_Combined_protective_&_neutral_conductor.svg",
+      "width": 105.32,
+      "height": 43.52,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0146",
+      "name": "3-phase wiring with neutral conductor & protective conductor",
+      "category": "conductor",
+      "filename": "iec_0146_3-phase_wiring_with_neutral_conductor_&_protective_conductor.svg",
+      "width": 106.52,
+      "height": 35.96,
+      "page": 20,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0147",
+      "name": "Wiring going upwards",
+      "category": "general",
+      "filename": "iec_0147_Wiring_going_upwards.svg",
+      "width": 41.84,
+      "height": 38.72,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "Wiring going upwards"
+    },
+    {
+      "id": "iec_0148",
+      "name": "Wiring going downwards",
+      "category": "general",
+      "filename": "iec_0148_Wiring_going_downwards.svg",
+      "width": 41.84,
+      "height": 37.64,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "Wiring going downwards"
+    },
+    {
+      "id": "iec_0149",
+      "name": "Wiring passing through vertically",
+      "category": "general",
+      "filename": "iec_0149_Wiring_passing_through_vertically.svg",
+      "width": 51.92,
+      "height": 48.68,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "Wiring passing through vertically"
+    },
+    {
+      "id": "iec_0150",
+      "name": "Box, General symbol",
+      "category": "general",
+      "filename": "iec_0150_Box,_General_symbol.svg",
+      "width": 41.24,
+      "height": 38.12,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "Box, General symbol"
+    },
+    {
+      "id": "iec_0151",
+      "name": "Connection box; Junction box",
+      "category": "conductor",
+      "filename": "iec_0151_Connection_box;_Junction_box.svg",
+      "width": 41.24,
+      "height": 37.52,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "连接"
+    },
+    {
+      "id": "iec_0152",
+      "name": "Consumers terminal, Service entrance equipment",
+      "category": "conductor",
+      "filename": "iec_0152_Consumers_terminal,_Service_entrance_equipment.svg",
+      "width": 29.24,
+      "height": 49.88,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "端子"
+    },
+    {
+      "id": "iec_0153",
+      "name": "Distribution centre",
+      "category": "general",
+      "filename": "iec_0153_Distribution_centre.svg",
+      "width": 57.08,
+      "height": 58.64,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "Distribution centre"
+    },
+    {
+      "id": "iec_0154",
+      "name": "Socket outlet (power) general symbol",
+      "category": "conductor",
+      "filename": "iec_0154_Socket_outlet_(power)_general_symbol.svg",
+      "width": 41.24,
+      "height": 46.88,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "插座"
+    },
+    {
+      "id": "iec_0155",
+      "name": "Multiple socket outlet (power)",
+      "category": "conductor",
+      "filename": "iec_0155_Multiple_socket_outlet_(power).svg",
+      "width": 51.92,
+      "height": 45.92,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "插座"
+    },
+    {
+      "id": "iec_0156",
+      "name": "Multiple socket outlet (power)",
+      "category": "conductor",
+      "filename": "iec_0156_Multiple_socket_outlet_(power).svg",
+      "width": 33.56,
+      "height": 50.48,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "插座"
+    },
+    {
+      "id": "iec_0157",
+      "name": "Socket outlet (power) with protective contact",
+      "category": "switching",
+      "filename": "iec_0157_Socket_outlet_(power)_with_protective_contact.svg",
+      "width": 43.04,
+      "height": 39.32,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0158",
+      "name": "Socket outlet (power) with sliding shutter",
+      "category": "conductor",
+      "filename": "iec_0158_Socket_outlet_(power)_with_sliding_shutter.svg",
+      "width": 55.16,
+      "height": 41.72,
+      "page": 21,
+      "standard": "IEC 60617",
+      "name_cn": "插座"
+    },
+    {
+      "id": "iec_0159",
+      "name": "Socket outlet (power) with single-pole switch",
+      "category": "switching",
+      "filename": "iec_0159_Socket_outlet_(power)_with_single-pole_switch.svg",
+      "width": 51.44,
+      "height": 46.4,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0160",
+      "name": "Socket outlet (power) with interlocked switch",
+      "category": "switching",
+      "filename": "iec_0160_Socket_outlet_(power)_with_interlocked_switch.svg",
+      "width": 51.44,
+      "height": 46.4,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0161",
+      "name": "Socket outlet (power) with isolating transformer",
+      "category": "transformer",
+      "filename": "iec_0161_Socket_outlet_(power)_with_isolating_transformer.svg",
+      "width": 53.84,
+      "height": 49.88,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0162",
+      "name": "Socket outlet (telecommunications), general symbol",
+      "category": "conductor",
+      "filename": "iec_0162_Socket_outlet_(telecommunications),_general_symbol.svg",
+      "width": 42.44,
+      "height": 46.4,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "插座"
+    },
+    {
+      "id": "iec_0163",
+      "name": "Switch, general symbol",
+      "category": "switching",
+      "filename": "iec_0163_Switch,_general_symbol.svg",
+      "width": 46.28,
+      "height": 51.08,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0164",
+      "name": "Switch with pilot light",
+      "category": "switching",
+      "filename": "iec_0164_Switch_with_pilot_light.svg",
+      "width": 46.88,
+      "height": 51.08,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0165",
+      "name": "2 pole switch",
+      "category": "switching",
+      "filename": "iec_0165_2_pole_switch.svg",
+      "width": 55.88,
+      "height": 51.08,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0166",
+      "name": "Multiposition single pole switch",
+      "category": "switching",
+      "filename": "iec_0166_Multiposition_single_pole_switch.svg",
+      "width": 72.32,
+      "height": 51.08,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0167",
+      "name": "2 way single pole switch",
+      "category": "switching",
+      "filename": "iec_0167_2_way_single_pole_switch.svg",
+      "width": 62.12,
+      "height": 57.44,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0168",
+      "name": "Intermediate switch",
+      "category": "switching",
+      "filename": "iec_0168_Intermediate_switch.svg",
+      "width": 62.12,
+      "height": 58.04,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0169",
+      "name": "Dimmer",
+      "category": "general",
+      "filename": "iec_0169_Dimmer.svg",
+      "width": 47.0,
+      "height": 51.08,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "Dimmer"
+    },
+    {
+      "id": "iec_0170",
+      "name": "Pull-cord single pole switch",
+      "category": "switching",
+      "filename": "iec_0170_Pull-cord_single_pole_switch.svg",
+      "width": 54.56,
+      "height": 50.48,
+      "page": 22,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0171",
+      "name": "Push-button",
+      "category": "general",
+      "filename": "iec_0171_Push-button.svg",
+      "width": 41.24,
+      "height": 37.52,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "Push-button"
+    },
+    {
+      "id": "iec_0172",
+      "name": "Push-button with indicator lamp",
+      "category": "load",
+      "filename": "iec_0172_Push-button_with_indicator_lamp.svg",
+      "width": 41.24,
+      "height": 37.52,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0173",
+      "name": "Push-button protected against unintentional operation",
+      "category": "general",
+      "filename": "iec_0173_Push-button_protected_against_unintentional_operation.svg",
+      "width": 45.56,
+      "height": 49.88,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "Push-button protected against unintentional operation"
+    },
+    {
+      "id": "iec_0174",
+      "name": "Time switch",
+      "category": "switching",
+      "filename": "iec_0174_Time_switch.svg",
+      "width": 84.92,
+      "height": 48.08,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0175",
+      "name": "Key-operated switch Watchman's system device",
+      "category": "switching",
+      "filename": "iec_0175_Key-operated_switch_Watchman's_system_device.svg",
+      "width": 48.8,
+      "height": 50.48,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0176",
+      "name": "Lighting outlet position",
+      "category": "load",
+      "filename": "iec_0176_Lighting_outlet_position.svg",
+      "width": 64.04,
+      "height": 28.76,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0177",
+      "name": "Lighting outlet on wall",
+      "category": "load",
+      "filename": "iec_0177_Lighting_outlet_on_wall.svg",
+      "width": 64.04,
+      "height": 44.12,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0178",
+      "name": "Luminaire, general symbol; Flourescent lamp, general symbol",
+      "category": "load",
+      "filename": "iec_0178_Luminaire,_general_symbol;_Flourescent_lamp,_general_symbol.svg",
+      "width": 64.64,
+      "height": 20.6,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0179",
+      "name": "Luminaire with many flourescent tubes.",
+      "category": "load",
+      "filename": "iec_0179_Luminaire_with_many_flourescent_tubes..svg",
+      "width": 64.04,
+      "height": 35.36,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯具"
+    },
+    {
+      "id": "iec_0180",
+      "name": "Luminaire with many flourescent tubes.",
+      "category": "load",
+      "filename": "iec_0180_Luminaire_with_many_flourescent_tubes..svg",
+      "width": 64.04,
+      "height": 28.16,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯具"
+    },
+    {
+      "id": "iec_0181",
+      "name": "Projector, general symbol",
+      "category": "general",
+      "filename": "iec_0181_Projector,_general_symbol.svg",
+      "width": 31.04,
+      "height": 38.12,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "Projector, general symbol"
+    },
+    {
+      "id": "iec_0182",
+      "name": "Spot light",
+      "category": "load",
+      "filename": "iec_0182_Spot_light.svg",
+      "width": 48.8,
+      "height": 36.92,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0183",
+      "name": "Flood light",
+      "category": "load",
+      "filename": "iec_0183_Flood_light.svg",
+      "width": 44.36,
+      "height": 48.68,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0184",
+      "name": "Emergency lighting luminaire on special circuit",
+      "category": "load",
+      "filename": "iec_0184_Emergency_lighting_luminaire_on_special_circuit.svg",
+      "width": 40.04,
+      "height": 36.44,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0185",
+      "name": "Self-contained emergency lighting luminaire",
+      "category": "load",
+      "filename": "iec_0185_Self-contained_emergency_lighting_luminaire.svg",
+      "width": 40.04,
+      "height": 36.92,
+      "page": 23,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0186",
+      "name": "Water heater",
+      "category": "load",
+      "filename": "iec_0186_Water_heater.svg",
+      "width": 78.56,
+      "height": 49.88,
+      "page": 24,
+      "standard": "IEC 60617",
+      "name_cn": "加热器"
+    },
+    {
+      "id": "iec_0187",
+      "name": "Time clock, time recorder",
+      "category": "general",
+      "filename": "iec_0187_Time_clock,_time_recorder.svg",
+      "width": 47.48,
+      "height": 51.08,
+      "page": 24,
+      "standard": "IEC 60617",
+      "name_cn": "Time clock, time recorder"
+    },
+    {
+      "id": "iec_0188",
+      "name": "Resistor, general symbol",
+      "category": "passive",
+      "filename": "iec_0188_Resistor,_general_symbol.svg",
+      "width": 60.92,
+      "height": 21.2,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "电阻器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0189",
+      "name": "Resistor, adjustable",
+      "category": "passive",
+      "filename": "iec_0189_Resistor,_adjustable.svg",
+      "width": 61.52,
+      "height": 39.32,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "电阻器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0190",
+      "name": "Resistor with movable contact",
+      "category": "passive",
+      "filename": "iec_0190_Resistor_with_movable_contact.svg",
+      "width": 58.88,
+      "height": 38.72,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "电阻器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0191",
+      "name": "Resistor with movable contact and off position",
+      "category": "passive",
+      "filename": "iec_0191_Resistor_with_movable_contact_and_off_position.svg",
+      "width": 59.6,
+      "height": 38.12,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "电阻器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0192",
+      "name": "Potentiameter with movable contact",
+      "category": "switching",
+      "filename": "iec_0192_Potentiameter_with_movable_contact.svg",
+      "width": 60.92,
+      "height": 39.32,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0193",
+      "name": "Potentiometer with movable contact and pre-set adjustment",
+      "category": "passive",
+      "filename": "iec_0193_Potentiometer_with_movable_contact_and_pre-set_adjustment.svg",
+      "width": 60.8,
+      "height": 46.4,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "电位器"
+    },
+    {
+      "id": "iec_0194",
+      "name": "Resistor with fixed tappings",
+      "category": "passive",
+      "filename": "iec_0194_Resistor_with_fixed_tappings.svg",
+      "width": 76.16,
+      "height": 38.12,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "电阻器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0195",
+      "name": "Resistor with separate current and voltage",
+      "category": "passive",
+      "filename": "iec_0195_Resistor_with_separate_current_and_voltage.svg",
+      "width": 76.76,
+      "height": 38.12,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "电阻器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0196",
+      "name": "Carbon-pile resistor",
+      "category": "passive",
+      "filename": "iec_0196_Carbon-pile_resistor.svg",
+      "width": 59.6,
+      "height": 38.12,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "电阻器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0197",
+      "name": "Heating element",
+      "category": "general",
+      "filename": "iec_0197_Heating_element.svg",
+      "width": 59.6,
+      "height": 21.8,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "Heating element"
+    },
+    {
+      "id": "iec_0198",
+      "name": "Capacitor, general symbol",
+      "category": "passive",
+      "filename": "iec_0198_Capacitor,_general_symbol.svg",
+      "width": 40.64,
+      "height": 46.4,
+      "page": 25,
+      "standard": "IEC 60617",
+      "name_cn": "电容器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0199",
+      "name": "Capacitor, adjustable",
+      "category": "passive",
+      "filename": "iec_0199_Capacitor,_adjustable.svg",
+      "width": 40.52,
+      "height": 54.8,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电容器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0200",
+      "name": "Capacitor with pre-set adjustment",
+      "category": "passive",
+      "filename": "iec_0200_Capacitor_with_pre-set_adjustment.svg",
+      "width": 40.52,
+      "height": 54.32,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电容器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0201",
+      "name": "Capacitor, differential",
+      "category": "passive",
+      "filename": "iec_0201_Capacitor,_differential.svg",
+      "width": 67.4,
+      "height": 44.36,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电容器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0202",
+      "name": "Capacitor, split and adjustable",
+      "category": "passive",
+      "filename": "iec_0202_Capacitor,_split_and_adjustable.svg",
+      "width": 36.8,
+      "height": 49.04,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电容器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0203",
+      "name": "Coil, general symbol; Winding, general symbol Inductor; Choke",
+      "category": "passive",
+      "filename": "iec_0203_Coil,_general_symbol;_Winding,_general_symbol_Inductor;_Choke.svg",
+      "width": 58.28,
+      "height": 20.48,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电感器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0204",
+      "name": "Inductor with magnetic core",
+      "category": "passive",
+      "filename": "iec_0204_Inductor_with_magnetic_core.svg",
+      "width": 59.6,
+      "height": 38.0,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电感器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0205",
+      "name": "Inductor with gap in magnetic core",
+      "category": "passive",
+      "filename": "iec_0205_Inductor_with_gap_in_magnetic_core.svg",
+      "width": 57.08,
+      "height": 35.6,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电感器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0206",
+      "name": "Inductor, continuously variable",
+      "category": "passive",
+      "filename": "iec_0206_Inductor,_continuously_variable.svg",
+      "width": 57.08,
+      "height": 43.76,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电感器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0207",
+      "name": "Inductor with fixed tappings",
+      "category": "passive",
+      "filename": "iec_0207_Inductor_with_fixed_tappings.svg",
+      "width": 57.68,
+      "height": 37.4,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电感器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0208",
+      "name": "Inductor with maveable contact, variable in steps",
+      "category": "passive",
+      "filename": "iec_0208_Inductor_with_maveable_contact,_variable_in_steps.svg",
+      "width": 58.4,
+      "height": 36.8,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "电感器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0209",
+      "name": "Variometer",
+      "category": "measuring",
+      "filename": "iec_0209_Variometer.svg",
+      "width": 84.32,
+      "height": 53.72,
+      "page": 26,
+      "standard": "IEC 60617",
+      "name_cn": "仪表"
+    },
+    {
+      "id": "iec_0210",
+      "name": "Semiconductor diode, general symbol",
+      "category": "semiconductor",
+      "filename": "iec_0210_Semiconductor_diode,_general_symbol.svg",
+      "width": 38.12,
+      "height": 51.08,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0211",
+      "name": "Light emitting diode (LED), general symbol",
+      "category": "semiconductor",
+      "filename": "iec_0211_Light_emitting_diode_(LED),_general_symbol.svg",
+      "width": 46.88,
+      "height": 50.48,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0212",
+      "name": "Temperature sensing diode",
+      "category": "semiconductor",
+      "filename": "iec_0212_Temperature_sensing_diode.svg",
+      "width": 46.88,
+      "height": 51.08,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0213",
+      "name": "Variable capacitance diode Varactor",
+      "category": "semiconductor",
+      "filename": "iec_0213_Variable_capacitance_diode_Varactor.svg",
+      "width": 45.68,
+      "height": 50.48,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0214",
+      "name": "Tunnel diode Esaki diode",
+      "category": "semiconductor",
+      "filename": "iec_0214_Tunnel_diode_Esaki_diode.svg",
+      "width": 36.8,
+      "height": 51.08,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0215",
+      "name": "Breakdown diode, unidirectional Zener diode; Voltage regulator diode",
+      "category": "semiconductor",
+      "filename": "iec_0215_Breakdown_diode,_unidirectional_Zener_diode;_Voltage_regulator_diode.svg",
+      "width": 36.8,
+      "height": 50.48,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0216",
+      "name": "Breakdown diode, bidirectional",
+      "category": "semiconductor",
+      "filename": "iec_0216_Breakdown_diode,_bidirectional.svg",
+      "width": 34.28,
+      "height": 59.84,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0217",
+      "name": "Backward diode (unitunnel diode)",
+      "category": "semiconductor",
+      "filename": "iec_0217_Backward_diode_(unitunnel_diode).svg",
+      "width": 36.8,
+      "height": 50.48,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0218",
+      "name": "Bidirectional diode",
+      "category": "semiconductor",
+      "filename": "iec_0218_Bidirectional_diode.svg",
+      "width": 55.16,
+      "height": 50.48,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0219",
+      "name": "Reverse blocking diode thyristor",
+      "category": "semiconductor",
+      "filename": "iec_0219_Reverse_blocking_diode_thyristor.svg",
+      "width": 36.8,
+      "height": 50.48,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0220",
+      "name": "Reverse conducting diode thyristor",
+      "category": "semiconductor",
+      "filename": "iec_0220_Reverse_conducting_diode_thyristor.svg",
+      "width": 36.8,
+      "height": 51.08,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0221",
+      "name": "Bidirectional diode thyristor; Diac",
+      "category": "semiconductor",
+      "filename": "iec_0221_Bidirectional_diode_thyristor;_Diac.svg",
+      "width": 56.48,
+      "height": 50.48,
+      "page": 27,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0222",
+      "name": "Reverse blocking triode thyristor, N-gate (anode-side controlled)",
+      "category": "semiconductor",
+      "filename": "iec_0222_Reverse_blocking_triode_thyristor,_N-gate_(anode-side_controlled).svg",
+      "width": 52.04,
+      "height": 44.72,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0223",
+      "name": "Reverse blocking triode thyristor, P-gate (cathode-side controlled)",
+      "category": "semiconductor",
+      "filename": "iec_0223_Reverse_blocking_triode_thyristor,_P-gate_(cathode-side_controlled).svg",
+      "width": 45.68,
+      "height": 39.32,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0224",
+      "name": "Turn-off thyristor, gate not specified",
+      "category": "semiconductor",
+      "filename": "iec_0224_Turn-off_thyristor,_gate_not_specified.svg",
+      "width": 44.96,
+      "height": 50.48,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0225",
+      "name": "Turn-off triode thyristor, N-gate (anode-side)",
+      "category": "semiconductor",
+      "filename": "iec_0225_Turn-off_triode_thyristor,_N-gate_(anode-side).svg",
+      "width": 45.56,
+      "height": 50.48,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0226",
+      "name": "Turn-off triode thyristor, P-gate (cathode-side controlled)",
+      "category": "semiconductor",
+      "filename": "iec_0226_Turn-off_triode_thyristor,_P-gate_(cathode-side_controlled).svg",
+      "width": 44.36,
+      "height": 50.48,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0227",
+      "name": "Reverse blocking thyristor, tetrode type",
+      "category": "semiconductor",
+      "filename": "iec_0227_Reverse_blocking_thyristor,_tetrode_type.svg",
+      "width": 54.56,
+      "height": 50.48,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0228",
+      "name": "Bidirectional triode thyristor; Triac",
+      "category": "semiconductor",
+      "filename": "iec_0228_Bidirectional_triode_thyristor;_Triac.svg",
+      "width": 55.16,
+      "height": 50.48,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0229",
+      "name": "Reverse conducting triode thyristor, gate not specified",
+      "category": "semiconductor",
+      "filename": "iec_0229_Reverse_conducting_triode_thyristor,_gate_not_specified.svg",
+      "width": 45.56,
+      "height": 50.48,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0230",
+      "name": "Reverse conducting triode thyristor, N-gate (anode-side controlled)",
+      "category": "semiconductor",
+      "filename": "iec_0230_Reverse_conducting_triode_thyristor,_N-gate_(anode-side_controlled).svg",
+      "width": 46.28,
+      "height": 51.08,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0231",
+      "name": "Reverse conducting triode thyristor, P-gate (cathode-side controlled)",
+      "category": "semiconductor",
+      "filename": "iec_0231_Reverse_conducting_triode_thyristor,_P-gate_(cathode-side_controlled).svg",
+      "width": 55.16,
+      "height": 51.08,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶闸管",
+      "terminals": 3,
+      "terminal_positions": [
+        "anode",
+        "cathode",
+        "gate"
+      ]
+    },
+    {
+      "id": "iec_0232",
+      "name": "PNP transistor",
+      "category": "semiconductor",
+      "filename": "iec_0232_PNP_transistor.svg",
+      "width": 55.76,
+      "height": 50.48,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0233",
+      "name": "NPN transistor with collector connected to the envelope",
+      "category": "semiconductor",
+      "filename": "iec_0233_NPN_transistor_with_collector_connected_to_the_envelope.svg",
+      "width": 55.16,
+      "height": 49.88,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0234",
+      "name": "NPN avalanche transistor",
+      "category": "semiconductor",
+      "filename": "iec_0234_NPN_avalanche_transistor.svg",
+      "width": 71.72,
+      "height": 50.48,
+      "page": 28,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0235",
+      "name": "Unijunction transistor with P-type base",
+      "category": "semiconductor",
+      "filename": "iec_0235_Unijunction_transistor_with_P-type_base.svg",
+      "width": 60.2,
+      "height": 45.32,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0236",
+      "name": "Unijunction transistor with N-type base",
+      "category": "semiconductor",
+      "filename": "iec_0236_Unijunction_transistor_with_N-type_base.svg",
+      "width": 60.92,
+      "height": 38.12,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0237",
+      "name": "NPN transistor with transverse biased base",
+      "category": "semiconductor",
+      "filename": "iec_0237_NPN_transistor_with_transverse_biased_base.svg",
+      "width": 51.32,
+      "height": 60.44,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0238",
+      "name": "PNIP transistor with connection to the intrinsic region",
+      "category": "semiconductor",
+      "filename": "iec_0238_PNIP_transistor_with_connection_to_the_intrinsic_region.svg",
+      "width": 50.72,
+      "height": 60.44,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0239",
+      "name": "PNIN transistor with connection to the intrinsic region",
+      "category": "semiconductor",
+      "filename": "iec_0239_PNIN_transistor_with_connection_to_the_intrinsic_region.svg",
+      "width": 50.72,
+      "height": 60.44,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0240",
+      "name": "Junction field effect transistor with N-type channel",
+      "category": "semiconductor",
+      "filename": "iec_0240_Junction_field_effect_transistor_with_N-type_channel.svg",
+      "width": 59.6,
+      "height": 38.12,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0241",
+      "name": "Junction field effect transistor with P-type channel",
+      "category": "semiconductor",
+      "filename": "iec_0241_Junction_field_effect_transistor_with_P-type_channel.svg",
+      "width": 59.6,
+      "height": 38.24,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0242",
+      "name": "Insulated gate field effect transistor IGFET enhancement type, single gate, P-type channel without substrate connection",
+      "category": "semiconductor",
+      "filename": "iec_0242_Insulated_gate_field_effect_transistor_IGFET_enhancement_type,_single_gate,_P-ty.svg",
+      "width": 59.6,
+      "height": 38.24,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0243",
+      "name": "Insulated gate field effect transistor IGFET enhancement type, single gate, N-type channel without substrate connection",
+      "category": "semiconductor",
+      "filename": "iec_0243_Insulated_gate_field_effect_transistor_IGFET_enhancement_type,_single_gate,_N-ty.svg",
+      "width": 60.8,
+      "height": 38.72,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0244",
+      "name": "Insulated gate field effect transistor IGFET enhancement type, single gate, P-type channel with substrate connection brought out",
+      "category": "semiconductor",
+      "filename": "iec_0244_Insulated_gate_field_effect_transistor_IGFET_enhancement_type,_single_gate,_P-ty.svg",
+      "width": 54.56,
+      "height": 50.48,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0245",
+      "name": "Insulated gate field effect transistor IGFET enhancement type, single gate, N-type channel with substrate internally connected to source",
+      "category": "semiconductor",
+      "filename": "iec_0245_Insulated_gate_field_effect_transistor_IGFET_enhancement_type,_single_gate,_N-ty.svg",
+      "width": 59.6,
+      "height": 38.24,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0246",
+      "name": "Insulated gate field effect transistor IGFET, depletion type, single gate, N-type channel without substrate connection",
+      "category": "semiconductor",
+      "filename": "iec_0246_Insulated_gate_field_effect_transistor_IGFET,_depletion_type,_single_gate,_N-typ.svg",
+      "width": 60.2,
+      "height": 38.72,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0247",
+      "name": "Insulated gate field effect transistor IGFET, depletion type, single gate, P-type channel without substrate connection",
+      "category": "semiconductor",
+      "filename": "iec_0247_Insulated_gate_field_effect_transistor_IGFET,_depletion_type,_single_gate,_P-typ.svg",
+      "width": 59.6,
+      "height": 38.72,
+      "page": 29,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0248",
+      "name": "Insulated gate field effect transistor IGFET, depletion type, two gates, P-type channel with substrate connection brought out",
+      "category": "semiconductor",
+      "filename": "iec_0248_Insulated_gate_field_effect_transistor_IGFET,_depletion_type,_two_gates,_P-type_.svg",
+      "width": 55.16,
+      "height": 50.6,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0249",
+      "name": "Insulated-gate bipolar transistor (IGBT) enhancement type, P channel",
+      "category": "semiconductor",
+      "filename": "iec_0249_Insulated-gate_bipolar_transistor_(IGBT)_enhancement_type,_P_channel.svg",
+      "width": 64.04,
+      "height": 71.0,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0250",
+      "name": "Insulated-gate bipolar transistor (IGBT) enhancement type, N channel",
+      "category": "semiconductor",
+      "filename": "iec_0250_Insulated-gate_bipolar_transistor_(IGBT)_enhancement_type,_N_channel.svg",
+      "width": 62.12,
+      "height": 69.8,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0251",
+      "name": "Insulated-gate bipolar transistor (IGBT) depletion type, P channel",
+      "category": "semiconductor",
+      "filename": "iec_0251_Insulated-gate_bipolar_transistor_(IGBT)_depletion_type,_P_channel.svg",
+      "width": 61.52,
+      "height": 69.8,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0252",
+      "name": "Insulated-gate bipolar transistor (IGBT) depletion type, N channel",
+      "category": "semiconductor",
+      "filename": "iec_0252_Insulated-gate_bipolar_transistor_(IGBT)_depletion_type,_N_channel.svg",
+      "width": 62.72,
+      "height": 71.0,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0253",
+      "name": "Light dependent resistor (LDR); Photo resistor",
+      "category": "passive",
+      "filename": "iec_0253_Light_dependent_resistor_(LDR);_Photo_resistor.svg",
+      "width": 43.16,
+      "height": 55.88,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "电阻器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0254",
+      "name": "Photodiode",
+      "category": "semiconductor",
+      "filename": "iec_0254_Photodiode.svg",
+      "width": 45.68,
+      "height": 51.08,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "二极管",
+      "terminals": 2,
+      "terminal_positions": [
+        "anode",
+        "cathode"
+      ]
+    },
+    {
+      "id": "iec_0255",
+      "name": "Photovoltaic cell",
+      "category": "source",
+      "filename": "iec_0255_Photovoltaic_cell.svg",
+      "width": 46.28,
+      "height": 51.08,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "电池"
+    },
+    {
+      "id": "iec_0256",
+      "name": "Phototransistor",
+      "category": "semiconductor",
+      "filename": "iec_0256_Phototransistor.svg",
+      "width": 40.52,
+      "height": 50.48,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "晶体管",
+      "terminals": 3,
+      "terminal_positions": [
+        "collector",
+        "emitter",
+        "base"
+      ]
+    },
+    {
+      "id": "iec_0257",
+      "name": "Hall generator with four connections",
+      "category": "machine",
+      "filename": "iec_0257_Hall_generator_with_four_connections.svg",
+      "width": 53.24,
+      "height": 50.48,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "发电机",
+      "terminals": 3,
+      "terminal_positions": [
+        "U",
+        "V",
+        "W"
+      ]
+    },
+    {
+      "id": "iec_0258",
+      "name": "Magnetoresistor",
+      "category": "passive",
+      "filename": "iec_0258_Magnetoresistor.svg",
+      "width": 45.68,
+      "height": 51.08,
+      "page": 30,
+      "standard": "IEC 60617",
+      "name_cn": "电阻器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0259",
+      "name": "Three-phase winding, delta",
+      "category": "passive",
+      "filename": "iec_0259_Three-phase_winding,_delta.svg",
+      "width": 41.24,
+      "height": 38.12,
+      "page": 31,
+      "standard": "IEC 60617",
+      "name_cn": "绕组"
+    },
+    {
+      "id": "iec_0260",
+      "name": "Three-phase winding, open delta",
+      "category": "passive",
+      "filename": "iec_0260_Three-phase_winding,_open_delta.svg",
+      "width": 41.24,
+      "height": 38.12,
+      "page": 31,
+      "standard": "IEC 60617",
+      "name_cn": "绕组"
+    },
+    {
+      "id": "iec_0261",
+      "name": "Three-phase winding, star",
+      "category": "passive",
+      "filename": "iec_0261_Three-phase_winding,_star.svg",
+      "width": 41.24,
+      "height": 37.52,
+      "page": 31,
+      "standard": "IEC 60617",
+      "name_cn": "绕组"
+    },
+    {
+      "id": "iec_0262",
+      "name": "Three-phase winding, star, with neutral brought out",
+      "category": "passive",
+      "filename": "iec_0262_Three-phase_winding,_star,_with_neutral_brought_out.svg",
+      "width": 40.04,
+      "height": 36.44,
+      "page": 31,
+      "standard": "IEC 60617",
+      "name_cn": "绕组"
+    },
+    {
+      "id": "iec_0263",
+      "name": "Brush (on slip-ring or commutator)",
+      "category": "general",
+      "filename": "iec_0263_Brush_(on_slip-ring_or_commutator).svg",
+      "width": 47.6,
+      "height": 35.96,
+      "page": 31,
+      "standard": "IEC 60617",
+      "name_cn": "Brush (on slip-ring or commutator)"
+    },
+    {
+      "id": "iec_0264",
+      "name": "Transformer with two windings, general symbol (form 1)",
+      "category": "passive",
+      "filename": "iec_0264_Transformer_with_two_windings,_general_symbol_(form_1).svg",
+      "width": 46.28,
+      "height": 82.16,
+      "page": 34,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0265",
+      "name": "Transformer with two windings, general symbol (form 2)",
+      "category": "passive",
+      "filename": "iec_0265_Transformer_with_two_windings,_general_symbol_(form_2).svg",
+      "width": 62.12,
+      "height": 57.56,
+      "page": 34,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0266",
+      "name": "Transformer with two windings (and instantaneous voltage polarity indicators) (form 2)",
+      "category": "passive",
+      "filename": "iec_0266_Transformer_with_two_windings_(and_instantaneous_voltage_polarity_indicators)_(f.svg",
+      "width": 54.56,
+      "height": 56.36,
+      "page": 34,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0267",
+      "name": "Transformer with three windings, general symbol (form 1)",
+      "category": "passive",
+      "filename": "iec_0267_Transformer_with_three_windings,_general_symbol_(form_1).svg",
+      "width": 78.68,
+      "height": 95.72,
+      "page": 34,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0268",
+      "name": "Transformer with three windings, general symbol (form 2)",
+      "category": "passive",
+      "filename": "iec_0268_Transformer_with_three_windings,_general_symbol_(form_2).svg",
+      "width": 89.96,
+      "height": 56.84,
+      "page": 34,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0269",
+      "name": "Auto-transformer, general symbol (form 1)",
+      "category": "transformer",
+      "filename": "iec_0269_Auto-transformer,_general_symbol_(form_1).svg",
+      "width": 53.96,
+      "height": 85.16,
+      "page": 34,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0270",
+      "name": "Auto-transformer, general symbol (form 2)",
+      "category": "transformer",
+      "filename": "iec_0270_Auto-transformer,_general_symbol_(form_2).svg",
+      "width": 47.6,
+      "height": 44.12,
+      "page": 34,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0271",
+      "name": "Reactor, general symbol Choke (form 1)",
+      "category": "passive",
+      "filename": "iec_0271_Reactor,_general_symbol_Choke_(form_1).svg",
+      "width": 53.96,
+      "height": 72.2,
+      "page": 34,
+      "standard": "IEC 60617",
+      "name_cn": "扼流圈"
+    },
+    {
+      "id": "iec_0272",
+      "name": "Reactor, general symbol Choke  (form 2)",
+      "category": "passive",
+      "filename": "iec_0272_Reactor,_general_symbol_Choke_(form_2).svg",
+      "width": 58.28,
+      "height": 20.6,
+      "page": 35,
+      "standard": "IEC 60617",
+      "name_cn": "扼流圈"
+    },
+    {
+      "id": "iec_0273",
+      "name": "Current transformer, general symbol (form 1)",
+      "category": "transformer",
+      "filename": "iec_0273_Current_transformer,_general_symbol_(form_1).svg",
+      "width": 55.16,
+      "height": 57.44,
+      "page": 35,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0274",
+      "name": "Current transformer, general symbol (form 2)",
+      "category": "transformer",
+      "filename": "iec_0274_Current_transformer,_general_symbol_(form_2).svg",
+      "width": 40.04,
+      "height": 56.36,
+      "page": 35,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0275",
+      "name": "Transformer with two windings and screen (form 1)",
+      "category": "passive",
+      "filename": "iec_0275_Transformer_with_two_windings_and_screen_(form_1).svg",
+      "width": 54.56,
+      "height": 109.04,
+      "page": 35,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0276",
+      "name": "Transformer with two windings and screen (form 2)",
+      "category": "passive",
+      "filename": "iec_0276_Transformer_with_two_windings_and_screen_(form_2).svg",
+      "width": 47.0,
+      "height": 56.36,
+      "page": 35,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0277",
+      "name": "Transformer with centre tap on one winding (form 1)",
+      "category": "passive",
+      "filename": "iec_0277_Transformer_with_centre_tap_on_one_winding_(form_1).svg",
+      "width": 67.76,
+      "height": 108.44,
+      "page": 35,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0278",
+      "name": "Transformer with centre tap on one winding (form 2)",
+      "category": "passive",
+      "filename": "iec_0278_Transformer_with_centre_tap_on_one_winding_(form_2).svg",
+      "width": 46.88,
+      "height": 56.84,
+      "page": 35,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0279",
+      "name": "Transformer with variable coupling (form 1)",
+      "category": "transformer",
+      "filename": "iec_0279_Transformer_with_variable_coupling_(form_1).svg",
+      "width": 72.2,
+      "height": 107.24,
+      "page": 35,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0280",
+      "name": "Transformer with variable coupling (form 2)",
+      "category": "transformer",
+      "filename": "iec_0280_Transformer_with_variable_coupling_(form_2).svg",
+      "width": 47.0,
+      "height": 57.44,
+      "page": 36,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0281",
+      "name": "Three-phase transformer, connection star-delta (form 1)",
+      "category": "transformer",
+      "filename": "iec_0281_Three-phase_transformer,_connection_star-delta_(form_1).svg",
+      "width": 53.84,
+      "height": 106.64,
+      "page": 36,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0282",
+      "name": "Three-phase transformer, connection star-delta (form 2)",
+      "category": "transformer",
+      "filename": "iec_0282_Three-phase_transformer,_connection_star-delta_(form_2).svg",
+      "width": 78.08,
+      "height": 106.16,
+      "page": 36,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0283",
+      "name": "Three-phase transformer with four taps, connection: star-star (form 1)",
+      "category": "transformer",
+      "filename": "iec_0283_Three-phase_transformer_with_four_taps,_connection__star-star_(form_1).svg",
+      "width": 53.84,
+      "height": 107.36,
+      "page": 36,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0284",
+      "name": "Three-phase transformer with four taps, connection: star-star (form 2)",
+      "category": "transformer",
+      "filename": "iec_0284_Three-phase_transformer_with_four_taps,_connection__star-star_(form_2).svg",
+      "width": 85.04,
+      "height": 102.68,
+      "page": 36,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0285",
+      "name": "Three-phase bank of single-phase transformers, connection star-delta (form 1)",
+      "category": "transformer",
+      "filename": "iec_0285_Three-phase_bank_of_single-phase_transformers,_connection_star-delta_(form_1).svg",
+      "width": 72.32,
+      "height": 107.84,
+      "page": 36,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0286",
+      "name": "Three-phase bank of single-phase transformers, connection star-delta (form 2)",
+      "category": "transformer",
+      "filename": "iec_0286_Three-phase_bank_of_single-phase_transformers,_connection_star-delta_(form_2).svg",
+      "width": 96.44,
+      "height": 69.8,
+      "page": 37,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0287",
+      "name": "Three-phase transformer with tap changer (form 1)",
+      "category": "transformer",
+      "filename": "iec_0287_Three-phase_transformer_with_tap_changer_(form_1).svg",
+      "width": 84.92,
+      "height": 107.84,
+      "page": 37,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0288",
+      "name": "Three-phase transformer with tap changer (form 2)",
+      "category": "transformer",
+      "filename": "iec_0288_Three-phase_transformer_with_tap_changer_(form_2).svg",
+      "width": 102.68,
+      "height": 106.76,
+      "page": 37,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0289",
+      "name": "Three-phase transformer, connection star-zigzag with the neutral brought out (form 1)",
+      "category": "transformer",
+      "filename": "iec_0289_Three-phase_transformer,_connection_star-zigzag_with_the_neutral_brought_out_(fo.svg",
+      "width": 53.84,
+      "height": 106.76,
+      "page": 37,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0290",
+      "name": "Three-phase transformer, connection star-zigzag with the neutral brought out (form 2)",
+      "category": "transformer",
+      "filename": "iec_0290_Three-phase_transformer,_connection_star-zigzag_with_the_neutral_brought_out_(fo.svg",
+      "width": 103.4,
+      "height": 113.24,
+      "page": 37,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0291",
+      "name": "Three-phase transformer, connection star-star-delta (form 1)",
+      "category": "transformer",
+      "filename": "iec_0291_Three-phase_transformer,_connection_star-star-delta_(form_1).svg",
+      "width": 89.36,
+      "height": 118.4,
+      "page": 37,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0292",
+      "name": "Three-phase transformer, connection star-star-delta (form 2)",
+      "category": "transformer",
+      "filename": "iec_0292_Three-phase_transformer,_connection_star-star-delta_(form_2).svg",
+      "width": 85.64,
+      "height": 78.56,
+      "page": 38,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0293",
+      "name": "Auto-transformer, single-phase (form 1)",
+      "category": "transformer",
+      "filename": "iec_0293_Auto-transformer,_single-phase_(form_1).svg",
+      "width": 54.56,
+      "height": 97.4,
+      "page": 38,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0294",
+      "name": "Auto-transformer, single-phase (form 2)",
+      "category": "transformer",
+      "filename": "iec_0294_Auto-transformer,_single-phase_(form_2).svg",
+      "width": 53.36,
+      "height": 49.28,
+      "page": 38,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0295",
+      "name": "Auto-transformer, three-phase, connection star (form 1)",
+      "category": "transformer",
+      "filename": "iec_0295_Auto-transformer,_three-phase,_connection_star_(form_1).svg",
+      "width": 53.96,
+      "height": 96.2,
+      "page": 38,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0296",
+      "name": "Auto-transformer, three-phase, connection star (form 2)",
+      "category": "transformer",
+      "filename": "iec_0296_Auto-transformer,_three-phase,_connection_star_(form_2).svg",
+      "width": 89.96,
+      "height": 57.56,
+      "page": 38,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0297",
+      "name": "Auto-transformer, single-phase with voltage regulation (form 1)",
+      "category": "transformer",
+      "filename": "iec_0297_Auto-transformer,_single-phase_with_voltage_regulation_(form_1).svg",
+      "width": 72.92,
+      "height": 96.8,
+      "page": 38,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0298",
+      "name": "Auto-transformer, single-phase with voltage regulation (form 2)",
+      "category": "transformer",
+      "filename": "iec_0298_Auto-transformer,_single-phase_with_voltage_regulation_(form_2).svg",
+      "width": 58.88,
+      "height": 55.28,
+      "page": 38,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0299",
+      "name": "Three-phase induction regulator (form 1)",
+      "category": "general",
+      "filename": "iec_0299_Three-phase_induction_regulator_(form_1).svg",
+      "width": 72.2,
+      "height": 76.28,
+      "page": 38,
+      "standard": "IEC 60617",
+      "name_cn": "Three-phase induction regulator (form 1)"
+    },
+    {
+      "id": "iec_0300",
+      "name": "Three-phase induction regulator (form 2)",
+      "category": "general",
+      "filename": "iec_0300_Three-phase_induction_regulator_(form_2).svg",
+      "width": 119.24,
+      "height": 56.84,
+      "page": 39,
+      "standard": "IEC 60617",
+      "name_cn": "Three-phase induction regulator (form 2)"
+    },
+    {
+      "id": "iec_0301",
+      "name": "Voltage transformer Measuring transformer (form 1)",
+      "category": "transformer",
+      "filename": "iec_0301_Voltage_transformer_Measuring_transformer_(form_1).svg",
+      "width": 47.0,
+      "height": 71.0,
+      "page": 40,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0302",
+      "name": "Voltage transformer Measuring transformer (form 2)",
+      "category": "transformer",
+      "filename": "iec_0302_Voltage_transformer_Measuring_transformer_(form_2).svg",
+      "width": 62.12,
+      "height": 57.56,
+      "page": 40,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0303",
+      "name": "Current transformer with two cores with one secondary winding on each core (form 1)",
+      "category": "passive",
+      "filename": "iec_0303_Current_transformer_with_two_cores_with_one_secondary_winding_on_each_core_(form.svg",
+      "width": 54.56,
+      "height": 78.56,
+      "page": 40,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0304",
+      "name": "Current transformer with two cores with one secondary winding on each core (form 2)",
+      "category": "passive",
+      "filename": "iec_0304_Current_transformer_with_two_cores_with_one_secondary_winding_on_each_core_(form.svg",
+      "width": 36.2,
+      "height": 73.4,
+      "page": 40,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0305",
+      "name": "Current transformer with two secondary windings on one core (form 1)",
+      "category": "passive",
+      "filename": "iec_0305_Current_transformer_with_two_secondary_windings_on_one_core_(form_1).svg",
+      "width": 62.12,
+      "height": 70.4,
+      "page": 40,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0306",
+      "name": "Current transformer with two secondary windings on one core (form 2)",
+      "category": "passive",
+      "filename": "iec_0306_Current_transformer_with_two_secondary_windings_on_one_core_(form_2).svg",
+      "width": 35.48,
+      "height": 74.0,
+      "page": 40,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0307",
+      "name": "Current transformer with one secondary winding with one tap (form 1)",
+      "category": "passive",
+      "filename": "iec_0307_Current_transformer_with_one_secondary_winding_with_one_tap_(form_1).svg",
+      "width": 62.12,
+      "height": 57.44,
+      "page": 40,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0308",
+      "name": "Current transformer with one secondary winding with one tap (form 2)",
+      "category": "passive",
+      "filename": "iec_0308_Current_transformer_with_one_secondary_winding_with_one_tap_(form_2).svg",
+      "width": 35.48,
+      "height": 62.84,
+      "page": 41,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0309",
+      "name": "Current transformer with five passages of a conductor acting as a primary winding (form 1)",
+      "category": "passive",
+      "filename": "iec_0309_Current_transformer_with_five_passages_of_a_conductor_acting_as_a_primary_windin.svg",
+      "width": 62.72,
+      "height": 65.24,
+      "page": 41,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0310",
+      "name": "Pulse or current transformer with three threaded primary conductors (form 1)",
+      "category": "transformer",
+      "filename": "iec_0310_Pulse_or_current_transformer_with_three_threaded_primary_conductors_(form_1).svg",
+      "width": 62.12,
+      "height": 65.84,
+      "page": 41,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0311",
+      "name": "Pulse or current transformer with three threaded primary conductors (form 2)",
+      "category": "transformer",
+      "filename": "iec_0311_Pulse_or_current_transformer_with_three_threaded_primary_conductors_(form_2).svg",
+      "width": 55.16,
+      "height": 57.56,
+      "page": 41,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0312",
+      "name": "Pulse or current transformer with two secondary windings on the same core (form 1)",
+      "category": "passive",
+      "filename": "iec_0312_Pulse_or_current_transformer_with_two_secondary_windings_on_the_same_core_(form_.svg",
+      "width": 62.12,
+      "height": 86.24,
+      "page": 41,
+      "standard": "IEC 60617",
+      "name_cn": "绕组",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0313",
+      "name": "DC/DC converter Chopper",
+      "category": "transformer",
+      "filename": "iec_0313_DC_DC_converter_Chopper.svg",
+      "width": 59.6,
+      "height": 54.68,
+      "page": 42,
+      "standard": "IEC 60617",
+      "name_cn": "变换器"
+    },
+    {
+      "id": "iec_0314",
+      "name": "Rectifier in full wave (bridge) connection",
+      "category": "transformer",
+      "filename": "iec_0314_Rectifier_in_full_wave_(bridge)_connection.svg",
+      "width": 59.0,
+      "height": 55.28,
+      "page": 42,
+      "standard": "IEC 60617",
+      "name_cn": "整流器"
+    },
+    {
+      "id": "iec_0315",
+      "name": "Primary cell",
+      "category": "source",
+      "filename": "iec_0315_Primary_cell.svg",
+      "width": 60.92,
+      "height": 47.48,
+      "page": 42,
+      "standard": "IEC 60617",
+      "name_cn": "电池"
+    },
+    {
+      "id": "iec_0316",
+      "name": "Heat source, general symbol",
+      "category": "general",
+      "filename": "iec_0316_Heat_source,_general_symbol.svg",
+      "width": 77.36,
+      "height": 55.88,
+      "page": 42,
+      "standard": "IEC 60617",
+      "name_cn": "Heat source, general symbol"
+    },
+    {
+      "id": "iec_0317",
+      "name": "Radio-isotope heat source",
+      "category": "general",
+      "filename": "iec_0317_Radio-isotope_heat_source.svg",
+      "width": 76.76,
+      "height": 54.68,
+      "page": 42,
+      "standard": "IEC 60617",
+      "name_cn": "Radio-isotope heat source"
+    },
+    {
+      "id": "iec_0318",
+      "name": "Combustion heat source",
+      "category": "general",
+      "filename": "iec_0318_Combustion_heat_source.svg",
+      "width": 77.36,
+      "height": 54.68,
+      "page": 42,
+      "standard": "IEC 60617",
+      "name_cn": "Combustion heat source"
+    },
+    {
+      "id": "iec_0319",
+      "name": "Voltmeter",
+      "category": "measuring",
+      "filename": "iec_0319_Voltmeter.svg",
+      "width": 59.0,
+      "height": 55.28,
+      "page": 44,
+      "standard": "IEC 60617",
+      "name_cn": "仪表"
+    },
+    {
+      "id": "iec_0320",
+      "name": "Thrmocouple",
+      "category": "general",
+      "filename": "iec_0320_Thrmocouple.svg",
+      "width": 44.96,
+      "height": 41.72,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "Thrmocouple"
+    },
+    {
+      "id": "iec_0321",
+      "name": "Thermocouple with non-insulated heating element",
+      "category": "general",
+      "filename": "iec_0321_Thermocouple_with_non-insulated_heating_element.svg",
+      "width": 33.56,
+      "height": 69.8,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "Thermocouple with non-insulated heating element"
+    },
+    {
+      "id": "iec_0322",
+      "name": "Thermocouple with insulated heating element",
+      "category": "general",
+      "filename": "iec_0322_Thermocouple_with_insulated_heating_element.svg",
+      "width": 32.96,
+      "height": 70.4,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "Thermocouple with insulated heating element"
+    },
+    {
+      "id": "iec_0323",
+      "name": "Clock, general symbol secondary clock",
+      "category": "general",
+      "filename": "iec_0323_Clock,_general_symbol_secondary_clock.svg",
+      "width": 47.6,
+      "height": 43.52,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "Clock, general symbol secondary clock"
+    },
+    {
+      "id": "iec_0324",
+      "name": "Clock with contact",
+      "category": "switching",
+      "filename": "iec_0324_Clock_with_contact.svg",
+      "width": 47.6,
+      "height": 44.12,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0325",
+      "name": "Lamp, general symbol lamp, general symbol; signal lamp, general symbol",
+      "category": "load",
+      "filename": "iec_0325_Lamp,_general_symbol_lamp,_general_symbol;_signal_lamp,_general_symbol.svg",
+      "width": 41.24,
+      "height": 38.12,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0326",
+      "name": "Signal lamp, flashing type",
+      "category": "load",
+      "filename": "iec_0326_Signal_lamp,_flashing_type.svg",
+      "width": 58.28,
+      "height": 45.32,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "灯"
+    },
+    {
+      "id": "iec_0327",
+      "name": "Indicator, electromechanical; annunciator element",
+      "category": "general",
+      "filename": "iec_0327_Indicator,_electromechanical;_annunciator_element.svg",
+      "width": 41.84,
+      "height": 38.72,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "Indicator, electromechanical; annunciator element"
+    },
+    {
+      "id": "iec_0328",
+      "name": "Electromechanical position indicator",
+      "category": "general",
+      "filename": "iec_0328_Electromechanical_position_indicator.svg",
+      "width": 60.92,
+      "height": 60.68,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "Electromechanical position indicator"
+    },
+    {
+      "id": "iec_0329",
+      "name": "Siren",
+      "category": "load",
+      "filename": "iec_0329_Siren.svg",
+      "width": 47.48,
+      "height": 36.8,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "警报器"
+    },
+    {
+      "id": "iec_0330",
+      "name": "Buzzer",
+      "category": "load",
+      "filename": "iec_0330_Buzzer.svg",
+      "width": 45.8,
+      "height": 37.88,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "蜂鸣器"
+    },
+    {
+      "id": "iec_0331",
+      "name": "Signalling lamp energized by a built-in transformer",
+      "category": "transformer",
+      "filename": "iec_0331_Signalling_lamp_energized_by_a_built-in_transformer.svg",
+      "width": 50.72,
+      "height": 61.16,
+      "page": 46,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0332",
+      "name": "Selector wiper, non-bridging",
+      "category": "signal",
+      "filename": "iec_0332_Selector_wiper,_non-bridging.svg",
+      "width": 53.3,
+      "height": 48.8,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0333",
+      "name": "Selector wiper, bridging",
+      "category": "signal",
+      "filename": "iec_0333_Selector_wiper,_bridging.svg",
+      "width": 53.36,
+      "height": 49.34,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0334",
+      "name": "Arc or bank of single-motion selector",
+      "category": "signal",
+      "filename": "iec_0334_Arc_or_bank_of_single-motion_selector.svg",
+      "width": 33.68,
+      "height": 58.76,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0335",
+      "name": "Arc or bank of two-motion selector",
+      "category": "signal",
+      "filename": "iec_0335_Arc_or_bank_of_two-motion_selector.svg",
+      "width": 33.02,
+      "height": 57.02,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0336",
+      "name": "Selector arc with one special position",
+      "category": "signal",
+      "filename": "iec_0336_Selector_arc_with_one_special_position.svg",
+      "width": 31.76,
+      "height": 58.76,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0337",
+      "name": "Selector bank or level",
+      "category": "signal",
+      "filename": "iec_0337_Selector_bank_or_level.svg",
+      "width": 38.12,
+      "height": 48.8,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0338",
+      "name": "Selector level showing individual outlets or contacts",
+      "category": "switching",
+      "filename": "iec_0338_Selector_level_showing_individual_outlets_or_contacts.svg",
+      "width": 41.9,
+      "height": 49.34,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "触点"
+    },
+    {
+      "id": "iec_0339",
+      "name": "Selector level with bridging wiper",
+      "category": "signal",
+      "filename": "iec_0339_Selector_level_with_bridging_wiper.svg",
+      "width": 92.0,
+      "height": 48.8,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0340",
+      "name": "Selector level with non-bridging wiper",
+      "category": "signal",
+      "filename": "iec_0340_Selector_level_with_non-bridging_wiper.svg",
+      "width": 99.62,
+      "height": 48.8,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0341",
+      "name": "Single-motion selector, non-homing",
+      "category": "signal",
+      "filename": "iec_0341_Single-motion_selector,_non-homing.svg",
+      "width": 78.68,
+      "height": 57.02,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0342",
+      "name": "Single-motion selector, homing",
+      "category": "signal",
+      "filename": "iec_0342_Single-motion_selector,_homing.svg",
+      "width": 79.94,
+      "height": 57.62,
+      "page": 47,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0343",
+      "name": "Two-motion selector, homing",
+      "category": "signal",
+      "filename": "iec_0343_Two-motion_selector,_homing.svg",
+      "width": 79.34,
+      "height": 58.94,
+      "page": 48,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0344",
+      "name": "Selector, motor driven, homing",
+      "category": "machine",
+      "filename": "iec_0344_Selector,_motor_driven,_homing.svg",
+      "width": 79.34,
+      "height": 58.22,
+      "page": 48,
+      "standard": "IEC 60617",
+      "name_cn": "电动机",
+      "terminals": 3,
+      "terminal_positions": [
+        "U",
+        "V",
+        "W"
+      ]
+    },
+    {
+      "id": "iec_0345",
+      "name": "Selector for four-wire switching, homing",
+      "category": "switching",
+      "filename": "iec_0345_Selector_for_four-wire_switching,_homing.svg",
+      "width": 80.0,
+      "height": 57.62,
+      "page": 48,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0346",
+      "name": "Single-motion selector, set",
+      "category": "signal",
+      "filename": "iec_0346_Single-motion_selector,_set.svg",
+      "width": 77.42,
+      "height": 66.38,
+      "page": 48,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0347",
+      "name": "Single-motion homing selector with individual outlets",
+      "category": "signal",
+      "filename": "iec_0347_Single-motion_homing_selector_with_individual_outlets.svg",
+      "width": 79.94,
+      "height": 57.62,
+      "page": 48,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0348",
+      "name": "Two-motion selector showing levels",
+      "category": "signal",
+      "filename": "iec_0348_Two-motion_selector_showing_levels.svg",
+      "width": 88.82,
+      "height": 56.42,
+      "page": 48,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0349",
+      "name": "Crossbar selector, general symbol",
+      "category": "signal",
+      "filename": "iec_0349_Crossbar_selector,_general_symbol.svg",
+      "width": 61.52,
+      "height": 57.02,
+      "page": 48,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0350",
+      "name": "Crossbar selector, single connecting unit",
+      "category": "signal",
+      "filename": "iec_0350_Crossbar_selector,_single_connecting_unit.svg",
+      "width": 72.32,
+      "height": 76.94,
+      "page": 48,
+      "standard": "IEC 60617",
+      "name_cn": "选择器"
+    },
+    {
+      "id": "iec_0351",
+      "name": "Crossbar selector, four-wire switching",
+      "category": "switching",
+      "filename": "iec_0351_Crossbar_selector,_four-wire_switching.svg",
+      "width": 55.88,
+      "height": 57.02,
+      "page": 48,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0352",
+      "name": "Antenna, general symbol",
+      "category": "signal",
+      "filename": "iec_0352_Antenna,_general_symbol.svg",
+      "width": 35.48,
+      "height": 45.32,
+      "page": 49,
+      "standard": "IEC 60617",
+      "name_cn": "天线"
+    },
+    {
+      "id": "iec_0353",
+      "name": "Battery of primary or secondary cells",
+      "category": "source",
+      "filename": "iec_0353_Battery_of_primary_or_secondary_cells.svg",
+      "width": 48.8,
+      "height": 38.12,
+      "page": 50,
+      "standard": "IEC 60617",
+      "name_cn": "电池"
+    },
+    {
+      "id": "iec_0354",
+      "name": "Pulse transformer (form 1)",
+      "category": "transformer",
+      "filename": "iec_0354_Pulse_transformer_(form_1).svg",
+      "width": 54.44,
+      "height": 56.84,
+      "page": 50,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0355",
+      "name": "Pulse transformer",
+      "category": "transformer",
+      "filename": "iec_0355_Pulse_transformer.svg",
+      "width": 39.92,
+      "height": 56.36,
+      "page": 50,
+      "standard": "IEC 60617",
+      "name_cn": "变压器",
+      "terminals": 4,
+      "terminal_positions": [
+        "primary_1",
+        "primary_2",
+        "secondary_1",
+        "secondary_2"
+      ]
+    },
+    {
+      "id": "iec_0356",
+      "name": "Direct current",
+      "category": "general",
+      "filename": "iec_0356_Direct_current.svg",
+      "width": 46.28,
+      "height": 34.76,
+      "page": 51,
+      "standard": "IEC 60617",
+      "name_cn": "Direct current"
+    },
+    {
+      "id": "iec_0357",
+      "name": "Piezo-electric effect",
+      "category": "general",
+      "filename": "iec_0357_Piezo-electric_effect.svg",
+      "width": 59.0,
+      "height": 44.12,
+      "page": 51,
+      "standard": "IEC 60617",
+      "name_cn": "Piezo-electric effect"
+    },
+    {
+      "id": "iec_0358",
+      "name": "Spring-operated device",
+      "category": "general",
+      "filename": "iec_0358_Spring-operated_device.svg",
+      "width": 48.2,
+      "height": 44.12,
+      "page": 51,
+      "standard": "IEC 60617",
+      "name_cn": "Spring-operated device"
+    },
+    {
+      "id": "iec_0359",
+      "name": "Functional earthing; Functional grounding (US) Functional earthing conductor; Functional earthing terminal",
+      "category": "conductor",
+      "filename": "iec_0359_Functional_earthing;_Functional_grounding_(US)_Functional_earthing_conductor;_Fu.svg",
+      "width": 51.92,
+      "height": 48.08,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0360",
+      "name": "Functional equipotential bonding Functional bonding conductor; Functional bonding terminal",
+      "category": "conductor",
+      "filename": "iec_0360_Functional_equipotential_bonding_Functional_bonding_conductor;_Functional_bondin.svg",
+      "width": 50.12,
+      "height": 46.88,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0361",
+      "name": "Functional equipotential bonding Functional bonding conductor; Functional bonding terminal",
+      "category": "conductor",
+      "filename": "iec_0361_Functional_equipotential_bonding_Functional_bonding_conductor;_Functional_bondin.svg",
+      "width": 49.52,
+      "height": 46.4,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "导体"
+    },
+    {
+      "id": "iec_0362",
+      "name": "Capacitor, lead-through Capacitor, feed-through",
+      "category": "passive",
+      "filename": "iec_0362_Capacitor,_lead-through_Capacitor,_feed-through.svg",
+      "width": 55.88,
+      "height": 35.84,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "电容器",
+      "terminals": 2,
+      "terminal_positions": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "iec_0363",
+      "name": "Multiple-function switching device Control and protective switching device (CPS); Reversing CPS",
+      "category": "switching",
+      "filename": "iec_0363_Multiple-function_switching_device_Control_and_protective_switching_device_(CPS).svg",
+      "width": 34.88,
+      "height": 76.76,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    },
+    {
+      "id": "iec_0364",
+      "name": "Directed connection",
+      "category": "conductor",
+      "filename": "iec_0364_Directed_connection.svg",
+      "width": 94.4,
+      "height": 46.4,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "连接"
+    },
+    {
+      "id": "iec_0365",
+      "name": "Point of access to a bundle",
+      "category": "general",
+      "filename": "iec_0365_Point_of_access_to_a_bundle.svg",
+      "width": 96.32,
+      "height": 47.48,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "Point of access to a bundle"
+    },
+    {
+      "id": "iec_0366",
+      "name": "Polarized relay, stable positions",
+      "category": "switching",
+      "filename": "iec_0366_Polarized_relay,_stable_positions.svg",
+      "width": 110.96,
+      "height": 56.84,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "继电器",
+      "terminals": 4,
+      "terminal_positions": [
+        "coil_1",
+        "coil_2",
+        "contact_1",
+        "contact_2"
+      ]
+    },
+    {
+      "id": "iec_0367",
+      "name": "Acoustic signalling device, general symbol Horn; Bell; Single-stroke bell; Whistle",
+      "category": "load",
+      "filename": "iec_0367_Acoustic_signalling_device,_general_symbol_Horn;_Bell;_Single-stroke_bell;_Whist.svg",
+      "width": 53.24,
+      "height": 46.4,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "电铃"
+    },
+    {
+      "id": "iec_0368",
+      "name": "Combined electric and heat generated station, planned",
+      "category": "general",
+      "filename": "iec_0368_Combined_electric_and_heat_generated_station,_planned.svg",
+      "width": 51.32,
+      "height": 47.48,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "Combined electric and heat generated station, planned"
+    },
+    {
+      "id": "iec_0369",
+      "name": "Combined electric and heat generating station, in service or unspecified",
+      "category": "general",
+      "filename": "iec_0369_Combined_electric_and_heat_generating_station,_in_service_or_unspecified.svg",
+      "width": 50.72,
+      "height": 47.0,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "Combined electric and heat generating station, in service or unspecified"
+    },
+    {
+      "id": "iec_0370",
+      "name": "Fan",
+      "category": "load",
+      "filename": "iec_0370_Fan.svg",
+      "width": 74.12,
+      "height": 47.48,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "风扇"
+    },
+    {
+      "id": "iec_0371",
+      "name": "Pump",
+      "category": "load",
+      "filename": "iec_0371_Pump.svg",
+      "width": 74.12,
+      "height": 47.48,
+      "page": 52,
+      "standard": "IEC 60617",
+      "name_cn": "泵"
+    },
+    {
+      "id": "iec_0372",
+      "name": "Simplicity voltage detector",
+      "category": "general",
+      "filename": "iec_0372_Simplicity_voltage_detector.svg",
+      "width": 65.96,
+      "height": 46.88,
+      "page": 53,
+      "standard": "IEC 60617",
+      "name_cn": "Simplicity voltage detector"
+    },
+    {
+      "id": "iec_0373",
+      "name": "Combined disconnector and earthing switch",
+      "category": "switching",
+      "filename": "iec_0373_Combined_disconnector_and_earthing_switch.svg",
+      "width": 39.92,
+      "height": 47.0,
+      "page": 53,
+      "standard": "IEC 60617",
+      "name_cn": "开关",
+      "terminals": 2,
+      "terminal_positions": [
+        "common",
+        "NO"
+      ]
+    }
+  ],
+  "categories_cn": {
+    "conductor": "导体/连接",
+    "general": "通用符号",
+    "load": "负载/用电设备",
+    "machine": "旋转电机",
+    "measuring": "测量仪表",
+    "passive": "无源元件",
+    "protection": "保护器件",
+    "semiconductor": "半导体器件",
+    "signal": "信号/通信",
+    "source": "电源",
+    "switching": "开关器件",
+    "transformer": "变压器/变流器"
+  }
+}

@@ -1,27 +1,21 @@
-﻿feat(svg): IEC 符号库 PNG -> 真矢量 (vtracer) + Vercel 部署路径修复
+﻿fix(deploy): Vercel function bundle 直接含 IEC 库 (基于 2a87f6e)
 
-L5 SVG Renderer 在 Vercel 生产环境渲染出"5 个空矩形"的根本原因:
-- iec_symbols_svg/ 373 个 SVG 实际是 base64 PNG 内嵌的伪 SVG(每个文件 4 行)
-- vercel.json outputDirectory="dist" 让 Vercel 不会自动把 iec_symbols_svg/ 打包进 function bundle
-- L5 渲染器 resolveIecDir() walk-up 找不到库,fallback 到占位 rect
+affd8b4 + 2a87f6e 后,Vercel 部署后 L5 SLD 仍渲染为 5 个空矩形。
+排查后根因:vercel.json 的 includeFiles="iec_symbols_svg/**" 在当前
+Vercel 版本下没把库打包进 function bundle。
 
-修复 (A + D 档):
-1. **批量矢量化** 373 个 SVG PNG -> 真 SVG path (vtracer 0.6.15 + Python 3.11)
-   - colormode=binary + mode=polygon,适合 IEC 黑白线条图
-   - filter_speckle=2 / corner_threshold=60,锐角识别
-   - 输出: 820 个 <path> 矢量元素,0 个 base64 PNG
-2. **Vercel includeFiles** 显式打包 iec_symbols_svg/ 到 function bundle
-3. **resolveIecDir()** 加 process.cwd() 候选路径,生产环境优先
-4. **dist/iec_symbols_svg/** 双保险副本,供静态资源访问
-5. **scripts/sync-iec-to-dist.ps1** 同步脚本 (--Verify 模式可漂移检测)
-6. **tools/vectorize_iec_symbols.py** 矢量化工具,Python 3.11 + vtracer
-7. **.gitignore** 排除 iec_symbols_svg_png_backup (转换前自动备份)
+修复:把 iec_symbols_svg/ 复制到 api/_iec_symbols_svg/ — Vercel 自动
+把整个 api/ 树打进 function bundle,无需依赖 includeFiles。
 
-效果对比 (大庆管业 2000kWh / 1000kW / 10kV):
-- Before: SLD svg_len 1.8KB (5 个空矩形 + [?] 占位符)
-- After:  SLD svg_len 75KB (5 个真 IEC 符号 + 完整 polyline 连线)
-- symbols_loaded: 0 -> 5
+改动:
+1. iec_symbols_svg/ -> api/_iec_symbols_svg/ (373 SVG + index.json)
+2. dist/_iec_symbols_svg/ 同步副本 (静态资源兜底)
+3. api/render_svg.js resolveIecDir() 加 __dirname 候选路径
+   (path.join(__dirname, '_iec_symbols_svg') 优先),console.log
+   输出 [resolveIecDir] cwd / 候选数 / 命中路径,Vercel 函数日志可查
 
-下一步 (B/C 档,后续 commit):
-- B: render_arch.js 也读 IEC 库 (当前 0 个调用)
-- C: 废弃前端 renderArchSvg/RenderWiringSvg/RenderTopoSvg,统一走 API
+预期:Vercel 部署后 L5 SLD 不再 fallback 到 placeholder rectangle,
+应输出 75KB SVG,含 5 个真 IEC 矢量符号 (断路器/变压器/电池/PCS/电网)。
+
+本地验证:
+  smoke svg_len=75813, symbols=5, layers=6, components=7
