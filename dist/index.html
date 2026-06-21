@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="client-render-svg.js"></script>
 
 <style>
 :root{--bg1:#1A1D21;--bg2:#22262B;--bg3:#2A2E33;--border:rgba(222,220,209,.15);--text1:#FAFAF5;--text2:#C2C0B6;--blue:#185FA5;--green:#0F6E56;--purple:#534AB7;--brown:#854F0B;--orange:#EF9F27;--red:#E06070}
@@ -3680,12 +3681,33 @@ function aiDesignSetLoading(loading){
 async function aiDesignRenderOne(apiPath, body, contentId, label){
   var content = document.getElementById(contentId);
   if (content) content.innerHTML = '<div style="color:var(--blue);font-size:12px">⏳ 渲染 ' + label + ' 中...</div>';
+  // Plan B: 客户端直接渲染 SLD (绕开 Vercel 函数 hang 问题)
+  // /api/render_svg 改走 window.EssAgentRenderSld,其它仍走 server fetch
+  if (apiPath === '/api/render_svg' && typeof window.EssAgentRenderSld === 'function' && body && body.uem) {
+    try {
+      var localRes = window.EssAgentRenderSld(body.uem, 'sld');
+      if (localRes && localRes.ok && localRes.svg) {
+        if (content) content.innerHTML = localRes.svg;
+        return { ok: true, size: localRes.svg.length, meta: localRes, source: 'client' };
+      }
+      // local renderer failed — fall through to server fetch
+      console.warn('[aiDesignRenderOne] client render failed:', localRes && localRes.error, '— falling back to /api/render_svg');
+    } catch (e) {
+      console.warn('[aiDesignRenderOne] client render threw:', e && e.message, '— falling back to /api/render_svg');
+    }
+  }
   try {
-    var resp = await fetch(apiPath, {
+    // 30 秒 timeout,防止 server hang 永久卡住 UI
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 30000) : null;
+    var fetchOpts = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
-    });
+    };
+    if (ctrl) fetchOpts.signal = ctrl.signal;
+    var resp = await fetch(apiPath, fetchOpts);
+    if (timer) clearTimeout(timer);
     if (!resp.ok) {
       var t = await resp.text();
       throw new Error('HTTP ' + resp.status + ': ' + t.slice(0, 200));
@@ -3695,7 +3717,7 @@ async function aiDesignRenderOne(apiPath, body, contentId, label){
     var svg = data.svg || '';
     if (!svg) throw new Error('后端未返回 svg');
     if (content) content.innerHTML = svg;
-    return { ok: true, size: svg.length, meta: data };
+    return { ok: true, size: svg.length, meta: data, source: 'server' };
   } catch (e) {
     if (content) content.innerHTML = '<div style="color:var(--red);font-size:12px;padding:12px;background:rgba(224,96,112,.08);border-radius:6px">❌ ' + label + ' 渲染失败: ' + (e && e.message ? e.message : e) + '</div>';
     return { ok: false, error: e && e.message ? e.message : String(e) };
