@@ -1823,17 +1823,61 @@ ACC AC一体柜专题
 </div>
 
 <div id="page-ch-software" class="charging-content" style="display:none;padding:24px 32px">
-<div class="sec-title">软件平台 Agent</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">支持中电联协议平台互联互通、海外OCPP平台、运营SaaS平台架构设计</div>
+<div class="sec-title">OCPP 平台智能部署 Agent</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">分布式微服务架构可视化 · 服务按需勾选 · 资源自动计算 · 一键生成部署脚本</div>
+<div class="sw-tabs" style="margin-bottom:16px">
+<div class="sw-tab active" onclick="chSwTab('arch')">平台架构</div>
+<div class="sw-tab" onclick="chSwTab('select')">服务勾选</div>
+<div class="sw-tab" onclick="chSwTab('deploy')">一键部署</div>
+</div>
+<div id="chSwArch" style="display:none">
+<div class="mg-card" style="margin-bottom:16px"><h3>OCPP 平台四层架构</h3>
+<div class="diagram-svg" id="chSwArchSvg" style="min-height:420px"></div>
+</div>
 <div class="mg-grid">
-<div class="mg-card mg-col-6"><h3>平台架构图</h3><div class="diagram-svg" id="chSwArchSvg"></div></div>
-<div class="mg-card mg-col-6"><h3>核心模块</h3><div class="mg-skill-grid">
-<div class="mg-skill-card"><b>运营管理 (SaaS)</b><p>计费规则、站点管理、用户CRM、营销活动、分账结算</p></div>
-<div class="mg-skill-card"><b>OCPP网关</b><p>支持1.6J/2.0.1，WebSocket接入，协议转换与路由</p></div>
-<div class="mg-skill-card"><b>中电联网关</b><p>支持国内互联互通协议，透传/解析国标报文</p></div>
-<div class="mg-skill-card"><b>设备管理 (IoT)</b><p>桩状态监控、远程升级(OTA)、日志采集、故障诊断</p></div>
+<div class="mg-card mg-col-6"><h3>微服务清单 (20+)</h3>
+<table class="result-table" style="font-size:11px" id="chSwServiceTable"></table></div>
+<div class="mg-card mg-col-6"><h3>中间件依赖</h3>
+<table class="result-table" style="font-size:11px" id="chSwMiddlewareTable"></table></div>
+</div></div>
+<div id="chSwSelect" style="display:none">
+<div class="mg-grid">
+<div class="mg-card mg-col-8"><h3>微服务选择</h3><div id="chSwServiceChecklist"></div></div>
+<div class="mg-card mg-col-4"><h3>中间件选择</h3><div id="chSwMiddlewareChecklist"></div></div>
+</div>
+<div class="mg-card" style="margin-top:16px"><h3>资源需求估算</h3>
+<div class="mg-grid" style="margin-top:10px">
+<div class="mg-card mg-col-4" style="text-align:center"><div style="font-size:11px;color:var(--text2)">CPU (核)</div><div style="font-size:28px;font-weight:700;color:var(--blue)" id="chSwResCpu">0</div></div>
+<div class="mg-card mg-col-4" style="text-align:center"><div style="font-size:11px;color:var(--text2)">内存 (GB)</div><div style="font-size:28px;font-weight:700;color:var(--green)" id="chSwResMem">0</div></div>
+<div class="mg-card mg-col-4" style="text-align:center"><div style="font-size:11px;color:var(--text2)">磁盘 (GB)</div><div style="font-size:28px;font-weight:700;color:var(--orange)" id="chSwResDisk">0</div></div>
+</div>
+<div style="margin-top:12px;font-size:12px;color:var(--text2)" id="chSwInstanceRec">请勾选服务后查看资源需求</div>
+</div></div>
+<div id="chSwDeploy" style="display:none">
+<div class="mg-grid">
+<div class="mg-card mg-col-6"><h3>部署配置</h3>
+<div class="mg-form-grid" style="margin-top:10px">
+<div><label class="mg-label">目标服务器IP</label><input class="mg-input" id="chSwDeployIp" placeholder="192.168.1.100"></div>
+<div><label class="mg-label">SSH端口</label><input class="mg-input" id="chSwDeployPort" value="22"></div>
+<div><label class="mg-label">ROOT密码</label><input class="mg-input" id="chSwDeployPwd" type="password" placeholder="留空则脚本中手动输入"></div>
+</div>
+<div class="mg-form-grid" style="margin-top:10px">
+<div><label class="mg-label">部署目录</label><input class="mg-input" id="chSwDeployDir" value="/opt/ocpp-platform"></div>
+<div><label class="mg-label">MySQL密码</label><input class="mg-input" id="chSwDeployMysqlPwd" type="password" placeholder="自动生成"></div>
+<div><label class="mg-label">Redis密码</label><input class="mg-input" id="chSwDeployRedisPwd" type="password" placeholder="自动生成"></div>
+</div>
+<div class="mg-actions" style="margin-top:14px">
+<button class="btn btn-primary" onclick="chSwGenScripts()" style="width:auto;padding:10px 24px">生成部署脚本</button>
+<button class="btn btn-success" onclick="chSwDownloadZip()" style="width:auto;padding:10px 24px">下载 ZIP 包</button>
+</div></div>
+<div class="mg-card mg-col-6"><h3>部署进度</h3>
+<div id="chSwDeployProgress" style="margin-top:10px">
+<div style="font-size:12px;color:var(--text2)">生成脚本后查看部署步骤</div>
 </div></div>
 </div>
+<div class="mg-card" style="margin-top:16px"><h3>生成脚本预览</h3>
+<div class="mg-code" id="chSwScriptPreview" style="margin-top:10px;min-height:200px">等待生成...</div>
+</div></div>
 </div>
 
 <div id="page-ch-proto" class="charging-content" style="display:none;padding:24px 32px">
@@ -36085,23 +36129,273 @@ function chElecDownloadSvg(){
 
 
 
+var OCPP_SERVICES=[
+  {id:'eureka',name:'服务注册与配置中心',group:'基础设施',cpu:1,mem:2,disk:10,required:true,deps:['mysql'],desc:'Eureka/Nacos服务发现与配置管理'},
+  {id:'websocket',name:'OCPP WebSocket通信服务',group:'核心通信',cpu:2,mem:4,disk:20,required:true,deps:['redis','kafka'],desc:'OCPP 1.6J/2.0.1 WebSocket接入'},
+  {id:'websocket-secure',name:'OCPP WebSocket (Secure)服务',group:'核心通信',cpu:2,mem:4,disk:20,deps:['redis','kafka'],desc:'WSS加密通信服务'},
+  {id:'pile',name:'充电桩核心业务逻辑',group:'核心业务',cpu:2,mem:4,disk:30,required:true,deps:['mysql','redis'],desc:'充电桩状态管理、交易处理'},
+  {id:'system',name:'系统管理中心',group:'管理',cpu:1,mem:2,disk:15,deps:['mysql','redis'],desc:'用户权限、角色、菜单管理'},
+  {id:'device',name:'设备管理中心',group:'管理',cpu:1,mem:2,disk:15,deps:['mysql','redis'],desc:'充电桩设备注册、参数配置'},
+  {id:'order',name:'订单管理中心',group:'业务',cpu:2,mem:4,disk:30,deps:['mysql','redis','kafka'],desc:'充电订单生命周期管理'},
+  {id:'data',name:'数据处理与分析中心',group:'数据',cpu:2,mem:8,disk:100,deps:['mysql','hbase','kafka'],desc:'大数据分析、报表、BI'},
+  {id:'pay',name:'支付中心',group:'业务',cpu:1,mem:2,disk:20,deps:['mysql','redis'],desc:'微信/支付宝/银联支付对接'},
+  {id:'app',name:'移动App后端服务',group:'前端',cpu:1,mem:2,disk:15,deps:['mysql','redis'],desc:'iOS/Android App API'},
+  {id:'ota',name:'固件OTA升级中心',group:'运维',cpu:1,mem:2,disk:50,deps:['mysql','minio'],desc:'充电桩固件版本管理与远程升级'},
+  {id:'gps',name:'GPS数据处理服务',group:'数据',cpu:1,mem:2,disk:20,deps:['mysql','kafka'],desc:'充电桩GPS定位与地理围栏'},
+  {id:'private-proto',name:'私有协议处理服务',group:'核心通信',cpu:1,mem:2,disk:10,deps:['redis'],desc:'非标充电桩私有协议适配'},
+  {id:'gateway',name:'API网关',group:'基础设施',cpu:1,mem:2,disk:10,required:true,deps:['redis'],desc:'Spring Cloud Gateway路由与限流'},
+  {id:'log',name:'日志中心',group:'运维',cpu:1,mem:2,disk:50,deps:['mysql','kafka'],desc:'ELK日志采集与查询'},
+  {id:'xxl',name:'XXL-JOB任务调度',group:'基础设施',cpu:1,mem:1,disk:10,deps:['mysql'],desc:'定时任务调度管理'},
+  {id:'official',name:'官方网站后端服务',group:'前端',cpu:1,mem:1,disk:10,deps:['mysql'],desc:'官网CMS与SEO'},
+  {id:'opencenter',name:'海外开放平台',group:'业务',cpu:1,mem:2,disk:15,deps:['mysql','redis'],desc:'海外运营商API开放'},
+  {id:'platform',name:'平台管理后台',group:'管理',cpu:1,mem:2,disk:15,deps:['mysql','redis'],desc:'运营管理Web后台'},
+  {id:'charge-app',name:'充电App运营后台',group:'管理',cpu:1,mem:2,disk:15,deps:['mysql','redis'],desc:'App运营数据与配置'}
+];
+
+var OCPP_MIDDLEWARES=[
+  {id:'mysql',name:'MySQL',group:'数据库',cpu:2,mem:4,disk:50,required:true,desc:'主数据库，存储业务数据'},
+  {id:'redis',name:'Redis',group:'缓存',cpu:1,mem:4,disk:10,required:true,desc:'缓存、会话、消息队列'},
+  {id:'kafka',name:'Kafka',group:'消息队列',cpu:2,mem:4,disk:50,desc:'异步消息、事件驱动'},
+  {id:'hbase',name:'HBase',group:'数据库',cpu:2,mem:8,disk:200,desc:'海量充电数据存储'},
+  {id:'minio',name:'MinIO',group:'存储',cpu:1,mem:2,disk:100,desc:'对象存储，固件包/图片'},
+  {id:'nginx',name:'Nginx',group:'基础设施',cpu:1,mem:1,disk:5,required:true,desc:'反向代理与负载均衡'}
+];
+
+var CH_SW_SELECTED_SERVICES={};
+var CH_SW_SELECTED_MW={};
+
+function chSwTab(tab){
+  document.querySelectorAll('#page-ch-software .sw-tab').forEach(function(t){t.classList.remove('active');});
+  var tabs=document.querySelectorAll('#page-ch-software .sw-tab');
+  var idx=['arch','select','deploy'].indexOf(tab);
+  if(idx>=0&&tabs[idx]) tabs[idx].classList.add('active');
+  document.getElementById('chSwArch').style.display=tab==='arch'?'':'none';
+  document.getElementById('chSwSelect').style.display=tab==='select'?'':'none';
+  document.getElementById('chSwDeploy').style.display=tab==='deploy'?'':'none';
+  if(tab==='arch') chDrawSwArch();
+  if(tab==='select') chSwRenderChecklists();
+  if(tab==='deploy') chSwRenderProgress();
+}
+
 function chDrawSwArch(){
-  const el=document.getElementById('chSwArchSvg');
+  var el=document.getElementById('chSwArchSvg');
   if(!el) return;
-  el.innerHTML='<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">'+
-  '<text x="300" y="22" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">充电运营平台架构 (中电联 + 海外OCPP)</text>'+
-  '<rect x="40" y="50" width="160" height="46" rx="4" fill="#1e3a5f" stroke="#4a90d9"/><text x="120" y="78" text-anchor="middle" fill="#fff" font-size="11">云 SaaS 运营平台</text>'+
-  '<rect x="40" y="160" width="160" height="46" rx="4" fill="#1a1a3f" stroke="#a0a0ff"/><text x="120" y="183" text-anchor="middle" fill="#fff" font-size="11">OCPP / 中电联网关</text>'+
-  '<rect x="260" y="105" width="160" height="46" rx="4" fill="#1e3a5f" stroke="#f59e0b"/><text x="340" y="128" text-anchor="middle" fill="#fff" font-size="11">站端 4G 路由器</text>'+
-  '<rect x="260" y="220" width="160" height="46" rx="4" fill="#0d2a15" stroke="#50c878"/><text x="340" y="248" text-anchor="middle" fill="#fff" font-size="11">充电桩 SECC 主控</text>'+
-  '<rect x="460" y="50" width="120" height="46" rx="4" fill="#2d1e3f" stroke="#8B5CF6"/><text x="520" y="78" text-anchor="middle" fill="#8B5CF6" font-size="10">中电联平台</text>'+
-  '<rect x="460" y="160" width="120" height="46" rx="4" fill="#3d1820" stroke="#e06070"/><text x="520" y="188" text-anchor="middle" fill="#e06070" font-size="10">海外OCPP平台</text>'+
-  '<line x1="120" y1="96" x2="120" y2="160" stroke="#a0a0ff" stroke-width="2"/>'+
-  '<line x1="200" y1="183" x2="260" y2="128" stroke="#a0a0ff" stroke-width="2" stroke-dasharray="4,2"/>'+
-  '<line x1="420" y1="128" x2="460" y2="73" stroke="#a0a0ff" stroke-width="1.5"/>'+
-  '<line x1="420" y1="128" x2="460" y2="183" stroke="#e06070" stroke-width="1.5"/>'+
-  '<line x1="340" y1="151" x2="340" y2="220" stroke="#50c878" stroke-width="2"/>'+
-  '</svg>';
+  var layers=[
+    {name:'用户端层',color:'#4a90d9',items:['运营管理Web','充电App (iOS/Android)','官方网站','开放平台API'],y:50},
+    {name:'网关层',color:'#f59e0b',items:['Nginx 反向代理','API Gateway (路由/限流)','OCPP WS/WSs 接入'],y:140},
+    {name:'微服务层',color:'#50c878',items:['充电桩业务','订单中心','支付中心','设备管理','系统管理','数据分析','OTA升级','GPS服务','日志中心','任务调度'],y:230},
+    {name:'中间件层',color:'#8B5CF6',items:['MySQL','Redis','Kafka','HBase','MinIO','Eureka/Nacos'],y:320}
+  ];
+  var svg='<svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117">';
+  svg+='<text x="450" y="24" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">OCPP 充电运营平台 · 分布式微服务架构</text>';
+  layers.forEach(function(layer,li){
+    var lw=860,lx=20;
+    svg+='<rect x="'+lx+'" y="'+layer.y+'" width="'+lw+'" height="70" rx="6" fill="rgba(255,255,255,.03)" stroke="'+layer.color+'" stroke-width="1" stroke-dasharray="4,2"/>';
+    svg+='<text x="'+(lx+8)+'" y="'+(layer.y+16)+'" fill="'+layer.color+'" font-size="10" font-weight="600">'+layer.name+'</text>';
+    var iw=Math.floor((lw-20)/layer.items.length);
+    layer.items.forEach(function(item,ii){
+      var ix=lx+10+ii*iw;
+      svg+='<rect x="'+ix+'" y="'+(layer.y+24)+'" width="'+(iw-6)+'" height="34" rx="4" fill="rgba(255,255,255,.06)" stroke="'+layer.color+'" stroke-width="1"/>';
+      svg+='<text x="'+(ix+(iw-6)/2)+'" y="'+(layer.y+46)+'" text-anchor="middle" fill="#fff" font-size="9">'+item+'</text>';
+    });
+    if(li<layers.length-1){
+      svg+='<line x1="450" y1="'+(layer.y+70)+'" x2="450" y2="'+(layers[li+1].y)+'" stroke="'+layer.color+'" stroke-width="2" marker-end="url(#arrow)"/>';
+    }
+  });
+  svg+='<defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#666"/></marker></defs>';
+  svg+='</svg>';
+  el.innerHTML=svg;
+  chSwRenderServiceTable();
+  chSwRenderMwTable();
+}
+
+function chSwRenderServiceTable(){
+  var el=document.getElementById('chSwServiceTable');
+  if(!el) return;
+  var html='<tr><th>服务</th><th>分组</th><th>CPU</th><th>内存</th><th>依赖</th><th>必选</th></tr>';
+  OCPP_SERVICES.forEach(function(s){
+    html+='<tr><td style="color:var(--text1);font-weight:600">'+s.name+'</td><td>'+s.group+'</td><td>'+s.cpu+'核</td><td>'+s.mem+'GB</td><td style="font-size:10px">'+s.deps.join(', ')+'</td><td>'+(s.required?'<span style="color:var(--green)">是</span>':'否')+'</td></tr>';
+  });
+  el.innerHTML=html;
+}
+
+function chSwRenderMwTable(){
+  var el=document.getElementById('chSwMiddlewareTable');
+  if(!el) return;
+  var html='<tr><th>中间件</th><th>分类</th><th>CPU</th><th>内存</th><th>磁盘</th><th>必选</th></tr>';
+  OCPP_MIDDLEWARES.forEach(function(m){
+    html+='<tr><td style="color:var(--text1);font-weight:600">'+m.name+'</td><td>'+m.group+'</td><td>'+m.cpu+'核</td><td>'+m.mem+'GB</td><td>'+m.disk+'GB</td><td>'+(m.required?'<span style="color:var(--green)">是</span>':'否')+'</td></tr>';
+  });
+  el.innerHTML=html;
+}
+
+function chSwRenderChecklists(){
+  var sEl=document.getElementById('chSwServiceChecklist');
+  var mEl=document.getElementById('chSwMiddlewareChecklist');
+  if(!sEl||!mEl) return;
+  var groups={};
+  OCPP_SERVICES.forEach(function(s){
+    if(!groups[s.group]) groups[s.group]=[];
+    groups[s.group].push(s);
+  });
+  var shtml='';
+  Object.keys(groups).forEach(function(g){
+    shtml+='<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:600;color:var(--blue);margin-bottom:6px">'+g+'</div><div class="mg-check-grid">';
+    groups[g].forEach(function(s){
+      var checked=CH_SW_SELECTED_SERVICES[s.id]!==false;
+      if(s.required) checked=true;
+      shtml+='<label class="mg-check"><input type="checkbox" '+(checked?'checked':'')+' '+(s.required?'disabled':'')+' onchange="chSwToggleService(\''+s.id+'\',this.checked)" data-sid="'+s.id+'"><span>'+s.name+'</span></label>';
+    });
+    shtml+='</div></div>';
+  });
+  sEl.innerHTML=shtml;
+  var mhtml='';
+  OCPP_MIDDLEWARES.forEach(function(m){
+    var checked=CH_SW_SELECTED_MW[m.id]!==false;
+    if(m.required) checked=true;
+    mhtml+='<label class="mg-check" style="margin-bottom:8px"><input type="checkbox" '+(checked?'checked':'')+' '+(m.required?'disabled':'')+' onchange="chSwToggleMw(\''+m.id+'\',this.checked)" data-mid="'+m.id+'"><span><b>'+m.name+'</b> <span style="font-size:10px;color:var(--text2)">'+m.desc+'</span></span></label>';
+  });
+  mEl.innerHTML=mhtml;
+  chSwCalcResources();
+}
+
+function chSwToggleService(id,checked){
+  CH_SW_SELECTED_SERVICES[id]=checked;
+  var svc=OCPP_SERVICES.find(function(s){return s.id===id;});
+  if(svc&&checked){
+    svc.deps.forEach(function(dep){
+      CH_SW_SELECTED_MW[dep]=true;
+    });
+  }
+  chSwRenderChecklists();
+}
+
+function chSwToggleMw(id,checked){
+  var mw=OCPP_MIDDLEWARES.find(function(m){return m.id===id;});
+  if(!checked&&mw&&!mw.required){
+    var conflict=OCPP_SERVICES.filter(function(s){
+      return CH_SW_SELECTED_SERVICES[s.id]!==false&&s.deps.indexOf(id)>=0;
+    });
+    if(conflict.length>0){
+      alert('无法取消 '+mw.name+'，以下服务依赖它: '+conflict.map(function(s){return s.name;}).join(', '));
+      chSwRenderChecklists();
+      return;
+    }
+  }
+  CH_SW_SELECTED_MW[id]=checked;
+  chSwCalcResources();
+}
+
+function chSwCalcResources(){
+  var cpu=0,mem=0,disk=0;
+  OCPP_SERVICES.forEach(function(s){
+    if(CH_SW_SELECTED_SERVICES[s.id]!==false){cpu+=s.cpu;mem+=s.mem;disk+=s.disk;}
+  });
+  OCPP_MIDDLEWARES.forEach(function(m){
+    if(CH_SW_SELECTED_MW[m.id]!==false){cpu+=m.cpu;mem+=m.mem;disk+=m.disk;}
+  });
+  var cpuEl=document.getElementById('chSwResCpu');
+  var memEl=document.getElementById('chSwResMem');
+  var diskEl=document.getElementById('chSwResDisk');
+  var recEl=document.getElementById('chSwInstanceRec');
+  if(cpuEl) cpuEl.textContent=cpu;
+  if(memEl) memEl.textContent=mem;
+  if(memEl) memEl.style.color=mem>64?'var(--red)':mem>32?'var(--orange)':'var(--green)';
+  if(diskEl) diskEl.textContent=disk;
+  if(recEl){
+    var rec='';
+    if(cpu<=4&&mem<=16) rec='推荐: 1台 4C16G (c5.xlarge)';
+    else if(cpu<=8&&mem<=32) rec='推荐: 1台 8C32G (c5.2xlarge)';
+    else if(cpu<=16&&mem<=64) rec='推荐: 1台 16C64G (c5.4xlarge)';
+    else if(cpu<=32&&mem<=128) rec='推荐: 2台 16C64G 或 1台 32C128G';
+    else rec='推荐: 多机部署，至少 '+Math.ceil(cpu/16)+' 台 16C64G 服务器';
+    recEl.innerHTML='<b>资源汇总:</b> '+cpu+'核CPU / '+mem+'GB内存 / '+disk+'GB磁盘 — <span style="color:var(--blue)">'+rec+'</span>';
+  }
+}
+
+function chSwGenScripts(){
+  var ip=document.getElementById('chSwDeployIp').value.trim()||'YOUR_SERVER_IP';
+  var port=document.getElementById('chSwDeployPort').value.trim()||'22';
+  var deployDir=document.getElementById('chSwDeployDir').value.trim()||'/opt/ocpp-platform';
+  var mysqlPwd=document.getElementById('chSwDeployMysqlPwd').value.trim()||'Ocpp@'+Math.random().toString(36).slice(2,10);
+  var redisPwd=document.getElementById('chSwDeployRedisPwd').value.trim()||'Ocpp@'+Math.random().toString(36).slice(2,10);
+  var selectedSvcs=OCPP_SERVICES.filter(function(s){return CH_SW_SELECTED_SERVICES[s.id]!==false;});
+  var selectedMws=OCPP_MIDDLEWARES.filter(function(m){return CH_SW_SELECTED_MW[m.id]!==false;});
+  var script='#!/bin/bash\n# OCPP Platform Auto Deploy Script\n# Generated by Open ESS Agent\n# Target: '+ip+'\n# Date: '+new Date().toISOString().slice(0,10)+'\n\nset -e\n\nDEPLOY_DIR="'+deployDir+'"\nMYSQL_PWD="'+mysqlPwd+'"\nREDIS_PWD="'+redisPwd+'"\n\necho "========================================"\necho "  OCPP Platform Auto Deploy"\necho "========================================"\n\n# Phase 1: Environment Check\necho "[Phase 1] Checking environment..."\nif ! command -v docker &> /dev/null; then\n  echo "Installing Docker..."\n  curl -fsSL https://get.docker.com | sh\n  systemctl enable docker && systemctl start docker\nfi\nif ! command -v docker-compose &> /dev/null; then\n  echo "Installing docker-compose..."\n  curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose\n  chmod +x /usr/local/bin/docker-compose\nfi\n\nmkdir -p $DEPLOY_DIR\ncd $DEPLOY_DIR\n\n# Phase 2: Middleware\necho "[Phase 2] Starting middleware..."\ncat > docker-compose.yml << \'DCEOF\'\nversion: "3.8"\nservices:\n';
+  selectedMws.forEach(function(m){
+    if(m.id==='mysql'){
+      script+='  mysql:\n    image: mysql:8.0\n    restart: always\n    ports: ["3306:3306"]\n    environment:\n      MYSQL_ROOT_PASSWORD: '+mysqlPwd+'\n    volumes: ["mysql_data:/var/lib/mysql"]\n\n';
+    }else if(m.id==='redis'){
+      script+='  redis:\n    image: redis:7-alpine\n    restart: always\n    ports: ["6379:6379"]\n    command: redis-server --requirepass '+redisPwd+'\n    volumes: ["redis_data:/data"]\n\n';
+    }else if(m.id==='kafka'){
+      script+='  zookeeper:\n    image: confluentinc/cp-zookeeper:7.5.0\n    restart: always\n    environment:\n      ZOOKEEPER_CLIENT_PORT: 2181\n  kafka:\n    image: confluentinc/cp-kafka:7.5.0\n    restart: always\n    depends_on: [zookeeper]\n    ports: ["9092:9092"]\n    environment:\n      KAFKA_BROKER_ID: 1\n      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181\n      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://'+ip+':9092\n\n';
+    }else if(m.id==='hbase'){
+      script+='  hbase:\n    image: harisekhon/hbase:2.4\n    restart: always\n    ports: ["16010:16010","16020:16020"]\n    volumes: ["hbase_data:/data"]\n\n';
+    }else if(m.id==='minio'){
+      script+='  minio:\n    image: minio/minio:latest\n    restart: always\n    ports: ["9000:9000","9001:9001"]\n    environment:\n      MINIO_ROOT_USER: admin\n      MINIO_ROOT_PASSWORD: minio123456\n    command: server /data --console-address ":9001"\n    volumes: ["minio_data:/data"]\n\n';
+    }else if(m.id==='nginx'){
+      script+='  nginx:\n    image: nginx:alpine\n    restart: always\n    ports: ["80:80","443:443"]\n    volumes: ["./nginx/conf.d:/etc/nginx/conf.d"]\n\n';
+    }
+  });
+  script+='volumes:\n  mysql_data:\n  redis_data:\n  hbase_data:\n  minio_data:\nDCEOF\n\n';
+  script+='docker-compose up -d\necho "Middleware started. Waiting 30s for initialization..."\nsleep 30\n\n';
+  script+='# Phase 3: Core Services\necho "[Phase 3] Starting core services..."\n';
+  selectedSvcs.forEach(function(s){
+    if(s.required||s.group==='核心通信'||s.group==='核心业务'){
+      script+='# TODO: deploy '+s.name+' (image: ocpp/'+s.id+':latest)\n';
+    }
+  });
+  script+='\n# Phase 4: Other Services\necho "[Phase 4] Starting other services..."\n';
+  selectedSvcs.forEach(function(s){
+    if(!s.required&&s.group!=='核心通信'&&s.group!=='核心业务'){
+      script+='# TODO: deploy '+s.name+' (image: ocpp/'+s.id+':latest)\n';
+    }
+  });
+  script+='\n# Phase 5: Gateway & Frontend\necho "[Phase 5] Starting gateway & frontend..."\n';
+  script+='# Nginx config\necho "Deploy complete!"\necho "========================================"\necho "  API: http://'+ip+'"\necho "  MySQL: '+ip+':3306"\necho "  Redis: '+ip+':6379"\necho "========================================"\n';
+  var preview=document.getElementById('chSwScriptPreview');
+  if(preview) preview.textContent=script;
+  chSwRenderProgress();
+}
+
+function chSwDownloadZip(){
+  var preview=document.getElementById('chSwScriptPreview');
+  if(!preview||preview.textContent==='等待生成...'){alert('请先生成部署脚本');return;}
+  var content=preview.textContent;
+  var blob=new Blob([content],{type:'text/plain'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='deploy_ocpp_platform.sh';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function chSwRenderProgress(){
+  var el=document.getElementById('chSwDeployProgress');
+  if(!el) return;
+  var steps=[
+    {name:'环境检查',desc:'Docker/docker-compose安装、端口检查',icon:'🔍'},
+    {name:'中间件启动',desc:'MySQL/Redis/Kafka等中间件容器启动',icon:'🗄️'},
+    {name:'核心服务部署',desc:'WebSocket/充电桩业务/网关等核心服务',icon:'⚡'},
+    {name:'其他服务部署',desc:'订单/支付/OTA/GPS等业务服务',icon:'📦'},
+    {name:'网关与前端',desc:'Nginx配置、Web前端部署',icon:'🌐'}
+  ];
+  var html='<div style="display:flex;flex-direction:column;gap:8px">';
+  steps.forEach(function(s,i){
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px">';
+    html+='<div style="font-size:18px">'+s.icon+'</div>';
+    html+='<div><div style="font-size:13px;font-weight:600;color:var(--text1)">Step '+(i+1)+': '+s.name+'</div>';
+    html+='<div style="font-size:11px;color:var(--text2)">'+s.desc+'</div></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function chDrawSwArch(){
+  var el=document.getElementById('chSwArchSvg');
+  if(!el) return;
+  chSwTab('arch');
 }
 
 function chShowProto(type){
