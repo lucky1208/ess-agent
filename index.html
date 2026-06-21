@@ -1849,9 +1849,9 @@ ACC AC一体柜专题
 <div class="ocpp-debug-breadcrumb"><span>Home</span><span class="ocpp-debug-bc-sep">/</span><span>Debug Center</span><span class="ocpp-debug-bc-sep">/</span><span class="ocpp-debug-bc-active" id="ocppDebugBcAction">ChangeAvailability</span><span style="margin-left:auto;display:flex;align-items:center;gap:6px"><span class="em-comm-dot" id="ocppDebugConnDot" style="background:var(--text2)"></span><span id="ocppDebugConnLabel" style="font-size:11px;color:var(--text2)">未连接</span></span></div>
 <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
 <span class="mg-label" style="margin:0;white-space:nowrap">CSMS地址</span>
-<input class="mg-input" id="ocppDebugServerUrl" value="" placeholder="https://your-csms.railway.app" style="max-width:280px;font-size:11px">
+<input class="mg-input" id="ocppDebugServerUrl" value="" placeholder="https://ocpp.ess-agent.com" style="max-width:280px;font-size:11px">
 <button class="ocpp-debug-call-btn" style="padding:5px 12px;font-size:11px;background:var(--blue)" onclick="ocppDebugSaveConfig()">保存</button>
-<span id="ocppDebugWsUrl" style="font-size:10px;color:var(--text2);margin-left:8px;cursor:pointer" onclick="ocppDebugCopyWsUrl()" title="点击复制充电桩连接地址">wss://...</span>
+<span id="ocppDebugWsUrl" style="font-size:11px;color:#82aaff;margin-left:8px;cursor:pointer;font-family:'Cascadia Code','Fira Code',monospace;background:rgba(24,95,165,.1);padding:3px 8px;border-radius:4px;border:1px solid rgba(24,95,165,.2)" onclick="ocppDebugCopyWsUrl()" title="此地址用于充电桩CSMS配置，点击复制">wss://...</span>
 </div>
 <div class="ocpp-debug-ver-tabs">
 <div class="ocpp-debug-ver-tab active" onclick="ocppDebugSwitchVer('1.6J')">OCPP 1.6J</div>
@@ -1865,7 +1865,7 @@ ACC AC一体柜专题
 </div>
 <div class="ocpp-debug-panel">
 <div class="ocpp-debug-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Request</div>
-<div class="ocpp-debug-req-row"><span class="mg-label" style="margin:0;white-space:nowrap">充电桩</span><select class="mg-input" id="ocppDebugChargerSelect" style="max-width:200px"><option value="">-- 选择充电桩 --</option></select><button style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:11px;cursor:pointer" onclick="ocppDebugLoadChargers()" title="刷新列表">⟳</button><button class="ocpp-debug-call-btn" id="ocppDebugCallBtn" onclick="ocppDebugCall()">Call</button><label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);cursor:pointer;margin-left:6px"><input type="checkbox" id="ocppDebugSimMode" onchange="ocppDebugToggleSim()">模拟</label></div>
+<div class="ocpp-debug-req-row"><span class="mg-label" style="margin:0;white-space:nowrap">充电桩</span><select class="mg-input" id="ocppDebugChargerSelect" style="max-width:200px" onchange="ocppDebugUpdateWsUrl()"><option value="">-- 选择充电桩 --</option></select><button style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:11px;cursor:pointer" onclick="ocppDebugLoadChargers()" title="刷新列表">⟳</button><button class="ocpp-debug-call-btn" id="ocppDebugCallBtn" onclick="ocppDebugCall()">Call</button><label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);cursor:pointer;margin-left:6px"><input type="checkbox" id="ocppDebugSimMode" onchange="ocppDebugToggleSim()">模拟</label></div>
 <textarea class="ocpp-debug-req-textarea" id="ocppDebugReqBody" spellcheck="false"></textarea>
 <div class="ocpp-debug-panel-title" style="margin-top:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 6 2 12 8 18"/><polyline points="16 18 22 12 16 6"/></svg> Response</div>
 <div class="ocpp-debug-res-box" id="ocppDebugResBox"><span style="color:var(--text2)">Waiting for call...</span></div>
@@ -36422,21 +36422,23 @@ function ocppDebugUpdateWsUrl(){
   var selEl=document.getElementById('ocppDebugChargerSelect');
   if(!el) return;
   var baseUrl=ocppDebugGetBaseUrl();
-  if(!baseUrl){el.textContent='wss://...';return;}
-  var chargerId=selEl?selEl.value:'CP_001';
+  if(!baseUrl){el.textContent='wss://...';el.title='此地址用于充电桩CSMS配置，点击复制';return;}
+  var chargerId=selEl&&selEl.value?selEl.value:'{chargePointId}';
   var wsUrl=baseUrl.replace(/^https?:/,baseUrl.startsWith('https')?'wss:':'ws:')+'/ocpp/'+chargerId;
   el.textContent=wsUrl;
-  el.title='点击复制: '+wsUrl;
+  el.title='此地址用于充电桩CSMS配置，点击复制\n'+wsUrl;
 }
 
 function ocppDebugCopyWsUrl(){
   var el=document.getElementById('ocppDebugWsUrl');
   if(!el) return;
   var text=el.textContent;
+  if(text==='wss://...') return;
   if(navigator.clipboard){navigator.clipboard.writeText(text);}
   else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
   el.style.color='var(--green)';
-  setTimeout(function(){el.style.color='';},1500);
+  el.style.borderColor='var(--green)';
+  setTimeout(function(){el.style.color='#82aaff';el.style.borderColor='rgba(24,95,165,.2)';},1500);
 }
 
 var OCPP_DEBUG_SSE=null;
