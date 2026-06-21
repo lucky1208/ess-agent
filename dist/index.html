@@ -227,6 +227,33 @@ select.form-input{appearance:auto}
 .bs-elec-params-table tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 .bs-elec-params-group{background:var(--blue);color:#fff;font-weight:600;font-size:12px}
 .bs-elec-params-group td{background:rgba(24,95,165,.15);color:var(--blue);font-weight:600;padding:8px 10px}
+.ocpp-debug-breadcrumb{font-size:12px;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:4px}
+.ocpp-debug-breadcrumb span{color:var(--text2)}
+.ocpp-debug-breadcrumb .ocpp-debug-bc-sep{color:#555;margin:0 2px}
+.ocpp-debug-breadcrumb .ocpp-debug-bc-active{color:var(--blue);font-weight:600}
+.ocpp-debug-ver-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
+.ocpp-debug-ver-tab{padding:8px 20px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;font-size:13px;font-weight:500}
+.ocpp-debug-ver-tab:hover{color:var(--text1)}
+.ocpp-debug-ver-tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+.ocpp-debug-action-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.ocpp-debug-action-btn{padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.ocpp-debug-action-btn:hover{border-color:var(--purple);color:var(--text1);background:rgba(83,74,183,.08)}
+.ocpp-debug-action-btn.active{background:var(--purple);color:#fff;border-color:var(--purple);box-shadow:0 2px 8px rgba(83,74,183,.3)}
+.ocpp-debug-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+.ocpp-debug-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px}
+.ocpp-debug-panel-title{font-size:12px;font-weight:600;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ocpp-debug-schema-box{background:#0b111b;border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'Cascadia Code','Fira Code',monospace;font-size:11px;color:#b7d7ff;white-space:pre-wrap;max-height:320px;overflow:auto;line-height:1.6}
+.ocpp-debug-schema-box .sk{color:#c792ea}.ocpp-debug-schema-box .sv{color:#c3e88d}.ocpp-debug-schema-box .sn{color:#82aaff}.ocpp-debug-schema-box .sb{color:#f78c6c}.ocpp-debug-schema-box .sp{color:#89ddff}
+.ocpp-debug-req-row{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+.ocpp-debug-req-row .mg-input{flex:1}
+.ocpp-debug-call-btn{padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.ocpp-debug-call-btn:hover{background:#0A5A46}
+.ocpp-debug-req-textarea{width:100%;min-height:100px;background:#0b111b;border:1px solid var(--border);border-radius:6px;padding:10px;font-family:'Cascadia Code','Fira Code',monospace;font-size:11px;color:#d6e7ff;resize:vertical;line-height:1.6}
+.ocpp-debug-req-textarea:focus{outline:none;border-color:var(--blue)}
+.ocpp-debug-res-box{background:#0b111b;border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'Cascadia Code','Fira Code',monospace;font-size:11px;color:#d6e7ff;white-space:pre-wrap;min-height:80px;max-height:260px;overflow:auto;line-height:1.6}
+.ocpp-debug-res-box.res-ok{border-color:rgba(15,110,86,.4)}.ocpp-debug-res-box.res-err{border-color:rgba(224,96,112,.4)}
+.ocpp-debug-res-box .rsk{color:#c792ea}.ocpp-debug-res-box .rsv{color:#c3e88d}.ocpp-debug-res-box .rsn{color:#82aaff}.ocpp-debug-res-box .rsb{color:#f78c6c}.ocpp-debug-res-box .rsp{color:#89ddff}
+@media(max-width:900px){.ocpp-debug-layout{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1817,7 +1844,51 @@ ACC AC一体柜专题
 <div class="sw-tab" onclick="chShowProto('cec')">中电联协议</div>
 <div class="sw-tab" onclick="chShowProto('modbus')">Modbus点表</div>
 </div>
-<div id="chProtoContent" style="font-size:12px;color:var(--text2)"></div>
+<div id="chProtoContent">
+<div id="chProtoOcpp">
+<div class="ocpp-debug-breadcrumb"><span>Home</span><span class="ocpp-debug-bc-sep">/</span><span>Debug Center</span><span class="ocpp-debug-bc-sep">/</span><span class="ocpp-debug-bc-active" id="ocppDebugBcAction">ChangeAvailability</span></div>
+<div class="ocpp-debug-ver-tabs">
+<div class="ocpp-debug-ver-tab active" onclick="ocppDebugSwitchVer('1.6J')">OCPP 1.6J</div>
+<div class="ocpp-debug-ver-tab" onclick="ocppDebugSwitchVer('2.0.1')">OCPP 2.0.1</div>
+</div>
+<div class="ocpp-debug-action-grid" id="ocppDebugActionGrid"></div>
+<div class="ocpp-debug-layout">
+<div class="ocpp-debug-panel">
+<div class="ocpp-debug-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Schema</div>
+<div class="ocpp-debug-schema-box" id="ocppDebugSchemaBox"></div>
+</div>
+<div class="ocpp-debug-panel">
+<div class="ocpp-debug-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Request</div>
+<div class="ocpp-debug-req-row"><span class="mg-label" style="margin:0;white-space:nowrap">Product Code</span><input class="mg-input" id="ocppDebugProductCode" value="202323206050" style="max-width:200px"><button class="ocpp-debug-call-btn" onclick="ocppDebugCall()">Call</button></div>
+<textarea class="ocpp-debug-req-textarea" id="ocppDebugReqBody" spellcheck="false"></textarea>
+<div class="ocpp-debug-panel-title" style="margin-top:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 6 2 12 8 18"/><polyline points="16 18 22 12 16 6"/></svg> Response</div>
+<div class="ocpp-debug-res-box" id="ocppDebugResBox"><span style="color:var(--text2)">Waiting for call...</span></div>
+</div>
+</div>
+</div>
+<div id="chProtoCec" style="display:none">
+<p style="margin-bottom:8px">中电联 T/CEC 102 互联互通协议, 桩端按 GB/T 27930 充电协议接入.</p>
+<table class="result-table" style="font-size:11px"><tr><th>步骤</th><th>报文</th><th>说明</th></tr>
+<tr><td>1</td><td>CHM (握手)</td><td>桩检测连接</td></tr>
+<tr><td>2</td><td>CRM (辨识)</td><td>BCU/ECU 标识</td></tr>
+<tr><td>3</td><td>CTS/CRM/CML</td><td>参数配置</td></tr>
+<tr><td>4</td><td>CRO/CST</td><td>充电就绪</td></tr>
+<tr><td>5</td><td>CCS/CCV/CST</td><td>充电阶段</td></tr>
+<tr><td>6</td><td>CSD/CEM</td><td>充电结束</td></tr>
+</table>
+</div>
+<div id="chProtoModbus" style="display:none">
+<table class="result-table" style="font-size:11px"><tr><th>地址</th><th>参数</th><th>类型</th><th>说明</th></tr>
+<tr><td>40001</td><td>充电状态</td><td>UINT16</td><td>1=待机 2=充电 3=故障 4=离线</td></tr>
+<tr><td>40002</td><td>输出电压</td><td>UINT16</td><td>V × 10</td></tr>
+<tr><td>40003</td><td>输出电流</td><td>UINT16</td><td>A × 10</td></tr>
+<tr><td>40004</td><td>累计电量</td><td>UINT32</td><td>kWh × 100</td></tr>
+<tr><td>40006</td><td>SOC</td><td>UINT16</td><td>% × 10</td></tr>
+<tr><td>40007</td><td>枪温</td><td>INT16</td><td>℃ × 10</td></tr>
+<tr><td>40008</td><td>告警码</td><td>UINT16</td><td>0=正常</td></tr>
+</table>
+</div>
+</div>
 </div>
 
 <div id="page-ch-cooling" class="charging-content" style="display:none;padding:24px 32px">
@@ -36028,46 +36099,238 @@ function chDrawSwArch(){
 }
 
 function chShowProto(type){
-  const el=document.getElementById('chProtoContent');
-  if(!el) return;
   document.querySelectorAll('#page-ch-proto .sw-tab').forEach(t=>t.classList.remove('active'));
   const tabs=document.querySelectorAll('#page-ch-proto .sw-tab');
   const idx=['ocpp','cec','modbus'].indexOf(type);
   if(idx>=0&&tabs[idx]) tabs[idx].classList.add('active');
-  if(type==='ocpp'){
-    el.innerHTML='<table class="result-table" style="font-size:11px"><tr><th>OCPP 操作</th><th>方向</th><th>说明</th></tr>'+
-    '<tr><td>BootNotification</td><td>桩→云</td><td>开机注册</td></tr>'+
-    '<tr><td>Authorize</td><td>桩↔云</td><td>鉴权 (RFID/APP/即插即充)</td></tr>'+
-    '<tr><td>StartTransaction</td><td>桩→云</td><td>开始充电</td></tr>'+
-    '<tr><td>MeterValues</td><td>桩→云</td><td>电表数据</td></tr>'+
-    '<tr><td>StopTransaction</td><td>桩→云</td><td>结束充电</td></tr>'+
-    '<tr><td>SetChargingProfile</td><td>云→桩</td><td>下发放率</td></tr>'+
-    '<tr><td>GetConfiguration</td><td>云↔桩</td><td>读取配置</td></tr>'+
-    '<tr><td>RemoteStartTransaction</td><td>云→桩</td><td>远程启动</td></tr>'+
-    '<tr><td>Heartbeat</td><td>桩→云</td><td>心跳</td></tr>'+
-    '<tr><td>FirmwareUpdate</td><td>云→桩</td><td>OTA 升级</td></tr>'+
-    '</table>';
-  }else if(type==='cec'){
-    el.innerHTML='<p style="margin-bottom:8px">中电联 T/CEC 102 互联互通协议, 桩端按 GB/T 27930 充电协议接入.</p>'+
-    '<table class="result-table" style="font-size:11px"><tr><th>步骤</th><th>报文</th><th>说明</th></tr>'+
-    '<tr><td>1</td><td>CHM (握手)</td><td>桩检测连接</td></tr>'+
-    '<tr><td>2</td><td>CRM (辨识)</td><td>BCU/ECU 标识</td></tr>'+
-    '<tr><td>3</td><td>CTS/CRM/CML</td><td>参数配置</td></tr>'+
-    '<tr><td>4</td><td>CRO/CST</td><td>充电就绪</td></tr>'+
-    '<tr><td>5</td><td>CCS/CCV/CST</td><td>充电阶段</td></tr>'+
-    '<tr><td>6</td><td>CSD/CEM</td><td>充电结束</td></tr>'+
-    '</table>';
-  }else{
-    el.innerHTML='<table class="result-table" style="font-size:11px"><tr><th>地址</th><th>参数</th><th>类型</th><th>说明</th></tr>'+
-    '<tr><td>40001</td><td>充电状态</td><td>UINT16</td><td>1=待机 2=充电 3=故障 4=离线</td></tr>'+
-    '<tr><td>40002</td><td>输出电压</td><td>UINT16</td><td>V × 10</td></tr>'+
-    '<tr><td>40003</td><td>输出电流</td><td>UINT16</td><td>A × 10</td></tr>'+
-    '<tr><td>40004</td><td>累计电量</td><td>UINT32</td><td>kWh × 100</td></tr>'+
-    '<tr><td>40006</td><td>SOC</td><td>UINT16</td><td>% × 10</td></tr>'+
-    '<tr><td>40007</td><td>枪温</td><td>INT16</td><td>℃ × 10</td></tr>'+
-    '<tr><td>40008</td><td>告警码</td><td>UINT16</td><td>0=正常</td></tr>'+
-    '</table>';
+  var ocppEl=document.getElementById('chProtoOcpp');
+  var cecEl=document.getElementById('chProtoCec');
+  var modEl=document.getElementById('chProtoModbus');
+  if(ocppEl) ocppEl.style.display=type==='ocpp'?'':'none';
+  if(cecEl) cecEl.style.display=type==='cec'?'':'none';
+  if(modEl) modEl.style.display=type==='modbus'?'':'none';
+  if(type==='ocpp') ocppDebugInit();
+}
+
+var OCPP_DEBUG_STATE={ver:'1.6J',action:'ChangeAvailability',inited:false};
+
+var OCPP_16J_ACTIONS=[
+  {name:'ChangeAvailability',dir:'CS→CP',desc:'改变充电桩可用性'},
+  {name:'ChangeConfiguration',dir:'CS→CP',desc:'修改配置项'},
+  {name:'ClearCache',dir:'CS→CP',desc:'清除鉴权缓存'},
+  {name:'DataTransfer',dir:'CS↔CP',desc:'自定义数据传输'},
+  {name:'GetConfiguration',dir:'CS→CP',desc:'获取配置项'},
+  {name:'RemoteStartTransaction',dir:'CS→CP',desc:'远程启动充电'},
+  {name:'RemoteStopTransaction',dir:'CS→CP',desc:'远程停止充电'},
+  {name:'Reset',dir:'CS→CP',desc:'重启充电桩'},
+  {name:'UnlockConnector',dir:'CS→CP',desc:'解锁充电枪'},
+  {name:'GetDiagnostics',dir:'CS→CP',desc:'获取诊断信息'},
+  {name:'UpdateFirmware',dir:'CS→CP',desc:'固件升级'},
+  {name:'GetLocalListVersion',dir:'CS→CP',desc:'获取本地白名单版本'},
+  {name:'SendLocalList',dir:'CS→CP',desc:'下发本地白名单'},
+  {name:'ReserveNow',dir:'CS→CP',desc:'预约充电'},
+  {name:'CancelReservation',dir:'CS→CP',desc:'取消预约'},
+  {name:'ClearChargingProfile',dir:'CS→CP',desc:'清除充电曲线'},
+  {name:'GetCompositeSchedule',dir:'CS→CP',desc:'获取复合充电计划'},
+  {name:'SetChargingProfile',dir:'CS→CP',desc:'设置充电曲线'},
+  {name:'TriggerMessage',dir:'CS→CP',desc:'触发消息上报'}
+];
+
+var OCPP_201_EXTRA_ACTIONS=[
+  {name:'RequestStartTransaction',dir:'CS→CP',desc:'请求启动交易'},
+  {name:'RequestStopTransaction',dir:'CS→CP',desc:'请求停止交易'},
+  {name:'SetVariables',dir:'CS→CP',desc:'设置变量'},
+  {name:'GetVariables',dir:'CS→CP',desc:'获取变量'},
+  {name:'GetReport',dir:'CS→CP',desc:'获取设备报告'},
+  {name:'GetMonitoringReport',dir:'CS→CP',desc:'获取监控报告'},
+  {name:'SetVariableMonitoring',dir:'CS→CP',desc:'设置变量监控'},
+  {name:'SetMonitoringBase',dir:'CS→CP',desc:'设置监控基准'},
+  {name:'SetMonitoringLevel',dir:'CS→CP',desc:'设置监控级别'},
+  {name:'SetNetworkProfile',dir:'CS→CP',desc:'设置网络配置'},
+  {name:'GetLog',dir:'CS→CP',desc:'获取日志'},
+  {name:'InstallCertificate',dir:'CS→CP',desc:'安装证书'},
+  {name:'GetInstalledCertificateIds',dir:'CS→CP',desc:'获取已安装证书ID'},
+  {name:'DeleteCertificate',dir:'CS→CP',desc:'删除证书'},
+  {name:'CertificateSigned',dir:'CS→CP',desc:'证书签名通知'},
+  {name:'GetTransactionStatus',dir:'CS→CP',desc:'获取交易状态'},
+  {name:'CustomerInformation',dir:'CS→CP',desc:'客户信息'},
+  {name:'PublishFirmware',dir:'CS→CP',desc:'发布固件'},
+  {name:'UnpublishFirmware',dir:'CS→CP',desc:'取消发布固件'},
+  {name:'SignCertificate',dir:'CP→CS',desc:'签名证书请求'},
+  {name:'Get15118EVCertificate',dir:'CP→CS',desc:'获取ISO15118证书'},
+  {name:'GetCertificateStatus',dir:'CP→CS',desc:'获取证书状态'}
+];
+
+var OCPP_16J_SCHEMAS={
+  ChangeAvailability:{type:'object',properties:{connectorId:{type:'integer',description:'连接器ID'},type:{type:'string',enum:['Inoperative','Operative'],description:'可用性类型'}},required:['connectorId','type']},
+  ChangeConfiguration:{type:'object',properties:{key:{type:'string',description:'配置键名'},value:{type:'string',description:'配置值'}},required:['key','value']},
+  ClearCache:{type:'object',properties:{},required:[]},
+  DataTransfer:{type:'object',properties:{vendorId:{type:'string',description:'厂商ID'},messageId:{type:'string',description:'消息ID'},data:{type:'string',description:'数据内容'}},required:['vendorId']},
+  GetConfiguration:{type:'object',properties:{key:{type:'array',items:{type:'string'},description:'配置键列表'}},required:[]},
+  RemoteStartTransaction:{type:'object',properties:{connectorId:{type:'integer',description:'连接器ID'},idTag:{type:'string',description:'用户标识'}},required:['idTag']},
+  RemoteStopTransaction:{type:'object',properties:{transactionId:{type:'integer',description:'交易ID'}},required:['transactionId']},
+  Reset:{type:'object',properties:{type:{type:'string',enum:['Hard','Soft'],description:'重启类型'}},required:['type']},
+  UnlockConnector:{type:'object',properties:{connectorId:{type:'integer',description:'连接器ID'}},required:['connectorId']},
+  GetDiagnostics:{type:'object',properties:{location:{type:'string',description:'上传URL'},retries:{type:'integer',description:'重试次数'},retryInterval:{type:'integer',description:'重试间隔(秒)'}},required:['location']},
+  UpdateFirmware:{type:'object',properties:{location:{type:'string',description:'固件下载URL'},retrieveDate:{type:'string',format:'date-time',description:'下载时间'},retries:{type:'integer',description:'重试次数'}},required:['location']},
+  GetLocalListVersion:{type:'object',properties:{},required:[]},
+  SendLocalList:{type:'object',properties:{listVersion:{type:'integer',description:'白名单版本号'},localAuthorizationList:{type:'array',description:'鉴权列表'},updateType:{type:'string',enum:['Differential','Full'],description:'更新类型'}},required:['listVersion','updateType']},
+  ReserveNow:{type:'object',properties:{connectorId:{type:'integer',description:'连接器ID'},expiryDate:{type:'string',format:'date-time',description:'过期时间'},idTag:{type:'string',description:'用户标识'},reservationId:{type:'integer',description:'预约ID'}},required:['connectorId','expiryDate','idTag','reservationId']},
+  CancelReservation:{type:'object',properties:{reservationId:{type:'integer',description:'预约ID'}},required:['reservationId']},
+  ClearChargingProfile:{type:'object',properties:{id:{type:'integer',description:'充电曲线ID'},connectorId:{type:'integer',description:'连接器ID'},chargingProfilePurpose:{type:'string',enum:['ChargePointMaxProfile','TxDefaultProfile','TxProfile'],description:'曲线用途'},stackLevel:{type:'integer',description:'堆栈层级'}},required:[]},
+  GetCompositeSchedule:{type:'object',properties:{connectorId:{type:'integer',description:'连接器ID'},duration:{type:'integer',description:'持续时间(秒)'},chargingRateUnit:{type:'string',enum:['A','W'],description:'充电速率单位'}},required:['connectorId','duration']},
+  SetChargingProfile:{type:'object',properties:{connectorId:{type:'integer',description:'连接器ID(0=全局)'},csChargingProfiles:{type:'object',description:'充电曲线对象',properties:{chargingProfileId:{type:'integer'},stackLevel:{type:'integer'},chargingProfilePurpose:{type:'string',enum:['ChargePointMaxProfile','TxDefaultProfile','TxProfile']},chargingProfileKind:{type:'string',enum:['Absolute','Recurring','Relative']},chargingSchedule:{type:'object',properties:{duration:{type:'integer'},chargingRateUnit:{type:'string',enum:['A','W']},chargingSchedulePeriod:{type:'array'}}}}}},required:['connectorId','csChargingProfiles']},
+  TriggerMessage:{type:'object',properties:{requestedMessage:{type:'string',enum:['BootNotification','DiagnosticsStatusNotification','FirmwareStatusNotification','Heartbeat','MeterValues','StatusNotification'],description:'触发消息类型'},connectorId:{type:'integer',description:'连接器ID'}},required:['requestedMessage']}
+};
+
+var OCPP_201_SCHEMAS={
+  ChangeAvailability:{type:'object',additionalProperties:false,properties:{evse:{type:'object',properties:{id:{type:'integer'},connectorId:{type:'integer'}},required:['id']},operationalStatus:{type:'string',enum:['Inoperative','Operative']}},required:['operationalStatus']},
+  Reset:{type:'object',additionalProperties:false,properties:{type:{type:'string',enum:['Immediate','OnIdle']},evseId:{type:'integer'}},required:['type']},
+  UnlockConnector:{type:'object',additionalProperties:false,properties:{evseId:{type:'integer'},connectorId:{type:'integer'}},required:['evseId','connectorId']},
+  TriggerMessage:{type:'object',additionalProperties:false,properties:{requestedMessage:{type:'string',enum:['BootNotification','LogStatusNotification','FirmwareStatusNotification','Heartbeat','MeterValues','SignChargingStationCertificate','SignV2GCertificate','StatusNotification','TransactionEvent','SignCombinedCertificate','PublishFirmwareStatusNotification']},evse:{type:'object',properties:{id:{type:'integer'},connectorId:{type:'integer'}},required:['id']}},required:['requestedMessage']},
+  ReserveNow:{type:'object',additionalProperties:false,properties:{id:{type:'integer'},expiryDateTime:{type:'string',format:'date-time'},connectorType:{type:'string',enum:['cCCS1','cCCS2','cG105','cTesla','cType1','cType2','s309-1P-16A','s309-1P-32A','s309-3P-16A','s309-3P-32A','sType2','Undetermined','Unknown']},idToken:{type:'object',properties:{idToken:{type:'string'},type:{type:'string',enum:['Central','eMAID','ISO14443','ISO15693','KeyCode','Local','MacAddress','NoAuthorization']}},required:['idToken','type']},evseId:{type:'integer'}},required:['id','expiryDateTime','idToken']},
+  SetChargingProfile:{type:'object',additionalProperties:false,properties:{evseId:{type:'integer'},chargingProfile:{type:'object',properties:{id:{type:'integer'},stackLevel:{type:'integer'},chargingProfilePurpose:{type:'string',enum:['ChargingStationExternalConstraints','ChargingStationMaxProfile','TxDefaultProfile','TxProfile']},chargingProfileKind:{type:'string',enum:['Absolute','Recurring','Relative']},chargingSchedule:{type:'array',items:{type:'object',properties:{id:{type:'integer'},chargingRateUnit:{type:'string',enum:['W','A']},chargingSchedulePeriod:{type:'array',items:{type:'object',properties:{startPeriod:{type:'integer'},limit:{type:'number'}},required:['startPeriod','limit']}}}},required:['id','chargingRateUnit','chargingSchedulePeriod']}}}},required:['evseId','chargingProfile']},
+  RequestStartTransaction:{type:'object',additionalProperties:false,properties:{evseId:{type:'integer'},idToken:{type:'object',properties:{idToken:{type:'string'},type:{type:'string',enum:['Central','eMAID','ISO14443','ISO15693','KeyCode','Local','MacAddress','NoAuthorization']}},required:['idToken','type']},remoteStartId:{type:'integer'}},required:['evseId','idToken','remoteStartId']},
+  RequestStopTransaction:{type:'object',additionalProperties:false,properties:{transactionId:{type:'string'}},required:['transactionId']},
+  SetVariables:{type:'object',additionalProperties:false,properties:{setVariableData:{type:'array',items:{type:'object',properties:{attributeType:{type:'string',enum:['Actual','Target','MaxSet','MinSet']},attributeValue:{type:'string'},component:{type:'object',properties:{name:{type:'string'},evse:{type:'object',properties:{id:{type:'integer'},connectorId:{type:'integer'}}}}},variable:{type:'object',properties:{name:{type:'string'}}}},required:['attributeValue','component','variable']}}},required:['setVariableData']},
+  GetVariables:{type:'object',additionalProperties:false,properties:{getVariableData:{type:'array',items:{type:'object',properties:{attributeType:{type:'string',enum:['Actual','Target','MaxSet','MinSet']},component:{type:'object',properties:{name:{type:'string'},evse:{type:'object',properties:{id:{type:'integer'},connectorId:{type:'integer'}}}}},variable:{type:'object',properties:{name:{type:'string'}}}},required:['component','variable']}}},required:['getVariableData']},
+  GetReport:{type:'object',additionalProperties:false,properties:{evseId:{type:'integer'},componentVariable:{type:'array',items:{type:'object',properties:{component:{type:'object',properties:{name:{type:'string'}}},variable:{type:'object',properties:{name:{type:'string'}}}}}},reportBase:{type:'string',enum:['ConfigurationInventory','FullInventory','SummaryInventory']},componentCriteria:{type:'array',items:{type:'string',enum:['Active','Available','Enabled','Problem']}}},required:[]},
+  GetMonitoringReport:{type:'object',additionalProperties:false,properties:{evseId:{type:'integer'},componentVariable:{type:'array',items:{type:'object'}},monitoringBase:{type:'string',enum:['All','FactoryDefault','HardWiredOnly']},componentCriteria:{type:'array',items:{type:'string',enum:['Active','Enabled','Problem']}}},required:[]},
+  SetVariableMonitoring:{type:'object',additionalProperties:false,properties:{setMonitoringData:{type:'array',items:{type:'object',properties:{id:{type:'integer'},value:{type:'number'},type:{type:'string',enum:['UpperThreshold','LowerThreshold','UpperThresholdExpired','LowerThresholdExpired','Delta']},severity:{type:'integer'},component:{type:'object',properties:{name:{type:'string'}}},variable:{type:'object',properties:{name:{type:'string'}}}},required:['value','type','severity','component','variable']}}},required:['setMonitoringData']},
+  SetMonitoringBase:{type:'object',additionalProperties:false,properties:{monitoringBase:{type:'string',enum:['All','FactoryDefault','HardWiredOnly']}},required:['monitoringBase']},
+  SetMonitoringLevel:{type:'object',additionalProperties:false,properties:{severity:{type:'integer'}},required:['severity']},
+  SetNetworkProfile:{type:'object',additionalProperties:false,properties:{configurationSlot:{type:'integer'},connectionData:{type:'object',properties:{vpn:{type:'object'},apn:{type:'object'}}}},required:['configurationSlot','connectionData']},
+  GetLog:{type:'object',additionalProperties:false,properties:{log:{type:'object',properties:{remoteLocation:{type:'string'},type:{type:'string',enum:['DiagnosticsLog','SecurityLog']},requestId:{type:'integer'},retries:{type:'integer'},retryInterval:{type:'integer'}},required:['remoteLocation','type']}},required:['log']},
+  InstallCertificate:{type:'object',additionalProperties:false,properties:{certificateType:{type:'string',enum:['V2GRootCertificate','MORootCertificate','CSMSRootCertificate','V2GCertificateChain','ManufacturerRootCertificate']},certificate:{type:'string'}},required:['certificateType','certificate']},
+  GetInstalledCertificateIds:{type:'object',additionalProperties:false,properties:{certificateType:{type:'array',items:{type:'string',enum:['V2GRootCertificate','MORootCertificate','CSMSRootCertificate','V2GCertificateChain','ManufacturerRootCertificate']}}},required:['certificateType']},
+  DeleteCertificate:{type:'object',additionalProperties:false,properties:{certificateHashData:{type:'object',properties:{hashAlgorithm:{type:'string',enum:['SHA256','SHA384','SHA512']},issuerNameHash:{type:'string'},issuerKeyHash:{type:'string'},serialNumber:{type:'string'}},required:['hashAlgorithm','issuerNameHash','issuerKeyHash','serialNumber']}},required:['certificateHashData']},
+  CertificateSigned:{type:'object',additionalProperties:false,properties:{certificateChain:{type:'string'},typeOfCertificate:{type:'string',enum:['V2GRootCertificate','MORootCertificate','CSMSRootCertificate','V2GCertificateChain','ManufacturerRootCertificate']}},required:['certificateChain']},
+  GetTransactionStatus:{type:'object',additionalProperties:false,properties:{transactionId:{type:'string'},evseId:{type:'integer'}},required:[]},
+  CustomerInformation:{type:'object',additionalProperties:false,properties:{requestId:{type:'integer'},report:{type:'boolean'},clear:{type:'boolean'},customerIdentifier:{type:'string'},idToken:{type:'object'}},required:['requestId','report','clear']},
+  PublishFirmware:{type:'object',additionalProperties:false,properties:{location:{type:'string'},checksum:{type:'string'},requestId:{type:'integer'},retries:{type:'integer'},retryInterval:{type:'integer'}},required:['location','checksum','requestId']},
+  UnpublishFirmware:{type:'object',additionalProperties:false,properties:{checksum:{type:'string'}},required:['checksum']},
+  SignCertificate:{type:'object',additionalProperties:false,properties:{csr:{type:'string'},signingCertificateType:{type:'string',enum:['ChargingStationCertificate','V2GCertificate']}},required:['csr']},
+  Get15118EVCertificate:{type:'object',additionalProperties:false,properties:{iso15118SchemaVersion:{type:'string'},action:{type:'string',enum:['Install','Update']},exiRequest:{type:'string'}},required:['iso15118SchemaVersion','action','exiRequest']},
+  GetCertificateStatus:{type:'object',additionalProperties:false,properties:{ocspRequestData:{type:'object',properties:{hashAlgorithm:{type:'string',enum:['SHA256','SHA384','SHA512']},issuerNameHash:{type:'string'},issuerKeyHash:{type:'string'},responderURL:{type:'string'},serialNumber:{type:'string'}},required:['hashAlgorithm','issuerNameHash','issuerKeyHash','serialNumber','responderURL']}},required:['ocspRequestData']}
+};
+
+function ocppDebugInit(){
+  if(!OCPP_DEBUG_STATE.inited){
+    OCPP_DEBUG_STATE.inited=true;
+    ocppDebugRenderActions();
+    ocppDebugSelectAction(OCPP_DEBUG_STATE.action);
   }
+}
+
+function ocppDebugSwitchVer(ver){
+  OCPP_DEBUG_STATE.ver=ver;
+  document.querySelectorAll('.ocpp-debug-ver-tab').forEach(function(t){t.classList.remove('active');});
+  var tabs=document.querySelectorAll('.ocpp-debug-ver-tab');
+  if(ver==='1.6J'&&tabs[0]) tabs[0].classList.add('active');
+  if(ver==='2.0.1'&&tabs[1]) tabs[1].classList.add('active');
+  var first=ver==='1.6J'?OCPP_16J_ACTIONS[0].name:OCPP_16J_ACTIONS[0].name;
+  ocppDebugRenderActions();
+  ocppDebugSelectAction(first);
+}
+
+function ocppDebugRenderActions(){
+  var grid=document.getElementById('ocppDebugActionGrid');
+  if(!grid) return;
+  var actions=OCPP_16J_ACTIONS.slice();
+  if(OCPP_DEBUG_STATE.ver==='2.0.1'){
+    actions=actions.concat(OCPP_201_EXTRA_ACTIONS);
+  }
+  grid.innerHTML=actions.map(function(a){
+    var cls='ocpp-debug-action-btn';
+    if(a.name===OCPP_DEBUG_STATE.action) cls+=' active';
+    return '<div class="'+cls+'" onclick="ocppDebugSelectAction(\''+a.name+'\')" title="'+a.desc+'">'+a.name+'</div>';
+  }).join('');
+}
+
+function ocppDebugSelectAction(name){
+  OCPP_DEBUG_STATE.action=name;
+  var bcEl=document.getElementById('ocppDebugBcAction');
+  if(bcEl) bcEl.textContent=name;
+  document.querySelectorAll('.ocpp-debug-action-btn').forEach(function(b){
+    b.classList.toggle('active',b.textContent===name||b.getAttribute('onclick')?.indexOf("'"+name+"'")>-1);
+  });
+  var schema=ocppDebugGetSchema(name);
+  ocppDebugRenderSchema(schema);
+  var tmpl=ocppDebugGenTemplate(schema);
+  var reqEl=document.getElementById('ocppDebugReqBody');
+  if(reqEl) reqEl.value=JSON.stringify(tmpl,null,2);
+  var resEl=document.getElementById('ocppDebugResBox');
+  if(resEl){resEl.innerHTML='<span style="color:var(--text2)">Waiting for call...</span>';resEl.className='ocpp-debug-res-box';}
+}
+
+function ocppDebugGetSchema(name){
+  if(OCPP_DEBUG_STATE.ver==='2.0.1'&&OCPP_201_SCHEMAS[name]) return OCPP_201_SCHEMAS[name];
+  if(OCPP_16J_SCHEMAS[name]) return OCPP_16J_SCHEMAS[name];
+  if(OCPP_201_SCHEMAS[name]) return OCPP_201_SCHEMAS[name];
+  return {type:'object',properties:{},required:[],additionalProperties:false};
+}
+
+function ocppDebugRenderSchema(schema){
+  var box=document.getElementById('ocppDebugSchemaBox');
+  if(!box) return;
+  var jsonStr=JSON.stringify(schema,null,2);
+  box.innerHTML=ocppDebugHighlight(jsonStr);
+}
+
+function ocppDebugHighlight(json){
+  var s=json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return s.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(m){
+    var c='sv';
+    if(/^"/.test(m)){c=/:$/.test(m)?'sk':'sv';}
+    else if(/true|false/.test(m)){c='sb';}
+    else if(/null/.test(m)){c='sb';}
+    return '<span class="'+c+'">'+m+'</span>';
+  });
+}
+
+function ocppDebugGenTemplate(schema){
+  if(!schema||!schema.properties) return {};
+  var obj={};
+  var props=schema.properties;
+  var req=schema.required||[];
+  for(var k in props){
+    if(!props.hasOwnProperty(k)) continue;
+    var p=props[k];
+    if(req.indexOf(k)===-1) continue;
+    if(p['$ref']) continue;
+    if(p.type==='string'){
+      if(p.enum&&p.enum.length) obj[k]=p.enum[0];
+      else if(p.format==='date-time') obj[k]=new Date().toISOString().replace(/\.\d{3}Z$/,'Z');
+      else obj[k]='';
+    }else if(p.type==='integer') obj[k]=0;
+    else if(p.type==='number') obj[k]=0;
+    else if(p.type==='boolean') obj[k]=false;
+    else if(p.type==='array') obj[k]=[];
+    else if(p.type==='object'&&p.properties){
+      obj[k]=ocppDebugGenTemplate(p);
+    }else if(p.type==='object'){
+      obj[k]={};
+    }
+  }
+  return obj;
+}
+
+function ocppDebugCall(){
+  var pcEl=document.getElementById('ocppDebugProductCode');
+  var reqEl=document.getElementById('ocppDebugReqBody');
+  var resEl=document.getElementById('ocppDebugResBox');
+  if(!pcEl||!reqEl||!resEl) return;
+  var pc=pcEl.value.trim();
+  if(!/^[A-Za-z0-9_\-]+$/.test(pc)){resEl.innerHTML='<span style="color:var(--red)">Invalid Product Code</span>';resEl.className='ocpp-debug-res-box res-err';return;}
+  var reqText=reqEl.value.trim();
+  var payload;
+  try{payload=JSON.parse(reqText);}catch(e){resEl.innerHTML='<span style="color:var(--red)">Invalid JSON: '+e.message+'</span>';resEl.className='ocpp-debug-res-box res-err';return;}
+  var uid=Date.now().toString()+Math.floor(Math.random()*1000).toString().padStart(3,'0');
+  var callMsg=[2,uid,OCPP_DEBUG_STATE.action,payload];
+  var callStr=JSON.stringify(callMsg,null,2);
+  var resBox=document.getElementById('ocppDebugResBox');
+  resBox.innerHTML='<div style="color:var(--text2);margin-bottom:8px">CALL sent:</div>'+ocppDebugHighlight(callStr)+'<div style="color:var(--text2);margin:10px 0 8px">Simulated CALLRESULT:</div>'+ocppDebugHighlight(JSON.stringify([3,uid,{status:'Accepted'}],null,2));
+  resBox.className='ocpp-debug-res-box res-ok';
 }
 
 function chDrawCooling(){
