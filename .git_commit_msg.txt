@@ -1,21 +1,30 @@
-﻿fix(deploy): Vercel function bundle 直接含 IEC 库 (基于 2a87f6e)
+﻿fix(deploy): 改用 inline ES module 打包 IEC 符号库,绕开 Vercel 文件系统限制
 
-affd8b4 + 2a87f6e 后,Vercel 部署后 L5 SLD 仍渲染为 5 个空矩形。
-排查后根因:vercel.json 的 includeFiles="iec_symbols_svg/**" 在当前
-Vercel 版本下没把库打包进 function bundle。
+之前两次修复(b31142b 用 api/_iec_symbols_svg/, affd8b4 用
+vercel.json includeFiles="iec_symbols_svg/**") 都没让 ess-agent.com
+生产环境的 L5 SLD 显示真 IEC 矢量符号,仍是 5 个空矩形。
 
-修复:把 iec_symbols_svg/ 复制到 api/_iec_symbols_svg/ — Vercel 自动
-把整个 api/ 树打进 function bundle,无需依赖 includeFiles。
+根因:Vercel serverless function 默认只打包 函数入口文件本身 + node_modules,
+不会把 api/ 下其他文件 或 includeFiles 路径自动打进 function bundle。
+resolveIecDir() 运行时找不到 iec_symbols_svg/,fallback 到 [?] 占位符。
+
+最终方案:把 373 个 SVG 内联到一个 ES module 文件(api/_iec_symbols_inline.mjs,
+3.1 MB),api/render_svg.js 用 static import('./_iec_symbols_inline.mjs')
+加载。Static import 走 Vercel 函数打包路径,保证 inline mjs 100% 进 function
+bundle,不依赖任何文件系统 IO。
 
 改动:
-1. iec_symbols_svg/ -> api/_iec_symbols_svg/ (373 SVG + index.json)
-2. dist/_iec_symbols_svg/ 同步副本 (静态资源兜底)
-3. api/render_svg.js resolveIecDir() 加 __dirname 候选路径
-   (path.join(__dirname, '_iec_symbols_svg') 优先),console.log
-   输出 [resolveIecDir] cwd / 候选数 / 命中路径,Vercel 函数日志可查
+1. tools/build_inline_iec_symbols.py — 新增:扫描 iec_symbols_svg/ 生成
+   api/_iec_symbols_inline.mjs (export const IEC_SYMBOLS_INDEX + IEC_SYMBOLS_FILES)
+2. api/_iec_symbols_inline.mjs — 新增 (3.1 MB, auto-generated)
+3. api/render_svg.js — top-level await import + loadIecSymbol() 优先读 INLINE_FILES
+4. 删除冗余:api/_iec_symbols_svg/ + dist/_iec_symbols_svg/ + dist/iec_symbols_svg/
+   (inline 方案不再需要这些目录)
+5. .gitignore — 加 nul (Windows 保留名)
 
-预期:Vercel 部署后 L5 SLD 不再 fallback 到 placeholder rectangle,
-应输出 75KB SVG,含 5 个真 IEC 矢量符号 (断路器/变压器/电池/PCS/电网)。
+本地 smoke 验证 (PRJ INLINE-TEST, 2000kWh / 1000kW / 10kV):
+  svg_len=74989, symbols=5, layers=6, components=7
+  has <path>: true, has data:image/png;base64: false
 
-本地验证:
-  smoke svg_len=75813, symbols=5, layers=6, components=7
+预期 Vercel:刷新 ess-agent.com (Ctrl+Shift+R 硬刷新) 后,L5 SLD 出现
+真 IEC 矢量符号 (断路器/变压器/电池/PCS/电网),不再是 5 个空矩形。
