@@ -1,0 +1,766 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1100" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="navGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e40af"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="contentBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="prod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <linearGradient id="explode1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="explode2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+    <linearGradient id="busRed" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#991b1b"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0e7490"/>
+    </linearGradient>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b82f6"/>
+    </marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#10b981"/>
+    </marker>
+    <marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#06b6d4"/>
+    </marker>
+    <style>
+      .tt{font-size:11px;fill:#cbd5e1}
+      .tl{font-size:12px;fill:#e2e8f0;font-weight:600}
+      .tx{font-size:10px;fill:#94a3b8}
+      .hd{font-size:13px;fill:#fff;font-weight:700}
+      .sub{font-size:10px;fill:#94a3b8}
+      .menu{font-size:11px;fill:#cbd5e1}
+      .menuActive{font-size:11px;fill:#fff;font-weight:700}
+      .tab{font-size:11px;fill:#cbd5e1}
+      .tabActive{font-size:11px;fill:#fff;font-weight:700}
+      .blkTitle{font-size:12px;fill:#e2e8f0;font-weight:700}
+      .val{font-size:11px;fill:#f1f5f9;font-weight:600}
+      .small{font-size:9px;fill:#94a3b8}
+      .smallW{font-size:9px;fill:#fff}
+    </style>
+  </defs>
+
+  <!-- ========== 背景 ========== -->
+  <rect width="1500" height="1100" fill="url(#contentBg)"/>
+
+  <!-- ========== 顶部蓝色标题栏 ========== -->
+  <rect width="1500" height="50" fill="url(#bg)"/>
+  <text x="20" y="22" class="hd" font-size="16">Open ESS Agent — 开源储能系统解决方案AI智能体</text>
+  <text x="20" y="42" class="sub" font-size="10">设计遵循规范：系统级（GB/T 36558-2023） 电气接线设计层（GB 50055） 并网层（GB/T 34120）（GB/T 34131） 储能电站层（GB/T 42288）  |  设计人：卢继雄  |  联系电话：15026953905</text>
+  <!-- 语言按钮 -->
+  <g transform="translate(1340,15)">
+    <rect width="40" height="22" rx="3" fill="#1e40af" stroke="#3b82f6"/>
+    <text x="20" y="15" class="smallW" text-anchor="middle">中文</text>
+    <rect x="45" width="50" height="22" rx="3" fill="#1e40af" stroke="#3b82f6"/>
+    <text x="70" y="15" class="smallW" text-anchor="middle">English</text>
+    <rect x="100" width="40" height="22" rx="3" fill="#1e40af" stroke="#3b82f6"/>
+    <text x="120" y="15" class="smallW" text-anchor="middle">العربية</text>
+  </g>
+
+  <!-- ========== 主导航 5 项 ========== -->
+  <rect y="50" width="1500" height="35" fill="#0f172a"/>
+  <g transform="translate(0,50)">
+    <text x="30" y="23" class="tab">储能方案智能体</text>
+    <text x="200" y="23" class="tab">微网交付智能体</text>
+    <text x="370" y="23" class="tab">AIDC方案智能体</text>
+    <line x1="540" y1="0" x2="540" y2="35" stroke="#3b82f6" stroke-width="2"/>
+    <text x="565" y="23" class="tabActive">充电方案智能体</text>
+    <text x="730" y="23" class="tab">换电方案智能体</text>
+  </g>
+
+  <!-- ========== 子标签 8 项 (超充液冷 高亮) ========== -->
+  <rect y="85" width="1500" height="35" fill="#1e293b"/>
+  <g transform="translate(0,85)">
+    <text x="30" y="23" class="tab">方案设计</text>
+    <text x="130" y="23" class="tab">电气设计</text>
+    <text x="230" y="23" class="tab">软件平台</text>
+    <text x="340" y="23" class="tab">通信协议</text>
+    <line x1="450" y1="0" x2="450" y2="35" stroke="#3b82f6" stroke-width="2"/>
+    <text x="475" y="23" class="tabActive">超充液冷</text>
+    <text x="580" y="23" class="tab">EVCC/SECC</text>
+    <text x="690" y="23" class="tab">BOM清单</text>
+    <text x="790" y="23" class="tab">核心Skill</text>
+  </g>
+
+  <!-- ========== 左侧菜单 12 项 ========== -->
+  <rect y="120" width="160" height="980" fill="#0f172a"/>
+  <g transform="translate(0,120)">
+    <!-- 菜单项 -->
+    <g transform="translate(0,0)">
+      <rect width="160" height="36" fill="#1e3a8a"/>
+      <text x="20" y="22" class="menuActive">ⓘ 总体概览</text>
+    </g>
+    <g transform="translate(0,36)"><text x="20" y="22" class="menu">⚡ 系统架构</text></g>
+    <g transform="translate(0,72)"><text x="20" y="22" class="menu">⊕ 电气拓扑</text></g>
+    <g transform="translate(0,108)"><text x="20" y="22" class="menu">⊟ 一次接线图</text></g>
+    <g transform="translate(0,144)"><text x="20" y="22" class="menu">▦ 原理图</text></g>
+    <g transform="translate(0,180)"><text x="20" y="22" class="menu">❄ 液冷系统</text></g>
+    <g transform="translate(0,216)"><text x="20" y="22" class="menu">⊞ 元器件选型</text></g>
+    <g transform="translate(0,252)"><text x="20" y="22" class="menu">⊟ 控制逻辑</text></g>
+    <g transform="translate(0,288)"><text x="20" y="22" class="menu">✦ 分解爆炸图</text></g>
+    <g transform="translate(0,324)"><text x="20" y="22" class="menu">⊠ BOM清单</text></g>
+    <g transform="translate(0,360)"><text x="20" y="22" class="menu">⊡ 性能参数</text></g>
+    <g transform="translate(0,396)"><text x="20" y="22" class="menu">⊙ 应用场景</text></g>
+
+    <!-- 分隔线 -->
+    <line x1="0" y1="450" x2="160" y2="450" stroke="#334155"/>
+    <text x="20" y="475" class="small">📌 页面信息</text>
+    <text x="20" y="495" class="small">总条目: 12</text>
+    <text x="20" y="513" class="small">激活: 1</text>
+    <text x="20" y="540" class="small">SVG 矢量版</text>
+    <text x="20" y="558" class="small">50KB · 1500×1100</text>
+  </g>
+
+  <!-- ============================================
+       主内容区 (170 ~ 1100, 1340 宽)
+       分上(170-450) 中(450-700) 下(700-1100) 三大区
+       ============================================ -->
+
+  <!-- ========== 上半区: ① 系统概览 + ② 系统架构图 ========== -->
+
+  <!-- ① 系统概览 (左, 170-880 × 460-880) -->
+  <g transform="translate(170,140)">
+    <rect width="660" height="320" rx="6" fill="#1e293b" stroke="#475569"/>
+    <text x="14" y="20" class="blkTitle">系统概览</text>
+    <line x1="14" y1="28" x2="200" y2="28" stroke="#3b82f6"/>
+
+    <!-- 产品外观图(简化,左侧大图) -->
+    <g transform="translate(20,40)">
+      <rect width="120" height="240" fill="url(#prod)" stroke="#475569"/>
+      <rect x="20" y="40" width="80" height="40" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="60" y="65" class="smallW" text-anchor="middle">屏幕</text>
+      <circle cx="25" cy="120" r="5" fill="#dc2626"/>
+      <rect x="20" y="140" width="80" height="80" fill="#475569"/>
+      <text x="60" y="185" class="smallW" text-anchor="middle">通风栅</text>
+      <text x="60" y="265" class="smallW" text-anchor="middle">机柜</text>
+    </g>
+
+    <!-- 文字说明 (中间) -->
+    <g transform="translate(160,40)">
+      <text x="0" y="14" class="val" font-size="14">720kW 液冷超充储能一体机</text>
+      <!-- 4 个标签 -->
+      <g transform="translate(0,30)">
+        <rect width="40" height="18" rx="3" fill="#10b981"/>
+        <text x="20" y="13" class="smallW" text-anchor="middle">超充</text>
+        <rect x="48" width="40" height="18" rx="3" fill="#0891b2"/>
+        <text x="68" y="13" class="smallW" text-anchor="middle">液冷</text>
+        <rect x="96" width="40" height="18" rx="3" fill="#a855f7"/>
+        <text x="116" y="13" class="smallW" text-anchor="middle">储能</text>
+        <rect x="144" width="40" height="18" rx="3" fill="#1e3a8a"/>
+        <text x="164" y="13" class="smallW" text-anchor="middle">SiC</text>
+      </g>
+      <text x="0" y="80" class="tt">集成储能、超充、电源管理与液冷散热</text>
+      <text x="0" y="96" class="tt">的高功率充电解决方案</text>
+    </g>
+
+    <!-- 爆炸图 (右侧, 6 层) -->
+    <g transform="translate(370,40)">
+      <!-- 6 层堆叠 -->
+      <g transform="translate(0,0)">
+        <rect width="270" height="32" fill="url(#explode1)" stroke="#64748b"/>
+        <text x="8" y="20" class="smallW">① 顶盖与结构件</text>
+      </g>
+      <g transform="translate(0,38)">
+        <rect width="270" height="34" fill="url(#explode2)" stroke="#3b82f6"/>
+        <g transform="translate(8,4)">
+          <rect width="6" height="26" fill="#3b82f6"/><rect x="8" width="6" height="26" fill="#3b82f6"/>
+          <rect x="16" width="6" height="26" fill="#3b82f6"/><rect x="24" width="6" height="26" fill="#3b82f6"/>
+          <rect x="32" width="6" height="26" fill="#3b82f6"/><rect x="40" width="6" height="26" fill="#3b82f6"/>
+          <rect x="48" width="6" height="26" fill="#3b82f6"/><rect x="56" width="6" height="26" fill="#3b82f6"/>
+        </g>
+        <text x="80" y="14" class="smallW">② 超充功率模块堆</text>
+        <text x="80" y="28" class="small">40kW SiC模块 x18 (720kW)</text>
+      </g>
+      <g transform="translate(0,76)">
+        <rect width="270" height="32" fill="#7c2d12" stroke="#dc2626"/>
+        <line x1="20" y1="6" x2="250" y2="6" stroke="url(#busRed)" stroke-width="3"/>
+        <line x1="20" y1="26" x2="250" y2="26" stroke="url(#busRed)" stroke-width="3"/>
+        <text x="80" y="20" class="smallW">③ 母排与直流汇流</text>
+        <text x="180" y="20" class="small">1000V DC 母排</text>
+      </g>
+      <g transform="translate(0,112)">
+        <rect width="270" height="34" fill="#1e3a8a" stroke="#3b82f6"/>
+        <g transform="translate(8,8)">
+          <rect width="254" height="18" fill="#0f172a" stroke="#3b82f6"/>
+          <rect x="10" y="6" width="20" height="6" fill="#10b981"/>
+          <rect x="40" y="6" width="20" height="6" fill="#10b981"/>
+          <rect x="70" y="6" width="20" height="6" fill="#10b981"/>
+          <rect x="100" y="6" width="20" height="6" fill="#10b981"/>
+          <rect x="130" y="6" width="20" height="6" fill="#10b981"/>
+          <rect x="160" y="6" width="20" height="6" fill="#10b981"/>
+          <rect x="190" y="6" width="20" height="6" fill="#10b981"/>
+          <rect x="220" y="6" width="20" height="6" fill="#10b981"/>
+        </g>
+        <text x="8" y="-2" class="smallW">④ 控制与保护单元</text>
+        <text x="8" y="48" class="small">主控板, BMS, 计量, 通讯</text>
+      </g>
+      <g transform="translate(0,166)">
+        <rect width="270" height="34" fill="#0891b2" stroke="#06b6d4"/>
+        <line x1="10" y1="10" x2="260" y2="10" stroke="#3b82f6" stroke-width="2"/>
+        <line x1="10" y1="24" x2="260" y2="24" stroke="#dc2626" stroke-width="2"/>
+        <text x="8" y="-2" class="smallW">⑤ 液冷板与管路</text>
+        <text x="8" y="48" class="small">双面冷板, 液冷通道</text>
+      </g>
+      <g transform="translate(0,216)">
+        <rect width="270" height="32" fill="#475569" stroke="#64748b"/>
+        <g transform="translate(20,8)">
+          <circle cx="10" cy="8" r="6" fill="#3b82f6"/>
+          <circle cx="40" cy="8" r="6" fill="#3b82f6"/>
+          <circle cx="70" cy="8" r="6" fill="#3b82f6"/>
+          <circle cx="100" cy="8" r="6" fill="#3b82f6"/>
+          <circle cx="130" cy="8" r="6" fill="#3b82f6"/>
+          <circle cx="160" cy="8" r="6" fill="#3b82f6"/>
+          <circle cx="190" cy="8" r="6" fill="#3b82f6"/>
+          <circle cx="220" cy="8" r="6" fill="#3b82f6"/>
+        </g>
+        <text x="8" y="-2" class="smallW">⑥ 液冷风扇与底座</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ② 系统架构图 (右上) -->
+  <g transform="translate(840,140)">
+    <rect width="650" height="320" rx="6" fill="#1e293b" stroke="#475569"/>
+    <text x="14" y="20" class="blkTitle">系统架构图</text>
+    <line x1="14" y1="28" x2="200" y2="28" stroke="#3b82f6"/>
+
+    <!-- 电网 -->
+    <g transform="translate(20,50)">
+      <rect width="60" height="44" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="30" y="18" class="smallW" text-anchor="middle">电网</text>
+      <text x="30" y="34" class="smallW" text-anchor="middle">10kV</text>
+    </g>
+    <line x1="80" y1="72" x2="120" y2="72" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- 变压器 -->
+    <g transform="translate(120,55)">
+      <circle cx="17" cy="10" r="10" fill="none" stroke="#3b82f6" stroke-width="2"/>
+      <circle cx="17" cy="34" r="10" fill="none" stroke="#3b82f6" stroke-width="2"/>
+      <text x="17" y="58" class="smallW" text-anchor="middle">变压器</text>
+      <text x="17" y="70" class="small" text-anchor="middle">10kV/690V</text>
+    </g>
+    <line x1="160" y1="72" x2="200" y2="72" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- ACB配电柜 -->
+    <g transform="translate(200,55)">
+      <rect width="60" height="34" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="30" y="14" class="smallW" text-anchor="middle">ACB</text>
+      <text x="30" y="28" class="smallW" text-anchor="middle">配电柜</text>
+    </g>
+    <line x1="260" y1="72" x2="300" y2="72" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- PFC -->
+    <g transform="translate(300,55)">
+      <rect width="60" height="34" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="30" y="14" class="smallW" text-anchor="middle">功率因数</text>
+      <text x="30" y="28" class="smallW" text-anchor="middle">校正 PFC</text>
+    </g>
+    <line x1="360" y1="72" x2="400" y2="72" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- 超充功率模块堆 -->
+    <g transform="translate(400,55)">
+      <rect width="80" height="34" fill="#0891b2" stroke="#06b6d4"/>
+      <text x="40" y="14" class="smallW" text-anchor="middle">超充功率模块堆</text>
+      <text x="40" y="28" class="smallW" text-anchor="middle">(40kW SiC x18)</text>
+    </g>
+    <line x1="480" y1="72" x2="520" y2="72" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- Power Router -->
+    <g transform="translate(520,55)">
+      <rect width="60" height="34" fill="#a855f7" stroke="#c084fc"/>
+      <text x="30" y="14" class="smallW" text-anchor="middle">Power</text>
+      <text x="30" y="28" class="smallW" text-anchor="middle">Router</text>
+      <text x="30" y="56" class="small" text-anchor="middle">功率路由</text>
+    </g>
+
+    <!-- 充电枪 N 个 -->
+    <g transform="translate(600,30)">
+      <rect width="40" height="36" rx="4" fill="#0ea5e9" stroke="#0c4a6e"/>
+      <text x="20" y="14" class="smallW" text-anchor="middle">液冷枪 1</text>
+      <text x="20" y="28" class="smallW" text-anchor="middle">(CCS2)</text>
+    </g>
+    <g transform="translate(600,76)">
+      <rect width="40" height="36" rx="4" fill="#0ea5e9" stroke="#0c4a6e"/>
+      <text x="20" y="14" class="smallW" text-anchor="middle">液冷枪 2</text>
+      <text x="20" y="28" class="smallW" text-anchor="middle">(CCS2)</text>
+    </g>
+    <g transform="translate(600,122)">
+      <rect width="40" height="36" rx="4" fill="#475569" stroke="#64748b"/>
+      <text x="20" y="14" class="smallW" text-anchor="middle">液冷枪 N</text>
+      <text x="20" y="28" class="smallW" text-anchor="middle">(扩展)</text>
+    </g>
+
+    <line x1="580" y1="48" x2="600" y2="48" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="580" y1="94" x2="600" y2="94" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="580" y1="140" x2="600" y2="140" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- 储能电池 (左下) -->
+    <g transform="translate(20,160)">
+      <rect width="80" height="44" fill="#10b981" stroke="#34d399"/>
+      <text x="40" y="18" class="smallW" text-anchor="middle">储能电池</text>
+      <text x="40" y="34" class="smallW" text-anchor="middle">1000V DC</text>
+    </g>
+
+    <!-- 液冷核心单元 CDU -->
+    <g transform="translate(160,160)">
+      <rect width="160" height="44" fill="#0891b2" stroke="#06b6d4"/>
+      <text x="80" y="18" class="smallW" text-anchor="middle">液冷核心单元</text>
+      <text x="80" y="34" class="smallW" text-anchor="middle">CDU</text>
+      <text x="80" y="58" class="small" text-anchor="middle">水箱  循环泵  热交换器</text>
+    </g>
+
+    <!-- 控制与保护单元 -->
+    <g transform="translate(360,160)">
+      <rect width="120" height="44" fill="#a855f7" stroke="#c084fc"/>
+      <text x="60" y="18" class="smallW" text-anchor="middle">控制与保护单元</text>
+      <text x="60" y="34" class="smallW" text-anchor="middle">主板板, BMS, 计量, 保护</text>
+    </g>
+
+    <!-- 平台/云端 -->
+    <g transform="translate(520,160)">
+      <rect width="120" height="44" fill="#1e40af" stroke="#3b82f6"/>
+      <text x="60" y="18" class="smallW" text-anchor="middle">平台/云端</text>
+      <text x="60" y="34" class="smallW" text-anchor="middle">OCCP 2.0.1</text>
+      <text x="60" y="50" class="small" text-anchor="middle">EMS 接入</text>
+    </g>
+
+    <!-- 流向连线 -->
+    <path d="M 60 204 L 100 204 L 100 180 L 160 180" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrG)"/>
+    <line x1="240" y1="204" x2="280" y2="204" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrW)"/>
+    <path d="M 320 180 L 360 180" stroke="#a855f7" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+    <line x1="480" y1="180" x2="520" y2="180" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="580" y1="180" x2="600" y2="180" stroke="#a855f7" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="450" y="240" class="small" text-anchor="middle">CAN | Modbus | Ethernet</text>
+
+    <!-- 图例 -->
+    <g transform="translate(20,260)">
+      <line x1="0" y1="0" x2="30" y2="0" stroke="#3b82f6" stroke-width="2"/>
+      <text x="36" y="3" class="small">功率流</text>
+      <line x1="120" y1="0" x2="150" y2="0" stroke="#06b6d4" stroke-width="2"/>
+      <text x="156" y="3" class="small">冷却液流</text>
+      <line x1="240" y1="0" x2="270" y2="0" stroke="#10b981" stroke-width="2" stroke-dasharray="4,2"/>
+      <text x="276" y="3" class="small">信号流</text>
+    </g>
+  </g>
+
+  <!-- ========== 中间区: ③ 电气拓扑图 + ④ 液冷系统原理图 ========== -->
+
+  <!-- ③ 电气拓扑图(主回路) -->
+  <g transform="translate(170,470)">
+    <rect width="660" height="240" rx="6" fill="#1e293b" stroke="#475569"/>
+    <text x="14" y="20" class="blkTitle">电气拓扑图（主回路）</text>
+    <line x1="14" y1="28" x2="220" y2="28" stroke="#3b82f6"/>
+
+    <!-- 3φ AC 输入 -->
+    <g transform="translate(20,60)">
+      <line x1="0" y1="0" x2="50" y2="0" stroke="#3b82f6" stroke-width="2"/>
+      <line x1="0" y1="20" x2="50" y2="20" stroke="#3b82f6" stroke-width="2"/>
+      <line x1="0" y1="40" x2="50" y2="40" stroke="#3b82f6" stroke-width="2"/>
+      <line x1="0" y1="60" x2="50" y2="60" stroke="#10b981" stroke-width="2"/>
+      <text x="-2" y="3" class="small" text-anchor="end">L1</text>
+      <text x="-2" y="23" class="small" text-anchor="end">L2</text>
+      <text x="-2" y="43" class="small" text-anchor="end">L3</text>
+      <text x="-2" y="63" class="small" text-anchor="end">PE</text>
+      <text x="25" y="80" class="small" text-anchor="middle">3φ AC 380Vac</text>
+    </g>
+
+    <!-- EMI 滤波器 -->
+    <g transform="translate(70,40)">
+      <rect width="50" height="80" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="25" y="34" class="smallW" text-anchor="middle">EMI</text>
+      <text x="25" y="48" class="smallW" text-anchor="middle">滤波器</text>
+    </g>
+    <line x1="120" y1="80" x2="150" y2="80" stroke="#3b82f6" stroke-width="2"/>
+
+    <!-- 整流 + PFC -->
+    <g transform="translate(150,40)">
+      <rect width="60" height="80" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="30" y="24" class="smallW" text-anchor="middle">整流</text>
+      <text x="30" y="38" class="smallW" text-anchor="middle">+</text>
+      <text x="30" y="52" class="smallW" text-anchor="middle">PFC</text>
+    </g>
+    <line x1="210" y1="80" x2="240" y2="80" stroke="#dc2626" stroke-width="3"/>
+
+    <!-- DC 母线 700-1000V -->
+    <g transform="translate(240,40)">
+      <rect width="120" height="80" fill="#7c2d12" stroke="#dc2626"/>
+      <line x1="6" y1="14" x2="114" y2="14" stroke="url(#busRed)" stroke-width="3"/>
+      <line x1="6" y1="66" x2="114" y2="66" stroke="url(#busRed)" stroke-width="3"/>
+      <text x="60" y="10" class="smallW" text-anchor="middle">DC 母线</text>
+      <text x="60" y="46" class="smallW" text-anchor="middle" fill="#fff">700~1000V DC</text>
+      <text x="60" y="76" class="small" text-anchor="middle"></text>
+    </g>
+
+    <!-- DC/DC 隔离变换 -->
+    <g transform="translate(360,40)">
+      <rect width="60" height="80" fill="#0891b2" stroke="#06b6d4"/>
+      <text x="30" y="28" class="smallW" text-anchor="middle">DC/DC</text>
+      <text x="30" y="42" class="smallW" text-anchor="middle">隔离</text>
+      <text x="30" y="56" class="smallW" text-anchor="middle">变换</text>
+    </g>
+    <line x1="420" y1="80" x2="450" y2="80" stroke="#dc2626" stroke-width="2"/>
+
+    <!-- 直流计量 -->
+    <g transform="translate(450,40)">
+      <rect width="60" height="80" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="30" y="34" class="smallW" text-anchor="middle">直流</text>
+      <text x="30" y="48" class="smallW" text-anchor="middle">计量</text>
+    </g>
+    <line x1="510" y1="80" x2="540" y2="80" stroke="#dc2626" stroke-width="2"/>
+
+    <!-- 液冷枪输出 -->
+    <g transform="translate(540,40)">
+      <rect width="60" height="80" fill="#0ea5e9" stroke="#0c4a6e"/>
+      <text x="30" y="34" class="smallW" text-anchor="middle">液冷枪</text>
+      <text x="30" y="48" class="smallW" text-anchor="middle">输出</text>
+      <text x="30" y="62" class="smallW" text-anchor="middle">CCS2</text>
+    </g>
+
+    <!-- 辅助 + 监测 (下方) -->
+    <g transform="translate(20,150)">
+      <rect width="60" height="32" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="30" y="14" class="smallW" text-anchor="middle">辅助电源</text>
+      <text x="30" y="26" class="smallW" text-anchor="middle">AC/DC</text>
+    </g>
+    <g transform="translate(90,150)">
+      <rect width="60" height="32" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="30" y="14" class="smallW" text-anchor="middle">控制与</text>
+      <text x="30" y="26" class="smallW" text-anchor="middle">驱动</text>
+    </g>
+    <g transform="translate(160,150)">
+      <rect width="60" height="32" fill="#10b981" stroke="#34d399"/>
+      <text x="30" y="14" class="smallW" text-anchor="middle">绝缘监测</text>
+      <text x="30" y="26" class="smallW" text-anchor="middle">IMD</text>
+    </g>
+    <g transform="translate(230,150)">
+      <rect width="60" height="32" fill="#10b981" stroke="#34d399"/>
+      <text x="30" y="14" class="smallW" text-anchor="middle">泄漏检测</text>
+      <text x="30" y="26" class="smallW" text-anchor="middle">RCMD</text>
+    </g>
+    <g transform="translate(300,150)">
+      <rect width="60" height="32" fill="#a855f7" stroke="#c084fc"/>
+      <text x="30" y="14" class="smallW" text-anchor="middle">BMS 通信</text>
+      <text x="30" y="26" class="smallW" text-anchor="middle">CAN</text>
+    </g>
+    <g transform="translate(370,150)">
+      <rect width="60" height="32" fill="#dc2626" stroke="#ef4444"/>
+      <text x="30" y="14" class="smallW" text-anchor="middle">紧急</text>
+      <text x="30" y="26" class="smallW" text-anchor="middle">停机</text>
+    </g>
+    <g transform="translate(440,150)">
+      <rect width="80" height="32" fill="#dc2626" stroke="#ef4444"/>
+      <text x="40" y="14" class="smallW" text-anchor="middle">紧急停机</text>
+      <text x="40" y="26" class="smallW" text-anchor="middle">E-Stop</text>
+    </g>
+
+    <!-- 流向 -->
+    <line x1="80" y1="130" x2="80" y2="150" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,2"/>
+    <line x1="150" y1="130" x2="150" y2="150" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,2"/>
+    <line x1="380" y1="120" x2="190" y2="150" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,2"/>
+  </g>
+
+  <!-- ④ 液冷系统原理图 -->
+  <g transform="translate(840,470)">
+    <rect width="650" height="240" rx="6" fill="#1e293b" stroke="#475569"/>
+    <text x="14" y="20" class="blkTitle">液冷系统原理图</text>
+    <line x1="14" y1="28" x2="200" y2="28" stroke="#3b82f6"/>
+
+    <!-- 风扇 x3 -->
+    <g transform="translate(20,80)">
+      <circle cx="20" cy="20" r="16" fill="#0891b2" stroke="#06b6d4"/>
+      <circle cx="20" cy="20" r="6" fill="#1e3a8a"/>
+      <text x="20" y="50" class="smallW" text-anchor="middle">风扇</text>
+      <text x="20" y="60" class="small" text-anchor="middle">FAN x 3</text>
+    </g>
+
+    <!-- 板式热交换器 HEX -->
+    <g transform="translate(80,50)">
+      <rect width="80" height="80" fill="#0891b2" stroke="#06b6d4"/>
+      <line x1="10" y1="14" x2="70" y2="14" stroke="#3b82f6" stroke-width="2"/>
+      <line x1="10" y1="30" x2="70" y2="30" stroke="#3b82f6" stroke-width="2"/>
+      <line x1="10" y1="46" x2="70" y2="46" stroke="#3b82f6" stroke-width="2"/>
+      <line x1="10" y1="62" x2="70" y2="62" stroke="#3b82f6" stroke-width="2"/>
+      <text x="40" y="36" class="smallW" text-anchor="middle">板式热</text>
+      <text x="40" y="50" class="smallW" text-anchor="middle">交换器</text>
+      <text x="40" y="74" class="smallW" text-anchor="middle">HEX</text>
+    </g>
+    <line x1="56" y1="100" x2="80" y2="100" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrW)"/>
+
+    <!-- 循环泵 PUMP -->
+    <g transform="translate(200,80)">
+      <circle cx="22" cy="22" r="18" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="22" y="20" class="smallW" text-anchor="middle">M</text>
+      <text x="22" y="30" class="smallW" text-anchor="middle" font-size="7">PUMP</text>
+      <text x="22" y="55" class="small" text-anchor="middle">循环泵</text>
+    </g>
+    <line x1="160" y1="100" x2="200" y2="100" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrW)"/>
+
+    <!-- 膨胀水箱 -->
+    <g transform="translate(260,40)">
+      <rect width="80" height="80" fill="#0891b2" stroke="#06b6d4"/>
+      <ellipse cx="40" cy="40" rx="30" ry="20" fill="#06b6d4" opacity="0.5"/>
+      <text x="40" y="36" class="smallW" text-anchor="middle">膨胀</text>
+      <text x="40" y="50" class="smallW" text-anchor="middle">水箱</text>
+    </g>
+    <line x1="240" y1="100" x2="260" y2="80" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrW)"/>
+    <line x1="340" y1="80" x2="380" y2="100" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrW)"/>
+
+    <!-- 液冷模块 1, 2, ..., 18 -->
+    <g transform="translate(380,40)">
+      <rect width="80" height="22" fill="#0891b2" stroke="#06b6d4"/>
+      <text x="40" y="14" class="smallW" text-anchor="middle">液冷模块 1</text>
+    </g>
+    <g transform="translate(380,68)">
+      <rect width="80" height="22" fill="#0891b2" stroke="#06b6d4"/>
+      <text x="40" y="14" class="smallW" text-anchor="middle">液冷模块 2</text>
+    </g>
+    <text x="420" y="105" class="smallW" text-anchor="middle">...</text>
+    <g transform="translate(380,116)">
+      <rect width="80" height="22" fill="#0891b2" stroke="#06b6d4"/>
+      <text x="40" y="14" class="smallW" text-anchor="middle">液冷模块 18</text>
+    </g>
+
+    <!-- 传感器组 (右侧) -->
+    <g transform="translate(490,40)">
+      <circle cx="14" cy="14" r="10" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+      <text x="14" y="18" class="small" text-anchor="middle" fill="#dc2626">T</text>
+      <text x="32" y="18" class="smallW">温度传感器</text>
+      <text x="32" y="30" class="small">T1 / T2</text>
+    </g>
+    <g transform="translate(490,80)">
+      <circle cx="14" cy="14" r="10" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+      <text x="14" y="18" class="small" text-anchor="middle" fill="#dc2626">F</text>
+      <text x="32" y="18" class="smallW">流量传感器</text>
+      <text x="32" y="30" class="small">FLOW</text>
+    </g>
+    <g transform="translate(490,120)">
+      <circle cx="14" cy="14" r="10" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+      <text x="14" y="18" class="small" text-anchor="middle" fill="#dc2626">P</text>
+      <text x="32" y="18" class="smallW">压力传感器</text>
+      <text x="32" y="30" class="small">PRESS</text>
+    </g>
+
+    <!-- 回路(回流) -->
+    <path d="M 380 50 L 360 50 L 360 30 L 280 30 L 280 50" stroke="#06b6d4" stroke-width="2" fill="none"/>
+    <path d="M 460 130 L 480 130 L 480 145 L 240 145 L 240 130" stroke="#06b6d4" stroke-width="2" fill="none" stroke-dasharray="4,2"/>
+    <path d="M 56 110 L 56 140 L 360 140" stroke="#06b6d4" stroke-width="2" fill="none"/>
+
+    <!-- 图例 -->
+    <g transform="translate(20,190)">
+      <line x1="0" y1="0" x2="30" y2="0" stroke="#06b6d4" stroke-width="2"/>
+      <text x="36" y="3" class="small">冷却液进</text>
+      <line x1="120" y1="0" x2="150" y2="0" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4,2"/>
+      <text x="156" y="3" class="small">冷却液回</text>
+    </g>
+  </g>
+
+  <!-- ========== 下半区: ⑤ 元器件选型 + ⑥ 控制逻辑 + ⑦ 性能参数 + ⑧ 应用场景 ========== -->
+
+  <!-- ⑤ 元器件选型推荐 (主回路) -->
+  <g transform="translate(170,720)">
+    <rect width="380" height="370" rx="6" fill="#1e293b" stroke="#475569"/>
+    <text x="14" y="20" class="blkTitle">元器件选型推荐（主回路）</text>
+    <line x1="14" y1="28" x2="240" y2="28" stroke="#3b82f6"/>
+
+    <!-- 表格 -->
+    <g transform="translate(14,40)">
+      <rect width="352" height="20" fill="#1e40af"/>
+      <text x="6" y="14" class="smallW" font-weight="700">设备名称</text>
+      <text x="80" y="14" class="smallW" font-weight="700">推荐型号</text>
+      <text x="160" y="14" class="smallW" font-weight="700">品牌</text>
+      <text x="220" y="14" class="smallW" font-weight="700">技术参数</text>
+      <text x="320" y="14" class="smallW" font-weight="700" text-anchor="middle">数量</text>
+    </g>
+
+    <g transform="translate(14,60)" font-size="10">
+      <g><rect width="352" height="28" fill="#0f172a" stroke="#334155"/><text x="6" y="12" class="val">PFC模块</text><text x="6" y="24" class="small"></text><text x="80" y="12" class="smallW">HCP-40K-PFC-SiC</text><text x="160" y="12" class="smallW">HYPERCHARGER</text><text x="220" y="12" class="smallW">40kW, 690V AC→1000V DC</text><text x="320" y="12" class="smallW" text-anchor="middle">18</text></g>
+      <g transform="translate(0,28)"><rect width="352" height="28" fill="#1e293b" stroke="#334155"/><text x="6" y="12" class="val">DC/DC模块</text><text x="80" y="12" class="smallW">HCD-40K-DC-SiC</text><text x="160" y="12" class="smallW">HYPERCHARGER</text><text x="220" y="12" class="smallW">40kW, 1000V DC→200~1000V DC</text><text x="320" y="12" class="smallW" text-anchor="middle">18</text></g>
+      <g transform="translate(0,56)"><rect width="352" height="28" fill="#0f172a" stroke="#334155"/><text x="6" y="12" class="val">主接触器</text><text x="80" y="12" class="smallW">EVKM-500A</text><text x="160" y="12" class="smallW">TE Connectivity</text><text x="220" y="12" class="smallW">1000V DC, 500A</text><text x="320" y="12" class="smallW" text-anchor="middle">2</text></g>
+      <g transform="translate(0,84)"><rect width="352" height="28" fill="#1e293b" stroke="#334155"/><text x="6" y="12" class="val">断路器</text><text x="80" y="12" class="smallW">ABB SACE Tmax XT5</text><text x="160" y="12" class="smallW">ABB</text><text x="220" y="12" class="smallW">1000V DC, 630A</text><text x="320" y="12" class="smallW" text-anchor="middle">1</text></g>
+      <g transform="translate(0,112)"><rect width="352" height="28" fill="#0f172a" stroke="#334155"/><text x="6" y="12" class="val">直流熔断器</text><text x="80" y="12" class="smallW">170M5808</text><text x="160" y="12" class="smallW">Bussmann</text><text x="220" y="12" class="smallW">1000V DC, 800A</text><text x="320" y="12" class="smallW" text-anchor="middle">2</text></g>
+      <g transform="translate(0,140)"><rect width="352" height="28" fill="#1e293b" stroke="#334155"/><text x="6" y="12" class="val">液冷泵</text><text x="80" y="12" class="smallW">CRP-32/40</text><text x="160" y="12" class="smallW">Grundfos</text><text x="220" y="12" class="smallW">流量12L/min, 扬程40m</text><text x="320" y="12" class="smallW" text-anchor="middle">1</text></g>
+      <g transform="translate(0,168)"><rect width="352" height="28" fill="#0f172a" stroke="#334155"/><text x="6" y="12" class="val">热交换器</text><text x="80" y="12" class="smallW">BPHE-60-50</text><text x="160" y="12" class="smallW">Alfa Laval</text><text x="220" y="12" class="smallW">换热量 60kW</text><text x="320" y="12" class="smallW" text-anchor="middle">1</text></g>
+      <g transform="translate(0,196)"><rect width="352" height="28" fill="#1e293b" stroke="#334155"/><text x="6" y="12" class="val">风扇</text><text x="80" y="12" class="smallW">A2E250-AM06-01</text><text x="160" y="12" class="smallW">ebm-papst</text><text x="220" y="12" class="smallW">230VAC, 550W</text><text x="320" y="12" class="smallW" text-anchor="middle">3</text></g>
+    </g>
+  </g>
+
+  <!-- ⑥ 控制逻辑框图 -->
+  <g transform="translate(560,720)">
+    <rect width="350" height="370" rx="6" fill="#1e293b" stroke="#475569"/>
+    <text x="14" y="20" class="blkTitle">控制逻辑框图</text>
+    <line x1="14" y1="28" x2="200" y2="28" stroke="#3b82f6"/>
+
+    <!-- 用户/平台指令 -->
+    <g transform="translate(20,50)">
+      <rect width="90" height="160" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="45" y="16" class="smallW" text-anchor="middle">用户/平台指令</text>
+      <g transform="translate(6,24)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">充电预约</text>
+      </g>
+      <g transform="translate(6,52)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">功率设定</text>
+      </g>
+      <g transform="translate(6,80)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">状态查询</text>
+      </g>
+    </g>
+    <line x1="110" y1="130" x2="130" y2="130" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- 主控MCU/DSP -->
+    <g transform="translate(130,50)">
+      <rect width="90" height="160" fill="#a855f7" stroke="#c084fc"/>
+      <text x="45" y="16" class="smallW" text-anchor="middle">主控MCU/DSP</text>
+      <g transform="translate(6,24)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">功率分配</text>
+      </g>
+      <g transform="translate(6,52)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">保护策略</text>
+      </g>
+      <g transform="translate(6,80)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">模块管理</text>
+      </g>
+      <g transform="translate(6,108)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">热量管理策略</text>
+      </g>
+    </g>
+    <line x1="220" y1="130" x2="240" y2="130" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- 执行与反馈 -->
+    <g transform="translate(240,50)">
+      <rect width="90" height="160" fill="#10b981" stroke="#34d399"/>
+      <text x="45" y="16" class="smallW" text-anchor="middle">执行与反馈</text>
+      <g transform="translate(6,24)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">功率模块驱动</text>
+      </g>
+      <g transform="translate(6,52)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">接触器控制</text>
+      </g>
+      <g transform="translate(6,80)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">液冷系统控制</text>
+      </g>
+      <g transform="translate(6,108)">
+        <rect width="78" height="22" fill="#0f172a"/>
+        <text x="39" y="14" class="smallW" text-anchor="middle">BMS 通信</text>
+      </g>
+    </g>
+
+    <!-- 底部:安全与权压 -->
+    <g transform="translate(20,240)">
+      <rect width="310" height="100" fill="#7c2d12" stroke="#dc2626"/>
+      <text x="155" y="18" class="smallW" text-anchor="middle">安全与权压</text>
+      <g transform="translate(8,28)">
+        <rect width="58" height="22" fill="#0f172a"/>
+        <text x="29" y="14" class="smallW" text-anchor="middle">过流</text>
+        <rect x="64" width="58" height="22" fill="#0f172a"/>
+        <text x="93" y="14" class="smallW" text-anchor="middle">过温</text>
+        <rect x="128" width="58" height="22" fill="#0f172a"/>
+        <text x="157" y="14" class="smallW" text-anchor="middle">接地故障</text>
+        <rect x="192" width="58" height="22" fill="#0f172a"/>
+        <text x="221" y="14" class="smallW" text-anchor="middle">绝缘故障</text>
+        <rect x="256" width="40" height="22" fill="#0f172a"/>
+        <text x="276" y="14" class="smallW" text-anchor="middle">紧急停机</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ⑦ 关键性能参数 -->
+  <g transform="translate(920,720)">
+    <rect width="270" height="370" rx="6" fill="#1e293b" stroke="#475569"/>
+    <text x="14" y="20" class="blkTitle">关键性能参数</text>
+    <line x1="14" y1="28" x2="200" y2="28" stroke="#3b82f6"/>
+
+    <!-- 表格 -->
+    <g transform="translate(14,40)">
+      <rect width="242" height="20" fill="#1e40af"/>
+      <text x="6" y="14" class="smallW" font-weight="700">项目</text>
+      <text x="86" y="14" class="smallW" font-weight="700">参数值</text>
+      <text x="160" y="14" class="smallW" font-weight="700">说明</text>
+    </g>
+    <g transform="translate(14,60)" font-size="10">
+      <g><rect width="242" height="24" fill="#0f172a" stroke="#334155"/><text x="6" y="11" class="val">最大功率</text><text x="86" y="11" class="smallW">720kW</text><text x="160" y="11" class="smallW">双枪480kW + 单枪720kW</text></g>
+      <g transform="translate(0,24)"><rect width="242" height="24" fill="#1e293b" stroke="#334155"/><text x="6" y="11" class="val">输出电压范围</text><text x="86" y="11" class="smallW">200~1000V DC</text><text x="160" y="11" class="smallW">可调</text></g>
+      <g transform="translate(0,48)"><rect width="242" height="24" fill="#0f172a" stroke="#334155"/><text x="6" y="11" class="val">输出电流范围</text><text x="86" y="11" class="smallW">0~720A</text><text x="160" y="11" class="smallW">单枪最大</text></g>
+      <g transform="translate(0,72)"><rect width="242" height="24" fill="#1e293b" stroke="#334155"/><text x="6" y="11" class="val">系统效率</text><text x="86" y="11" class="smallW">≥96%</text><text x="160" y="11" class="smallW">典型值</text></g>
+      <g transform="translate(0,96)"><rect width="242" height="24" fill="#0f172a" stroke="#334155"/><text x="6" y="11" class="val">功率因数</text><text x="86" y="11" class="smallW">≥0.99</text><text x="160" y="11" class="smallW">满载工况</text></g>
+      <g transform="translate(0,120)"><rect width="242" height="24" fill="#1e293b" stroke="#334155"/><text x="6" y="11" class="val">冷却方式</text><text x="86" y="11" class="smallW">液冷+风冷</text><text x="160" y="11" class="smallW">CDU + 风扇辅助</text></g>
+      <g transform="translate(0,144)"><rect width="242" height="24" fill="#0f172a" stroke="#334155"/><text x="6" y="11" class="val">防护等级</text><text x="86" y="11" class="smallW">IP54</text><text x="160" y="11" class="smallW">户外柜体</text></g>
+      <g transform="translate(0,168)"><rect width="242" height="24" fill="#1e293b" stroke="#334155"/><text x="6" y="11" class="val">工作温度</text><text x="86" y="11" class="smallW">-30~+50℃</text><text x="160" y="11" class="smallW">液冷率 运行</text></g>
+      <g transform="translate(0,192)"><rect width="242" height="24" fill="#0f172a" stroke="#334155"/><text x="6" y="11" class="val">噪音</text><text x="86" y="11" class="smallW">≤65dB</text><text x="160" y="11" class="smallW">距离1m</text></g>
+    </g>
+  </g>
+
+  <!-- ⑧ 应用场景 -->
+  <g transform="translate(1200,720)">
+    <rect width="290" height="370" rx="6" fill="#1e293b" stroke="#475569"/>
+    <text x="14" y="20" class="blkTitle">应用场景</text>
+    <line x1="14" y1="28" x2="200" y2="28" stroke="#3b82f6"/>
+
+    <g transform="translate(20,50)">
+      <!-- 高速公路服务区 -->
+      <g>
+        <circle cx="20" cy="20" r="18" fill="#1e3a8a" stroke="#3b82f6"/>
+        <text x="20" y="24" class="smallW" text-anchor="middle">🛣</text>
+        <text x="50" y="14" class="val">高速公路服务区</text>
+        <text x="50" y="28" class="small">长途补电 · 双枪快充</text>
+      </g>
+      <!-- 物流园区 -->
+      <g transform="translate(0,70)">
+        <circle cx="20" cy="20" r="18" fill="#0891b2" stroke="#06b6d4"/>
+        <text x="20" y="24" class="smallW" text-anchor="middle">📦</text>
+        <text x="50" y="14" class="val">物流园区车队</text>
+        <text x="50" y="28" class="small">车队充电 · 调度管理</text>
+      </g>
+      <!-- 城市超充站 -->
+      <g transform="translate(0,140)">
+        <circle cx="20" cy="20" r="18" fill="#a855f7" stroke="#c084fc"/>
+        <text x="20" y="24" class="smallW" text-anchor="middle">🏙</text>
+        <text x="50" y="14" class="val">城市超充站</text>
+        <text x="50" y="28" class="small">公共充电 · 智能调度</text>
+      </g>
+      <!-- 光储充一体站 -->
+      <g transform="translate(0,210)">
+        <circle cx="20" cy="20" r="18" fill="#10b981" stroke="#34d399"/>
+        <text x="20" y="24" class="smallW" text-anchor="middle">☀</text>
+        <text x="50" y="14" class="val">光储充一体站</text>
+        <text x="50" y="28" class="small">光伏 + 储能 + 充电</text>
+      </g>
+      <!-- 重卡换电站 -->
+      <g transform="translate(0,280)">
+        <circle cx="20" cy="20" r="18" fill="#dc2626" stroke="#ef4444"/>
+        <text x="20" y="24" class="smallW" text-anchor="middle">🚛</text>
+        <text x="50" y="14" class="val">重卡换电站配套</text>
+        <text x="50" y="28" class="small">大功率 · 商业车队</text>
+      </g>
+    </g>
+  </g>
+</svg>
