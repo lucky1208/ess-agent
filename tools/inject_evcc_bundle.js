@@ -23,7 +23,7 @@ const RENDER_AND_DOWNLOAD = `
     var panel=document.getElementById('chEvccPanel-chips');
     if(!panel)return;
     var html='<div class="mg-grid">';
-    html+='<div class="mg-card"><h3>EVCC 选型 (车载端) - '+EVCC_CHIPS.length+' 个主流方案</h3><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px">';
+    html+='<div class="mg-card mg-col-6"><h3>EVCC 选型 (车载端) - '+EVCC_CHIPS.length+' 个主流方案</h3><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px">';
     EVCC_CHIPS.forEach(function(c){
       html+='<div style="padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;border-left:3px solid var(--blue)">';
       html+='<div style="font-size:13px;font-weight:700;color:var(--blue)">'+evccEsc(c.name)+'</div>';
@@ -34,7 +34,7 @@ const RENDER_AND_DOWNLOAD = `
       html+='</div>';
     });
     html+='</div></div>';
-    html+='<div class="mg-card"><h3>SECC 选型 (桩端) - '+SECC_CHIPS.length+' 个主流方案</h3><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px">';
+    html+='<div class="mg-card mg-col-6"><h3>SECC 选型 (桩端) - '+SECC_CHIPS.length+' 个主流方案</h3><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px">';
     SECC_CHIPS.forEach(function(c){
       html+='<div style="padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;border-left:3px solid var(--purple)">';
       html+='<div style="font-size:13px;font-weight:700;color:var(--purple)">'+evccEsc(c.name)+'</div>';
@@ -45,12 +45,12 @@ const RENDER_AND_DOWNLOAD = `
       html+='</div>';
     });
     html+='</div></div>';
-    html+='</div>';
-    html+='<div class="mg-card" style="margin-top:16px"><h3>协议适配矩阵 (EVCC × SECC)</h3><table class="result-table" style="font-size:11px;margin-top:10px"><tr><th>协议</th><th>EVCC 支持</th><th>SECC 支持</th><th>适用地区</th></tr>';
+    html+='<div class="mg-card mg-col-12" style="margin-top:16px"><h3>协议适配矩阵 (EVCC × SECC)</h3><table class="result-table" style="font-size:11px;margin-top:10px"><tr><th>协议</th><th>EVCC 支持</th><th>SECC 支持</th><th>适用地区</th></tr>';
     [{n:'ISO 15118-2 (PnC 即插即充)',e:'S32K3/TMS570/RH850',s:'i.MX6/RK3568/AM62',r:'EU/US'},{n:'ISO 15118-20 (PnC V2X)',e:'S32K3/RH850',s:'i.MX6/AM62',r:'EU/US (2025+)'},{n:'DIN 70121',e:'S32K3/TMS570',s:'i.MX6/RK3568',r:'DE/EU'},{n:'GB/T 27930-2015',e:'TMS570/RH850',s:'RK3568',r:'CN'},{n:'CHAdeMO 1.2/2.0',e:'RH850',s:'AM62',r:'JP'},{n:'CCS1 (北美)',e:'S32K3',s:'i.MX6/RK3568',r:'US'},{n:'CCS2 (欧标)',e:'S32K3/RH850',s:'i.MX6/RK3568/AM62',r:'EU'},{n:'NACS (特斯拉)',e:'S32K3',s:'RK3568',r:'US'}].forEach(function(p){
       html+='<tr><td style="font-weight:600">'+p.n+'</td><td style="font-size:10px">'+p.e+'</td><td style="font-size:10px">'+p.s+'</td><td>'+p.r+'</td></tr>';
     });
     html+='</table></div>';
+    html+='</div>';
     panel.innerHTML=html;
   }
 
@@ -356,7 +356,7 @@ const RENDER_AND_DOWNLOAD = `
     renderEvccProgramPanel:renderEvccProgramPanel,
     renderEvccDemoPanel:renderEvccDemoPanel,
     renderEvccBomPanel:renderEvccBomPanel,
-    startEvccDemo:startEvccDemo,
+    startEvccDemo:window.startEvccDemo,
     toggleEvccCode:toggleEvccCode,
   };
 
@@ -482,7 +482,7 @@ if (oldRenderStart >= 0) {
   }
 }
 
-const anchor1 = 'window.SECC_CHIPS=window.SECC_CHIPS||[\r\n';
+const anchor1 = 'window.SECC_CHIPS=window.SECC_CHIPS||[';
 if (!html.includes(anchor1)) {
   console.error('ERROR: 找不到 SECC_CHIPS 锚点');
   process.exit(1);
