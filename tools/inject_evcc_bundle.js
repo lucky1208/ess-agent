@@ -59,7 +59,7 @@ const RENDER_AND_DOWNLOAD = `
     if(!panel)return;
     var html='<div class="mg-grid">';
     // EVCC 板
-    html+='<div class="mg-card"><h3>EVCC 板 (车载端) - 外设接口清单</h3>';
+    html+='<div class="mg-card mg-col-6"><h3>EVCC 板 (车载端) - 外设接口清单</h3>';
     html+='<svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px;margin-top:10px">';
     html+='<rect x="50" y="40" width="400" height="240" rx="6" fill="#1a1d23" stroke="#4a90d9" stroke-width="2"/>';
     html+='<text x="250" y="65" text-anchor="middle" fill="#4a90d9" font-size="14" font-weight="700">EVCC 板</text>';
@@ -89,7 +89,7 @@ const RENDER_AND_DOWNLOAD = `
     });
     html+='</table></div>';
     // SECC 板
-    html+='<div class="mg-card"><h3>SECC 板 (桩端) - 外设接口清单</h3>';
+    html+='<div class="mg-card mg-col-6"><h3>SECC 板 (桩端) - 外设接口清单</h3>';
     html+='<svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#0d1117;border-radius:6px;margin-top:10px">';
     html+='<rect x="50" y="40" width="400" height="240" rx="6" fill="#1a1d23" stroke="#a78bfa" stroke-width="2"/>';
     html+='<text x="250" y="65" text-anchor="middle" fill="#a78bfa" font-size="14" font-weight="700">SECC 板</text>';
