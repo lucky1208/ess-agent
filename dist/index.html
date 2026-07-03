@@ -96775,22 +96775,30 @@ function drawPid(title, nodes, pipes, opts){
   for(var ni=0;ni<nodes.length;ni++){
     var nd=nodes[ni]; var nx=nd.x*(w/100), ny=nd.y*(h/100)+25;
     var c=nd.sc||th.power; var ic=nd.icon||null;
-    if(nd.type==='pump'){svg+='<g>'+drawIcon('pump',nx,ny,c,28)+'</g>';}
-    else if(nd.type==='valve'){svg+='<g>'+drawIcon('valve',nx,ny,c,24)+'</g>';}
-    else if(nd.type==='tank'){svg+='<g>'+drawIcon('cdu',nx,ny,c,28)+'</g>';}
-    else{
-      var nW=nd.w||80,nH=nd.h||36;
-      svg+='<rect x="'+(nx-nW/2)+'" y="'+(ny-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="3" fill="'+(nd.fc||th.boxFill)+'" stroke="'+c+'" stroke-width="1"/>';
-      if(ic&&ICONS[ic]){svg+=drawIcon(ic,nx-nW/2+14,ny,c,16);}
-      svg+='<text x="'+nx+'" y="'+(ny+3)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+nd.n+'</text>';
-    }
+    var nW=nd.w||72,nH=nd.h||34;
+    svg+='<rect x="'+(nx-nW/2)+'" y="'+(ny-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+(nd.fc||th.boxFill)+'" stroke="'+c+'" stroke-width="1.2"/>';
+    var iconSize=Math.min(nH-6,18);
+    var iconX=nx-nW/2+6;
+    if(ic&&ICONS[ic]){svg+=drawIcon(ic,iconX+iconSize/2,ny,c,iconSize);}
+    else if(nd.type==='pump'){svg+=drawIcon('pump',iconX+iconSize/2,ny,c,iconSize);}
+    else if(nd.type==='valve'){svg+=drawIcon('valve',iconX+iconSize/2,ny,c,iconSize);}
+    else if(nd.type==='tank'){svg+=drawIcon('cdu',iconX+iconSize/2,ny,c,iconSize);}
+    var tx=(ic||nd.type)?iconX+iconSize+4:nx; var ta=(ic||nd.type)?'start':'middle';
+    svg+='<text x="'+tx+'" y="'+(ny+3)+'" text-anchor="'+ta+'" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+nd.n+'</text>';
   }
   for(var pi=0;pi<pipes.length;pi++){
     var pp=pipes[pi]; var x1=pp.x1*(w/100), y1=pp.y1*(h/100)+25; var x2=pp.x2*(w/100), y2=pp.y2*(h/100)+25;
     var col=pp.c||th.mech; var st=pp.style||'mech'; var cs=CONN_STYLE[st]||CONN_STYLE.mech;
     var rte=pp.route||'vh'; var pts=connPath(x1,y1,x2,y2,rte);
     svg+='<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="'+cs.w+'" stroke-dasharray="'+(pp.dash?cs.dash:'')+'" marker-end="url(#pidArr'+st+')"/>';
-    if(pp.label){var mx=(x1+x2)/2; svg+='<rect x="'+(mx-pp.label.length*3.5-3)+'" y="'+((y1+y2)/2-8)+'" width="'+(pp.label.length*7+6)+'" height="11" rx="2" fill="rgba(0,0,0,0.7)"/><text x="'+mx+'" y="'+((y1+y2)/2+1)+'" text-anchor="middle" font-size="7" fill="'+col+'" font-family="'+th.fontMono+'">'+pp.label+'</text>';}
+    if(pp.label){
+      var lx=Math.min(x1,x2); var ly=Math.min(y1,y2);
+      var isHoriz=Math.abs(y2-y1)<Math.abs(x2-x1);
+      var labelX=(x1+x2)/2; var labelY=isHoriz?(ly-10):((y1+y2)/2);
+      var lboxW=pp.label.length*6+10;
+      svg+='<rect x="'+(labelX-lboxW/2)+'" y="'+(labelY-7)+'" width="'+lboxW+'" height="12" rx="2" fill="rgba(0,0,0,0.75)"/>';
+      svg+='<text x="'+labelX+'" y="'+(labelY+2)+'" text-anchor="middle" font-size="7" fill="'+col+'" font-family="'+th.fontMono+'">'+pp.label+'</text>';
+    }
   }
   if(legendItems) svg+=_legendBlock(legendItems,w-145,h-18,130,themeName);
   svg+=_cadTitle(title,opts.drawingNo||'PID-001',opts.ver||'V1.0',opts.scale||'NTS',w,svgH,th);
@@ -97357,10 +97365,28 @@ function synUnifiedFlow(){
 
   steps[2].delay=800; steps[2].result=
     drawPid('液冷散热系统P&ID图 — '+coolLabel,[
-      {x:8,y:50,n:'冷却塔',icon:'pump',sc:'#26A69A'},{x:22,y:30,n:'CDU-1',type:'pump',sc:'#1976D2'},{x:22,y:70,n:'CDU-2',type:'pump',sc:'#1976D2'},{x:40,y:30,n:'分水器',type:'tank',sc:'#1976D2'},{x:40,y:70,n:'集水器',type:'tank',sc:'#FF7043'},{x:58,y:30,n:'GPU行A',icon:'gpu',sc:'#26A69A',w:80},{x:58,y:70,n:'GPU行B',icon:'gpu',sc:'#26A69A',w:80},{x:78,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC'},{x:88,y:30,n:'补水阀',type:'valve',sc:'#42A5F5'},{x:88,y:70,n:'过滤器',type:'valve',sc:'#78909C'}
+      {x:8,y:45,n:'冷却塔',icon:'pump',sc:'#26A69A',w:72,h:40},
+      {x:24,y:30,n:'CDU-1',type:'pump',sc:'#1976D2',w:64,h:34},
+      {x:24,y:65,n:'CDU-2',type:'pump',sc:'#1976D2',w:64,h:34},
+      {x:42,y:28,n:'分水器',type:'tank',sc:'#1976D2',w:64,h:30},
+      {x:42,y:67,n:'集水器',type:'tank',sc:'#FF7043',w:64,h:30},
+      {x:62,y:28,n:'GPU行A',icon:'gpu',sc:'#26A69A',w:88,h:34},
+      {x:62,y:67,n:'GPU行B',icon:'gpu',sc:'#26A69A',w:88,h:34},
+      {x:82,y:47,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:72,h:34},
+      {x:92,y:30,n:'补水阀',type:'valve',sc:'#42A5F5',w:48,h:28},
+      {x:92,y:65,n:'过滤器',type:'valve',sc:'#78909C',w:48,h:28}
     ],[
-      {x1:15,y1:50,x2:22,y2:30,label:'供水',c:'#26A69A',style:'mech',route:'vh'},{x1:26,y1:30,x2:40,y2:30,label:'一次供'+Math.round(coolKw*0.6)+'L/min',c:'#26A69A',style:'mech',route:'th'},{x1:26,y1:70,x2:40,y2:70,label:'二次供',c:'#26A69A',style:'mech',route:'th'},{x1:46,y1:30,x2:58,y2:30,label:'供液'+Math.round(coolKw*1.25)+'L/min',c:'#26A69A',style:'mech',route:'th'},{x1:46,y1:70,x2:58,y2:70,label:'供液',c:'#26A69A',style:'mech',route:'th'},{x1:70,y1:30,x2:40,y2:30,label:'回液',c:'#FF7043',style:'mech',dash:true,route:'th'},{x1:70,y1:70,x2:40,y2:70,label:'回液',c:'#FF7043',style:'mech',dash:true,route:'th'},{x1:78,y1:50,x2:48,y2:50,label:'定压补水',c:'#AB47BC',style:'mech',route:'vh'},{x1:22,y1:38,x2:22,y2:62,label:'冗余',c:'#1976D2',style:'control',route:'th'}
-    ],{w:760,h:300,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.0',scale:'1:50',
+      {x1:15,y1:45,x2:24,y2:30,label:'',c:'#26A69A',style:'mech',route:'vh'},
+      {x1:15,y1:45,x2:24,y2:65,label:'',c:'#26A69A',style:'mech',route:'vh'},
+      {x1:30,y1:30,x2:42,y2:28,label:'供水 '+Math.round(coolKw*0.6)+'L/min',c:'#26A69A',style:'mech',route:'th'},
+      {x1:30,y1:65,x2:42,y2:67,label:'供水',c:'#26A69A',style:'mech',route:'th'},
+      {x1:48,y1:28,x2:62,y2:28,label:'供液 '+Math.round(coolKw*1.25)+'L/min',c:'#26A69A',style:'mech',route:'th'},
+      {x1:48,y1:67,x2:62,y2:67,label:'供液',c:'#26A69A',style:'mech',route:'th'},
+      {x1:70,y1:28,x2:48,y2:67,label:'回液',c:'#FF7043',style:'mech',dash:true,route:'vh'},
+      {x1:70,y1:67,x2:48,y2:67,label:'回液',c:'#FF7043',style:'mech',dash:true,route:'th'},
+      {x1:82,y1:47,x2:50,y2:47,label:'定压补水',c:'#AB47BC',style:'mech',route:'th'},
+      {x1:24,y1:38,x2:24,y2:57,label:'冗余',c:'#1976D2',style:'control',route:'vh'}
+    ],{w:760,h:320,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.0',scale:'1:50',
        legend:[{style:'mech',label:'冷却水管路'},{style:'control',label:'冗余控制'},{style:'data',label:'Modbus RTU'}]})+
     tableHtml(
     ['参数','数值','说明'],
