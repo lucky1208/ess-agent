@@ -96295,6 +96295,175 @@ function svgSankey(title, flows, w, h){
   svg+='</svg></div>'; return svg;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   PROFESSIONAL DIAGRAM PLANNER ENGINE (V3)
+   ────────────────────────────────────────────────────────────
+   Themes · Legends · Right-angle Routing · Connector Labels
+   Layout Engine · Auto Alignment · Professional Colors
+ ══════════════════════════════════════════════════════════════ */
+
+var DIAGRAM_THEME={
+  huawei:{bg:'#06090f',title:'#e0e8f0',sub:'#8a9ab0',layerLine:'#1a3a5a',
+    layerLabel:'#4a6a8a',boxFill:'#0d1a2a',boxStroke:'#2a4a6a',boxText:'#c0d0e0',boxSub:'#6a8aa0',
+    power:['#1565C0','#1976D2','#2196F3'],control:['#455A64','#546E7A','#607D8B'],
+    data:['#4a9aff','#2196F3','#1976D2'],cloud:['#009688','#26A69A','#4DB6AC'],
+    ai:['#7B1FA2','#8E24AA','#9C27B0'],alarm:['#F44336','#E53935','#D32F2F'],
+    device:['#616161','#757575','#9E9E9E'],grid:['#1a3a5a','#2a4a6a','#3a5a7a'],
+    pipe:['#4ac8ff','#20c840','#e3b341','#ff9040'],
+    font:'-apple-system,"Microsoft YaHei","PingFang SC",sans-serif',fontMono:'"SF Mono","Cascadia Code",Consolas,monospace'},
+  stategrid:{bg:'#0a0e1a',title:'#d4a940',sub:'#8a7040',layerLine:'#2a3a1a',
+    layerLabel:'#6a8a4a',boxFill:'#0d1a1a',boxStroke:'#2a4a3a',boxText:'#c0d0c0',boxSub:'#6a8a60',
+    power:['#0D47A1','#1565C0','#1976D2'],control:['#212121','#424242','#616161'],
+    data:['#1565C0','#1976D2','#2196F3'],cloud:['#00695C','#00796B','#00897B'],
+    ai:['#6A1B9A','#7B1FA2','#8E24AA'],alarm:['#B71C1C','#D32F2F','#F44336'],
+    device:['#37474F','#455A64','#546E7A'],grid:['#1B5E20','#2E7D32','#388E3C'],
+    pipe:['#4ac8ff','#20c840','#e3b341','#ff9040'],
+    font:'-apple-system,"Microsoft YaHei","PingFang SC",sans-serif',fontMono:'"SF Mono","Source Code Pro",Consolas,monospace'},
+  siemens:{bg:'#0d1117',title:'#4ac8ff',sub:'#6a8aa0',layerLine:'#1a3a5a',
+    layerLabel:'#4a6a8a',boxFill:'#0d1a2a',boxStroke:'#2a4a6a',boxText:'#c0d0e0',boxSub:'#6a8aa0',
+    power:['#004D40','#00695C','#00897B'],control:['#263238','#37474F','#455A64'],
+    data:['#00838F','#0097A7','#00ACC1'],cloud:['#00838F','#0097A7','#00ACC1'],
+    ai:['#4A148C','#6A1B9A','#7B1FA2'],alarm:['#B71C1C','#D32F2F','#F44336'],
+    device:['#37474F','#455A64','#546E7A'],grid:['#1A237E','#283593','#303F9F'],
+    pipe:['#00ACC1','#4caf50','#ffc107','#ff7043'],
+    font:'-apple-system,"Microsoft YaHei","PingFang SC",sans-serif',fontMono:'"JetBrains Mono","Cascadia Code",monospace'},
+  schneider:{bg:'#0a0e14',title:'#20c840',sub:'#6a8a60',layerLine:'#1a3a2a',
+    layerLabel:'#4a6a4a',boxFill:'#0d1a1a',boxStroke:'#2a4a3a',boxText:'#c0d0c0',boxSub:'#6a8a60',
+    power:['#1B5E20','#2E7D32','#388E3C'],control:['#212121','#424242','#616161'],
+    data:['#1565C0','#1976D2','#2196F3'],cloud:['#00695C','#00796B','#00897B'],
+    ai:['#4A148C','#6A1B9A','#7B1FA2'],alarm:['#B71C1C','#D32F2F','#F44336'],
+    device:['#37474F','#455A64','#546E7A'],grid:['#0D47A1','#1565C0','#1976D2'],
+    pipe:['#2E7D32','#1976D2','#FF8F00','#4a148c'],
+    font:'-apple-system,"Microsoft YaHei","PingFang SC",sans-serif',fontMono:'"SF Mono","Source Code Pro",monospace'},
+  dark:{bg:'#06090f',title:'#e0e8f0',sub:'#6a8aa0',layerLine:'#1a3a5a',
+    layerLabel:'#4a6a8a',boxFill:'#0d1a2a',boxStroke:'#1a3a5a',boxText:'#c0d0e0',boxSub:'#6a8aa0',
+    power:['#4a9aff','#20c840','#ff9040'],control:['#4a9aff','#20c840','#e3b341'],
+    data:['#4a9aff','#20c840','#bc8cff'],cloud:['#4ac8ff','#20c840','#e3b341'],
+    ai:['#bc8cff','#ff6b9d','#4ac8ff'],alarm:['#f85149','#ff9040','#e3b341'],
+    device:['#4a9aff','#20c840','#e3b341'],grid:['#1a3a5a','#2a4a6a','#3a5a7a'],
+    pipe:['#4ac8ff','#20c840','#e3b341','#ff9040'],
+    font:'-apple-system,"Microsoft YaHei","PingFang SC",sans-serif',fontMono:'"SF Mono","Cascadia Code",Consolas,monospace'}
+};
+
+/* ── Legend Generator ── */
+function drawLegend(items, x, y, w, themeName){
+  var th=DIAGRAM_THEME[themeName]||DIAGRAM_THEME.dark;
+  var ix=x||10; var iy=y||0; var iw=w||200;
+  var lx=ix; var legend='<g class="diagram-legend">';
+  legend+='<rect x="'+ix+'" y="'+iy+'" width="'+iw+'" height="'+(items.length*16+10)+'" rx="3" fill="'+th.bg+'" stroke="'+th.layerLine+'" stroke-width="0.8" opacity="0.9"/>';
+  legend+='<text x="'+(ix+iw/2)+'" y="'+(iy+12)+'" text-anchor="middle" font-size="7" fill="'+th.sub+'" font-family="'+th.fontMono+'">图例 LEGEND</text>';
+  for(var li=0;li<items.length;li++){
+    var ly=iy+22+li*14; var it=items[li];
+    legend+='<line x1="'+(ix+8)+'" y1="'+ly+'" x2="'+(ix+28)+'" y2="'+ly+'" stroke="'+it.c+'" stroke-width="1.5" stroke-dasharray="'+(it.d||'')+'"/>';
+    legend+='<text x="'+(ix+34)+'" y="'+(ly+4)+'" font-size="7" fill="'+th.boxText+'" font-family="'+th.font+'">'+it.n+'</text>';
+  }
+  legend+='</g>';
+  return legend;
+}
+
+/* ── Right-Angle Polyline Router ── */
+function connPath(x1,y1,x2,y2,dir){
+  dir=dir||'hv';
+  if(dir==='hv') return x1+','+y1+' '+x1+','+((y1+y2)/2)+' '+x2+','+((y1+y2)/2)+' '+x2+','+y2;
+  if(dir==='vh') return x1+','+y1+' '+((x1+x2)/2)+','+y1+' '+((x1+x2)/2)+','+y2+' '+x2+','+y2;
+  if(dir==='th') return x1+','+y1+' '+x1+','+(y2)+' '+x2+','+(y2);
+  return x1+','+y1+' '+(x1+20)+','+y1+' '+(x1+20)+','+y2+' '+x2+','+y2;
+}
+
+/* ── Professional Architecture Diagram ── */
+function drawArch(title, layers, opts){
+  opts=opts||{}; var w=opts.w||700; var h=opts.h||320; var themeName=opts.theme||'dark'; var legendItems=opts.legend||null;
+  var th=DIAGRAM_THEME[themeName]||DIAGRAM_THEME.dark;
+  var lh=legendItems?22:0; var padL=opts.padL||10; var padR=opts.padR||10;
+  var svg='<div class="arch-svg"><svg width="100%" height="'+(h+lh)+'" viewBox="0 0 '+w+' '+(h+lh)+'" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<defs><filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svg+='<marker id="arr" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="7" markerHeight="6" orient="auto"><path d="M0,0 L10,3 L0,6" fill="'+th.data[0]+'" opacity="0.6"/></marker></defs>';
+  svg+='<rect width="'+w+'" height="'+(h+lh)+'" fill="'+th.bg+'"/>';
+  svg+='<text x="'+w/2+'" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="'+th.title+'" font-family="'+th.font+'">'+title+'</text>';
+  var layerH=Math.floor((h-30)/layers.length);
+  svg+='<line x1="10" y1="24" x2="'+(w-10)+'" y2="24" stroke="'+th.layerLine+'" stroke-width="0.6"/>';
+  for(var li=0;li<layers.length;li++){
+    var ly=28+li*layerH; var layer=layers[li]; var boxes=layer.boxes;
+    svg+='<text x="'+(padL+2)+'" y="'+(ly+12)+'" font-size="8" fill="'+th.layerLabel+'" font-family="'+th.font+'" font-weight="600">'+layer.name+'</text>';
+    svg+='<line x1="'+(padL+2)+'" y1="'+(ly+16)+'" x2="'+(w-10)+'" y2="'+(ly+16)+'" stroke="'+th.layerLine+'" stroke-width="0.6" stroke-dasharray="4 2"/>';
+    var nBox=boxes.length; var margin=10; var bw=Math.min(130,Math.floor((w-padL*2-margin*(nBox-1))/nBox));
+    var totalBW=bw*nBox+margin*(nBox-1); var startX=(w-totalBW)/2;
+    for(var bi=0;bi<nBox;bi++){
+      var bx=startX+bi*(bw+margin); var by=ly+20; var bh=Math.min(layerH-28,36);
+      var col=boxes[bi].c||th.boxFill; var stroke=boxes[bi].s||th.boxStroke;
+      svg+='<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="4" fill="'+col+'" stroke="'+stroke+'" stroke-width="1" filter="url(#glow)"/>';
+      svg+='<text x="'+(bx+bw/2)+'" y="'+(by+bh/2-3)+'" text-anchor="middle" font-size="9" fill="'+th.boxText+'" font-weight="600" font-family="'+th.font+'">'+boxes[bi].n+'</text>';
+      if(boxes[bi].sub) svg+='<text x="'+(bx+bw/2)+'" y="'+(by+bh/2+11)+'" text-anchor="middle" font-size="7" fill="'+th.boxSub+'" font-family="'+th.fontMono+'">'+boxes[bi].sub+'</text>';
+    }
+    if(li<layers.length-1){
+      svg+='<line x1="'+(w/2)+'" y1="'+(ly+layerH-4)+'" x2="'+(w/2)+'" y2="'+(ly+layerH+28)+'" stroke="'+th.layerLine+'" stroke-width="1" marker-end="url(#arr)"/>';
+      svg+='<polygon points="'+(w/2-4)+','+(ly+layerH+22)+' '+(w/2+4)+','+(ly+layerH+22)+' '+(w/2)+','+(ly+layerH+28)+'" fill="'+th.data[0]+'" opacity="0.4"/>';
+    }
+  }
+  if(legendItems) svg+=drawLegend(legendItems,w-155,h-5,140,themeName);
+  svg+='</svg></div>'; return svg;
+}
+
+/* ── Professional P&ID Diagram (right-angle pipes) ── */
+function drawPid(title, nodes, pipes, opts){
+  opts=opts||{}; var w=opts.w||700; var h=opts.h||320; var themeName=opts.theme||'dark'; var legendItems=opts.legend||null;
+  var th=DIAGRAM_THEME[themeName]||DIAGRAM_THEME.dark;
+  var lh=legendItems?25:0;
+  var svg='<div class="arch-svg"><svg width="100%" height="'+(h+lh)+'" viewBox="0 0 '+w+' '+(h+lh)+'" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<defs><marker id="pidArr" viewBox="0 0 8 6" refX="8" refY="3" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,3 L0,6" fill="'+(th.pipe[0]||'#4ac8ff')+'"/></marker></defs>';
+  svg+='<rect width="'+w+'" height="'+(h+lh)+'" fill="'+th.bg+'"/>';
+  svg+='<text x="'+w/2+'" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="'+th.title+'" font-family="'+th.font+'">'+title+'</text>';
+  svg+='<line x1="10" y1="22" x2="'+(w-10)+'" y2="22" stroke="'+th.layerLine+'" stroke-width="0.5"/>';
+  for(var ni=0;ni<nodes.length;ni++){
+    var nd=nodes[ni]; var nx=nd.x*(w/100); var ny=nd.y*(h/100)+18;
+    var nW=nd.w||70; var nH=nd.h||30; var fc=nd.fc||th.boxFill; var sc=nd.sc||th.boxStroke; var tc=th.boxText;
+    if(nd.type==='pump'){svg+='<circle cx="'+nx+'" cy="'+ny+'" r="14" fill="'+th.boxFill+'" stroke="'+(nd.sc||th.pipe[0])+'" stroke-width="1.5"/>';svg+='<text x="'+nx+'" y="'+(ny+4)+'" text-anchor="middle" font-size="9" fill="'+(nd.sc||th.pipe[0])+'" font-family="'+th.fontMono+'">P</text>';}
+    else if(nd.type==='valve'){svg+='<polygon points="'+(nx-9)+','+(ny-10)+' '+(nx+9)+','+(ny)+' '+(nx-9)+','+(ny+10)+'" fill="'+th.boxFill+'" stroke="'+(nd.sc||th.pipe[1])+'" stroke-width="1"/>';}
+    else if(nd.type==='tank'){svg+='<rect x="'+(nx-20)+'" y="'+(ny-15)+'" width="40" height="30" rx="4" fill="'+th.boxFill+'" stroke="'+(nd.sc||th.pipe[0])+'" stroke-width="1"/>';}
+    else{svg+='<rect x="'+(nx-nW/2)+'" y="'+(ny-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+fc+'" stroke="'+sc+'" stroke-width="1"/>';}
+    svg+='<text x="'+nx+'" y="'+(ny+4)+'" text-anchor="middle" font-size="8" fill="'+tc+'" font-family="'+th.font+'">'+nd.n+'</text>';
+  }
+  for(var pi=0;pi<pipes.length;pi++){
+    var pp=pipes[pi]; var x1=pp.x1*(w/100)+2; var y1=pp.y1*(h/100)+18; var x2=pp.x2*(w/100)+2; var y2=pp.y2*(h/100)+18;
+    var col=pp.c||th.pipe[0]; var das=pp.dash?' stroke-dasharray="4 2"':''; var rte=pp.route||'vh';
+    var pts=connPath(x1,y1,x2,y2,rte);
+    svg+='<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="1.2" marker-end="url(#pidArr)"'+das+'/>';
+    if(pp.label){var mx=(x1+x2)/2; var my=(y1+y2)/2-7;svg+='<text x="'+mx+'" y="'+my+'" text-anchor="middle" font-size="7" fill="'+col+'" font-family="'+th.fontMono+'">'+pp.label+'</text>';}
+  }
+  if(legendItems) svg+=drawLegend(legendItems,w-155,h-5,140,themeName);
+  svg+='</svg></div>'; return svg;
+}
+
+/* ── Professional Sankey Diagram ── */
+function drawSankey(title, flows, opts){
+  opts=opts||{}; var w=opts.w||700; var h=opts.h||260; var themeName=opts.theme||'dark'; var legendItems=opts.legend||null;
+  var th=DIAGRAM_THEME[themeName]||DIAGRAM_THEME.dark;
+  var lh=legendItems?25:0;
+  var svg='<div class="arch-svg"><svg width="100%" height="'+(h+lh)+'" viewBox="0 0 '+w+' '+(h+lh)+'" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<rect width="'+w+'" height="'+(h+lh)+'" fill="'+th.bg+'"/>';
+  svg+='<text x="'+w/2+'" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="'+th.title+'" font-family="'+th.font+'">'+title+'</text>';
+  svg+='<line x1="10" y1="22" x2="'+(w-10)+'" y2="22" stroke="'+th.layerLine+'" stroke-width="0.5"/>';
+  var cols={}; for(var fi=0;fi<flows.length;fi++){cols[flows[fi].from]=1;cols[flows[fi].to]=1;}
+  var cNames=Object.keys(cols); var cW=w/(cNames.length+1);
+  var colY={}; for(var ci=0;ci<cNames.length;ci++)colY[cNames[ci]]=30;
+  var colors=th.pipe||['#4a9aff','#20c840','#e3b341','#ff9040','#bc8cff','#4ac8ff','#ff6b9d'];
+  for(var fi=0;fi<flows.length;fi++){
+    var fl=flows[fi]; var x1=cNames.indexOf(fl.from)*cW+cW; var x2=cNames.indexOf(fl.to)*cW+cW;
+    var thick=Math.max(3,Math.min(22,fl.v/8));
+    if(x1===x2)x2=w-x1;
+    var y1=colY[fl.from]; colY[fl.from]+=thick+5;
+    var y2=colY[fl.to]; colY[fl.to]+=thick+5;
+    var c=fl.c||colors[fi%colors.length];
+    svg+='<path d="M'+x1+','+y1+' C'+((x1+x2)/2)+','+y1+' '+((x1+x2)/2)+','+y2+' '+x2+','+y2+'" stroke="'+c+'" stroke-width="'+thick+'" fill="none" opacity="0.4"/>';
+    svg+='<text x="'+((x1+x2)/2)+'" y="'+((y1+y2)/2+3)+'" text-anchor="middle" font-size="8" fill="'+c+'" font-family="'+th.fontMono+'">'+fl.n+' '+fl.v+(fl.u||'')+'</text>';
+  }
+  for(var ci=0;ci<cNames.length;ci++){
+    svg+='<text x="'+(cW*(ci+1))+'" y="'+(h-6)+'" text-anchor="middle" font-size="9" fill="'+th.sub+'" font-weight="600" font-family="'+th.font+'">'+cNames[ci]+'</text>';
+  }
+  if(legendItems) svg+=drawLegend(legendItems,w-155,h-5,140,themeName);
+  svg+='</svg></div>'; return svg;
+}
+
 /* ── Code Block Generator ── */
 function codeBlock(lang, filename, code){
   var escaped=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -96376,7 +96545,7 @@ function vppUnifiedFlow(){
   );
 
   steps[1].delay=700; steps[1].result=
-    svgArchDiagram('VPP虚拟电厂系统架构 — '+cap+'MW',[
+    drawArch('VPP虚拟电厂系统架构 — '+cap+'MW',[
       {name:'应用层',boxes:[
         {n:'电力交易中心',sub:'日前+实时',c:'#3a2a1a',s:'#e3b341'},
         {n:'负荷聚合平台',sub:'ISO/TSO接口',c:'#1a2a4a',s:'#4a9aff'},
@@ -96395,7 +96564,11 @@ function vppUnifiedFlow(){
         {n:'充电桩群 '+cap*0.1+'MW',sub:'OCPP 1.6J',c:'#3a2a3a',s:'#bc8cff'},
         {n:'柔性负荷 '+cap*0.05+'MW',sub:'需求响应',c:'#3a3a1a',s:'#e3b341'}
       ]}
-    ],700,280);
+    ],{w:700,h:280,theme:'huawei',legend:[
+      {c:'#1565C0',d:'',n:'电力/一次系统'},
+      {c:'#4a9aff',d:'4 2',n:'数据/通信网'},
+      {c:'#7B1FA2',d:'3 3',n:'AI决策链路'}
+    ]});
 
   var forecastData=[];
   for(var fi=0;fi<24;fi++){
@@ -96429,14 +96602,20 @@ function vppUnifiedFlow(){
   ]);
 
   steps[4].delay=900; steps[4].result=
-    svgSankey('VPP能量流向 — '+cap+'MW系统',[
+    drawSankey('VPP能量流向 — '+cap+'MW系统',[
       {from:'电网',to:'储能',v:cap*0.6,u:'MW',n:'充电'},
       {from:'光伏',to:'储能',v:cap*0.15,u:'MW',n:'余电存储'},
       {from:'储能',to:'电网',v:cap*0.8,u:'MW',n:'放电'},
       {from:'光伏',to:'负荷',v:cap*0.1,u:'MW',n:'自发自用'},
-      {from:'风电',to:'电网',v:cap*0.08,u:'MW',n:'上网'},
-      {from:'储能',to:'充电站',v:cap*0.05,u:'MW',n:'V2G'}
-    ],700,240)+
+      {from:'风电',to:'电网',v:cap*0.12,u:'MW',n:'上网'},
+      {from:'储能',to:'辅助服务',v:cap*0.15,u:'MW',n:'调频'},
+      {from:'电网',to:'充电桩群',v:cap*0.08,u:'MW',n:'充电'},
+      {from:'需求响应',to:'电网',v:cap*0.05,u:'MW',n:'减载'},
+    ],{w:700,h:260,theme:'huawei',legend:[
+      {c:'#1565C0',d:'',n:'电力潮流'},
+      {c:'#20c840',d:'4 2',n:'辅助服务'},
+      {c:'#e3b341',d:'3 3',n:'市场交易'}
+    ]})+
     kpiRow([
       {v:'92%',l:'调度效率',color:'var(--green)'},
       {v:'≤200ms',l:'响应时间',color:'var(--blue)'},
@@ -96537,7 +96716,7 @@ END_PROGRAM`)+
     '<div style="color:var(--green);font-size:12px;padding:6px 0;font-weight:700">LCOE: 0.32元/kWh | LCOS: 0.45元/kWh | 碳减排: '+Math.round(cap*0.5*8760*0.0008)+'tCO₂/年</div>';
 
   steps[7].delay=700; steps[7].result=
-    svgArchDiagram('VPP系统接线图 — '+cap+'MW/'+capTotal+'MWh',[
+    drawArch('VPP系统接线图 — '+cap+'MW/'+capTotal+'MWh',[
       {name:'35kV母线',boxes:[
         {n:'35kV进线柜',sub:'GIS开关柜',c:'#3a2a1a',s:'#e3b341'},
         {n:'计量柜',sub:'0.2S级CT/PT',c:'#3a2a1a',s:'#e3b341'},
@@ -96554,7 +96733,11 @@ END_PROGRAM`)+
         {n:'储能汇流柜',sub:'DC 750V',c:'#0d2040',s:'#20c840'},
         {n:'EMS能量管理',sub:'IEC 61850',c:'#0d2040',s:'#ff9040'}
       ]}
-    ],700,260);
+    ],{w:700,h:260,theme:'huawei',legend:[
+      {c:'#e3b341',d:'',n:'35kV一次回路'},
+      {c:'#1565C0',d:'4 2',n:'10kV配电回路'},
+      {c:'#20c840',d:'3 3',n:'IEC 61850控制'}
+    ]});
 
   steps[8].delay=800; steps[8].result=
     codeBlock('Python','vpp_ems_dispatch.py',
@@ -96759,7 +96942,7 @@ function synUnifiedFlow(){
   );
 
   steps[1].delay=700; steps[1].result=
-    svgArchDiagram('供配电系统架构 — '+powerMW+'MW数据中心',[
+    drawArch('供配电系统架构 — '+powerMW+'MW数据中心',[
       {name:'110kV/35kV 进线',boxes:[
         {n:'110kV GIS',sub:powerMW*1.3+'MVA',c:'#3a2a1a',s:'#e3b341'},
         {n:'主变压器',sub:'2×'+Math.round(powerMW*0.7)+'MVA',c:'#3a2a1a',s:'#e3b341'},
@@ -96777,10 +96960,14 @@ function synUnifiedFlow(){
         {n:'液冷CDU',sub:Math.max(2,Math.ceil(coolKw/300))+'台',c:'#0d2040',s:'#4ac8ff'},
         {n:'BMS电池管理',sub:essMwh+'MWh',c:'#0d2040',s:'#20c840'}
       ]}
-    ],700,280);
+    ],{w:700,h:280,theme:'huawei',legend:[
+      {c:'#e3b341',d:'',n:'110kV/35kV一次'},
+      {c:'#1565C0',d:'4 2',n:'10kV/UPS供电'},
+      {c:'#009688',d:'3 3',n:'0.4kV终端负载'}
+    ]});
 
   steps[2].delay=800; steps[2].result=
-    svgPidDiagram('液冷散热系统P&ID — '+coolLabel,[
+    drawPid('液冷散热系统P&ID — '+coolLabel,[
       {x:8,y:30,n:'冷却塔',type:'box',fc:'#1a2a4a',sc:'#4ac8ff',w:70},
       {x:25,y:30,n:'CDU-1',type:'pump'},
       {x:25,y:70,n:'CDU-2',type:'pump'},
@@ -96791,15 +96978,19 @@ function synUnifiedFlow(){
       {x:85,y:50,n:'膨胀水箱',type:'tank'},
       {x:85,y:30,n:'补水装置',type:'valve'},
     ],[
-      {x1:15,y1:30,x2:22,y2:30,label:'供水',c:'#4ac8ff'},
-      {x1:32,y1:30,x2:42,y2:30,label:'供水',c:'#4ac8ff'},
-      {x1:32,y1:70,x2:42,y2:70,label:'供水',c:'#4ac8ff'},
-      {x1:52,y1:30,x2:62,y2:30,label:'供水'+Math.round(coolKw*1.25)+'L/min',c:'#4ac8ff'},
-      {x1:52,y1:70,x2:62,y2:70,label:'供水',c:'#4ac8ff'},
-      {x1:72,y1:30,x2:42,y2:30,label:'回水',c:'#ff9040',dash:true},
-      {x1:72,y1:70,x2:42,y2:70,label:'回水',c:'#ff9040',dash:true},
-      {x1:82,y1:50,x2:48,y2:50,label:'补水',c:'#20c840'},
-    ],700,260)+
+      {x1:15,y1:30,x2:22,y2:30,label:'供水',c:'#4ac8ff',route:'th'},
+      {x1:32,y1:30,x2:42,y2:30,label:'供水',c:'#4ac8ff',route:'th'},
+      {x1:32,y1:70,x2:42,y2:70,label:'供水',c:'#4ac8ff',route:'th'},
+      {x1:52,y1:30,x2:62,y2:30,label:'供水'+Math.round(coolKw*1.25)+'L/min',c:'#4ac8ff',route:'th'},
+      {x1:52,y1:70,x2:62,y2:70,label:'供水',c:'#4ac8ff',route:'th'},
+      {x1:72,y1:30,x2:42,y2:30,label:'回水 '+Math.round(coolKw*1.3)+'L/min',c:'#ff9040',dash:true,route:'th'},
+      {x1:72,y1:70,x2:42,y2:70,label:'回水',c:'#ff9040',dash:true,route:'th'},
+      {x1:82,y1:50,x2:48,y2:50,label:'补水',c:'#20c840',route:'vh'},
+    ],{w:700,h:280,theme:'huawei',legend:[
+      {c:'#4ac8ff',d:'',n:'一次供水管路'},
+      {c:'#ff9040',d:'4 2',n:'二次回水管路'},
+      {c:'#20c840',d:'3 3',n:'补水管路'}
+    ]})+
     tableHtml(
     ['参数','数值','说明'],
     [['冷却方式',coolLabel,'主冷却方案'],
@@ -96833,7 +97024,7 @@ function synUnifiedFlow(){
     '<div style="color:var(--text2);font-size:10px;padding:4px 0">能耗分解: IT负荷'+Math.round(itKw*0.7)+'kW + 制冷'+Math.round(coolKw*0.6)+'kW + 配电损耗'+Math.round(itKw*0.06)+'kW | 年耗电量: '+Math.round(powerMW*pue*8760)+'MWh</div>';
 
   steps[4].delay=800; steps[4].result=
-    svgArchDiagram('混合储能系统架构 — '+essMwh+'MWh',[
+    drawArch('混合储能系统架构 — '+essMwh+'MWh',[
       {name:'能量管理层',boxes:[
         {n:'EMS调度系统',sub:'AI预测调度',c:'#0d2040',s:'#ff9040'},
         {n:'BMS总控',sub:'IEC 61850',c:'#0d2040',s:'#ff9040'}
@@ -96849,7 +97040,11 @@ function synUnifiedFlow(){
         {n:'BBU电芯',sub:'LFP 280Ah',c:'#2a3a1a',s:'#e3b341'},
         {n:'BESS模组',sub:'液冷温控',c:'#1a2a4a',s:'#4a9aff'}
       ]}
-    ],700,260)+
+    ],{w:700,h:260,theme:'schneider',legend:[
+      {c:'#20c840',d:'',n:'HSC飞轮(≤2ms)'},
+      {c:'#e3b341',d:'4 2',n:'BBU电池(≤10ms)'},
+      {c:'#4a9aff',d:'3 3',n:'BESS储能(≤200ms)'}
+    ]})+
     tableHtml(['储能类型','容量(MWh)','功率(MW)','响应时间','循环寿命','应用场景'],
       [['HSC飞轮',Math.round(essMwh*0.05),Math.round(essPower*0.3),'≤2ms','15年/不限次','调频+暂态支撑'],
        ['BBU电池包',Math.round(essMwh*0.15),Math.round(essPower*0.4),'≤10ms','8年/6000次','UPS后备+削峰'],
@@ -97001,7 +97196,7 @@ resource "alicloud_db_instance" "dc_db" {
 }`);
 
   steps[9].delay=700; steps[9].result=
-    svgArchDiagram('数据中心系统交付图纸 — '+powerMW+'MW/'+racks+'柜',[
+    drawArch('数据中心系统交付图纸 — '+powerMW+'MW/'+racks+'柜',[
       {name:'电气系统',boxes:[
         {n:'供配电系统图',sub:'一次/二次接线',c:'#3a2a1a',s:'#e3b341'},
         {n:'UPS接线图',sub:'2N冗余拓扑',c:'#3a2a1a',s:'#e3b341'},
@@ -97017,7 +97212,11 @@ resource "alicloud_db_instance" "dc_db" {
         {n:'电缆桥架图',sub:'强弱电分离',c:'#0d2040',s:'#ff9040'},
         {n:'消防系统图',sub:'气体灭火',c:'#2a2a3a',s:'#bc8cff'}
       ]}
-    ],700,260);
+    ],{w:700,h:260,theme:'siemens',legend:[
+      {c:'#e3b341',d:'',n:'电气系统图纸'},
+      {c:'#00ACC1',d:'4 2',n:'暖通系统图纸'},
+      {c:'#ff9040',d:'3 3',n:'建筑结构图纸'}
+    ]});
 
   steps[10].delay=600; steps[10].result=
     tableHtml(
