@@ -82434,7 +82434,6 @@ function bsRenderAssetRevenue(){
 }
 
 function bsRenderRobot(){
-  if(!LAST_BS_RESULT) return;
   bsRobotSwitchTab('overview');
 }
 
@@ -83370,7 +83369,6 @@ function _bsRobotRunAnim(){
 }
 
 function bsRenderSoftware(){
-  if(!LAST_BS_RESULT) return;
   var systems=[
     {id:'plc',name:'PLC 主控程序',icon:'⚙',color:'#4a90d9',lang:'Structured Text (IEC 61131-3)',files:['main.st','io_config.st','fault_handler.st','hmi_interface.st']},
     {id:'ems',name:'EMS 能量调度',icon:'⚡',color:'#50c878',lang:'Python 3.11+',files:['ems_core.py','scheduler.py','price_forecast.py','grid_interface.py','config.yaml']},
@@ -83391,6 +83389,7 @@ function bsRenderSoftware(){
     btn.onmouseleave=function(){this.style.borderColor='var(--border)';};
     listEl.appendChild(btn);
   });
+  bsShowSwOutput(systems[0]);
 }
 
 function bsDownloadFile(filename,content,mime){
