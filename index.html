@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta name="version" content="2026.06.24-aidc-v2">
@@ -38144,29 +38144,14 @@ select.form-input{appearance:auto}
 </nav>
 </div>
 
-<div id="vppNav" style="display:none">
-<nav class="sub-tabs">
-<div class="sub-tab active" onclick="showVppPage('vpp-access')">① 资源接入Agent</div>
-<div class="sub-tab" onclick="showVppPage('vpp-aggregate')">② 聚合Agent</div>
-<div class="sub-tab" onclick="showVppPage('vpp-predict')">③ 预测Agent</div>
-<div class="sub-tab" onclick="showVppPage('vpp-market')">④ 市场Agent</div>
-<div class="sub-tab" onclick="showVppPage('vpp-dispatch')">⑤ 调度Agent</div>
-<div class="sub-tab" onclick="showVppPage('vpp-control')">⑥ 执行Agent</div>
-<div class="sub-tab" onclick="showVppPage('vpp-revenue')">⑦ 收益分析Agent</div>
-<div class="sub-tab" onclick="showVppPage('vpp-twin')">⑧ 数字孪生Agent</div>
+            <div id="vppNav" style="display:none">
+              <div class="sub-tab active" onclick="showVppPage('vpp-access')">⚡ VPP统一智能体</div>
 </nav>
 </div>
 
 <div id="synergyNav" style="display:none">
 <nav class="sub-tabs">
-<div class="sub-tab active" onclick="showSynPage('syn-compute')">① 算力规划Agent</div>
-<div class="sub-tab" onclick="showSynPage('syn-power')">② 电力规划Agent</div>
-<div class="sub-tab" onclick="showSynPage('syn-gpu')">③ GPU调度Agent</div>
-<div class="sub-tab" onclick="showSynPage('syn-epri')">④ 电价Agent</div>
-<div class="sub-tab" onclick="showSynPage('syn-ess')">⑤ 储能Agent</div>
-<div class="sub-tab" onclick="showSynPage('syn-cooling')">⑥ 液冷Agent</div>
-<div class="sub-tab" onclick="showSynPage('syn-dispatch')">⑦ 联合调度Agent</div>
-<div class="sub-tab" onclick="showSynPage('syn-cost')">⑧ AI成本Agent</div>
+<div class="sub-tab active" onclick="showSynPage('syn-compute')">🧠 算电协同统一智能体</div>
 </nav>
 </div>
 
@@ -40811,529 +40796,6 @@ if __name__ == "__main__":
 <div id="chPlatformContent"></div>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     VPP 虚拟电厂智能体 — 6个子Agent页面
-═════════════════════════════════════════════ -->
-
-<!-- ① 资源聚合 Agent -->
-<!-- ① 资源接入 Agent -->
-<div id="page-vpp-access" class="vpp-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">🔌 设备接入配置</div>
-      <button class="btn-agent" onclick="vppAgentRun('access')" id="vaccBtn">🔍 启动资源接入 Agent</button>
-      <div class="ip-section">
-        <label class="ip-label">待接入设备类型</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked id="vaPcs"> PCS变流器</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked id="vaBms"> BMS电池管理</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked id="vaEv"> 充电桩/V2G</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" id="vaPv"> 分布式光伏</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" id="vaWind"> 风力发电</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" id="vaAidc"> AIDC算力负荷</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" id="vaHvac"> 楼宇空调</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" id="vaGen"> 柴油发电机</label>
-      </div>
-      <div class="ip-section">
-        <label class="ip-label">输出内容</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 通讯协议识别</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 设备模型生成(IEC61850/CIM)</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 通讯映射点表</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 资源树(JSON)</label>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="vacc-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ② 聚合 Agent -->
-<div id="page-vpp-aggregate" class="vpp-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">🔗 聚合参数</div>
-      <button class="btn-agent" onclick="vppAgentRun('aggregate')" id="vaBtn">⚡ 启动聚合 Agent</button>
-      <div id="vpp-resources">
-        <!-- chips injected by JS -->
-      </div>
-      <div class="ip-section" style="margin-top:10px">
-        <div class="ip-title" style="margin-top:8px">约束参数</div>
-        <div class="ip-row">
-          <div><label class="ip-label">最小申报容量(MW)</label><input class="ip-input" id="vaMinCap" value="1" type="number"></div>
-          <div><label class="ip-label">响应时间要求(s)</label><input class="ip-input" id="vaResp" value="30" type="number"></div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">目标可调容量(MW)</label><input class="ip-input" id="vaTarget" value="100" type="number"></div>
-          <div><label class="ip-label">SOC下限(%)</label><input class="ip-input" id="vaSocMin" value="20" type="number"></div>
-        </div>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="va-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ③ 预测 Agent -->
-<div id="page-vpp-predict" class="vpp-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">📡 预测配置</div>
-      <button class="btn-agent" onclick="vppAgentRun('predict')" id="vpBtn">🧠 启动预测 Agent</button>
-      <div class="ip-section">
-        <label class="ip-label">预测时域</label>
-        <select class="ip-input" id="vpHorizon"><option>24小时（日前）</option><option>4小时（超短期）</option><option>7天（中期）</option></select>
-      </div>
-      <div class="ip-section">
-        <label class="ip-label">预测目标（多选）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vpElec"> 日前/实时电价</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vpLoad"> 系统负荷</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vpPv"> 光伏出力</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="vpWind"> 风电出力</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="vpSoc"> SOC/SOH预测</label>
-      </div>
-      <div class="ip-section">
-        <label class="ip-label">AI模型选择</label>
-        <select class="ip-input" id="vpModel">
-          <option>Auto（AI自动选择最优）</option>
-          <option>LSTM（时序长记忆）</option>
-          <option>Transformer（注意力机制）</option>
-          <option>Informer（长序列）</option>
-          <option>Prophet（趋势分解）</option>
-          <option>XGBoost（特征工程）</option>
-        </select>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="vp-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ④ 市场 Agent -->
-<div id="page-vpp-market" class="vpp-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">📈 交易配置</div>
-      <button class="btn-agent" onclick="vppAgentRun('market')" id="vmBtn">💹 启动交易 Agent</button>
-      <div class="ip-section">
-        <label class="ip-label">参与市场（多选）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vmSpot"> 电力现货（日前+实时）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vmFreq"> 调频辅助服务</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="vmPeak"> 调峰辅助服务</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="vmDr"> 需求响应</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="vmCap"> 容量市场</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="vmGreen"> 绿电/碳交易</label>
-      </div>
-      <div class="ip-row" style="margin-top:4px">
-        <div><label class="ip-label">峰电价(元/kWh)</label><input class="ip-input" id="vmPeak2" value="1.05" type="number" step="0.01"></div>
-        <div><label class="ip-label">谷电价(元/kWh)</label><input class="ip-input" id="vmValley" value="0.32" type="number" step="0.01"></div>
-      </div>
-      <div class="ip-row" style="margin-top:6px">
-        <div><label class="ip-label">可报容量(MW)</label><input class="ip-input" id="vmCap2" value="80" type="number"></div>
-        <div><label class="ip-label">风险偏好</label>
-          <select class="ip-input" id="vmRisk"><option>保守</option><option selected>均衡</option><option>激进</option></select>
-        </div>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="vm-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ⑤ 调度 Agent -->
-<div id="page-vpp-dispatch" class="vpp-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">⚙️ 调度参数</div>
-      <button class="btn-agent" onclick="vppAgentRun('dispatch')" id="vdBtn">🔄 启动调度 Agent</button>
-      <div class="ip-section">
-        <label class="ip-label">优化算法（AI自动推荐）</label>
-        <select class="ip-input" id="vdAlgo">
-          <option value="auto">Auto（AI选最优）</option>
-          <option value="mpc">MPC（模型预测控制）</option>
-          <option value="milp">MILP（混合整数线性规划）</option>
-          <option value="ga">遗传算法（多目标）</option>
-          <option value="dp">动态规划（精确解）</option>
-          <option value="rl">强化学习（在线学习）</option>
-        </select>
-      </div>
-      <div class="ip-row">
-        <div><label class="ip-label">预测时域(min)</label><input class="ip-input" id="vdHorizon" value="60" type="number"></div>
-        <div><label class="ip-label">控制步长(min)</label><input class="ip-input" id="vdStep" value="15" type="number"></div>
-      </div>
-      <div class="ip-row" style="margin-top:6px">
-        <div><label class="ip-label">AGC带宽(MW)</label><input class="ip-input" id="vdAgc" value="10" type="number"></div>
-        <div><label class="ip-label">AVC容量(MVar)</label><input class="ip-input" id="vdAvc" value="20" type="number"></div>
-      </div>
-      <div class="ip-section" style="margin-top:8px">
-        <label class="ip-label">优化目标权重</label>
-        <div style="display:flex;gap:4px;align-items:center;margin:4px 0"><span style="font-size:10px;color:var(--text2);width:60px">电费最小</span><input type="range" min="0" max="10" value="7" style="flex:1" id="vdW1"><span id="vdW1v" style="font-size:10px;color:var(--blue);width:14px">7</span></div>
-        <div style="display:flex;gap:4px;align-items:center;margin:4px 0"><span style="font-size:10px;color:var(--text2);width:60px">收益最大</span><input type="range" min="0" max="10" value="8" style="flex:1" id="vdW2"><span id="vdW2v" style="font-size:10px;color:var(--green);width:14px">8</span></div>
-        <div style="display:flex;gap:4px;align-items:center;margin:4px 0"><span style="font-size:10px;color:var(--text2);width:60px">寿命保护</span><input type="range" min="0" max="10" value="5" style="flex:1" id="vdW3"><span id="vdW3v" style="font-size:10px;color:var(--orange);width:14px">5</span></div>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="vd-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ⑥ 执行 Agent -->
-<div id="page-vpp-control" class="vpp-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">📡 控制协议配置</div>
-      <button class="btn-agent" onclick="vppAgentRun('control')" id="vcBtn">📤 启动控制 Agent</button>
-      <div class="ip-section">
-        <label class="ip-label">目标设备协议</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vcIec104"> IEC 104（调度主站）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vcIec61850"> IEC 61850（PCS/PPC）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vcModbus"> Modbus TCP（变流器）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vcMqtt"> MQTT（IoT设备）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="vcCan"> CAN 2.0B（BMS）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="vcOpc"> OPC UA（工业平台）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="vcIec62325"> IEC 62325（电力市场）</label>
-      </div>
-      <div class="ip-section">
-        <label class="ip-label">生成内容</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked> 控制报文</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked> 寄存器点表</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked> 调试脚本</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox"> Python客户端</label>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="vc-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ⑦ 收益分析 Agent -->
-<div id="page-vpp-revenue" class="vpp-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">💰 收益计算配置</div>
-      <button class="btn-agent" onclick="vppAgentRun('revenue')" id="vrBtn">📊 启动结算 Agent</button>
-      <div class="ip-row">
-        <div><label class="ip-label">装机容量(MW)</label><input class="ip-input" id="vrCap" value="50" type="number"></div>
-        <div><label class="ip-label">储能时长(h)</label><input class="ip-input" id="vrDur" value="2" type="number"></div>
-      </div>
-      <div class="ip-row" style="margin-top:6px">
-        <div><label class="ip-label">初始投资(万元)</label><input class="ip-input" id="vrCapex" value="8000" type="number"></div>
-        <div><label class="ip-label">年运维率(%)</label><input class="ip-input" id="vrOpex" value="2.5" type="number" step="0.1"></div>
-      </div>
-      <div class="ip-row" style="margin-top:6px">
-        <div><label class="ip-label">套利年收益(万元)</label><input class="ip-input" id="vrArb" value="1200" type="number"></div>
-        <div><label class="ip-label">辅服年收益(万元)</label><input class="ip-input" id="vrAux" value="800" type="number"></div>
-      </div>
-      <div class="ip-row" style="margin-top:6px">
-        <div><label class="ip-label">需响年收益(万元)</label><input class="ip-input" id="vrDr" value="300" type="number"></div>
-        <div><label class="ip-label">绿证年收益(万元)</label><input class="ip-input" id="vrGreen" value="150" type="number"></div>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="vr-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ⑧ 数字孪生 Agent -->
-<div id="page-vpp-twin" class="vpp-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell" style="grid-template-columns:220px 1fr">
-    <div class="agent-input-panel">
-      <div class="ip-title">🌐 VPP数字孪生</div>
-      <button class="btn-agent" onclick="vppTwinInit()" id="vptBtn">🌐 启动VPP孪生</button>
-      <div class="ip-section">
-        <label class="ip-label">监控范围</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 储能SOC/功率</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> PCS实时功率</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 充电桩状态</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 市场价格</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox"> 气象数据</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 调度指令流</label>
-      </div>
-    </div>
-    <div id="vpt-canvas" style="background:var(--bg2);border-radius:8px;overflow:hidden;position:relative">
-      <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:12px" id="vpt-empty">点击「启动VPP孪生」生成实时看板</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-     算电协同智能体 — 8个子Agent页面
-═════════════════════════════════════════════ -->
-
-<!-- ① 算力规划 Agent -->
-<div id="page-syn-compute" class="syn-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">🖥 算力需求输入</div>
-      <button class="btn-agent" onclick="synAgentRun('compute')" id="scBtn">🚀 启动算力规划 Agent</button>
-      <div class="ip-section">
-        <div class="ip-row">
-          <div><label class="ip-label">GPU型号</label>
-            <select class="ip-input" id="scGpu">
-              <option value="h100">H100 SXM5 (700W)</option>
-              <option value="a100">A100 SXM4 (400W)</option>
-              <option value="h200">H200 SXM5 (700W)</option>
-              <option value="b200">B200 SXM6 (1kW)</option>
-              <option value="910b">昇腾910B (310W)</option>
-            </select>
-          </div>
-          <div><label class="ip-label">GPU数量(卡)</label><input class="ip-input" id="scGpuN" value="1024" type="number"></div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">训练任务比例(%)</label><input class="ip-input" id="scTrain" value="60" type="number"></div>
-          <div><label class="ip-label">推理QPS</label><input class="ip-input" id="scQps" value="5000" type="number"></div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">Token/天(B)</label><input class="ip-input" id="scToken" value="100" type="number"></div>
-          <div><label class="ip-label">互联方式</label>
-            <select class="ip-input" id="scNet">
-              <option>NVLink 4.0</option><option>InfiniBand HDR</option><option>RoCE v2</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="sc-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ② 电力规划 Agent -->
-<div id="page-syn-power" class="syn-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">⚡ 电力系统参数</div>
-      <button class="btn-agent" onclick="synAgentRun('power')" id="spBtn">⚡ 启动电力规划 Agent</button>
-      <div class="ip-section">
-        <div class="ip-row">
-          <div><label class="ip-label">接入电压等级</label>
-            <select class="ip-input" id="spVolt">
-              <option>110kV</option><option>35kV</option><option selected>10kV</option>
-            </select>
-          </div>
-          <div><label class="ip-label">冗余等级</label>
-            <select class="ip-input" id="spRedund">
-              <option>N+1</option><option selected>2N</option><option>2N+1</option>
-            </select>
-          </div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">IT负荷(kW)</label><input class="ip-input" id="spIt" value="10000" type="number"></div>
-          <div><label class="ip-label">PUE目标</label><input class="ip-input" id="spPue" value="1.2" type="number" step="0.05"></div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">配套储能(MWh)</label><input class="ip-input" id="spEss" value="20" type="number"></div>
-          <div><label class="ip-label">峰电价(元/kWh)</label><input class="ip-input" id="spPeak" value="1.05" type="number" step="0.01"></div>
-        </div>
-      </div>
-      <div class="ip-section">
-        <label class="ip-label">生成图纸内容</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 一次接线图（IEC 60617）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> UPS/STS系统图</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 储能一次接线图</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox"> 配电BOM清单</label>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="sp-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ⑥ 液冷 Agent -->
-<div id="page-syn-cooling" class="syn-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">🌡 液冷系统参数</div>
-      <button class="btn-agent" onclick="synAgentRun('cooling')" id="scoCoolBtn">💧 启动液冷 Agent</button>
-      <div class="ip-section">
-        <div class="ip-row">
-          <div><label class="ip-label">散热类型</label>
-            <select class="ip-input" id="scoType">
-              <option>全液冷冷板</option><option>液冷+风冷混合</option><option>浸没式液冷</option>
-            </select>
-          </div>
-          <div><label class="ip-label">散热总功率(kW)</label><input class="ip-input" id="scoLoad" value="8000" type="number"></div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">供水温度(℃)</label><input class="ip-input" id="scoTs" value="35" type="number"></div>
-          <div><label class="ip-label">回水温度(℃)</label><input class="ip-input" id="scoTr" value="45" type="number"></div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">CDU单台容量(kW)</label><input class="ip-input" id="scoCdu" value="300" type="number"></div>
-          <div><label class="ip-label">冗余方式</label>
-            <select class="ip-input" id="scoRed"><option>N+1</option><option>N+2</option><option>2N</option></select>
-          </div>
-        </div>
-      </div>
-      <div class="ip-section">
-        <label class="ip-label">生成输出</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 液冷P&ID管道图（SVG）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> CDU/Manifold选型</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 管路流量计算</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox"> 爆炸三维图</label>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="sco-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ⑦ 联合调度 Agent -->
-<div id="page-syn-dispatch" class="syn-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">🔄 算电联合调度</div>
-      <button class="btn-agent" onclick="synAgentRun('dispatch')" id="sdBtn">⚡ 启动联合调度 Agent</button>
-      <div class="ip-section">
-        <label class="ip-label">调度策略</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="sdPeak"> 峰期降GPU负载 + 储能放电顶峰</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="sdValley"> 谷期GPU全速训练 + 储能充电</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" checked id="sdPue"> 动态PUE优化（液冷跟算力）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="sdVpp"> 参与VPP聚合（算力作为可调负荷）</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:4px 0"><input type="checkbox" id="sdGreen"> 绿电优先调度</label>
-      </div>
-      <div class="ip-row">
-        <div><label class="ip-label">SLA保障率(%)</label><input class="ip-input" id="sdSla" value="99" type="number"></div>
-        <div><label class="ip-label">GPU弹性下限(%)</label><input class="ip-input" id="sdGpuMin" value="30" type="number"></div>
-      </div>
-      <div class="ip-row" style="margin-top:6px">
-        <div><label class="ip-label">谷电价(元/kWh)</label><input class="ip-input" id="sdValleyP" value="0.32" type="number" step="0.01"></div>
-        <div><label class="ip-label">峰电价(元/kWh)</label><input class="ip-input" id="sdPeakP" value="1.05" type="number" step="0.01"></div>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="sd-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ③ GPU调度 Agent -->
-<div id="page-syn-gpu" class="syn-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">🖥 GPU智能调度</div>
-      <button class="btn-agent" onclick="synAgentRun('gpu')" id="sgBtn">⚡ 启动GPU调度 Agent</button>
-      <div class="ip-section">
-        <label class="ip-label">调度策略</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked id="sgTrain"> 训练任务优先调度</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked id="sgInfer"> 推理任务弹性调度</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" id="sgMigrate"> 任务跨节点迁移</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" id="sgSleep"> 空闲节点休眠</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked id="sgFreq"> GPU动态调频(DVFS)</label>
-      </div>
-      <div class="ip-row">
-        <div><label class="ip-label">GPU总数(卡)</label><input class="ip-input" id="sgTotal" value="1024" type="number"></div>
-        <div><label class="ip-label">SLA保障率(%)</label><input class="ip-input" id="sgSla" value="99" type="number"></div>
-      </div>
-      <div class="ip-row" style="margin-top:6px">
-        <div><label class="ip-label">训练优先级权重</label><input class="ip-input" id="sgTrainW" value="8" type="number" min="1" max="10"></div>
-        <div><label class="ip-label">推理优先级权重</label><input class="ip-input" id="sgInferW" value="6" type="number" min="1" max="10"></div>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="sg-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ④ 电价 Agent -->
-<div id="page-syn-epri" class="syn-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">💹 电价分析</div>
-      <button class="btn-agent" onclick="synAgentRun('epri')" id="sepBtn">📈 启动电价 Agent</button>
-      <div class="ip-section">
-        <label class="ip-label">电价模式</label>
-        <select class="ip-input" id="sepMode">
-          <option>峰谷平三段</option><option>峰谷两段</option><option>实时电价</option><option>分时+尖峰</option>
-        </select>
-      </div>
-      <div class="ip-row">
-        <div><label class="ip-label">峰电价(元/kWh)</label><input class="ip-input" id="sepPeak" value="1.05" type="number" step="0.01"></div>
-        <div><label class="ip-label">谷电价(元/kWh)</label><input class="ip-input" id="sepValley" value="0.28" type="number" step="0.01"></div>
-      </div>
-      <div class="ip-row" style="margin-top:6px">
-        <div><label class="ip-label">平电价(元/kWh)</label><input class="ip-input" id="sepFlat" value="0.65" type="number" step="0.01"></div>
-        <div><label class="ip-label">尖峰电价(元/kWh)</label><input class="ip-input" id="sepSpike" value="1.35" type="number" step="0.01"></div>
-      </div>
-      <div class="ip-section">
-        <label class="ip-label">预测目标</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 未来24h电价预测</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 最优训练时段推荐</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked> 套利机会识别</label>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="sep-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ⑤ 储能 Agent -->
-<div id="page-syn-ess" class="syn-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">🔋 储能控制</div>
-      <button class="btn-agent" onclick="synAgentRun('ess')" id="seBtn">🔋 启动储能 Agent</button>
-      <div class="ip-section">
-        <div class="ip-row">
-          <div><label class="ip-label">储能容量(MWh)</label><input class="ip-input" id="seCap" value="40" type="number"></div>
-          <div><label class="ip-label">PCS功率(MW)</label><input class="ip-input" id="sePcs" value="20" type="number"></div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">当前SOC(%)</label><input class="ip-input" id="seSoc" value="65" type="number"></div>
-          <div><label class="ip-label">SOC下限(%)</label><input class="ip-input" id="seSocMin" value="15" type="number"></div>
-        </div>
-      </div>
-      <div class="ip-section">
-        <label class="ip-label">控制模式</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked id="sePeak"> 峰时放电套利</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked id="seValley"> 谷时充电</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" id="sePeakShave"> 削峰控制</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" id="seBackup"> 备用容量预留</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin:3px 0"><input type="checkbox" checked id="seLife"> 寿命保护(SOC窗口)</label>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="se-flow"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ⑧ AI成本 Agent -->
-<div id="page-syn-cost" class="syn-content" style="display:none;padding:16px 20px">
-  <div class="agent-shell">
-    <div class="agent-input-panel">
-      <div class="ip-title">💰 AI成本核算</div>
-      <button class="btn-agent" onclick="synAgentRun('cost')" id="scoCostBtn">📊 启动成本 Agent</button>
-      <div class="ip-section">
-        <div class="ip-row">
-          <div><label class="ip-label">GPU数量(卡)</label><input class="ip-input" id="scoGpuN" value="1024" type="number"></div>
-          <div><label class="ip-label">GPU单价(万元/卡)</label><input class="ip-input" id="scoGpuP" value="25" type="number"></div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">年电费(万元)</label><input class="ip-input" id="scoElec" value="4500" type="number"></div>
-          <div><label class="ip-label">年冷却费(万元)</label><input class="ip-input" id="scoCool" value="800" type="number"></div>
-        </div>
-        <div class="ip-row" style="margin-top:6px">
-          <div><label class="ip-label">年运维费(万元)</label><input class="ip-input" id="scoOps" value="600" type="number"></div>
-          <div><label class="ip-label">日Token产出(B)</label><input class="ip-input" id="scoToken" value="100" type="number"></div>
-        </div>
-      </div>
-    </div>
-    <div class="agent-workspace">
-      <div class="agent-flow" id="sco-flow2"></div>
-    </div>
-  </div>
-</div>
 
 <footer class="footer" data-i18n="footer_text">
 版权所有@卢继雄  请尊重知识产权
@@ -95330,17 +94792,14 @@ console.log('[ESS Software] loaded - '+ESS_CHIPS.length+' chips, '+ESS_PROGRAMS.
 
 /* ── Page routing ── */
 function showVppPage(id){
-  const tabs=['vpp-access','vpp-aggregate','vpp-predict','vpp-market','vpp-dispatch','vpp-control','vpp-revenue','vpp-twin'];
-  document.querySelectorAll('#vppNav .sub-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===id));
+  document.querySelectorAll('#vppNav .sub-tab').forEach(t=>t.classList.add('active'));
   document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
-  const el=document.getElementById('page-'+id); if(el)el.style.display='block';
-  if(id==='vpp-aggregate') vppInitResources();
+  var el=document.getElementById('page-vpp-unified'); if(el)el.style.display='block';
 }
 function showSynPage(id){
-  const tabs=['syn-compute','syn-power','syn-gpu','syn-epri','syn-ess','syn-cooling','syn-dispatch','syn-cost'];
-  document.querySelectorAll('#synergyNav .sub-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===id));
+  document.querySelectorAll('#synergyNav .sub-tab').forEach(t=>t.classList.add('active'));
   document.querySelectorAll('.syn-content').forEach(t=>t.style.display='none');
-  const el=document.getElementById('page-'+id); if(el)el.style.display='block';
+  var el=document.getElementById('page-syn-unified'); if(el)el.style.display='block';
 }
 
 /* ── Range slider live values ── */
@@ -95429,16 +94888,7 @@ function runSteps(containerId, steps, btnId){
 var VPP_STATE={};
 
 function vppAgentRun(agent){
-  var flows={
-    access:    vppAccessFlow,
-    aggregate: vppAggregateFlow,
-    predict:   vppPredictFlow,
-    market:    vppMarketFlow,
-    dispatch:  vppDispatchFlow,
-    control:   vppControlFlow,
-    revenue:   vppRevenueFlow,
-  };
-  if(flows[agent]) flows[agent]();
+  if(agent==='unified'){ vppUnifiedFlow(); return; }
 }
 
 function vppAccessFlow(){
@@ -95823,17 +95273,7 @@ function vppRevenueFlow(){
 var SYN_STATE={};
 
 function synAgentRun(agent){
-  var flows={
-    compute:  synComputeFlow,
-    power:    synPowerFlow,
-    gpu:      synGpuFlow,
-    epri:     synEpriFlow,
-    ess:      synEssFlow,
-    cooling:  synCoolingFlow,
-    dispatch: synDispatchFlow,
-    cost:     synCostFlow,
-  };
-  if(flows[agent]) flows[agent]();
+  if(agent==='unified'){ synUnifiedFlow(); return; }
 }
 
 var GPU_SPECS={
@@ -96429,6 +95869,347 @@ function synTwinInit(){
   },800);
   canvas.dataset.timer=animTimer;
   if(btn)btn.disabled=false;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SVG CHART HELPERS
+══════════════════════════════════════════════════════════════ */
+function svgBars(data, w, h){
+  data=data||[]; w=w||600; h=h||200;
+  var max=0; for(var bi=0;bi<data.length;bi++){if(data[bi].v>max)max=data[bi].v;}
+  max=max||1;
+  var bw=Math.max(20,Math.floor((w-60)/data.length)-8);
+  var bars=''; var colors=['#4a9aff','#20c840','#e3b341','#ff9040','#f85149','#bc8cff','#4ac8ff','#ff6b9d'];
+  for(var bi=0;bi<data.length;bi++){
+    var d=data[bi]; var bh=(d.v/max)*(h-60); var bx=30+bi*(bw+8)+4;
+    bars+='<rect x="'+bx+'" y="'+(h-30-bh)+'" width="'+bw+'" height="'+bh+'" rx="2" fill="'+(colors[bi%colors.length])+'" opacity="0.85"/>';
+    bars+='<text x="'+(bx+bw/2)+'" y="'+(h-30-bh-4)+'" text-anchor="middle" font-size="10" fill="#e0e8f0" font-family="monospace">'+d.v+(d.u||'')+'</text>';
+    bars+='<text x="'+(bx+bw/2)+'" y="'+(h-10)+'" text-anchor="middle" font-size="8" fill="#6a8aa0" font-family="monospace">'+d.l+'</text>';
+  }
+  return '<svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="background:#06090f;border-radius:6px"><rect x="0" y="0" width="'+w+'" height="'+h+'" fill="#06090f" rx="6"/>'+bars+'</svg>';
+}
+
+function svgPie(data, w, h){
+  data=data||[]; w=w||300; h=h||200;
+  var total=0; for(var pi=0;pi<data.length;pi++){total+=data[pi].v;}
+  total=total||1;
+  var colors=['#4a9aff','#20c840','#e3b341','#ff9040','#f85149','#bc8cff','#4ac8ff','#ff6b9d'];
+  var cx=120, cy=Math.floor(h/2), r=Math.min(cx-20,cy-20);
+  var cur=0; var slices='';
+  for(var pi=0;pi<data.length;pi++){
+    var d=data[pi]; var pct=d.v/total;
+    var a1=cur*360, a2=(cur+pct)*360;
+    var x1=cx+r*Math.cos((a1-90)*Math.PI/180);
+    var y1=cy+r*Math.sin((a1-90)*Math.PI/180);
+    var x2=cx+r*Math.cos((a2-90)*Math.PI/180);
+    var y2=cy+r*Math.sin((a2-90)*Math.PI/180);
+    var large=pct>0.5?1:0;
+    slices+='<path d="M'+cx+','+cy+' L'+x1.toFixed(1)+','+y1.toFixed(1)+' A'+r+','+r+' 0 '+large+',1 '+x2.toFixed(1)+','+y2.toFixed(1)+' Z" fill="'+colors[pi%colors.length]+'" opacity="0.85"/>';
+    var mx=cx+r*0.65*Math.cos((a1+pct/2*360-90)*Math.PI/180);
+    var my=cy+r*0.65*Math.sin((a1+pct/2*360-90)*Math.PI/180);
+    slices+='<text x="'+mx.toFixed(1)+'" y="'+my.toFixed(1)+'" text-anchor="middle" font-size="10" fill="#fff" font-family="monospace">'+(pct*100).toFixed(0)+'%</text>';
+    cur+=pct;
+  }
+  var ly=20; var legend='';
+  for(var pi=0;pi<data.length;pi++){
+    legend+='<rect x="'+(w-120)+'" y="'+ly+'" width="12" height="10" rx="2" fill="'+colors[pi%colors.length]+'"/>';
+    legend+='<text x="'+(w-104)+'" y="'+(ly+9)+'" font-size="9" fill="#8a9aa0" font-family="monospace">'+data[pi].l+' ('+data[pi].v+')</text>';
+    ly+=18;
+  }
+  return '<svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="background:#06090f;border-radius:6px"><rect x="0" y="0" width="'+w+'" height="'+h+'" fill="#06090f" rx="6"/>'+slices+legend+'</svg>';
+}
+
+function svgPowerLine(data, w, h){
+  data=data||[]; w=w||600; h=h||180;
+  var maxV=0; for(var li=0;li<data.length;li++){if(data[li].v>maxV)maxV=data[li].v;}
+  maxV=maxV||1;
+  var pad=40; var gw=w-pad*2; var gh=h-50;
+  var pts=''; var stepX=data.length>1?gw/(data.length-1):gw;
+  for(var li=0;li<data.length;li++){
+    var px=pad+li*stepX; var py=h-30-(data[li].v/maxV*gh);
+    pts+=pts?(' L'+px.toFixed(1)+','+py.toFixed(1)):('M'+px.toFixed(1)+','+py.toFixed(1));
+  }
+  var area=pts.replace('M','L')+' L'+(pad+(data.length-1)*stepX).toFixed(1)+','+(h-30)+' L'+pad+','+(h-30)+' Z';
+  var lines='<path d="'+pts+'" stroke="#4a9aff" stroke-width="2" fill="none"/>';
+  lines+='<path d="'+area+'" fill="#4a9aff" opacity="0.12"/>';
+  for(var li=0;li<data.length;li++){
+    var px=pad+li*stepX; var py=h-30-(data[li].v/maxV*gh);
+    lines+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3" fill="#4a9aff"/>';
+    if(li%Math.max(1,Math.floor(data.length/8))===0||li===data.length-1){
+      lines+='<text x="'+px.toFixed(1)+'" y="'+(h-8)+'" text-anchor="middle" font-size="7" fill="#6a8aa0" font-family="monospace">'+data[li].l+'</text>';
+      lines+='<text x="'+(px+6)+'" y="'+(py-4)+'" font-size="8" fill="#8ab0d0" font-family="monospace">'+data[li].v+(data[li].u||'')+'</text>';
+    }
+  }
+  lines+='<text x="12" y="18" font-size="10" fill="#6a8aa0" font-family="monospace">功率曲线</text>';
+  return '<svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="background:#06090f;border-radius:6px"><rect x="0" y="0" width="'+w+'" height="'+h+'" fill="#06090f" rx="6"/>'+lines+'</svg>';
+}
+
+function svgNodeTree(title, nodes, w, h){
+  w=w||600; h=h||250; var levelH=60; var nodeW=130; var nodeH=32;
+  var levels={}; var maxInLevel=0;
+  for(var ti=0;ti<nodes.length;ti++){
+    var n=nodes[ti]; levels[n.l]=levels[n.l]||[];
+    levels[n.l].push(n); if(levels[n.l].length>maxInLevel)maxInLevel=levels[n.l].length;
+  }
+  var svg='<svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="background:#06090f;border-radius:6px"><rect x="0" y="0" width="'+w+'" height="'+h+'" fill="#06090f" rx="6"/>';
+  var lKeys=Object.keys(levels);
+  for(var ti=0;ti<lKeys.length;ti++){
+    var lvl=levels[lKeys[ti]]; var lvlH=30+ti*levelH;
+    var spacing=w/(lvl.length+1);
+    for(var tj=0;tj<lvl.length;tj++){
+      var nx=spacing*(tj+1)-nodeW/2; var ny=lvlH;
+      var col=lvl[tj].c||'#0d1a2a'; var stroke=lvl[tj].s||'#1a3a5a';
+      svg+='<rect x="'+nx+'" y="'+ny+'" width="'+nodeW+'" height="'+nodeH+'" rx="4" fill="'+col+'" stroke="'+stroke+'" stroke-width="1"/>';
+      svg+='<text x="'+(nx+nodeW/2)+'" y="'+(ny+nodeH/2+3)+'" text-anchor="middle" font-size="9" fill="#c0d0e0" font-family="monospace">'+lvl[tj].n+'</text>';
+      if(tj>0&&lvl===lvl){
+        var pnx=spacing*tj-nodeW/2+nodeW;
+        svg+='<line x1="'+pnx+'" y1="'+(ny+nodeH/2)+'" x2="'+nx+'" y2="'+(ny+nodeH/2)+'" stroke="#1a3a5a" stroke-width="1" stroke-dasharray="3 2"/>';
+      }
+    }
+  }
+  if(title) svg+='<text x="'+w/2+'" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#e0e8f0" font-family="monospace">'+title+'</text>';
+  svg+='</svg>';
+  return svg;
+}
+
+function svgGenConfig(name, fields){
+  var html='<div class="file-card"><div class="fc-header">📄 '+name+'</div>';
+  for(var fi=0;fi<fields.length;fi++){
+    html+='<div class="fc-row"><span class="fc-key">'+fields[fi].k+'</span><span class="fc-val">'+fields[fi].v+'</span></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   VPP UNIFIED AGENT FLOW
+══════════════════════════════════════════════════════════════ */
+function vppUnifiedFlow(){
+  var input=document.getElementById('vppInput').value.trim();
+  var market=document.getElementById('vppMarket').value;
+  var objective=document.getElementById('vppObjective').value;
+  var depth=document.getElementById('vppDepth').value;
+
+  var cap=150; var duration=2; var nRes=8; var demand=120;
+  var capM=input.match(/(\d+)\s*MW/); if(capM)cap=parseInt(capM[1]);
+  var durM=input.match(/(\d+)\s*[时小]/); if(durM)duration=parseInt(durM[1]);
+  var demM=input.match(/(\d+)\s*MWh/); if(demM)demand=parseInt(demM[1]);
+
+  var capTotal=cap*duration; var essPct=Math.round(40+Math.random()*20);
+  var pvPct=Math.round(15+Math.random()*10);
+  var windPct=Math.round(10+Math.random()*10);
+  var evPct=Math.round(10+Math.random()*5); var loadPct=100-essPct-pvPct-windPct-evPct;
+
+  var steps=[
+    mkStep('📋','1. 需求解析',['NLP.skill','Requirement.skill','Intent.skill']),
+    mkStep('🗺','2. 资源建模',['ResourceModel.skill','CIM.skill','Asset.skill']),
+    mkStep('🔮','3. 预测分析',['Forecast.skill','ML.skill','Weather.skill']),
+    mkStep('📊','4. 市场策略',['Market.skill','Bidding.skill','Risk.skill']),
+    mkStep('⚡','5. 优化调度',['Optimizer.skill','MILP.skill','Dispatch.skill']),
+    mkStep('🔧','6. 控制配置',['Control.skill','IEC61850.skill','SCADA.skill']),
+    mkStep('💰','7. 收益分析',['Finance.skill','ROI.skill','DCF.skill']),
+    mkStep('📐','8. 图纸生成',['Drawing.skill','SVG.skill','CAD.skill']),
+    mkStep('📄','9. 报告交付',['Report.skill','PDF.skill','Export.skill']),
+  ];
+
+  steps[0].delay=500; steps[0].result=tableHtml(
+    ['需求参数','解析值'],
+    [['总容量',cap+' MW'],['调节时长',duration+' 小时'],['可调电量',capTotal+' MWh'],
+     ['市场类型',market],['优化目标',objective],['输出深度',depth]], false
+  );
+
+  steps[1].delay=700; steps[1].result=svgNodeTree('VPP 资源模型',[
+    {l:0, n:'VPP 聚合商 '+cap+'MW', c:'#0d1a2a', s:'#4a9aff'},
+    {l:1, n:'储能系统 '+essPct+'%', c:'#1a2a4a', s:'#4a9aff'},
+    {l:1, n:'光伏 '+pvPct+'%', c:'#2a3a1a', s:'#20c840'},
+    {l:1, n:'风电 '+windPct+'%', c:'#2a3a3a', s:'#4ac8ff'},
+    {l:1, n:'充电桩 '+evPct+'%', c:'#3a2a3a', s:'#bc8cff'},
+    {l:1, n:'AIDC负荷 '+loadPct+'%', c:'#3a3a1a', s:'#e3b341'},
+    {l:2, n:'EMS调度单元', c:'#0d2040', s:'#ff9040'},
+    {l:2, n:'市场交互接口', c:'#0d2040', s:'#ff9040'},
+  ], 600,200);
+
+  steps[2].delay=800; steps[2].result=svgPowerLine(
+    [{l:'00:00',v:35,u:'MW'},{l:'04:00',v:28,u:'MW'},{l:'08:00',v:45,u:'MW'},{l:'10:00',v:78,u:'MW'},
+     {l:'12:00',v:85,u:'MW'},{l:'14:00',v:92,u:'MW'},{l:'16:00',v:80,u:'MW'},{l:'18:00',v:65,u:'MW'},
+     {l:'20:00',v:48,u:'MW'},{l:'22:00',v:38,u:'MW'}], 600,180)+
+    '<div style="color:var(--text2);font-size:11px;padding:6px 0">预测精度: 96.2% (R²) | 置信区间 ±8% | 日前+日内4h滚动</div>';
+
+  steps[3].delay=700; steps[3].result=tableHtml(
+    ['时段','日前电价(元)','策略','申报量(MW)','预期收益(万元)'],
+    [['00:00-06:00 (谷)',0.28,'储能充电',(cap*0.8).toFixed(0),Math.round(cap*0.8*0.28*6/10)/10],
+     ['06:00-10:00 (平)',0.52,'削峰',(cap*0.6).toFixed(0),Math.round(cap*0.6*0.52*4/10)/10],
+     ['10:00-14:00 (峰)',0.85,'放电+调频',cap,Math.round(cap*0.85*4/10)/10],
+     ['14:00-18:00 (平)',0.48,'光伏满发',(cap*0.5).toFixed(0),Math.round(cap*0.5*0.48*4/10)/10],
+     ['18:00-22:00 (峰)',0.92,'放电+备用',cap,Math.round(cap*0.92*4/10)/10],
+     ['22:00-24:00 (谷)',0.25,'储能充电',(cap*0.7).toFixed(0),Math.round(cap*0.7*0.25*2/10)/10]], true
+  );
+
+  steps[4].delay=900; steps[4].result=svgPowerLine(
+    [{l:'调度前',v:150,u:''},{l:'储放',v:60,u:''},{l:'光伏',v:35,u:''},{l:'风电',v:18,u:''},
+     {l:'EV',v:12,u:''},{l:'负荷',v:25,u:''},{l:'调度后',v:cap,u:''},{l:'节省',v:15,u:'MW'}],
+    500,160)+'<div style="color:var(--text2);font-size:11px;padding:6px 0">调度策略: 谷充峰放 + 调频辅助服务 | 整体效率 92% | 响应时间 ≤200ms</div>';
+
+  steps[5].delay=700; steps[5].result=svgGenConfig('IEC 61850 控制器配置',[
+    {k:'IED Name',v:'VPP-Controller-001'},
+    {k:'Voltage Level',v:'10kV / 0.4kV'},
+    {k:'Protocol',v:'IEC 61850 MMS + GOOSE'},
+    {k:'Logical Nodes',v:'MMXU1, ZGEN1, ZBAT1, ZCHG1'},
+    {k:'Datasets',v:'dsMeasurements, dsStatus, dsControl'},
+    {k:'Report Type',v:'BRCB (Buffered Report)'},
+    {k:'GOOSE Dataset',v:'dsTrip, dsAlarm'},
+    {k:'SCL File',v:'VPP_ICD_001.scd'},
+  ]);
+
+  steps[6].delay=800; steps[6].result=svgBars(
+    [{l:'售电收入',v:3650,u:'万'},{l:'调频收入',v:890,u:'万'},{l:'备用收入',v:420,u:'万'},{l:'需求响应',v:280,u:'万'},
+     {l:'运维成本',v:-680,u:'万'},{l:'折旧',v:-520,u:'万'},{l:'购电成本',v:-350,u:'万'}],550,180)+
+    '<div style="color:var(--green);font-size:13px;padding:6px 0;font-weight:700">年净收益: '+(3650+890+420+280-680-520-350)+' 万元 | IRR: '+(14+Math.random()*6).toFixed(1)+'% | 回收期: '+(3+Math.random()*2).toFixed(1)+'年</div>';
+
+  var hours=['00','02','04','06','08','10','12','14','16','18','20','22'];
+  var svgStr='<svg width="100%" height="140" viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg" style="background:#06090f;border-radius:6px">';
+  svgStr+='<rect x="0" y="0" width="600" height="140" fill="#06090f" rx="6"/>';
+  svgStr+='<text x="300" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#e0e8f0" font-family="monospace">VPP架构图</text>';
+  var boxes=[{n:'市场',x:30,y:35,w:80,h:28,c:'#3a2a1a'},
+    {n:'EMS',x:150,y:35,w:70,h:28,c:'#1a2a4a'},
+    {n:'储能',x:260,y:35,w:70,h:28,c:'#1a3a2a'},
+    {n:'光伏',x:260,y:72,w:70,h:28,c:'#2a3a1a'},
+    {n:'EV',x:370,y:35,w:70,h:28,c:'#2a2a3a'},
+    {n:'AIDC',x:370,y:72,w:70,h:28,c:'#3a1a2a'},
+    {n:'调度',x:500,y:35,w:70,h:28,c:'#0d2040'}];
+  for(var bi=0;bi<boxes.length;bi++){
+    var b=boxes[bi];
+    svgStr+='<rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="4" fill="'+b.c+'" stroke="#2a4a6a" stroke-width="1"/>';
+    svgStr+='<text x="'+(b.x+b.w/2)+'" y="'+(b.y+b.h/2+3)+'" text-anchor="middle" font-size="9" fill="#c0d0e0" font-family="monospace">'+b.n+'</text>';
+  }
+  var conns=[{x1:110,y1:49,x2:150,y2:49},{x1:220,y1:49,x2:260,y2:49},{x1:220,y1:49,x2:260,y2:86},{x1:330,y1:49,x2:370,y2:49},{x1:330,y1:86,x2:370,y2:86},{x1:440,y1:49,x2:500,y2:49}];
+  for(var bi=0;bi<conns.length;bi++){
+    var c=conns[bi]; svgStr+='<line x1="'+c.x1+'" y1="'+c.y1+'" x2="'+c.x2+'" y2="'+c.y2+'" stroke="#4a9aff" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.6"/>';
+  }
+  svgStr+='</svg>';
+  steps[7].delay=600; steps[7].result=svgStr;
+
+  steps[8].delay=500; steps[8].result=logLines([
+    {t:'ok',m:'方案报告已生成: VPP_'+cap+'MW_方案报告.pdf'},
+    {t:'ok',m:'IEC 61850 SCD配置文件: VPP_ICD_001.scd'},
+    {t:'ok',m:'SVG拓扑图纸: VPP_Topology.svg'},
+    {t:'ok',m:'收益分析Excel: VPP_Financial_Model.xlsx'},
+    {t:'ok',m:'市场申报文件: Market_Bidding.csv (当前市场: '+market+')'},
+    {t:'info',m:'全部交付物打包 → VPP_'+cap+'MW_'+market.replace(/\s/g,'')+'_'+(new Date().toISOString().slice(0,10))+'.zip'},
+  ]);
+
+  runSteps('vpp-unified-flow', steps, 'vppUnifiedBtn');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SYNERGY UNIFIED AGENT FLOW
+══════════════════════════════════════════════════════════════ */
+function synUnifiedFlow(){
+  var input=document.getElementById('synInput').value.trim();
+  var coolType=document.getElementById('synCoolType').value;
+  var objective=document.getElementById('synObjective').value;
+  var depth=document.getElementById('synDepth').value;
+
+  var powerMW=100; var gpuN=1024; var essMwh=100;
+  var pMW=input.match(/(\d+)\s*MW/); if(pMW)powerMW=parseInt(pMW[1]);
+  var gN=input.match(/(\d+)\s*[Gg][Pp][Uu]/); if(gN)gpuN=parseInt(gN[1]);
+  var eM=input.match(/(\d+)\s*MWh/); if(eM)essMwh=parseInt(eM[1]);
+
+  var itKw=powerMW*1000; var racks=Math.ceil(gpuN/32); var pue=1.18;
+  var coolKw=Math.round(itKw*(pue-1));
+  var essPower=Math.round(essMwh*0.5); var upTime=2;
+
+  var steps=[
+    mkStep('📋','1. 算力需求解析',['NLP.skill','GPU-Spec.skill','Workload.skill']),
+    mkStep('🏗','2. 供配电架构',['PowerArch.skill','UPS.skill','Transformer.skill']),
+    mkStep('❄️','3. 液冷散热设计',['Cooling.skill','Liquid.skill','CFD.skill']),
+    mkStep('📈','4. PUE优化策略',['PUE.skill','Optimizer.skill','Analytics.skill']),
+    mkStep('🔋','5. 储能配置',['ESS.skill','BESS.skill','HSC.skill']),
+    mkStep('🖥','6. 机柜布局',['Layout.skill','Rack.skill','Thermal.skill']),
+    mkStep('📦','7. BOM清单',['BOM.skill','Cost.skill','Procurement.skill']),
+    mkStep('📐','8. 图纸交付',['Drawing.skill','SVG.skill','CAD.skill']),
+  ];
+
+  steps[0].delay=500; steps[0].result=tableHtml(
+    ['需求参数','解析值'],
+    [['数据中心总功率',powerMW+' MW ('+itKw+' kW IT)'],
+     ['GPU数量',gpuN+' 张'],
+     ['GPU机柜',racks+' 柜 (32卡/柜)'],
+     ['储能配置',essMwh+' MWh / '+essPower+' MW'],
+     ['冷却方式',coolType],
+     ['优化目标',objective],
+     ['PUE目标',pue.toFixed(2)]], false
+  );
+
+  steps[1].delay=700; steps[1].result=svgNodeTree('供配电架构',[
+    {l:0, n:'电网 '+powerMW*1.3+'MVA', c:'#0d1a2a', s:'#e3b341'},
+    {l:1, n:'主变压器 2×(', c:'#1a2a4a', s:'#4a9aff'},
+    {l:1, n:'UPS 2N冗余', c:'#1a3a2a', s:'#20c840'},
+    {l:2, n:'HVDC 240V', c:'#1a2a4a', s:'#4a9aff'},
+    {l:2, n:'PDU 智能配电', c:'#1a3a2a', s:'#20c840'},
+    {l:3, n:'GPU机柜 1~'+racks, c:'#0d2040', s:'#ff9040'},
+    {l:3, n:'液冷CDU', c:'#0d2040', s:'#4ac8ff'},
+  ], 600, 200);
+
+  steps[2].delay=800; steps[2].result=svgGenConfig('液冷系统参数',[
+    {k:'冷却方式', v:coolType},
+    {k:'冷却负载', v:coolKw+' kW'},
+    {k:'进水温度', v:'18~22℃'},
+    {k:'出水温度', v:'35~40℃'},
+    {k:'流量需求', v:Math.round(coolKw*2.5)+' L/min'},
+    {k:'CDU数量', v:Math.max(2,Math.ceil(coolKw/300))+' 台'},
+    {k:'冷却塔', v:'闭式冷却塔 × '+Math.max(1,Math.ceil(coolKw/800))},
+    {k:'PUE贡献', v:'-0.12 (液冷vs风冷)'},
+  ])+svgBars(
+    [{l:'GPU发热',v:Math.round(itKw*0.7),u:'kW'},{l:'内存发热',v:Math.round(itKw*0.15),u:'kW'},{l:'电源损耗',v:Math.round(itKw*0.1),u:'kW'},{l:'其他',v:Math.round(itKw*0.05),u:'kW'}],
+    450, 160
+  );
+
+  var pueData=[];
+  for(var pi=0;pi<12;pi++){pueData.push({l:(pi*2)+'时',v:(1.12+Math.random()*0.12+(pi>3&&pi<8?0.08:0))});}
+  steps[3].delay=700; steps[3].result=svgPowerLine(pueData,600,160)+
+    '<div style="color:var(--green);font-size:13px;padding:6px 0;font-weight:700">全年平均PUE: '+pue.toFixed(2)+' | 比行业平均(1.35)低 '+(100-Math.round(pue/1.35*100))+'% | 年节省电费 '+(powerMW*1000*0.17*8760*0.05/10000).toFixed(0)+' 万元</div>';
+
+  steps[4].delay=800; steps[4].result=svgNodeTree('储能架构',[
+    {l:0, n:'BMS总控', c:'#0d1a2a', s:'#20c840'},
+    {l:1, n:'HSC 飞轮', c:'#1a3a2a', s:'#20c840'},
+    {l:1, n:'BBU 电池包', c:'#2a3a1a', s:'#e3b341'},
+    {l:1, n:'BESS 储能仓', c:'#1a2a4a', s:'#4a9aff'},
+    {l:2, n:'EMS调度', c:'#0d2040', s:'#ff9040'},
+  ], 400, 170)+
+    tableHtml(['参数','HSC飞轮','BBU电池包','BESS储能仓'],
+      [['容量',essMwh*0.05+' MWh',essMwh*0.15+' MWh',essMwh*0.8+' MWh'],
+       ['功率',essPower*0.3+' MW',essPower*0.4+' MW',essPower*0.3+' MW'],
+       ['响应',upTime+'ms',upTime+'ms','500ms'],
+       ['时长','30s','5min','2h'],
+       ['寿命','15年','8年','10年']], true
+    );
+
+  steps[5].delay=600; steps[5].result=svgNodeTree('机柜布局',[
+    {l:0, n:'数据中心 电力模组', c:'#0d1a2a', s:'#4a9aff'},
+    {l:1, n:'GPU区 '+Math.ceil(racks*0.7)+'柜', c:'#1a2a4a', s:'#4a9aff'},
+    {l:1, n:'存储区 '+Math.ceil(racks*0.15)+'柜', c:'#1a3a2a', s:'#20c840'},
+    {l:1, n:'网络区 '+Math.ceil(racks*0.1)+'柜', c:'#2a2a3a', s:'#bc8cff'},
+    {l:1, n:'管理区 '+Math.max(1,Math.ceil(racks*0.05))+'柜', c:'#3a2a1a', s:'#e3b341'},
+  ], 500, 180)+
+    '<div style="color:var(--text2);font-size:11px;padding:6px 0">行间冷却: 每行6柜 + CDU | 单柜功率密度 '+(coolType==='immersion'?'60':'35')+'kW/柜 | 封闭冷通道</div>';
+
+  steps[6].delay=700; steps[6].result=svgBars(
+    [{l:'GPU服务器',v:Math.round(gpuN/8)*80,u:'万'},{l:'液冷系统',v:Math.round(coolKw*0.12),u:'万'},{l:'供配电',v:powerMW*200,u:'万'},{l:'储能系统',v:essMwh*35,u:'万'},
+     {l:'网络设备',v:racks*3,u:'万'},{l:'施工安装',v:Math.round((powerMW*200+coolKw*0.12)*0.2),u:'万'}],550,180)+
+    '<div style="color:var(--green);font-size:13px;padding:6px 0;font-weight:700">设备总投资: 约 '+(Math.round(gpuN/8)*80+Math.round(coolKw*0.12)+powerMW*200+essMwh*35+racks*3)+' 万元</div>';
+
+  steps[7].delay=500; steps[7].result=logLines([
+    {t:'ok',m:'图纸1: 供配电系统图 (SVG) → Syn_PowerDist_'+powerMW+'MW.svg'},
+    {t:'ok',m:'图纸2: 液冷管路图 (SVG) → Syn_Cooling_'+coolType+'.svg'},
+    {t:'ok',m:'图纸3: 机柜布局图 (SVG) → Syn_FloorPlan_'+racks+'racks.svg'},
+    {t:'ok',m:'图纸4: 储能系统图 (SVG) → Syn_ESS_'+essMwh+'MWh.svg'},
+    {t:'ok',m:'BOM明细表: Syn_BOM_v1.xlsx ('+Math.round(gpuN/8)+'类物料)'},
+    {t:'ok',m:'施工方案: Syn_Construction_v1.pdf (含工期'+Math.round(powerMW*0.5)+'个月)'},
+    {t:'info',m:'项目成功率: '+(80+Math.floor(Math.random()*15))+'% | 综合能效评分: A+ | 碳减排: '+(powerMW*0.5*8760*0.001).toFixed(0)+'tCO₂/年'},
+  ]);
+
+  runSteps('syn-unified-flow', steps, 'synUnifiedBtn');
 }
 
 /* ── Utilities ── */
