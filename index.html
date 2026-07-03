@@ -96756,51 +96756,177 @@ function connPath(x1,y1,x2,y2,rte){
   return x1+','+y1+' '+x1+','+y2+' '+x2+','+y2;
 }
 
-/* ── V4 P&ID with IEC symbols ── */
+/* ── V4 P&ID with IEC 60617 symbols ── */
 function drawPid(title, nodes, pipes, opts){
-  opts=opts||{}; var w=opts.w||760,h=opts.h||340; var themeName=opts.theme||'huawei';
+  opts=opts||{}; var w=opts.w||800,h=opts.h||400; var themeName=opts.theme||'huawei';
   var th=DIAGRAM_THEME[themeName]||DIAGRAM_THEME.huawei; var legendItems=opts.legend||null;
-  var cadH=58; var svgH=h+cadH+(legendItems?20:0);
+  var cadH=58; var svgH=h+cadH+(legendItems?24:0);
   var svg='<div class="arch-svg"><svg width="100%" height="'+svgH+'" viewBox="0 0 '+w+' '+svgH+'" xmlns="http://www.w3.org/2000/svg">';
   svg+='<defs>';
   ['mech','data','control','alarm','power'].forEach(function(st){
     var cc=({power:'#1976D2',data:'#42A5F5',control:'#546E7A',alarm:'#E53935',mech:'#26A69A'})[st];
-    svg+='<marker id="pidArr'+st+'" viewBox="0 0 8 6" refX="8" refY="3" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,3 L0,6" fill="'+cc+'"/></marker>';
+    svg+='<marker id="pidArr'+st+'" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8 Z" fill="'+cc+'"/></marker>';
+    svg+='<marker id="pidTick'+st+'" viewBox="0 0 2 8" refX="1" refY="4" markerWidth="2" markerHeight="8" orient="auto"><line x1="1" y1="0" x2="1" y2="8" stroke="'+cc+'" stroke-width="1.5"/></marker>';
   });
   svg+='</defs>';
   svg+='<rect width="'+w+'" height="'+svgH+'" fill="'+th.bg+'"/>';
   svg+=_fineGrid(w,h,th);
-  svg+='<text x="'+w/2+'" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="'+th.title+'">'+title+'</text>';
-  svg+='<line x1="10" y1="22" x2="'+(w-10)+'" y2="22" stroke="'+th.accent+'" stroke-width="1.2"/>';
-  for(var ni=0;ni<nodes.length;ni++){
-    var nd=nodes[ni]; var nx=nd.x*(w/100), ny=nd.y*(h/100)+25;
-    var c=nd.sc||th.power; var ic=nd.icon||null;
-    var nW=nd.w||72,nH=nd.h||34;
-    svg+='<rect x="'+(nx-nW/2)+'" y="'+(ny-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+(nd.fc||th.boxFill)+'" stroke="'+c+'" stroke-width="1.2"/>';
-    var iconSize=Math.min(nH-6,18);
-    var iconX=nx-nW/2+6;
-    if(ic&&ICONS[ic]){svg+=drawIcon(ic,iconX+iconSize/2,ny,c,iconSize);}
-    else if(nd.type==='pump'){svg+=drawIcon('pump',iconX+iconSize/2,ny,c,iconSize);}
-    else if(nd.type==='valve'){svg+=drawIcon('valve',iconX+iconSize/2,ny,c,iconSize);}
-    else if(nd.type==='tank'){svg+=drawIcon('cdu',iconX+iconSize/2,ny,c,iconSize);}
-    var tx=(ic||nd.type)?iconX+iconSize+4:nx; var ta=(ic||nd.type)?'start':'middle';
-    svg+='<text x="'+tx+'" y="'+(ny+3)+'" text-anchor="'+ta+'" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+nd.n+'</text>';
+
+  /* title */
+  svg+='<text x="'+w/2+'" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="'+th.title+'" letter-spacing="0.5">'+title+'</text>';
+  svg+='<line x1="12" y1="22" x2="'+(w-12)+'" y2="22" stroke="'+th.accent+'" stroke-width="1.2"/>';
+
+  var top=30;
+
+  /* ── IEC symbol helper functions ── */
+  function _iecpump(cx,cy,c,sz){
+    sz=sz||16; var r=sz/2;
+    var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.4"/>';
+    s+='<path d="M'+(cx-r*0.5)+','+(cy+r*0.3)+' L'+(cx+r*0.7)+','+cy+' L'+(cx-r*0.5)+','+(cy-r*0.3)+' Z" fill="none" stroke="'+c+'" stroke-width="1.2"/>';
+    s+='<line x1="'+(cx+r*0.7)+'" y1="'+cy+'" x2="'+(cx+r)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.2"/>';
+    return s;
   }
-  for(var pi=0;pi<pipes.length;pi++){
-    var pp=pipes[pi]; var x1=pp.x1*(w/100), y1=pp.y1*(h/100)+25; var x2=pp.x2*(w/100), y2=pp.y2*(h/100)+25;
-    var col=pp.c||th.mech; var st=pp.style||'mech'; var cs=CONN_STYLE[st]||CONN_STYLE.mech;
-    var rte=pp.route||'vh'; var pts=connPath(x1,y1,x2,y2,rte);
-    svg+='<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="'+cs.w+'" stroke-dasharray="'+(pp.dash?cs.dash:'')+'" marker-end="url(#pidArr'+st+')"/>';
-    if(pp.label){
-      var lx=Math.min(x1,x2); var ly=Math.min(y1,y2);
-      var isHoriz=Math.abs(y2-y1)<Math.abs(x2-x1);
-      var labelX=(x1+x2)/2; var labelY=isHoriz?(ly-10):((y1+y2)/2);
-      var lboxW=pp.label.length*6+10;
-      svg+='<rect x="'+(labelX-lboxW/2)+'" y="'+(labelY-7)+'" width="'+lboxW+'" height="12" rx="2" fill="rgba(0,0,0,0.75)"/>';
-      svg+='<text x="'+labelX+'" y="'+(labelY+2)+'" text-anchor="middle" font-size="7" fill="'+col+'" font-family="'+th.fontMono+'">'+pp.label+'</text>';
+  function _iecvalve(cx,cy,c,type,sz){
+    sz=sz||12; var hz=sz/2;
+    var s='';
+    if(type==='gate'){
+      s+='<polygon points="'+cx+','+(cy-hz)+' '+(cx-hz)+','+cy+' '+cx+','+(cy+hz)+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.2"/>';
+      s+='<polygon points="'+cx+','+(cy-hz)+' '+(cx+hz)+','+cy+' '+cx+','+(cy+hz)+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.2"/>';
+    }else if(type==='check'){
+      s+='<line x1="'+(cx-hz)+'" y1="'+cy+'" x2="'+(cx+hz)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.2"/>';
+      s+='<polygon points="'+(cx-2)+','+(cy-hz*0.7)+' '+(cx+hz*0.6)+','+cy+' '+(cx-2)+','+(cy+hz*0.7)+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1"/>';
+    }else if(type==='butterfly'){
+      s+='<line x1="'+(cx-hz)+'" y1="'+cy+'" x2="'+(cx+hz)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.2"/>';
+      s+='<line x1="'+cx+'" y1="'+(cy-hz)+'" x2="'+cx+'" y2="'+(cy+hz)+'" stroke="'+c+'" stroke-width="1.2"/>';
+      s+='<circle cx="'+cx+'" cy="'+cy+'" r="2" fill="'+c+'"/>';
+    }else{
+      s+='<polygon points="'+cx+','+(cy-hz)+' '+(cx-hz)+','+cy+' '+cx+','+(cy+hz)+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.2"/>';
+      s+='<polygon points="'+cx+','+(cy-hz)+' '+(cx+hz)+','+cy+' '+cx+','+(cy+hz)+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.2"/>';
+    }
+    return s;
+  }
+  function _iectank(cx,cy,c,w,h){
+    var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="2" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.2"/>';
+    s+='<line x1="'+(cx-w/2)+'" y1="'+(cy-h/2+4)+'" x2="'+(cx+w/2)+'" y2="'+(cy-h/2+4)+'" stroke="'+c+'" stroke-width="0.6" stroke-dasharray="2 2"/>';
+    return s;
+  }
+  function _iecexchanger(cx,cy,c,sz){
+    sz=sz||20; var r=sz/2;
+    var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.2"/>';
+    s+='<path d="M'+(cx-r*0.6)+','+(cy-r*0.3)+' Q'+cx+','+(cy-r*0.7)+' '+(cx+r*0.6)+','+(cy-r*0.3)+'" fill="none" stroke="'+c+'" stroke-width="1"/>';
+    s+='<path d="M'+(cx-r*0.6)+','+(cy+r*0.3)+' Q'+cx+','+(cy+r*0.7)+' '+(cx+r*0.6)+','+(cy+r*0.3)+'" fill="none" stroke="'+c+'" stroke-width="1"/>';
+    return s;
+  }
+  function _iecbubble(cx,cy,c,tag,sub){
+    var s='<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.2"/>';
+    var fs=tag.length>3?5.5:7;
+    s+='<text x="'+cx+'" y="'+(cy+1.5)+'" text-anchor="middle" font-size="'+fs+'" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+tag+'</text>';
+    if(sub){s+='<text x="'+cx+'" y="'+(cy+16)+'" text-anchor="middle" font-size="5.5" fill="'+th.sub+'" font-family="'+th.fontMono+'">'+sub+'</text>';}
+    return s;
+  }
+  function _iecbubbleDash(cx,cy,c,tag){
+    var s='<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.2" stroke-dasharray="3 2"/>';
+    var fs=tag.length>3?5.5:7;
+    s+='<text x="'+cx+'" y="'+(cy+1.5)+'" text-anchor="middle" font-size="'+fs+'" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+tag+'</text>';
+    return s;
+  }
+  function _sensorLine(x1,y1,x2,y2,c){
+    return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="0.8" stroke-dasharray="4 2"/>';
+  }
+
+  /* ── Draw nodes ── */
+  for(var ni=0;ni<nodes.length;ni++){
+    var nd=nodes[ni]; var nx=nd.x*(w/100)+10; var ny=top+nd.y*(h-60)/100;
+    var c=nd.sc||th.power; var ic=nd.icon||null; var nW=nd.w||80; var nH=nd.h||36;
+    var nType=nd.type||'box';
+
+    if(nType==='pump'){
+      svg+=_iecpump(nx,ny,c,nW*0.4);
+      svg+='<text x="'+nx+'" y="'+(ny+nW*0.4+14)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+nd.n+'</text>';
+      if(nd.tag){svg+='<text x="'+nx+'" y="'+(ny-nW*0.4-6)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+nd.tag+'</text>';}
+    }else if(nType==='valve'){
+      var vtype=nd.vtype||'gate';
+      svg+=_iecvalve(nx,ny,c,vtype,nW*0.35);
+      svg+='<text x="'+nx+'" y="'+(ny+nW*0.35+14)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+nd.n+'</text>';
+      if(nd.tag){svg+='<text x="'+nx+'" y="'+(ny-nW*0.35-6)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+nd.tag+'</text>';}
+    }else if(nType==='tank'){
+      svg+=_iectank(nx,ny,c,nW,nH);
+      svg+='<text x="'+nx+'" y="'+(ny+3)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+nd.n+'</text>';
+      if(nd.tag){svg+='<text x="'+nx+'" y="'+(ny-nH/2-6)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+nd.tag+'</text>';}
+    }else if(nType==='exchanger'){
+      svg+=_iecexchanger(nx,ny,c,nW*0.45);
+      svg+='<text x="'+nx+'" y="'+(ny+nW*0.45+14)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+nd.n+'</text>';
+      if(nd.tag){svg+='<text x="'+nx+'" y="'+(ny-nW*0.45-6)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+nd.tag+'</text>';}
+    }else{
+      /* box with icon */
+      svg+='<rect x="'+(nx-nW/2)+'" y="'+(ny-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+(nd.fc||th.boxFill)+'" stroke="'+c+'" stroke-width="1.2"/>';
+      var iconSize=Math.min(nH-6,18); var iconX=nx-nW/2+6;
+      if(ic&&ICONS[ic]){svg+=drawIcon(ic,iconX+iconSize/2,ny,c,iconSize);}
+      var tx=ic?iconX+iconSize+4:nx; var ta=ic?'start':'middle';
+      svg+='<text x="'+tx+'" y="'+(ny+3)+'" text-anchor="'+ta+'" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+nd.n+'</text>';
+      if(nd.tag){svg+='<text x="'+nx+'" y="'+(ny-nH/2-6)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+nd.tag+'</text>';}
     }
   }
-  if(legendItems) svg+=_legendBlock(legendItems,w-145,h-18,130,themeName);
+
+  /* ── Draw pipes with IEC flow arrows + tick marks ── */
+  for(var pi=0;pi<pipes.length;pi++){
+    var pp=pipes[pi];
+    var x1=pp.x1*(w/100)+10, y1=top+pp.y1*(h-60)/100;
+    var x2=pp.x2*(w/100)+10, y2=top+pp.y2*(h-60)/100;
+    var col=pp.c||th.mech; var st=pp.style||'mech';
+    var lw=st==='power'?2.5:st==='control'?1.2:1.8;
+    var rte=pp.route||'vh';
+    var pts=connPath(x1,y1,x2,y2,rte);
+
+    svg+='<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="'+lw+'" marker-end="url(#pidArr'+st+')"/>';
+
+    /* tick marks for process lines */
+    if(st==='mech'&&!pp.dash){
+      var isH=Math.abs(y2-y1)<Math.abs(x2-x1);
+      if(isH){
+        var mx=(x1+x2)/2;
+        svg+='<line x1="'+mx+'" y1="'+(y1-4)+'" x2="'+mx+'" y2="'+(y1+4)+'" stroke="'+col+'" stroke-width="1.2"/>';
+      }else{
+        var my=(y1+y2)/2;
+        svg+='<line x1="'+(x1-4)+'" y1="'+my+'" x2="'+(x1+4)+'" y2="'+my+'" stroke="'+col+'" stroke-width="1.2"/>';
+      }
+    }
+
+    /* pipe label */
+    if(pp.label){
+      var isHoriz=Math.abs(y2-y1)<Math.abs(x2-x1);
+      var labelX=(x1+x2)/2; var labelY=isHoriz?(Math.min(y1,y2)-10):((y1+y2)/2+12);
+      var lboxW=pp.label.length*5.5+10;
+      svg+='<rect x="'+(labelX-lboxW/2)+'" y="'+(labelY-7)+'" width="'+lboxW+'" height="12" rx="2" fill="rgba(0,0,0,0.8)" stroke="'+col+'" stroke-width="0.4"/>';
+      svg+='<text x="'+labelX+'" y="'+(labelY+2)+'" text-anchor="middle" font-size="6.5" fill="'+col+'" font-family="'+th.fontMono+'">'+pp.label+'</text>';
+    }
+
+    /* pipe spec label (DN, medium) */
+    if(pp.spec){
+      var isH2=Math.abs(y2-y1)<Math.abs(x2-x1);
+      var sx=isH2?(x1+x2)/2+20:((x1+x2)/2-25);
+      var sy=isH2?(y1+10):((y1+y2)/2-15);
+      svg+='<text x="'+sx+'" y="'+sy+'" text-anchor="middle" font-size="5" fill="'+th.sub+'" font-family="'+th.fontMono+'" font-style="italic">'+pp.spec+'</text>';
+    }
+  }
+
+  /* ── Draw instrument bubbles ── */
+  if(opts.instruments){
+    for(var ii=0;ii<opts.instruments.length;ii++){
+      var inst=opts.instruments[ii];
+      var ix=inst.x*(w/100)+10; var iy=top+inst.y*(h-60)/100;
+      var ic=inst.sc||'#42A5F5';
+      if(inst.dash){svg+=_iecbubbleDash(ix,iy,ic,inst.tag);}
+      else{svg+=_iecbubble(ix,iy,ic,inst.tag,inst.sub);}
+      if(inst.sx!==undefined&&inst.sy!==undefined){
+        var sdx=inst.sx*(w/100)+10; var sdy=top+inst.sy*(h-60)/100;
+        svg+=_sensorLine(ix,iy+9,sdx,sdy,ic);
+        svg+='<circle cx="'+sdx+'" cy="'+sdy+'" r="2.5" fill="'+ic+'" opacity="0.6"/>';
+      }
+    }
+  }
+
+  if(legendItems) svg+=_legendBlock(legendItems,w-160,h-18,145,themeName);
   svg+=_cadTitle(title,opts.drawingNo||'PID-001',opts.ver||'V1.0',opts.scale||'NTS',w,svgH,th);
   svg+='</svg></div>'; return svg;
 }
@@ -97365,29 +97491,52 @@ function synUnifiedFlow(){
 
   steps[2].delay=800; steps[2].result=
     drawPid('液冷散热系统P&ID图 — '+coolLabel,[
-      {x:8,y:45,n:'冷却塔',icon:'pump',sc:'#26A69A',w:72,h:40},
-      {x:24,y:30,n:'CDU-1',type:'pump',sc:'#1976D2',w:64,h:34},
-      {x:24,y:65,n:'CDU-2',type:'pump',sc:'#1976D2',w:64,h:34},
-      {x:42,y:28,n:'分水器',type:'tank',sc:'#1976D2',w:64,h:30},
-      {x:42,y:67,n:'集水器',type:'tank',sc:'#FF7043',w:64,h:30},
-      {x:62,y:28,n:'GPU行A',icon:'gpu',sc:'#26A69A',w:88,h:34},
-      {x:62,y:67,n:'GPU行B',icon:'gpu',sc:'#26A69A',w:88,h:34},
-      {x:82,y:47,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:72,h:34},
-      {x:92,y:30,n:'补水阀',type:'valve',sc:'#42A5F5',w:48,h:28},
-      {x:92,y:65,n:'过滤器',type:'valve',sc:'#78909C',w:48,h:28}
+      /* ── Row 1: supply line (top) ── */
+      {x:8,y:25,n:'冷却塔',type:'exchanger',sc:'#26A69A',w:70,h:32,tag:'E-101'},
+      {x:22,y:25,n:'冷却水泵A',type:'pump',sc:'#1976D2',w:28,h:28,tag:'P-101A'},
+      {x:37,y:25,n:'CDU-1',type:'tank',sc:'#1976D2',w:64,h:30,tag:'CDU-1'},
+      {x:55,y:22,n:'GPU行A',icon:'gpu',sc:'#26A69A',w:80,h:30},
+      {x:72,y:25,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:64,h:28,tag:'V-101'},
+      {x:88,y:18,n:'补水阀',type:'valve',sc:'#42A5F5',vtype:'gate',tag:'XV-101'},
+      /* ── Row 2: return line (bottom) ── */
+      {x:22,y:65,n:'冷却水泵B',type:'pump',sc:'#1976D2',w:28,h:28,tag:'P-101B'},
+      {x:37,y:65,n:'集水器',type:'tank',sc:'#FF7043',w:64,h:30,tag:'CDU-2'},
+      {x:55,y:68,n:'GPU行B',icon:'gpu',sc:'#26A69A',w:80,h:30},
+      {x:88,y:65,n:'过滤器',type:'valve',sc:'#78909C',vtype:'butterfly',tag:'XV-102'},
+      {x:72,y:65,n:'止回阀',type:'valve',sc:'#E53935',vtype:'check',tag:'XV-103'}
     ],[
-      {x1:15,y1:45,x2:24,y2:30,label:'',c:'#26A69A',style:'mech',route:'vh'},
-      {x1:15,y1:45,x2:24,y2:65,label:'',c:'#26A69A',style:'mech',route:'vh'},
-      {x1:30,y1:30,x2:42,y2:28,label:'供水 '+Math.round(coolKw*0.6)+'L/min',c:'#26A69A',style:'mech',route:'th'},
-      {x1:30,y1:65,x2:42,y2:67,label:'供水',c:'#26A69A',style:'mech',route:'th'},
-      {x1:48,y1:28,x2:62,y2:28,label:'供液 '+Math.round(coolKw*1.25)+'L/min',c:'#26A69A',style:'mech',route:'th'},
-      {x1:48,y1:67,x2:62,y2:67,label:'供液',c:'#26A69A',style:'mech',route:'th'},
-      {x1:70,y1:28,x2:48,y2:67,label:'回液',c:'#FF7043',style:'mech',dash:true,route:'vh'},
-      {x1:70,y1:67,x2:48,y2:67,label:'回液',c:'#FF7043',style:'mech',dash:true,route:'th'},
-      {x1:82,y1:47,x2:50,y2:47,label:'定压补水',c:'#AB47BC',style:'mech',route:'th'},
-      {x1:24,y1:38,x2:24,y2:57,label:'冗余',c:'#1976D2',style:'control',route:'vh'}
-    ],{w:760,h:320,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.0',scale:'1:50',
-       legend:[{style:'mech',label:'冷却水管路'},{style:'control',label:'冗余控制'},{style:'data',label:'Modbus RTU'}]})+
+      /* ── Supply line (left→right, top) ── */
+      {x1:14,y1:25,x2:22,y2:25,label:'',c:'#26A69A',style:'mech'},
+      {x1:28,y1:25,x2:37,y2:25,label:'供水 '+Math.round(coolKw*0.6)+'L/min',c:'#26A69A',style:'mech',spec:'DN80 纯水'},
+      {x1:44,y1:25,x2:55,y2:22,label:'供液 '+Math.round(coolKw*1.25)+'L/min',c:'#26A69A',style:'mech',spec:'DN65 20%乙二醇'},
+      /* ── Return line (right→left, bottom) ── */
+      {x1:55,y1:68,x2:44,y2:65,label:'回液',c:'#FF7043',style:'mech',dash:true,spec:'DN65 回液'},
+      {x1:28,y1:65,x2:14,y2:25,label:'',c:'#FF7043',style:'mech',dash:true,route:'vh'},
+      /* ── CDU cross-connection ── */
+      {x1:37,y1:30,x2:37,y2:60,label:'',c:'#1976D2',style:'control',route:'vh'},
+      /* ── Expansion tank ── */
+      {x1:72,y1:25,x2:72,y2:45,label:'定压补水',c:'#AB47BC',style:'mech',route:'vh'},
+      {x1:72,y1:45,x2:72,y2:65,label:'',c:'#AB47BC',style:'mech',route:'vh'},
+      /* ── Make-up / filter ── */
+      {x1:88,y1:25,x2:79,y2:25,label:'',c:'#42A5F5',style:'mech',route:'th'},
+      {x1:88,y1:65,x2:79,y2:65,label:'',c:'#78909C',style:'mech',route:'th'},
+      /* ── Check valve ── */
+      {x1:72,y1:50,x2:88,y2:65,label:'',c:'#E53935',style:'alarm',route:'vh'}
+    ],{w:800,h:340,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.0',scale:'1:50',
+       instruments:[
+         {x:16,y:10,tag:'TI',sub:'TI-101 进水温度',sc:'#42A5F5',sx:14,sy:25},
+         {x:48,y:10,tag:'TI',sub:'TI-102 供液温度',sc:'#42A5F5',sx:44,sy:25},
+         {x:48,y:52,tag:'FI',sub:'FI-101 流量',sc:'#3fb950',sx:55,sy:68},
+         {x:78,y:10,tag:'PI',sub:'PI-101 管路压力',sc:'#f0883e',sx:72,sy:25},
+         {x:78,y:52,tag:'PI',sub:'PI-102 回水压力',sc:'#f0883e',sx:72,sy:65},
+         {x:16,y:52,tag:'TI',sub:'TI-103 回水温度',sc:'#42A5F5',sx:14,sy:65,dash:true}
+       ],
+       legend:[
+         {style:'mech',label:'冷却水管路'},
+         {style:'control',label:'冗余切换控制'},
+         {style:'alarm',label:'止回/安全'},
+         {style:'data',label:'Modbus RTU 仪表'}
+       ]})+
     tableHtml(
     ['参数','数值','说明'],
     [['冷却方式',coolLabel,'主冷却方案'],
