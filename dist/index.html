@@ -81057,37 +81057,114 @@ function bsElecRenderPrimaryWiring(el){
 }
 
 function bsElecRenderSecondaryCtrl(el){
-  const W=1000,H=600;
-  let s=_bsSvgBox(W,H,'二次控制图','PLC → 接触器/继电器/互感器 控制回路');
-  s+='<defs><marker id="bsArr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4a90d9"/></marker></defs>';
-  // PLC
-  s=_bsBox(s,400,55,200,50,'#1e293b','#4a90d9','PLC S7-1500','主控制器');
-  // Control loops
-  const loops=[
-    {x:100,label:'充电回路控制',items:['KM1-KM8 接触器','CT 电流采样','温度传感器','SOC信号'],color:'#06b6d4'},
-    {x:350,label:'换电机器人控制',items:['伺服驱动器','液压阀组','夹具传感器','视觉触发'],color:'#ef4444'},
-    {x:600,label:'安全联锁',items:['急停按钮','安全光幕','门禁开关','烟感探测'],color:'#e8a838'},
-    {x:850,label:'辅助系统',items:['风机控制','照明控制','除湿器','空调'],color:'#94a3b8'}
-  ];
-  loops.forEach(function(loop){
-    s+='<line x1="500" y1="105" x2="'+loop.x+'" y2="150" stroke="'+loop.color+'" stroke-width="1.2" stroke-dasharray="4,2"/>';
-    s=_bsBox(s,loop.x-60,150,120,36,'#111827',loop.color,loop.label,'');
-    loop.items.forEach(function(item,i){
-      s+='<line x1="'+loop.x+'" y1="186" x2="'+loop.x+'" y2="'+(210+i*30)+'" stroke="#334155" stroke-width="0.8"/>';
-      s+='<rect x="'+(loop.x-55)+'" y="'+(205+i*30)+'" width="110" height="22" rx="3" fill="#0d1117" stroke="#334155"/>';
-      s+='<text x="'+loop.x+'" y="'+(220+i*30)+'" text-anchor="middle" fill="#94a3b8" font-size="8">'+item+'</text>';
-    });
-  });
+  const W=1100,H=620;
+  let s=_bsSvgBox(W,H,'二次控制图','PLC S7-1500 → 接触器/继电器/互感器 控制回路');
+  s+='<defs><marker id="bsArr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4a90d9"/></marker>';
+  s+='<marker id="bsArrCyan" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#06b6d4"/></marker>';
+  s+='<marker id="bsArrRed" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/></marker>';
+  s+='<marker id="bsArrYellow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#e8a838"/></marker>';
+  s+='<marker id="bsArrGray" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>';
+  // PLC S7-1500
+  s=_bsBox(s,430,52,240,48,'#1e293b','#4a90d9','PLC S7-1500 CPU 1515-2 PN','PROFINET IRT + Modbus TCP');
+  // Sequence 1: PLC → 分线端子排
+  s+='<polyline points="550,100 550,128 250,128 250,148" fill="none" stroke="#4a90d9" stroke-width="1.2"/>';
+  s+='<polyline points="550,100 550,128 850,128 850,148" fill="none" stroke="#4a90d9" stroke-width="1.2"/>';
+  s=_bsBox(s,190,148,120,32,'#111827','#4a90d9','分线端子排','TB1-TB8');
+  s=_bsBox(s,790,148,120,32,'#111827','#4a90d9','分线端子排','TB9-TB16');
+  s+='<circle cx="550" cy="114" r="8" fill="#4a90d9" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="550" y="118" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">1</text>';
+  s+='<text x="564" y="118" fill="#4a90d9" font-size="7">PROFINET 分线</text>';
+  // Sequence 2: TB → 4 control loops
+  // Loop 1: 充电回路控制 (left)
+  s+='<polyline points="250,180 250,198 155,198 155,218" fill="none" stroke="#06b6d4" stroke-width="1.2" marker-end="url(#bsArrCyan)"/>';
+  s=_bsBox(s,95,218,120,32,'#111827','#06b6d4','充电回路控制','KM1-KM8');
+  s+='<circle cx="250" cy="198" r="8" fill="#06b6d4" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="250" y="202" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">2</text>';
+  // KM contactors
+  s+='<polyline points="155,250 155,268 95,268 95,288" fill="none" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,2"/>';
+  s+='<polyline points="155,250 155,268 215,268 215,288" fill="none" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,2"/>';
+  s=_bsBox(s,40,288,110,28,'#0d1117','#06b6d4','KM1-KM4','接触器组A');
+  s=_bsBox(s,160,288,110,28,'#0d1117','#06b6d4','KM5-KM8','接触器组B');
+  s+='<text x="155" y="278" text-anchor="middle" fill="#06b6d4" font-size="7">DO 24VDC</text>';
+  // CT + temp + SOC feedback
+  s+='<polyline points="155,250 155,330 95,330 95,348" fill="none" stroke="#06b6d4" stroke-width="0.8" stroke-dasharray="3,2"/>';
+  s+='<polyline points="155,250 155,330 215,330 215,348" fill="none" stroke="#06b6d4" stroke-width="0.8" stroke-dasharray="3,2"/>';
+  s=_bsBox(s,40,348,110,26,'#0d1117','#06b6d4','CT 电流互感器','AI 4-20mA');
+  s=_bsBox(s,160,348,110,26,'#0d1117','#06b6d4','温度传感器 PT100','AI 4-20mA');
+  // Loop 2: 换电机器人控制 (center-left)
+  s+='<polyline points="250,180 250,198 405,198 405,218" fill="none" stroke="#ef4444" stroke-width="1.2" marker-end="url(#bsArrRed)"/>';
+  s=_bsBox(s,345,218,120,32,'#111827','#ef4444','换电机器人控制','伺服+液压');
+  s+='<circle cx="405" cy="198" r="8" fill="#ef4444" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="405" y="202" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">3</text>';
+  s+='<text x="419" y="202" fill="#ef4444" font-size="7">PROFINET</text>';
+  // Servo + hydraulic
+  s+='<polyline points="405,250 405,268 355,268 355,288" fill="none" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,2"/>';
+  s+='<polyline points="405,250 405,268 455,268 455,288" fill="none" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,2"/>';
+  s=_bsBox(s,300,288,110,28,'#0d1117','#ef4444','伺服驱动器','PROFINET');
+  s=_bsBox(s,410,288,110,28,'#0d1117','#ef4444','液压阀组','DO 24VDC');
+  s+='<text x="405" y="278" text-anchor="middle" fill="#ef4444" font-size="7">PROFINET / DO</text>';
+  // Sensors feedback
+  s+='<polyline points="405,250 405,330 355,330 355,348" fill="none" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="3,2"/>';
+  s+='<polyline points="405,250 405,330 455,330 455,348" fill="none" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="3,2"/>';
+  s=_bsBox(s,300,348,110,26,'#0d1117','#ef4444','夹具传感器','DI 24VDC');
+  s=_bsBox(s,410,348,110,26,'#0d1117','#ef4444','视觉触发','DI+PROFINET');
+  // Loop 3: 安全联锁 (center-right)
+  s+='<polyline points="850,180 850,198 655,198 655,218" fill="none" stroke="#e8a838" stroke-width="1.2" marker-end="url(#bsArrYellow)"/>';
+  s=_bsBox(s,595,218,120,32,'#111827','#e8a838','安全联锁回路','SIL3 / PLe');
+  s+='<circle cx="655" cy="198" r="8" fill="#e8a838" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="655" y="202" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">4</text>';
+  s+='<text x="669" y="202" fill="#e8a838" font-size="7">安全继电器</text>';
+  // Safety devices
+  s+='<polyline points="655,250 655,268 595,268 595,288" fill="none" stroke="#e8a838" stroke-width="1" stroke-dasharray="4,2"/>';
+  s+='<polyline points="655,250 655,268 715,268 715,288" fill="none" stroke="#e8a838" stroke-width="1" stroke-dasharray="4,2"/>';
+  s=_bsBox(s,540,288,110,28,'#0d1117','#e8a838','急停按钮 ×4','双通道NC');
+  s=_bsBox(s,660,288,110,28,'#0d1117','#e8a838','安全光幕','Type 4');
+  s+='<text x="655" y="278" text-anchor="middle" fill="#e8a838" font-size="7">安全IO双通道</text>';
+  s+='<polyline points="655,250 655,330 595,330 595,348" fill="none" stroke="#e8a838" stroke-width="0.8" stroke-dasharray="3,2"/>';
+  s+='<polyline points="655,250 655,330 715,330 715,348" fill="none" stroke="#e8a838" stroke-width="0.8" stroke-dasharray="3,2"/>';
+  s=_bsBox(s,540,348,110,26,'#0d1117','#e8a838','门禁开关','DI 24VDC');
+  s=_bsBox(s,660,348,110,26,'#0d1117','#e8a838','烟感探测','AI 4-20mA');
+  // Loop 4: 辅助系统 (right)
+  s+='<polyline points="850,180 850,218" fill="none" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#bsArrGray)"/>';
+  s=_bsBox(s,790,218,120,32,'#111827','#94a3b8','辅助系统','风机/照明/空调');
+  s+='<circle cx="850" cy="198" r="8" fill="#94a3b8" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="850" y="202" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">5</text>';
+  s+='<text x="864" y="202" fill="#94a3b8" font-size="7">Modbus RTU</text>';
+  // Aux devices
+  s+='<polyline points="850,250 850,268 795,268 795,288" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,2"/>';
+  s+='<polyline points="850,250 850,268 905,268 905,288" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,2"/>';
+  s=_bsBox(s,740,288,110,28,'#0d1117','#94a3b8','风机变频器','RS485 Modbus');
+  s=_bsBox(s,850,288,110,28,'#0d1117','#94a3b8','照明/除湿/空调','DO+RS485');
+  // Sequence 6: 传感器反馈回PLC
+  s+='<polyline points="155,374 155,400 550,400 550,460" fill="none" stroke="#50c878" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#bsArr)"/>';
+  s+='<polyline points="405,374 405,400 550,400" fill="none" stroke="#50c878" stroke-width="1" stroke-dasharray="5,3"/>';
+  s+='<polyline points="655,374 655,400 550,400" fill="none" stroke="#50c878" stroke-width="1" stroke-dasharray="5,3"/>';
+  s+='<circle cx="550" cy="414" r="8" fill="#50c878" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="550" y="418" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">6</text>';
+  s+='<text x="564" y="418" fill="#50c878" font-size="7">AI/DI 反馈至PLC</text>';
   // IO summary
-  s+='<rect x="60" y="430" width="880" height="80" rx="4" fill="#0f1729" stroke="#1e293b"/>';
-  s+='<text x="500" y="450" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">PLC IO 统计</text>';
-  s+='<text x="150" y="475" fill="#50c878" font-size="9">DI: 32点 (按钮/开关/传感器)</text>';
-  s+='<text x="400" y="475" fill="#06b6d4" font-size="9">DO: 24点 (接触器/指示灯)</text>';
-  s+='<text x="650" y="475" fill="#8B5CF6" font-size="9">AI: 16点 (温度/电流/电压)</text>';
-  s+='<text x="150" y="495" fill="#e8a838" font-size="9">AO: 8点 (变频器/比例阀)</text>';
-  s+='<text x="400" y="495" fill="#4a90d9" font-size="9">通信: 4×RS485 + 2×以太网</text>';
-  s+='<rect x="40" y="'+(H-42)+'" width="380" height="30" rx="4" fill="#0f1729" stroke="#1e293b"/>';
-  s+='<text x="52" y="'+(H-22)+'" fill="#94a3b8" font-size="8">ESS Agent AI | 图号: SW-SEC-001 | 二次控制原理图</text>';
+  s+='<rect x="60" y="440" width="980" height="72" rx="4" fill="#0f1729" stroke="#1e293b"/>';
+  s+='<text x="550" y="458" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">PLC IO 统计</text>';
+  s+='<text x="150" y="478" fill="#50c878" font-size="9">DI: 32点 (按钮/开关/传感器/限位)</text>';
+  s+='<text x="420" y="478" fill="#06b6d4" font-size="9">DO: 24点 (接触器/指示灯/阀)</text>';
+  s+='<text x="700" y="478" fill="#8B5CF6" font-size="9">AI: 16点 (温度/电流/电压/SOC)</text>';
+  s+='<text x="150" y="498" fill="#e8a838" font-size="9">AO: 8点 (变频器/比例阀)</text>';
+  s+='<text x="420" y="498" fill="#4a90d9" font-size="9">通信: 2×PROFINET + 4×RS485 Modbus</text>';
+  s+='<text x="700" y="498" fill="#ef4444" font-size="9">安全IO: 双通道 DI×8 / DO×4</text>';
+  // Title block
+  s+='<rect x="40" y="'+(H-42)+'" width="500" height="30" rx="4" fill="#0f1729" stroke="#1e293b"/>';
+  s+='<text x="52" y="'+(H-22)+'" fill="#94a3b8" font-size="8">ESS Agent AI | 图号: SW-SEC-001 | 二次控制原理图 | 版本: V2.0</text>';
+  // Legend
+  s+='<rect x="560" y="'+(H-42)+'" width="500" height="30" rx="4" fill="#0f1729" stroke="#1e293b"/>';
+  s+='<line x1="575" y1="'+(H-27)+'" x2="610" y2="'+(H-27)+'" stroke="#4a90d9" stroke-width="1.5"/>';
+  s+='<text x="615" y="'+(H-23)+'" fill="#94a3b8" font-size="7">PROFINET</text>';
+  s+='<line x1="675" y1="'+(H-27)+'" x2="710" y2="'+(H-27)+'" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="4,2"/>';
+  s+='<text x="715" y="'+(H-23)+'" fill="#94a3b8" font-size="7">DO/AI信号</text>';
+  s+='<line x1="790" y1="'+(H-27)+'" x2="825" y2="'+(H-27)+'" stroke="#50c878" stroke-width="1" stroke-dasharray="5,3"/>';
+  s+='<text x="830" y="'+(H-23)+'" fill="#94a3b8" font-size="7">反馈回路</text>';
+  s+='<circle cx="900" cy="'+(H-27)+'" r="8" fill="#4a90d9" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="900" y="'+(H-23)+'" text-anchor="middle" fill="#fff" font-size="7" font-weight="700">N</text>';
+  s+='<text x="912" y="'+(H-23)+'" fill="#94a3b8" font-size="7">控制时序</text>';
   el.innerHTML=_bsSvgEnd(s);
 }
 
@@ -81153,32 +81230,92 @@ function bsElecRenderBatteryBay(el){
 }
 
 function bsElecRenderRobotCtrl(el){
-  const W=1000,H=550;
-  let s=_bsSvgBox(W,H,'换电机器人控制图','PLC → 伺服驱动 → 机械臂XYZ + 夹具 + 视觉');
+  const W=1100,H=620;
+  let s=_bsSvgBox(W,H,'换电机器人控制图','PLC → 伺服驱动 → 机械臂XYZ + 夹具 + 视觉系统');
+  s+='<defs><marker id="bsArr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4a90d9"/></marker>';
+  s+='<marker id="bsArrGreen" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#50c878"/></marker>';
+  s+='<marker id="bsArrOrange" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#e8a838"/></marker>';
+  s+='<marker id="bsArrRed" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/></marker></defs>';
   // PLC
-  s=_bsBox(s,420,55,160,40,'#1e293b','#4a90d9','PLC S7-1500','主控');
-  // Axes
-  const axes=[
-    {x:120,label:'X轴 伸缩',sub:'伺服+滚珠丝杠 ±600mm',color:'#50c878'},
-    {x:370,label:'Z轴 升降',sub:'液压+伺服 0-800mm',color:'#e8a838'},
-    {x:620,label:'夹具 开合',sub:'液压缸 100-500mm',color:'#ef4444'}
-  ];
-  axes.forEach(function(a){
-    s+='<line x1="500" y1="95" x2="'+a.x+'" y2="130" stroke="'+a.color+'" stroke-width="1.2"/>';
-    s=_bsBox(s,a.x-60,130,120,40,'#111827',a.color,a.label,a.sub);
-    s+='<text x="'+a.x+'" y="195" text-anchor="middle" fill="#64748b" font-size="8">行程/速度/精度</text>';
-  });
-  // Vision & sensors
-  s=_bsBox(s,100,230,140,40,'#111827','#94a3b8','视觉系统','2D+3D定位');
-  s=_bsBox(s,300,230,140,40,'#111827','#94a3b8','安全传感器','光幕+急停');
-  s=_bsBox(s,500,230,140,40,'#111827','#94a3b8','力矩传感器','碰撞检测');
-  s=_bsBox(s,700,230,140,40,'#111827','#94a3b8','编码器','位置反馈');
-  // Safety
-  s+='<rect x="80" y="300" width="840" height="50" rx="4" fill="rgba(239,68,68,0.05)" stroke="#ef4444" stroke-width="1" stroke-dasharray="6,3"/>';
-  s+='<text x="500" y="320" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="600">安全回路: 急停→STO→安全继电器→抱闸锁定</text>';
-  s+='<text x="500" y="338" text-anchor="middle" fill="#94a3b8" font-size="8">SIL3 / PLe 安全等级 | 双通道冗余</text>';
-  s+='<rect x="40" y="'+(H-42)+'" width="380" height="30" rx="4" fill="#0f1729" stroke="#1e293b"/>';
-  s+='<text x="52" y="'+(H-22)+'" fill="#94a3b8" font-size="8">ESS Agent AI | 图号: SW-ROB-001 | 机器人控制图</text>';
+  s=_bsBox(s,430,52,240,48,'#1e293b','#4a90d9','PLC S7-1500 CPU 1515-2 PN','PROFINET IRT + 安全PROFINET');
+  // Sequence 1: PLC → PROFINET交换机
+  s+='<polyline points="550,100 550,128" fill="none" stroke="#4a90d9" stroke-width="1.5"/>';
+  s=_bsBox(s,470,128,160,28,'#111827','#4a90d9','PROFINET 交换机','IRT ≤1ms');
+  s+='<circle cx="550" cy="114" r="8" fill="#4a90d9" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="550" y="118" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">1</text>';
+  s+='<text x="564" y="118" fill="#4a90d9" font-size="7">PROFINET IRT</text>';
+  // Sequence 2: Switch → 3 servo drives
+  s+='<polyline points="470,142 350,142 350,175" fill="none" stroke="#4a90d9" stroke-width="1.2" marker-end="url(#bsArr)"/>';
+  s+='<polyline points="550,142 550,175" fill="none" stroke="#4a90d9" stroke-width="1.2" marker-end="url(#bsArr)"/>';
+  s+='<polyline points="630,142 750,142 750,175" fill="none" stroke="#4a90d9" stroke-width="1.2" marker-end="url(#bsArr)"/>';
+  s+='<circle cx="350" cy="158" r="8" fill="#4a90d9" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="350" y="162" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">2</text>';
+  s+='<text x="364" y="162" fill="#4a90d9" font-size="7">PROFINET → 伺服</text>';
+  // 3 servo drive boxes
+  s=_bsBox(s,270,175,160,36,'#111827','#50c878','伺服驱动器 V90','X轴 PROFINET');
+  s=_bsBox(s,470,175,160,36,'#111827','#e8a838','伺服驱动器 V90','Z轴 PROFINET');
+  s=_bsBox(s,670,175,160,36,'#111827','#ef4444','液压伺服阀组','夹具 PROFINET');
+  // Sequence 3: Servo → Motor/Actuator
+  s+='<polyline points="350,211 350,248" fill="none" stroke="#50c878" stroke-width="1.2" marker-end="url(#bsArrGreen)"/>';
+  s+='<polyline points="550,211 550,248" fill="none" stroke="#e8a838" stroke-width="1.2" marker-end="url(#bsArrOrange)"/>';
+  s+='<polyline points="750,211 750,248" fill="none" stroke="#ef4444" stroke-width="1.2" marker-end="url(#bsArrRed)"/>';
+  s+='<circle cx="350" cy="230" r="8" fill="#50c878" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="350" y="234" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">3</text>';
+  s+='<text x="364" y="234" fill="#50c878" font-size="7">动力线+编码器</text>';
+  // Motor + mechanical boxes
+  s=_bsBox(s,270,248,160,36,'#111827','#50c878','X轴伺服电机','1FK7 + 编码器');
+  s=_bsBox(s,270,286,160,28,'#0d1117','#50c878','滚珠丝杠 ±600mm','精度 ±0.05mm');
+  s=_bsBox(s,470,248,160,36,'#111827','#e8a838','Z轴液压+伺服','0-800mm');
+  s=_bsBox(s,470,286,160,28,'#0d1117','#e8a838','液压缸行程','速度 200mm/s');
+  s=_bsBox(s,670,248,160,36,'#111827','#ef4444','夹具液压缸','100-500mm');
+  s=_bsBox(s,670,286,160,28,'#0d1117','#ef4444','夹爪力控','力矩传感器');
+  // Sequence 4: Encoder feedback → PLC
+  s+='<polyline points="270,300 150,300 150,328 430,328 430,355" fill="none" stroke="#50c878" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#bsArrGreen)"/>';
+  s+='<polyline points="470,300 150,300" fill="none" stroke="#50c878" stroke-width="1" stroke-dasharray="5,3"/>';
+  s+='<circle cx="430" cy="340" r="8" fill="#50c878" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="430" y="344" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">4</text>';
+  s+='<text x="444" y="344" fill="#50c878" font-size="7">编码器反馈 PROFINET</text>';
+  // Sequence 5: Vision & sensors → PLC
+  s=_bsBox(s,100,370,150,36,'#111827','#94a3b8','视觉系统','2D+3D 定位');
+  s=_bsBox(s,300,370,150,36,'#111827','#94a3b8','安全光幕+急停','Type 4 / SIL3');
+  s=_bsBox(s,500,370,150,36,'#111827','#94a3b8','力矩传感器','碰撞检测');
+  s=_bsBox(s,700,370,150,36,'#111827','#94a3b8','限位开关 ×8','DI 24VDC');
+  s+='<polyline points="175,370 175,355 430,355" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#bsArr)"/>';
+  s+='<polyline points="375,370 375,355" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,2"/>';
+  s+='<polyline points="575,370 575,355" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,2"/>';
+  s+='<polyline points="775,370 775,355 870,355 870,328 430,328" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,2"/>';
+  s+='<circle cx="430" cy="362" r="8" fill="#94a3b8" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="430" y="366" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">5</text>';
+  s+='<text x="444" y="366" fill="#94a3b8" font-size="7">视觉 PROFINET / 传感器 DI</text>';
+  // Safety circuit panel (bottom)
+  s+='<rect x="80" y="420" width="940" height="72" rx="6" fill="rgba(239,68,68,0.06)" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="8,4"/>';
+  s+='<text x="550" y="440" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="700">安全回路 (双通道冗余)</text>';
+  // Safety sequence
+  s+='<polyline points="140,460 240,460" fill="none" stroke="#ef4444" stroke-width="1.5" marker-end="url(#bsArrRed)"/>';
+  s+='<polyline points="310,460 410,460" fill="none" stroke="#ef4444" stroke-width="1.5" marker-end="url(#bsArrRed)"/>';
+  s+='<polyline points="480,460 580,460" fill="none" stroke="#ef4444" stroke-width="1.5" marker-end="url(#bsArrRed)"/>';
+  s+='<polyline points="650,460 750,460" fill="none" stroke="#ef4444" stroke-width="1.5" marker-end="url(#bsArrRed)"/>';
+  s+='<polyline points="820,460 920,460" fill="none" stroke="#ef4444" stroke-width="1.5" marker-end="url(#bsArrRed)"/>';
+  s=_bsBox(s,100,448,120,24,'#0d1117','#ef4444','急停触发','NC双通道');
+  s=_bsBox(s,270,448,120,24,'#0d1117','#ef4444','STO 安全转矩','PROFIsafe');
+  s=_bsBox(s,440,448,120,24,'#0d1117','#ef4444','安全继电器','Pilz PNOZ');
+  s=_bsBox(s,610,448,120,24,'#0d1117','#ef4444','抱闸锁定','电磁制动');
+  s=_bsBox(s,780,448,120,24,'#0d1117','#ef4444','状态反馈','DI→PLC');
+  s+='<text x="550" y="490" text-anchor="middle" fill="#94a3b8" font-size="8">SIL3 / PLe 安全等级 | 响应时间 ≤10ms | 双通道冗余诊断</text>';
+  // Title block
+  s+='<rect x="40" y="'+(H-42)+'" width="500" height="30" rx="4" fill="#0f1729" stroke="#1e293b"/>';
+  s+='<text x="52" y="'+(H-22)+'" fill="#94a3b8" font-size="8">ESS Agent AI | 图号: SW-ROB-001 | 换电机器人控制图 | 版本: V2.0</text>';
+  // Legend
+  s+='<rect x="560" y="'+(H-42)+'" width="500" height="30" rx="4" fill="#0f1729" stroke="#1e293b"/>';
+  s+='<line x1="575" y1="'+(H-27)+'" x2="610" y2="'+(H-27)+'" stroke="#4a90d9" stroke-width="1.5"/>';
+  s+='<text x="615" y="'+(H-23)+'" fill="#94a3b8" font-size="7">PROFINET IRT</text>';
+  s+='<line x1="700" y1="'+(H-27)+'" x2="735" y2="'+(H-27)+'" stroke="#50c878" stroke-width="1" stroke-dasharray="5,3"/>';
+  s+='<text x="740" y="'+(H-23)+'" fill="#94a3b8" font-size="7">编码器反馈</text>';
+  s+='<line x1="830" y1="'+(H-27)+'" x2="865" y2="'+(H-27)+'" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="8,4"/>';
+  s+='<text x="870" y="'+(H-23)+'" fill="#94a3b8" font-size="7">安全回路</text>';
+  s+='<circle cx="575" cy="'+(H-27)+'" r="8" fill="#4a90d9" stroke="#0a0e1a" stroke-width="2"/>';
+  s+='<text x="575" y="'+(H-23)+'" text-anchor="middle" fill="#fff" font-size="7" font-weight="700">N</text>';
+  s+='<text x="590" y="'+(H-23)+'" fill="#94a3b8" font-size="7">控制时序</text>';
   el.innerHTML=_bsSvgEnd(s);
 }
 
