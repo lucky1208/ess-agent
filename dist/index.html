@@ -40796,6 +40796,55 @@ if __name__ == "__main__":
 <div id="chPlatformContent"></div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     VPP 虚拟电厂智能体 — 统一Agent流水线
+══════════════════════════════════════════════ -->
+
+<div id="page-vpp-unified" class="vpp-content" style="display:none;padding:16px 20px">
+  <div class="agent-shell">
+    <div class="agent-input-panel">
+      <div class="ip-title">🎯 VPP虚拟电厂建设需求</div>
+      <textarea class="ip-input" id="vppInput" rows="6" placeholder="请用自然语言描述您的项目需求，例如：&#10;&#10;我要建设150MW虚拟电厂，2小时储能配置，参与现货市场和调频市场，要求收益最大化。&#10;&#10;或：聚合50MW分布式光伏+30MWh储能+充电桩，输出完整VPP方案。"></textarea>
+      <button class="btn-agent" onclick="vppAgentRun('unified')" id="vppUnifiedBtn">🚀 启动VPP Agent</button>
+      <div class="ip-section">
+        <div class="ip-row"><label class="ip-label">市场类型</label>
+          <select class="ip-input" id="vppMarket"><option>现货市场</option><option>调频市场</option><option>备用市场</option><option>需求响应</option><option>综合市场</option></select></div>
+        <div class="ip-row"><label class="ip-label">优化目标</label>
+          <select class="ip-input" id="vppObjective"><option>收益最大化</option><option>PUE最低</option><option>碳排放最低</option><option>多目标均衡</option></select></div>
+        <div class="ip-row"><label class="ip-label">输出深度</label>
+          <select class="ip-input" id="vppDepth"><option value="full">完整方案（方案+图纸+配置+代码）</option><option value="design">方案设计</option><option value="code">仅代码/配置</option></select></div>
+      </div>
+    </div>
+    <div class="agent-workspace">
+      <div class="agent-flow" id="vpp-unified-flow"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     算电协同智能体 — 统一Agent流水线
+══════════════════════════════════════════════ -->
+
+<div id="page-syn-unified" class="syn-content" style="display:none;padding:16px 20px">
+  <div class="agent-shell">
+    <div class="agent-input-panel">
+      <div class="ip-title">🎯 算电协同建设需求</div>
+      <textarea class="ip-input" id="synInput" rows="6" placeholder="请用自然语言描述您的项目需求，例如：&#10;&#10;我要建设100MW数据中心，100MWh储能系统，液冷超充站，柴发备用，要求PUE最低、电费最低。&#10;&#10;或：规划一个50MW智算中心，800kW GPU集群，配50MWh储能，要求TCO最优。"></textarea>
+      <button class="btn-agent" onclick="synAgentRun('unified')" id="synUnifiedBtn">🚀 启动算电协同Agent</button>
+      <div class="ip-section">
+        <div class="ip-row"><label class="ip-label">冷却方式</label>
+          <select class="ip-input" id="synCoolType"><option value="liquid">全液冷冷板</option><option value="hybrid">液冷+风冷混合</option><option value="immersion">浸没式液冷</option><option value="air">精密空调</option></select></div>
+        <div class="ip-row"><label class="ip-label">优化目标</label>
+          <select class="ip-input" id="synObjective"><option>PUE最低</option><option>电费最低</option><option>TCO最优</option><option>多目标均衡</option></select></div>
+        <div class="ip-row"><label class="ip-label">输出深度</label>
+          <select class="ip-input" id="synDepth"><option value="full">完整方案（方案+图纸+BOM+配置）</option><option value="design">方案设计</option><option value="bom">仅BOM/配置</option></select></div>
+      </div>
+    </div>
+    <div class="agent-workspace">
+      <div class="agent-flow" id="syn-unified-flow"></div>
+    </div>
+  </div>
+</div>
 
 <footer class="footer" data-i18n="footer_text">
 版权所有@卢继雄  请尊重知识产权
@@ -94790,15 +94839,18 @@ console.log('[ESS Software] loaded - '+ESS_CHIPS.length+' chips, '+ESS_PROGRAMS.
 // ══════════════════════════════════════════════════════════════════════
 
 /* ── Page routing ── */
+var _vppInited=false, _synInited=false;
 function showVppPage(id){
   document.querySelectorAll('#vppNav .sub-tab').forEach(t=>t.classList.add('active'));
   document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
   var el=document.getElementById('page-vpp-unified'); if(el)el.style.display='block';
+  if(!_vppInited){ _vppInited=true; setTimeout(function(){ vppUnifiedFlow(); }, 100); }
 }
 function showSynPage(id){
   document.querySelectorAll('#synergyNav .sub-tab').forEach(t=>t.classList.add('active'));
   document.querySelectorAll('.syn-content').forEach(t=>t.style.display='none');
   var el=document.getElementById('page-syn-unified'); if(el)el.style.display='block';
+  if(!_synInited){ _synInited=true; setTimeout(function(){ synUnifiedFlow(); }, 100); }
 }
 
 /* ── Range slider live values ── */
