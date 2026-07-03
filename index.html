@@ -96308,7 +96308,7 @@ function vppUnifiedFlow(){
 
   steps[5].delay=800; steps[5].result=
     codeBlock('Structured Text (IEC 61850)','VPP_AGC_Controller.st',
-'PROGRAM VPP_AGC_Controller
+`PROGRAM VPP_AGC_Controller
   VAR_INPUT
     SetPoint : REAL;        // AGC调度指令 MW
     FreqMeasure : REAL;     // 系统频率 Hz
@@ -96343,9 +96343,9 @@ function vppUnifiedFlow(){
   MMXU1.ActTmwh := PowerMeasure;
   ZBAT1.SOC := SOC;
   GGIO1.StVal := DispatchMode;
-END_PROGRAM')+
+END_PROGRAM`)+
     codeBlock('IEC 61850 SCL Configuration','VPP_ICD_001.scd',
-'<?xml version="1.0" encoding="UTF-8"?>
+`<?xml version="1.0" encoding="UTF-8"?>
 <Communication>
   <SubNetwork name="VPP_LAN" type="802.1Q">
     <ConnectedAP apName="VPP_CTRL" iedName="VPP_CTRL_001">
@@ -96375,7 +96375,7 @@ END_PROGRAM')+
       </LDevice>
     </Server>
   </AccessPoint>
-</IED>');
+</IED>`);
 
   var totalInvest=cap*2800; // 2800万/MW
   var annualRevenue=Math.round(cap*0.85*0.8*8760*0.5/10);
@@ -96421,7 +96421,7 @@ END_PROGRAM')+
 
   steps[8].delay=800; steps[8].result=
     codeBlock('Python','vpp_ems_dispatch.py',
-'import numpy as np
+`import numpy as np
 from scipy.optimize import linprog
 from datetime import datetime
 
@@ -96465,9 +96465,9 @@ class VPPDispatcher:
 if __name__ == "__main__":
     vpp = VPPDispatcher(cap_mw=150, ess_mwh=300, market="现货")
     result = vpp.run()
-    print(f"日收益: {result[\'revenue\']:.0f} 万元")')+
+    print(f"日收益: {result[\'revenue\']:.0f} 万元")`)+
     codeBlock('Python','vpp_market_bidding.py',
-'class MarketBiddingEngine:
+`class MarketBiddingEngine:
     """电力市场交易申报引擎"""
     def __init__(self, market_type="现货"):
         self.market = market_type
@@ -96490,7 +96490,7 @@ if __name__ == "__main__":
         """风险评估"""
         return {"var_95": sum(b["qty"]*b["price"] for b in bids)*0.05,
                 "cvar": sum(b["qty"]*b["price"] for b in bids)*0.03,
-                "sharpe": 2.1}');
+                "sharpe": 2.1}`);
 
   steps[9].delay=700; steps[9].result=
     deployCard('自动化部署清单 — 客户服务器',[
@@ -96504,16 +96504,16 @@ if __name__ == "__main__":
       {icon:'💾',name:'数据持久化: PostgreSQL + InfluxDB',status:'ok',label:'就绪'}
     ])+
     codeBlock('Dockerfile','Dockerfile',
-'FROM python:3.11-slim
+`FROM python:3.11-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8080 102
-CMD ["python", "-m", "uvicorn", "vpp_ems:app", "--host", "0.0.0.0", "--port", "8080"]')+
+CMD ["python", "-m", "uvicorn", "vpp_ems:app", "--host", "0.0.0.0", "--port", "8080"]`)+
     codeBlock('Terraform','main.tf',
-'resource "alicloud_instance" "vpp_ems" {
-  instance_name = "vpp-ems-${var.project}"
+`resource "alicloud_instance" "vpp_ems" {
+  instance_name = "vpp-ems-\${var.project}"
   image_id      = "ubuntu_22_04_x64_20G_alibase_20240101.vhd"
   instance_type = "ecs.c7.xlarge"
   security_groups = [alicloud_security_group.vpp.id]
@@ -96524,7 +96524,7 @@ resource "alicloud_db_instance" "vpp_db" {
   engine_version   = "15.0"
   instance_type    = "rds.pg.s2.large"
   instance_storage = 100
-}');
+}`);
 
   steps[10].delay=600; steps[10].result=
     tableHtml(
@@ -96770,7 +96770,7 @@ function synUnifiedFlow(){
 
   steps[7].delay=800; steps[7].result=
     codeBlock('Python','cooling_control.py',
-'import asyncio
+`import asyncio
 import modbus_tk.defines as cst
 from modbus_tk import modbus_tcp
 
@@ -96811,9 +96811,9 @@ class CoolingController:
         while True:
             result = await self.auto_adjust()
             print(f"[Cooling] 出水{result[\'avg_outlet\']:.1f}℃ → 调整{result[\'adjustment\']:.1f}℃ → 频率{result[\'freq\']:.1f}Hz")
-            await asyncio.sleep(5)  # 5秒控制周期')+
+            await asyncio.sleep(5)  # 5秒控制周期`)+
     codeBlock('Python','bms_monitor.py',
-'class BMSMonitor:
+`class BMSMonitor:
     """电池管理系统 — 实时监控"""
     def __init__(self, pack_count=32):
         self.pack_count = pack_count
@@ -96830,15 +96830,15 @@ class CoolingController:
 
     def get_soh(self, cycle_count, capacity_fade):
         """计算SOH健康度"""
-        return max(0, 100 - cycle_count * 0.02 - capacity_fade * 0.5)')+
+        return max(0, 100 - cycle_count * 0.02 - capacity_fade * 0.5)`)+
     codeBlock('Dockerfile','Dockerfile',
-'FROM python:3.11-slim
+`FROM python:3.11-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8080 502
-CMD ["python", "-m", "uvicorn", "cooling_api:app", "--host", "0.0.0.0", "--port", "8080"]');
+CMD ["python", "-m", "uvicorn", "cooling_api:app", "--host", "0.0.0.0", "--port", "8080"]`);
 
   steps[8].delay=700; steps[8].result=
     deployCard('自动化部署清单 — 客户服务器',[
@@ -96851,8 +96851,8 @@ CMD ["python", "-m", "uvicorn", "cooling_api:app", "--host", "0.0.0.0", "--port"
       {icon:'🔔',name:'告警: 温度超限/PUE异常/设备故障',status:'ok',label:'就绪'},
       {icon:'💾',name:'时序数据库: InfluxDB + PostgreSQL',status:'ok',label:'就绪'}
     ])+codeBlock('Terraform','main.tf',
-'resource "alicloud_instance" "cooling_ctrl" {
-  instance_name = "cooling-ctl-${var.project}"
+`resource "alicloud_instance" "cooling_ctrl" {
+  instance_name = "cooling-ctl-\${var.project}"
   instance_type = "ecs.c7.large"
   image_id      = "ubuntu_22_04_x64_20G"
   tags = { Project = "DataCenter", Role = "cooling-controller" }
@@ -96861,7 +96861,7 @@ resource "alicloud_db_instance" "dc_db" {
   engine           = "PostgreSQL"
   engine_version   = "15.0"
   instance_storage = 200
-}');
+}`);
 
   steps[9].delay=700; steps[9].result=
     svgArchDiagram('数据中心系统交付图纸 — '+powerMW+'MW/'+racks+'柜',[
