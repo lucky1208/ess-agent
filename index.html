@@ -94914,8 +94914,9 @@ function runSteps(containerId, steps, btnId){
   function next(){
     if(i>=steps.length){if(btn)btn.disabled=false;return;}
     var step=steps[i];
-    var dot=container.querySelector('#'+step.id+' .wf-dot');
-    var badge=container.querySelector('#'+step.id+' .wf-title .wf-badge');
+    var stepEl=document.getElementById(step.id);
+    var dot=stepEl?stepEl.querySelector('.wf-dot'):null;
+    var badge=stepEl?stepEl.querySelector('.wf-title .wf-badge'):null;
     var out=document.getElementById(step.outId);
     if(dot){dot.className='wf-dot running';}
     if(badge){badge.textContent='执行中…';badge.style.background='#0d2040';badge.style.color='var(--blue)';badge.style.border='1px solid var(--blue)';}
@@ -94926,7 +94927,7 @@ function runSteps(containerId, steps, btnId){
         out.classList.add('visible');
         out.innerHTML=step.result;
       }
-      container.querySelector('#'+step.id+' .wf-skills .skill-tag:first-child').classList.add('active');
+      if(stepEl){var sk=stepEl.querySelector('.wf-skills .skill-tag:first-child');if(sk)sk.classList.add('active');}
       i++; setTimeout(next, 180);
     }, step.delay||600);
   }
