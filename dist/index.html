@@ -43050,6 +43050,8 @@ function switchCategory(cat){
     document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.bs-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.syn-content').forEach(t=>t.style.display='none');
     showPage('devices');
   }else if(cat==='microgrid'){
     essNav.style.display='none';
@@ -43064,6 +43066,8 @@ function switchCategory(cat){
     document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.bs-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.syn-content').forEach(t=>t.style.display='none');
     showMicroPage('mg-design');
   }else if(cat==='aidc'){
     essNav.style.display='none';
@@ -43078,6 +43082,8 @@ function switchCategory(cat){
     document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.bs-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.syn-content').forEach(t=>t.style.display='none');
     showAidcPage('aidc-design');
   }else if(cat==='charging'){
     essNav.style.display='none';
@@ -43092,6 +43098,8 @@ function switchCategory(cat){
     document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.bs-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.syn-content').forEach(t=>t.style.display='none');
     showChargingPage('ch-design');
   }else if(cat==='battery_swap'){
     essNav.style.display='none';
@@ -43110,6 +43118,7 @@ function switchCategory(cat){
     if(vppNav)vppNav.style.display='block'; if(synNav)synNav.style.display='none';
     if(mc)mc.style.display='none';
     document.querySelectorAll('.tab-content,.micro-content,.aidc-content,.bs-content,.charging-content,.syn-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
     showVppPage('vpp-access');
   }else if(cat==='synergy'){
     essNav.style.display='none'; mgNav.style.display='none'; aidcNav.style.display='none';
