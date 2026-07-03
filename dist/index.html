@@ -96738,6 +96738,15 @@ function drawArch(title, layers, opts){
   svg+='</svg></div>'; return svg;
 }
 
+/* ── Right-angle polyline router for P&ID pipes ── */
+function connPath(x1,y1,x2,y2,rte){
+  rte=rte||'vh';
+  if(rte==='vh') return x1+','+y1+' '+x1+','+y2+' '+x2+','+y2;
+  if(rte==='hv') return x1+','+y1+' '+x2+','+y1+' '+x2+','+y2;
+  if(rte==='th') return x1+','+y1+' '+x2+','+y1+' '+x2+','+y2;
+  return x1+','+y1+' '+x1+','+y2+' '+x2+','+y2;
+}
+
 /* ── V4 P&ID with IEC symbols ── */
 function drawPid(title, nodes, pipes, opts){
   opts=opts||{}; var w=opts.w||760,h=opts.h||340; var themeName=opts.theme||'huawei';
