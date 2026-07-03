@@ -38042,6 +38042,25 @@ select.form-input{appearance:auto}
 .ag-table th{background:var(--bg2);color:var(--text2);padding:5px 8px;border:1px solid var(--border);font-weight:600;text-align:left}
 .ag-table td{padding:5px 8px;border:1px solid var(--border);color:var(--text1)}
 .ag-table tr:nth-child(even){background:var(--bg3)}
+.code-block{background:#0a0e14;border:1px solid var(--border);border-radius:6px;margin:6px 0;overflow:hidden}
+.code-block .cb-header{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:#111820;border-bottom:1px solid var(--border);font-size:10px;color:var(--text2)}
+.code-block .cb-header .cb-lang{color:var(--blue);font-weight:600}
+.code-block pre{padding:10px;margin:0;overflow-x:auto;font-size:10.5px;line-height:1.5;color:#c8d0d8;font-family:'Cascadia Code','Fira Code','JetBrains Mono',monospace}
+.code-block pre .kw{color:#ff7b72} .code-block pre .fn{color:#d2a8ff} .code-block pre .str{color:#a5d6ff}
+.code-block pre .cm{color:#6e7681;font-style:italic} .code-block pre .num{color:#79c0ff} .code-block pre .op{color:#ff7b72}
+.deploy-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;margin:6px 0}
+.deploy-card .dc-title{font-size:11px;font-weight:600;color:var(--text1);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.deploy-card .dc-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:10.5px;color:var(--text2)}
+.deploy-card .dc-icon{width:20px;text-align:center}
+.deploy-card .dc-status{margin-left:auto;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600}
+.deploy-card .dc-status.ok{background:#0a2a1a;color:var(--green);border:1px solid #1a4a2a}
+.deploy-card .dc-status.pending{background:#1a1a0a;color:var(--orange);border:1px solid #3a3a1a}
+.arch-svg{background:#06090f;border-radius:6px;border:1px solid var(--border);overflow:hidden}
+.arch-svg svg{display:block}
+.kpi-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.kpi-box{flex:1;min-width:70px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;text-align:center}
+.kpi-box .kv{font-size:16px;font-weight:700;font-family:monospace}
+.kpi-box .kl{font-size:9px;color:var(--text2);margin-top:2px}
 </style>
 </head>
 <body>
@@ -96033,8 +96052,138 @@ function svgGenConfig(name, fields){
   return html;
 }
 
+/* ── Professional SVG: Architecture Diagram ── */
+function svgArchDiagram(title, layers, w, h){
+  w=w||700; h=h||320;
+  var svg='<div class="arch-svg"><svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<defs><filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svg+='<marker id="arrow" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="6" orient="auto"><path d="M0,0 L10,3 L0,6" fill="#4a9aff" opacity="0.7"/></marker></defs>';
+  svg+='<rect width="'+w+'" height="'+h+'" fill="#06090f"/>';
+  svg+='<text x="'+w/2+'" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#e0e8f0" font-family="monospace">'+title+'</text>';
+  var layerH=Math.floor((h-40)/layers.length);
+  for(var li=0;li<layers.length;li++){
+    var ly=28+li*layerH; var layer=layers[li];
+    svg+='<text x="10" y="'+(ly+12)+'" font-size="9" fill="#4a6a8a" font-family="monospace">'+layer.name+'</text>';
+    svg+='<line x1="10" y1="'+(ly+16)+'" x2="'+(w-10)+'" y2="'+(ly+16)+'" stroke="#1a2a3a" stroke-width="1" stroke-dasharray="4 2"/>';
+    var boxes=layer.boxes; var bw=Math.min(120,Math.floor((w-40)/boxes.length)-10);
+    var startX=(w-bw*boxes.length-(boxes.length-1)*10)/2;
+    for(var bi=0;bi<boxes.length;bi++){
+      var bx=startX+bi*(bw+10); var by=ly+22; var bh=layerH-34;
+      var col=boxes[bi].c||'#0d1a2a'; var stroke=boxes[bi].s||'#1a3a5a';
+      svg+='<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="4" fill="'+col+'" stroke="'+stroke+'" stroke-width="1" filter="url(#glow)"/>';
+      svg+='<text x="'+(bx+bw/2)+'" y="'+(by+14)+'" text-anchor="middle" font-size="9" fill="#c0d0e0" font-weight="600" font-family="monospace">'+boxes[bi].n+'</text>';
+      if(boxes[bi].sub) svg+='<text x="'+(bx+bw/2)+'" y="'+(by+26)+'" text-anchor="middle" font-size="7.5" fill="#6a8aa0" font-family="monospace">'+boxes[bi].sub+'</text>';
+    }
+  }
+  svg+='</svg></div>'; return svg;
+}
+
+/* ── Professional SVG: Rack Layout ── */
+function svgRackLayout(title, rows, cols, hotspots, w, h){
+  w=w||600; h=h||250;
+  var svg='<div class="arch-svg"><svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<rect width="'+w+'" height="'+h+'" fill="#06090f"/>';
+  svg+='<text x="'+w/2+'" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#e0e8f0" font-family="monospace">'+title+'</text>';
+  var pad=30; var rw=(w-pad*2)/cols; var rh=(h-50)/rows;
+  for(var ri=0;ri<rows;ri++){
+    svg+='<text x="8" y="'+(42+ri*rh+rh/2+3)+'" font-size="8" fill="#4a6a8a" font-family="monospace">行'+(ri+1)+'</text>';
+    for(var ci=0;ci<cols;ci++){
+      var rx=pad+ci*rw+2; var ry=28+ri*rh+2; var rww=rw-4; var rhh=rh-4;
+      var fill='#0d1a2a'; var stroke='#1a3a5a';
+      if(hotspots){
+        for(var hi=0;hi<hotspots.length;hi++){
+          if(hotspots[hi].r===ri&&hotspots[hi].c===ci){fill=hotspots[hi].fc||'#1a2a4a';stroke=hotspots[hi].sc||'#4a9aff';}
+        }
+      }
+      svg+='<rect x="'+rx+'" y="'+ry+'" width="'+rww+'" height="'+rhh+'" rx="2" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1"/>';
+      svg+='<text x="'+(rx+rww/2)+'" y="'+(ry+rhh/2+3)+'" text-anchor="middle" font-size="7" fill="#6a8aa0" font-family="monospace">'+(ri*cols+ci+1)+'</text>';
+    }
+  }
+  svg+='</svg></div>'; return svg;
+}
+
+/* ── Professional SVG: P&ID Flow ── */
+function svgPidDiagram(title, nodes, pipes, w, h){
+  w=w||700; h=h||280;
+  var svg='<div class="arch-svg"><svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<defs><marker id="parr" viewBox="0 0 8 6" refX="8" refY="3" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#4ac8ff"/></marker></defs>';
+  svg+='<rect width="'+w+'" height="'+h+'" fill="#06090f"/>';
+  svg+='<text x="'+w/2+'" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#e0e8f0" font-family="monospace">'+title+'</text>';
+  for(var ni=0;ni<nodes.length;ni++){
+    var nd=nodes[ni]; var nx=nd.x*(w/100); var ny=nd.y*(h/100)+10;
+    var nW=nd.w||70; var nH=nd.h||30;
+    if(nd.type==='pump'){
+      svg+='<circle cx="'+nx+'" cy="'+ny+'" r="14" fill="#0d2040" stroke="#4a9aff" stroke-width="1.5"/>';
+      svg+='<text x="'+nx+'" y="'+(ny+3)+'" text-anchor="middle" font-size="8" fill="#4a9aff" font-family="monospace">P</text>';
+    }else if(nd.type==='valve'){
+      svg+='<polygon points="'+(nx-8)+','+(ny-10)+' '+(nx+8)+','+(ny)+' '+(nx-8)+','+(ny+10)+'" fill="#1a3a2a" stroke="#20c840" stroke-width="1"/>';
+    }else if(nd.type==='tank'){
+      svg+='<rect x="'+(nx-18)+'" y="'+(ny-14)+'" width="36" height="28" rx="4" fill="#1a2a4a" stroke="#4a9aff" stroke-width="1"/>';
+    }else{
+      svg+='<rect x="'+(nx-nW/2)+'" y="'+(ny-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+(nd.fc||'#0d1a2a')+'" stroke="'+(nd.sc||'#2a4a6a')+'" stroke-width="1"/>';
+    }
+    svg+='<text x="'+nx+'" y="'+(ny+3)+'" text-anchor="middle" font-size="8" fill="#c0d0e0" font-family="monospace">'+nd.n+'</text>';
+  }
+  for(var pi=0;pi<pipes.length;pi++){
+    var pp=pipes[pi]; var x1=pp.x1*(w/100)+10; var y1=pp.y1*(h/100)+10; var x2=pp.x2*(w/100)+10; var y2=pp.y2*(h/100)+10;
+    var color=pp.c||'#4ac8ff'; var dash=pp.dash?' stroke-dasharray="4 2"':'';
+    svg+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+color+'" stroke-width="1.5" marker-end="url(#parr)"'+dash+'/>';
+    if(pp.label) svg+='<text x="'+((x1+x2)/2)+'" y="'+((y1+y2)/2-5)+'" text-anchor="middle" font-size="7" fill="#6a8aa0" font-family="monospace">'+pp.label+'</text>';
+  }
+  svg+='</svg></div>'; return svg;
+}
+
+/* ── Professional SVG: Energy Sankey ── */
+function svgSankey(title, flows, w, h){
+  w=w||700; h=h||260;
+  var svg='<div class="arch-svg"><svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<rect width="'+w+'" height="'+h+'" fill="#06090f"/>';
+  svg+='<text x="'+w/2+'" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#e0e8f0" font-family="monospace">'+title+'</text>';
+  var cols={}; for(var fi=0;fi<flows.length;fi++){cols[flows[fi].from]=1;cols[flows[fi].to]=1;}
+  var cNames=Object.keys(cols); var cW=w/(cNames.length+1);
+  var colY={}; for(var ci=0;ci<cNames.length;ci++)colY[cNames[ci]]=30;
+  var colors=['#4a9aff','#20c840','#e3b341','#ff9040','#bc8cff','#4ac8ff','#ff6b9d'];
+  for(var fi=0;fi<flows.length;fi++){
+    var fl=flows[fi]; var x1=cNames.indexOf(fl.from)*cW+cW; var x2=cNames.indexOf(fl.to)*cW+cW;
+    var thick=Math.max(3,Math.min(20,fl.v/10));
+    var y1=colY[fl.from]; colY[fl.from]+=thick+4;
+    var y2=colY[fl.to]; colY[fl.to]+=thick+4;
+    var c=colors[fi%colors.length];
+    svg+='<path d="M'+x1+','+y1+' C'+((x1+x2)/2)+','+y1+' '+((x1+x2)/2)+','+y2+' '+x2+','+y2+'" stroke="'+c+'" stroke-width="'+thick+'" fill="none" opacity="0.4"/>';
+    svg+='<text x="'+((x1+x2)/2)+'" y="'+((y1+y2)/2)+'" text-anchor="middle" font-size="8" fill="'+c+'" font-family="monospace">'+fl.n+' '+fl.v+fl.u+'</text>';
+  }
+  for(var ci=0;ci<cNames.length;ci++){
+    svg+='<text x="'+(cW*(ci+1))+'" y="'+(h-8)+'" text-anchor="middle" font-size="9" fill="#8a9aa0" font-weight="600" font-family="monospace">'+cNames[ci]+'</text>';
+  }
+  svg+='</svg></div>'; return svg;
+}
+
+/* ── Code Block Generator ── */
+function codeBlock(lang, filename, code){
+  var escaped=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return '<div class="code-block"><div class="cb-header"><span class="cb-lang">'+lang+'</span><span>'+filename+'</span></div><pre>'+escaped+'</pre></div>';
+}
+
+/* ── Deployment Card ── */
+function deployCard(title, items){
+  var h='<div class="deploy-card"><div class="dc-title">🚀 '+title+'</div>';
+  for(var i=0;i<items.length;i++){
+    h+='<div class="dc-row"><span class="dc-icon">'+items[i].icon+'</span><span>'+items[i].name+'</span><span class="dc-status '+items[i].status+'">'+items[i].label+'</span></div>';
+  }
+  h+='</div>'; return h;
+}
+
+/* ── KPI Row ── */
+function kpiRow(items){
+  var h='<div class="kpi-row">';
+  for(var i=0;i<items.length;i++){
+    h+='<div class="kpi-box"><div class="kv" style="color:'+(items[i].color||'var(--text1)')+'">'+items[i].v+'</div><div class="kl">'+items[i].l+'</div></div>';
+  }
+  return h+'</div>';
+}
+
 /* ══════════════════════════════════════════════════════════════
-   VPP UNIFIED AGENT FLOW
+   VPP UNIFIED AGENT FLOW — 12-Step Professional Pipeline
 ══════════════════════════════════════════════════════════════ */
 function vppUnifiedFlow(){
   var input=document.getElementById('vppInput').value.trim();
@@ -96047,114 +96196,379 @@ function vppUnifiedFlow(){
   var durM=input.match(/(\d+)\s*[时小]/); if(durM)duration=parseInt(durM[1]);
   var demM=input.match(/(\d+)\s*MWh/); if(demM)demand=parseInt(demM[1]);
 
-  var capTotal=cap*duration; var essPct=Math.round(40+Math.random()*20);
+  var capTotal=cap*duration;
+  var essPct=Math.round(40+Math.random()*20);
   var pvPct=Math.round(15+Math.random()*10);
   var windPct=Math.round(10+Math.random()*10);
   var evPct=Math.round(10+Math.random()*5); var loadPct=100-essPct-pvPct-windPct-evPct;
+  var irr=(14+Math.random()*6).toFixed(1); var payback=(3+Math.random()*2).toFixed(1);
+  var revenue=Math.round(cap*0.85*0.8*8760*0.5/10000*10)/10;
+  var annualNet=Math.round(revenue*0.65);
 
   var steps=[
     mkStep('📋','1. 需求解析',['NLP.skill','Requirement.skill','Intent.skill']),
-    mkStep('🗺','2. 资源建模',['ResourceModel.skill','CIM.skill','Asset.skill']),
-    mkStep('🔮','3. 预测分析',['Forecast.skill','ML.skill','Weather.skill']),
-    mkStep('📊','4. 市场策略',['Market.skill','Bidding.skill','Risk.skill']),
-    mkStep('⚡','5. 优化调度',['Optimizer.skill','MILP.skill','Dispatch.skill']),
-    mkStep('🔧','6. 控制配置',['Control.skill','IEC61850.skill','SCADA.skill']),
-    mkStep('💰','7. 收益分析',['Finance.skill','ROI.skill','DCF.skill']),
-    mkStep('📐','8. 图纸生成',['Drawing.skill','SVG.skill','CAD.skill']),
-    mkStep('📄','9. 报告交付',['Report.skill','PDF.skill','Export.skill']),
+    mkStep('🗺','2. 资源建模与拓扑设计',['ResourceModel.skill','CIM.skill','Topology.skill']),
+    mkStep('🔮','3. 负荷预测与气象分析',['Forecast.skill','ML.skill','Weather.skill']),
+    mkStep('📊','4. 电力市场交易策略',['Market.skill','Bidding.skill','Risk.skill']),
+    mkStep('⚡','5. 智能优化调度',['Optimizer.skill','MILP.skill','Dispatch.skill']),
+    mkStep('🔧','6. PLC控制程序生成',['IEC61850.skill','PLC.skill','SCADA.skill']),
+    mkStep('💰','7. 收益测算与投资分析',['Finance.skill','ROI.skill','DCF.skill']),
+    mkStep('📐','8. 专业图纸输出',['Drawing.skill','SVG.skill','CAD.skill']),
+    mkStep('💻','9. 自动代码生成',['CodeGen.skill','Python.skill','Docker.skill']),
+    mkStep('🚀','10. 自动化部署配置',['Deploy.skill','Terraform.skill','K8s.skill']),
+    mkStep('📋','11. 运营方案制定',['Ops.skill','SLA.skill','Maintain.skill']),
+    mkStep('📦','12. 交付物打包与验收',['Report.skill','PDF.skill','Export.skill']),
   ];
 
-  steps[0].delay=500; steps[0].result=tableHtml(
-    ['需求参数','解析值'],
-    [['总容量',cap+' MW'],['调节时长',duration+' 小时'],['可调电量',capTotal+' MWh'],
-     ['市场类型',market],['优化目标',objective],['输出深度',depth]], false
+  steps[0].delay=500; steps[0].result=
+    kpiRow([
+      {v:cap+' MW',l:'总容量',color:'var(--blue)'},
+      {v:duration+'h',l:'调节时长',color:'var(--green)'},
+      {v:capTotal+' MWh',l:'可调电量',color:'var(--orange)'},
+      {v:market,l:'交易市场',color:'var(--blue)'}
+    ])+tableHtml(
+    ['需求参数','解析值','置信度'],
+    [['总装机容量',cap+' MW','98%'],
+     ['储能时长',duration+' 小时','97%'],
+     ['可调电量',capTotal+' MWh','99%'],
+     ['交易市场',market,'95%'],
+     ['优化目标',objective,'96%'],
+     ['输出深度',depth,'100%'],
+     ['并网电压等级','10kV / 35kV','98%'],
+     ['调度响应要求','≤200ms (AGC)','99%']], false
   );
 
-  steps[1].delay=700; steps[1].result=svgNodeTree('VPP 资源模型',[
-    {l:0, n:'VPP 聚合商 '+cap+'MW', c:'#0d1a2a', s:'#4a9aff'},
-    {l:1, n:'储能系统 '+essPct+'%', c:'#1a2a4a', s:'#4a9aff'},
-    {l:1, n:'光伏 '+pvPct+'%', c:'#2a3a1a', s:'#20c840'},
-    {l:1, n:'风电 '+windPct+'%', c:'#2a3a3a', s:'#4ac8ff'},
-    {l:1, n:'充电桩 '+evPct+'%', c:'#3a2a3a', s:'#bc8cff'},
-    {l:1, n:'AIDC负荷 '+loadPct+'%', c:'#3a3a1a', s:'#e3b341'},
-    {l:2, n:'EMS调度单元', c:'#0d2040', s:'#ff9040'},
-    {l:2, n:'市场交互接口', c:'#0d2040', s:'#ff9040'},
-  ], 600,200);
+  steps[1].delay=700; steps[1].result=
+    svgArchDiagram('VPP虚拟电厂系统架构 — '+cap+'MW',[
+      {name:'应用层',boxes:[
+        {n:'电力交易中心',sub:'日前+实时',c:'#3a2a1a',s:'#e3b341'},
+        {n:'负荷聚合平台',sub:'ISO/TSO接口',c:'#1a2a4a',s:'#4a9aff'},
+        {n:'运维监控中心',sub:'SCADA/HMI',c:'#1a3a2a',s:'#20c840'},
+        {n:'收益优化引擎',sub:'MILP求解器',c:'#2a2a3a',s:'#bc8cff'}
+      ]},
+      {name:'控制层',boxes:[
+        {n:'VPP-EMS主控',sub:'IEC 61850 MMS',c:'#0d2040',s:'#ff9040'},
+        {n:'AGC/AVC控制器',sub:'调频+调压',c:'#0d2040',s:'#ff9040'},
+        {n:'市场申报网关',sub:'OCPP 2.0.1',c:'#0d2040',s:'#ff9040'}
+      ]},
+      {name:'设备层',boxes:[
+        {n:'储能系统 '+cap*0.4+'MW',sub:'LFP 280Ah',c:'#1a3a2a',s:'#20c840'},
+        {n:'光伏电站 '+cap*0.3+'MW',sub:'组串式逆变器',c:'#2a3a1a',s:'#20c840'},
+        {n:'风电场 '+cap*0.15+'MW',sub:'双馈发电机',c:'#2a3a3a',s:'#4ac8ff'},
+        {n:'充电桩群 '+cap*0.1+'MW',sub:'OCPP 1.6J',c:'#3a2a3a',s:'#bc8cff'},
+        {n:'柔性负荷 '+cap*0.05+'MW',sub:'需求响应',c:'#3a3a1a',s:'#e3b341'}
+      ]}
+    ],700,280);
 
-  steps[2].delay=800; steps[2].result=svgPowerLine(
-    [{l:'00:00',v:35,u:'MW'},{l:'04:00',v:28,u:'MW'},{l:'08:00',v:45,u:'MW'},{l:'10:00',v:78,u:'MW'},
-     {l:'12:00',v:85,u:'MW'},{l:'14:00',v:92,u:'MW'},{l:'16:00',v:80,u:'MW'},{l:'18:00',v:65,u:'MW'},
-     {l:'20:00',v:48,u:'MW'},{l:'22:00',v:38,u:'MW'}], 600,180)+
-    '<div style="color:var(--text2);font-size:11px;padding:6px 0">预测精度: 96.2% (R²) | 置信区间 ±8% | 日前+日内4h滚动</div>';
+  var forecastData=[];
+  for(var fi=0;fi<24;fi++){
+    var base=cap*0.3+cap*0.5*Math.sin((fi-6)*Math.PI/12);
+    forecastData.push({l:fi+':00',v:Math.round(base+Math.random()*cap*0.1),u:'MW'});
+  }
+  steps[2].delay=800; steps[2].result=
+    svgPowerLine(forecastData,700,180)+
+    kpiRow([
+      {v:'96.2%',l:'预测精度(R²)',color:'var(--green)'},
+      {v:'±8%',l:'置信区间',color:'var(--blue)'},
+      {v:'24h',l:'日前预测',color:'var(--text1)'},
+      {v:'4h',l:'滚动修正',color:'var(--orange)'}
+    ])+
+    '<div style="color:var(--text2);font-size:10px;padding:4px 0">模型: XGBoost+LSTM混合 | 特征: 温度/湿度/辐照/风速/节假日/工业活动指数 | 训练数据: 3年历史</div>';
 
-  steps[3].delay=700; steps[3].result=tableHtml(
-    ['时段','日前电价(元)','策略','申报量(MW)','预期收益(万元)'],
-    [['00:00-06:00 (谷)',0.28,'储能充电',(cap*0.8).toFixed(0),Math.round(cap*0.8*0.28*6/10)/10],
-     ['06:00-10:00 (平)',0.52,'削峰',(cap*0.6).toFixed(0),Math.round(cap*0.6*0.52*4/10)/10],
-     ['10:00-14:00 (峰)',0.85,'放电+调频',cap,Math.round(cap*0.85*4/10)/10],
-     ['14:00-18:00 (平)',0.48,'光伏满发',(cap*0.5).toFixed(0),Math.round(cap*0.5*0.48*4/10)/10],
-     ['18:00-22:00 (峰)',0.92,'放电+备用',cap,Math.round(cap*0.92*4/10)/10],
-     ['22:00-24:00 (谷)',0.25,'储能充电',(cap*0.7).toFixed(0),Math.round(cap*0.7*0.25*2/10)/10]], true
-  );
-
-  steps[4].delay=900; steps[4].result=svgPowerLine(
-    [{l:'调度前',v:150,u:''},{l:'储放',v:60,u:''},{l:'光伏',v:35,u:''},{l:'风电',v:18,u:''},
-     {l:'EV',v:12,u:''},{l:'负荷',v:25,u:''},{l:'调度后',v:cap,u:''},{l:'节省',v:15,u:'MW'}],
-    500,160)+'<div style="color:var(--text2);font-size:11px;padding:6px 0">调度策略: 谷充峰放 + 调频辅助服务 | 整体效率 92% | 响应时间 ≤200ms</div>';
-
-  steps[5].delay=700; steps[5].result=svgGenConfig('IEC 61850 控制器配置',[
-    {k:'IED Name',v:'VPP-Controller-001'},
-    {k:'Voltage Level',v:'10kV / 0.4kV'},
-    {k:'Protocol',v:'IEC 61850 MMS + GOOSE'},
-    {k:'Logical Nodes',v:'MMXU1, ZGEN1, ZBAT1, ZCHG1'},
-    {k:'Datasets',v:'dsMeasurements, dsStatus, dsControl'},
-    {k:'Report Type',v:'BRCB (Buffered Report)'},
-    {k:'GOOSE Dataset',v:'dsTrip, dsAlarm'},
-    {k:'SCL File',v:'VPP_ICD_001.scd'},
+  var bidRevenue=Math.round(cap*0.8*0.85*4*1000)/10;
+  steps[3].delay=700; steps[3].result=
+    tableHtml(
+    ['时段','电价(元/kWh)','策略','申报量(MW)','收益(万元)'],
+    [['00:00-06:00 (谷)',0.28,'储能充电+'+Math.round(cap*0.2)+'MW可调',cap*0.8,cap*0.8*0.28*6/10000].map(String),
+     ['06:00-10:00 (平)',0.52,'削峰填谷',cap*0.6,cap*0.6*0.52*4/10000].map(String),
+     ['10:00-14:00 (峰)',0.85,'放电+AGC调频',cap,cap*0.85*4/10000].map(String),
+     ['14:00-18:00 (平)',0.48,'光伏消纳+备用',cap*0.5,cap*0.5*0.48*4/10000].map(String),
+     ['18:00-22:00 (峰)',0.92,'放电+调频辅助',cap,cap*0.92*4/10000].map(String),
+     ['22:00-24:00 (谷)',0.25,'储能充电',cap*0.7,cap*0.7*0.25*2/10000].map(String)], true
+  )+kpiRow([
+    {v:bidRevenue+'万/日',l:'日均交易收益',color:'var(--green)'},
+    {v:(bidRevenue*365/10000).toFixed(1)+'亿/年',l:'年化交易收入',color:'var(--blue)'},
+    {v:'98.5%',l:'履约率',color:'var(--green)'}
   ]);
 
-  steps[6].delay=800; steps[6].result=svgBars(
-    [{l:'售电收入',v:3650,u:'万'},{l:'调频收入',v:890,u:'万'},{l:'备用收入',v:420,u:'万'},{l:'需求响应',v:280,u:'万'},
-     {l:'运维成本',v:-680,u:'万'},{l:'折旧',v:-520,u:'万'},{l:'购电成本',v:-350,u:'万'}],550,180)+
-    '<div style="color:var(--green);font-size:13px;padding:6px 0;font-weight:700">年净收益: '+(3650+890+420+280-680-520-350)+' 万元 | IRR: '+(14+Math.random()*6).toFixed(1)+'% | 回收期: '+(3+Math.random()*2).toFixed(1)+'年</div>';
+  steps[4].delay=900; steps[4].result=
+    svgSankey('VPP能量流向 — '+cap+'MW系统',[
+      {from:'电网',to:'储能',v:cap*0.6,u:'MW',n:'充电'},
+      {from:'光伏',to:'储能',v:cap*0.15,u:'MW',n:'余电存储'},
+      {from:'储能',to:'电网',v:cap*0.8,u:'MW',n:'放电'},
+      {from:'光伏',to:'负荷',v:cap*0.1,u:'MW',n:'自发自用'},
+      {from:'风电',to:'电网',v:cap*0.08,u:'MW',n:'上网'},
+      {from:'储能',to:'充电站',v:cap*0.05,u:'MW',n:'V2G'}
+    ],700,240)+
+    kpiRow([
+      {v:'92%',l:'调度效率',color:'var(--green)'},
+      {v:'≤200ms',l:'响应时间',color:'var(--blue)'},
+      {v:'谷充峰放',l:'主策略',color:'var(--orange)'}
+    ]);
 
-  var hours=['00','02','04','06','08','10','12','14','16','18','20','22'];
-  var svgStr='<svg width="100%" height="140" viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg" style="background:#06090f;border-radius:6px">';
-  svgStr+='<rect x="0" y="0" width="600" height="140" fill="#06090f" rx="6"/>';
-  svgStr+='<text x="300" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#e0e8f0" font-family="monospace">VPP架构图</text>';
-  var boxes=[{n:'市场',x:30,y:35,w:80,h:28,c:'#3a2a1a'},
-    {n:'EMS',x:150,y:35,w:70,h:28,c:'#1a2a4a'},
-    {n:'储能',x:260,y:35,w:70,h:28,c:'#1a3a2a'},
-    {n:'光伏',x:260,y:72,w:70,h:28,c:'#2a3a1a'},
-    {n:'EV',x:370,y:35,w:70,h:28,c:'#2a2a3a'},
-    {n:'AIDC',x:370,y:72,w:70,h:28,c:'#3a1a2a'},
-    {n:'调度',x:500,y:35,w:70,h:28,c:'#0d2040'}];
-  for(var bi=0;bi<boxes.length;bi++){
-    var b=boxes[bi];
-    svgStr+='<rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="4" fill="'+b.c+'" stroke="#2a4a6a" stroke-width="1"/>';
-    svgStr+='<text x="'+(b.x+b.w/2)+'" y="'+(b.y+b.h/2+3)+'" text-anchor="middle" font-size="9" fill="#c0d0e0" font-family="monospace">'+b.n+'</text>';
-  }
-  var conns=[{x1:110,y1:49,x2:150,y2:49},{x1:220,y1:49,x2:260,y2:49},{x1:220,y1:49,x2:260,y2:86},{x1:330,y1:49,x2:370,y2:49},{x1:330,y1:86,x2:370,y2:86},{x1:440,y1:49,x2:500,y2:49}];
-  for(var bi=0;bi<conns.length;bi++){
-    var c=conns[bi]; svgStr+='<line x1="'+c.x1+'" y1="'+c.y1+'" x2="'+c.x2+'" y2="'+c.y2+'" stroke="#4a9aff" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.6"/>';
-  }
-  svgStr+='</svg>';
-  steps[7].delay=600; steps[7].result=svgStr;
+  steps[5].delay=800; steps[5].result=
+    codeBlock('Structured Text (IEC 61850)','VPP_AGC_Controller.st',
+'PROGRAM VPP_AGC_Controller
+  VAR_INPUT
+    SetPoint : REAL;        // AGC调度指令 MW
+    FreqMeasure : REAL;     // 系统频率 Hz
+    PowerMeasure : REAL;    // 当前输出功率 MW
+    SOC : REAL;             // 储能SOC %
+  END_VAR
+  VAR_OUTPUT
+    PcsCommand : REAL;      // PCS功率指令 MW
+    DispatchMode : INT;     // 0=待机 1=充电 2=放电 3=调频
+    AlarmCode : INT;
+  END_VAR
 
-  steps[8].delay=500; steps[8].result=logLines([
-    {t:'ok',m:'方案报告已生成: VPP_'+cap+'MW_方案报告.pdf'},
-    {t:'ok',m:'IEC 61850 SCD配置文件: VPP_ICD_001.scd'},
-    {t:'ok',m:'SVG拓扑图纸: VPP_Topology.svg'},
-    {t:'ok',m:'收益分析Excel: VPP_Financial_Model.xlsx'},
-    {t:'ok',m:'市场申报文件: Market_Bidding.csv (当前市场: '+market+')'},
-    {t:'info',m:'全部交付物打包 → VPP_'+cap+'MW_'+market.replace(/\s/g,'')+'_'+(new Date().toISOString().slice(0,10))+'.zip'},
-  ]);
+  // PID调频控制
+  FreqError := FreqMeasure - 50.0;
+  FreqAdj := FreqError * Kp_Freq;  // Kp=2.5
+
+  // 功率指令计算
+  TargetPower := SetPoint + FreqAdj;
+  PowerError := TargetPower - PowerMeasure;
+  PcsCommand := PowerError * Kp_Power;  // Kp=0.8
+
+  // SOC保护
+  IF SOC < 10.0 THEN
+    DispatchMode := 0; AlarmCode := 1;
+  ELSIF SOC > 95.0 THEN
+    DispatchMode := 0; AlarmCode := 2;
+  ELSE
+    DispatchMode := 2;  // 放电模式
+  END_IF;
+
+  // IEC 61850 MMS数据上报
+  MMXU1.ActTmwh := PowerMeasure;
+  ZBAT1.SOC := SOC;
+  GGIO1.StVal := DispatchMode;
+END_PROGRAM')+
+    codeBlock('IEC 61850 SCL Configuration','VPP_ICD_001.scd',
+'<?xml version="1.0" encoding="UTF-8"?>
+<Communication>
+  <SubNetwork name="VPP_LAN" type="802.1Q">
+    <ConnectedAP apName="VPP_CTRL" iedName="VPP_CTRL_001">
+      <Address>
+        <P type="IP">192.168.1.100</P>
+        <P type="OSI-T">102</P>
+      </Address>
+    </ConnectedAP>
+  </SubNetwork>
+</Communication>
+<IED name="VPP_CTRL_001" type="VPP-Controller" manufacturer="OpenESS">
+  <AccessPoint name="VPP_CTRL">
+    <Server>
+      <LDevice inst="LD1">
+        <LN0 lnClass="LLN0" inst="" lnType="LLN0">
+          <DOI name="Mod" />
+          <DOI name="Beh" />
+        </LN0>
+        <LN lnClass="MMXU" inst="1" lnType="MMXU">
+          <DOI name="TotW" />
+          <DOI name="TotVAr" />
+        </LN>
+        <LN lnClass="ZBAT" inst="1" lnType="ZBAT">
+          <DOI name="SOC" />
+          <DOI name="SOH" />
+        </LN>
+      </LDevice>
+    </Server>
+  </AccessPoint>
+</IED>');
+
+  var totalInvest=cap*2800; // 2800万/MW
+  var annualRevenue=Math.round(cap*0.85*0.8*8760*0.5/10);
+  var annualCost=Math.round(totalInvest*0.03+cap*50);
+  var annualProfit=annualRevenue-annualCost;
+  steps[6].delay=800; steps[6].result=
+    kpiRow([
+      {v:(totalInvest/10000).toFixed(1)+'亿',l:'总投资',color:'var(--orange)'},
+      {v:(annualProfit/10000).toFixed(2)+'亿/年',l:'年净利润',color:'var(--green)'},
+      {v:irr+'%',l:'内部收益率(IRR)',color:'var(--blue)'},
+      {v:payback+'年',l:'投资回收期',color:'var(--green)'}
+    ])+
+    svgBars([
+      {l:'售电收入',v:Math.round(annualRevenue*0.45/100),u:'百万'},
+      {l:'调频收入',v:Math.round(annualRevenue*0.25/100),u:'百万'},
+      {l:'备用收入',v:Math.round(annualRevenue*0.15/100),u:'百万'},
+      {l:'需求响应',v:Math.round(annualRevenue*0.15/100),u:'百万'},
+      {l:'运维成本',v:-Math.round(annualCost*0.4/100),u:'百万'},
+      {l:'设备折旧',v:-Math.round(totalInvest*0.08/100),u:'百万'},
+      {l:'购电成本',v:-Math.round(annualCost*0.3/100),u:'百万'}
+    ],700,180)+
+    '<div style="color:var(--green);font-size:12px;padding:6px 0;font-weight:700">LCOE: 0.32元/kWh | LCOS: 0.45元/kWh | 碳减排: '+Math.round(cap*0.5*8760*0.0008)+'tCO₂/年</div>';
+
+  steps[7].delay=700; steps[7].result=
+    svgArchDiagram('VPP系统接线图 — '+cap+'MW/'+capTotal+'MWh',[
+      {name:'35kV母线',boxes:[
+        {n:'35kV进线柜',sub:'GIS开关柜',c:'#3a2a1a',s:'#e3b341'},
+        {n:'计量柜',sub:'0.2S级CT/PT',c:'#3a2a1a',s:'#e3b341'},
+        {n:'无功补偿SVG',sub:'±10MVar',c:'#3a2a1a',s:'#e3b341'}
+      ]},
+      {name:'10kV配电',boxes:[
+        {n:'储能变流器PCS',sub:cap*0.4+'MW×'+Math.ceil(cap*0.4/2)+'台',c:'#1a2a4a',s:'#4a9aff'},
+        {n:'光伏逆变器',sub:cap*0.3+'MW',c:'#1a3a2a',s:'#20c840'},
+        {n:'风电箱变',sub:cap*0.15+'MW',c:'#2a3a3a',s:'#4ac8ff'},
+        {n:'充电桩变压器',sub:cap*0.1+'MW',c:'#3a2a3a',s:'#bc8cff'}
+      ]},
+      {name:'0.4kV终端',boxes:[
+        {n:'BMS电池管理',sub:'280Ah LFP',c:'#0d2040',s:'#20c840'},
+        {n:'储能汇流柜',sub:'DC 750V',c:'#0d2040',s:'#20c840'},
+        {n:'EMS能量管理',sub:'IEC 61850',c:'#0d2040',s:'#ff9040'}
+      ]}
+    ],700,260);
+
+  steps[8].delay=800; steps[8].result=
+    codeBlock('Python','vpp_ems_dispatch.py',
+'import numpy as np
+from scipy.optimize import linprog
+from datetime import datetime
+
+class VPPDispatcher:
+    """VPP能量管理系统 — 调度优化引擎"""
+    def __init__(self, cap_mw, ess_mwh, market="现货"):
+        self.cap = cap_mw
+        self.ess_cap = ess_mwh
+        self.market = market
+        self.hourly_prices = self._load_prices()
+
+    def optimize_dayahead(self, forecast_pv, forecast_load):
+        """日前调度优化 — MILP求解"""
+        n = 24  # 24小时
+        # 目标函数: 最大化收益
+        c = -self.hourly_prices[:n]  # 负号=最大化
+        # 约束: 功率平衡
+        A_eq = np.ones((1, n))
+        b_eq = [self.cap * 0.8]
+        # 约束: 储能SOC
+        bounds = [(0, self.cap * 0.8) for _ in range(n)]
+        result = linprog(c, A_eq=A_eq, b_eq=b_eq, bounds=bounds)
+        return result.x if result.success else np.zeros(n)
+
+    def agc_control(self, setpoint, freq_meas, power_meas, soc):
+        """AGC调频控制 — PID"""
+        kp_freq, kp_power = 2.5, 0.8
+        freq_adj = (freq_meas - 50.0) * kp_freq
+        target = setpoint + freq_adj
+        error = target - power_meas
+        return error * kp_power
+
+    def run(self):
+        """执行24h调度"""
+        schedule = self.optimize_dayahead(
+            forecast_pv=np.random.uniform(0, self.cap*0.3, 24),
+            forecast_load=np.random.uniform(self.cap*0.2, self.cap*0.6, 24)
+        )
+        return {"schedule": schedule.tolist(), "revenue": float(np.sum(schedule * self.hourly_prices[:24]))}
+
+if __name__ == "__main__":
+    vpp = VPPDispatcher(cap_mw=150, ess_mwh=300, market="现货")
+    result = vpp.run()
+    print(f"日收益: {result[\'revenue\']:.0f} 万元")')+
+    codeBlock('Python','vpp_market_bidding.py',
+'class MarketBiddingEngine:
+    """电力市场交易申报引擎"""
+    def __init__(self, market_type="现货"):
+        self.market = market_type
+        self.bid_history = []
+
+    def generate_bid(self, capacity, price_forecast, strategy="谷充峰放"):
+        """自动生成交易申报"""
+        bids = []
+        for hour in range(24):
+            price = price_forecast[hour]
+            if price < 0.35:  # 低价时段充电
+                bids.append({"hour": hour, "action": "买", "qty": capacity*0.8, "price": price})
+            elif price > 0.75:  # 高价时段放电
+                bids.append({"hour": hour, "action": "卖", "qty": capacity*0.9, "price": price})
+            else:
+                bids.append({"hour": hour, "action": "持", "qty": 0, "price": price})
+        return bids
+
+    def risk_assess(self, bids):
+        """风险评估"""
+        return {"var_95": sum(b["qty"]*b["price"] for b in bids)*0.05,
+                "cvar": sum(b["qty"]*b["price"] for b in bids)*0.03,
+                "sharpe": 2.1}');
+
+  steps[9].delay=700; steps[9].result=
+    deployCard('自动化部署清单 — 客户服务器',[
+      {icon:'📦',name:'Docker镜像构建: vpp-ems:latest',status:'ok',label:'就绪'},
+      {icon:'☸️',name:'Kubernetes部署: vpp-ems namespace',status:'ok',label:'就绪'},
+      {icon:'🔧',name:'Terraform基础设施: AWS/阿里云/华为云',status:'ok',label:'就绪'},
+      {icon:'🔒',name:'TLS证书配置: Let\'s Encrypt自签发',status:'ok',label:'就绪'},
+      {icon:'📡',name:'IEC 61850 MMS通信: 端口102映射',status:'ok',label:'就绪'},
+      {icon:'📊',name:'Grafana监控面板: 实时功率/收益/SOC',status:'ok',label:'就绪'},
+      {icon:'🔔',name:'告警推送: 钉钉/企业微信/Webhook',status:'ok',label:'就绪'},
+      {icon:'💾',name:'数据持久化: PostgreSQL + InfluxDB',status:'ok',label:'就绪'}
+    ])+
+    codeBlock('Dockerfile','Dockerfile',
+'FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8080 102
+CMD ["python", "-m", "uvicorn", "vpp_ems:app", "--host", "0.0.0.0", "--port", "8080"]')+
+    codeBlock('Terraform','main.tf',
+'resource "alicloud_instance" "vpp_ems" {
+  instance_name = "vpp-ems-${var.project}"
+  image_id      = "ubuntu_22_04_x64_20G_alibase_20240101.vhd"
+  instance_type = "ecs.c7.xlarge"
+  security_groups = [alicloud_security_group.vpp.id]
+  tags = { Project = "VPP", Environment = "production" }
+}
+resource "alicloud_db_instance" "vpp_db" {
+  engine           = "PostgreSQL"
+  engine_version   = "15.0"
+  instance_type    = "rds.pg.s2.large"
+  instance_storage = 100
+}');
+
+  steps[10].delay=600; steps[10].result=
+    tableHtml(
+    ['运营模块','配置方案','SLA指标'],
+    [['日常巡检','AI自动巡检 + 人工复核','响应时间 < 30min'],
+     ['设备维护','预测性维护(振动/温度/内阻)','故障率 < 0.5%/年'],
+     ['市场交易','AI自动报价 + 人工审批','履约率 > 98%'],
+     ['收益核算','月度自动结算 + 对账','准确率 100%'],
+     ['安全合规','等保三级 + 密码审计','通过率 100%'],
+     ['技术支持','7×24小时 + 年度培训','可用率 > 99.9%'],
+     ['数据备份','异地双活 + 每日快照','RPO < 1h, RTO < 4h'],
+     ['碳资产管理','自动申报CCER','年度核查通过']], true
+  )+
+    '<div style="color:var(--text2);font-size:10px;padding:6px 0">运维团队配置: 项目经理×1 + 电气工程师×2 + 软件工程师×1 + 值班员×3 (轮班) | 年运维费用: '+Math.round(cap*3)+'万元</div>';
+
+  steps[11].delay=500; steps[11].result=
+    kpiRow([
+      {v:cap+'MW',l:'项目规模',color:'var(--blue)'},
+      {v:irr+'%',l:'IRR',color:'var(--green)'},
+      {v:payback+'年',l:'回收期',color:'var(--green)'},
+      {v:'A+',l:'能效评级',color:'var(--orange)'}
+    ])+logLines([
+      {t:'ok',m:'📄 VPP_'+cap+'MW_方案报告.pdf — 完整技术方案 (128页)'},
+      {t:'ok',m:'📐 VPP_'+cap+'MW_系统接线图.svg — 专业电气图纸'},
+      {t:'ok',m:'📐 VPP_'+cap+'MW_资源拓扑图.svg — 系统架构图'},
+      {t:'ok',m:'📄 VPP_'+cap+'MW_收益分析.xlsx — 财务模型'},
+      {t:'ok',m:'💻 vpp_ems_dispatch.py — 调度优化引擎 (Python)'},
+      {t:'ok',m:'💻 vpp_market_bidding.py — 市场交易引擎 (Python)'},
+      {t:'ok',m:'🔧 VPP_AGC_Controller.st — PLC控制程序 (IEC 61850)'},
+      {t:'ok',m:'🔧 VPP_ICD_001.scd — SCL配置文件'},
+      {t:'ok',m:'🐳 docker-compose.yml — 容器化部署配置'},
+      {t:'ok',m:'☸️ k8s-deployment.yaml — K8s编排配置'},
+      {t:'ok',m:'🏗 main.tf — Terraform基础设施代码'},
+      {t:'ok',m:'📊 grafana-dashboard.json — 监控面板'},
+      {t:'ok',m:'📋 运营SLA协议 — 服务等级承诺'},
+      {t:'info',m:'🔗 全部交付物打包 → VPP_'+cap+'MW_'+market.replace(/\s/g,'')+'_'+(new Date().toISOString().slice(0,10))+'.zip'},
+      {t:'info',m:'✅ 一键部署命令: docker-compose up -d && kubectl apply -f k8s/'},
+    ]);
 
   runSteps('vpp-unified-flow', steps, 'vppUnifiedBtn');
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SYNERGY UNIFIED AGENT FLOW
+   SYNERGY UNIFIED AGENT FLOW — 12-Step Professional Pipeline
 ══════════════════════════════════════════════════════════════ */
 function synUnifiedFlow(){
   var input=document.getElementById('synInput').value.trim();
@@ -96170,96 +96584,341 @@ function synUnifiedFlow(){
   var itKw=powerMW*1000; var racks=Math.ceil(gpuN/32); var pue=1.18;
   var coolKw=Math.round(itKw*(pue-1));
   var essPower=Math.round(essMwh*0.5); var upTime=2;
+  var coolLabel={liquid:'全液冷冷板',hybrid:'液冷+风冷混合',immersion:'浸没式液冷',air:'精密空调'}[coolType]||coolType;
+  var totalInvest=Math.round(gpuN/8*80+coolKw*0.12+powerMW*200+essMwh*35+racks*3);
+  var annualSave=Math.round(powerMW*1000*0.17*8760*(1.35-pue)/1.35/10000);
 
   var steps=[
-    mkStep('📋','1. 算力需求解析',['NLP.skill','GPU-Spec.skill','Workload.skill']),
-    mkStep('🏗','2. 供配电架构',['PowerArch.skill','UPS.skill','Transformer.skill']),
-    mkStep('❄️','3. 液冷散热设计',['Cooling.skill','Liquid.skill','CFD.skill']),
-    mkStep('📈','4. PUE优化策略',['PUE.skill','Optimizer.skill','Analytics.skill']),
-    mkStep('🔋','5. 储能配置',['ESS.skill','BESS.skill','HSC.skill']),
-    mkStep('🖥','6. 机柜布局',['Layout.skill','Rack.skill','Thermal.skill']),
-    mkStep('📦','7. BOM清单',['BOM.skill','Cost.skill','Procurement.skill']),
-    mkStep('📐','8. 图纸交付',['Drawing.skill','SVG.skill','CAD.skill']),
+    mkStep('📋','1. 算力需求深度解析',['NLP.skill','GPU-Spec.skill','Workload.skill']),
+    mkStep('⚡','2. 供配电系统架构设计',['PowerArch.skill','UPS.skill','Transformer.skill']),
+    mkStep('❄️','3. 液冷散热系统设计',['Cooling.skill','CFD.skill','PipeDesign.skill']),
+    mkStep('📈','4. PUE优化与能耗分析',['PUE.skill','Optimizer.skill','Analytics.skill']),
+    mkStep('🔋','5. 储能系统配置',['ESS.skill','BESS.skill','HSC.skill']),
+    mkStep('🖥','6. 数据中心机柜布局',['Layout.skill','Rack.skill','Thermal.skill']),
+    mkStep('📦','7. BOM清单与成本分析',['BOM.skill','Cost.skill','Procurement.skill']),
+    mkStep('🔧','8. 控制代码自动生成',['CodeGen.skill','Python.skill','Modbus.skill']),
+    mkStep('🚀','9. 自动化部署配置',['Deploy.skill','Terraform.skill','K8s.skill']),
+    mkStep('📐','10. 专业图纸输出',['Drawing.skill','SVG.skill','CAD.skill']),
+    mkStep('📋','11. 运营方案制定',['Ops.skill','SLA.skill','Maintain.skill']),
+    mkStep('📦','12. 交付物打包与验收',['Report.skill','PDF.skill','Export.skill']),
   ];
 
-  steps[0].delay=500; steps[0].result=tableHtml(
-    ['需求参数','解析值'],
-    [['数据中心总功率',powerMW+' MW ('+itKw+' kW IT)'],
-     ['GPU数量',gpuN+' 张'],
-     ['GPU机柜',racks+' 柜 (32卡/柜)'],
-     ['储能配置',essMwh+' MWh / '+essPower+' MW'],
-     ['冷却方式',coolType],
-     ['优化目标',objective],
-     ['PUE目标',pue.toFixed(2)]], false
+  steps[0].delay=500; steps[0].result=
+    kpiRow([
+      {v:powerMW+' MW',l:'总功率',color:'var(--blue)'},
+      {v:gpuN+' GPU',l:'算力规模',color:'var(--green)'},
+      {v:essMwh+' MWh',l:'储能配置',color:'var(--orange)'},
+      {v:'PUE '+pue.toFixed(2),l:'能效目标',color:'var(--blue)'}
+    ])+tableHtml(
+    ['需求参数','解析值','置信度'],
+    [['数据中心总功率',powerMW+' MW ('+itKw+' kW IT)','99%'],
+     ['GPU型号与数量',gpuN+' × NVIDIA H100 80GB','98%'],
+     ['GPU机柜数量',racks+' 柜 (32卡/柜)','99%'],
+     ['储能配置',essMwh+' MWh / '+essPower+' MW','97%'],
+     ['冷却方式',coolLabel,'95%'],
+     ['优化目标',objective,'96%'],
+     ['PUE目标',pue.toFixed(2)+' (行业平均1.35)','98%'],
+     ['UPS架构','2N冗余 (Tier III+)',('99%')]], false
   );
 
-  steps[1].delay=700; steps[1].result=svgNodeTree('供配电架构',[
-    {l:0, n:'电网 '+powerMW*1.3+'MVA', c:'#0d1a2a', s:'#e3b341'},
-    {l:1, n:'主变压器 2×(', c:'#1a2a4a', s:'#4a9aff'},
-    {l:1, n:'UPS 2N冗余', c:'#1a3a2a', s:'#20c840'},
-    {l:2, n:'HVDC 240V', c:'#1a2a4a', s:'#4a9aff'},
-    {l:2, n:'PDU 智能配电', c:'#1a3a2a', s:'#20c840'},
-    {l:3, n:'GPU机柜 1~'+racks, c:'#0d2040', s:'#ff9040'},
-    {l:3, n:'液冷CDU', c:'#0d2040', s:'#4ac8ff'},
-  ], 600, 200);
+  steps[1].delay=700; steps[1].result=
+    svgArchDiagram('供配电系统架构 — '+powerMW+'MW数据中心',[
+      {name:'110kV/35kV 进线',boxes:[
+        {n:'110kV GIS',sub:powerMW*1.3+'MVA',c:'#3a2a1a',s:'#e3b341'},
+        {n:'主变压器',sub:'2×'+Math.round(powerMW*0.7)+'MVA',c:'#3a2a1a',s:'#e3b341'},
+        {n:'35kV母线',sub:'单母线分段',c:'#3a2a1a',s:'#e3b341'}
+      ]},
+      {name:'10kV 配电层',boxes:[
+        {n:'UPS系统 2N',sub:itKw+'kW',c:'#1a2a4a',s:'#4a9aff'},
+        {n:'HVDC 240V',sub:Math.round(itKw*0.8)+'kW',c:'#1a2a4a',s:'#4a9aff'},
+        {n:'柴发备用',sub:powerMW*1.1+'MW',c:'#2a2a3a',s:'#bc8cff'},
+        {n:'储能PCS',sub:essPower+'MW',c:'#1a3a2a',s:'#20c840'}
+      ]},
+      {name:'0.4kV 终端层',boxes:[
+        {n:'PDU智能配电柜',sub:racks+'柜位',c:'#0d2040',s:'#ff9040'},
+        {n:'GPU服务器机柜',sub:racks+'柜 × 32卡',c:'#0d2040',s:'#ff9040'},
+        {n:'液冷CDU',sub:Math.max(2,Math.ceil(coolKw/300))+'台',c:'#0d2040',s:'#4ac8ff'},
+        {n:'BMS电池管理',sub:essMwh+'MWh',c:'#0d2040',s:'#20c840'}
+      ]}
+    ],700,280);
 
-  steps[2].delay=800; steps[2].result=svgGenConfig('液冷系统参数',[
-    {k:'冷却方式', v:coolType},
-    {k:'冷却负载', v:coolKw+' kW'},
-    {k:'进水温度', v:'18~22℃'},
-    {k:'出水温度', v:'35~40℃'},
-    {k:'流量需求', v:Math.round(coolKw*2.5)+' L/min'},
-    {k:'CDU数量', v:Math.max(2,Math.ceil(coolKw/300))+' 台'},
-    {k:'冷却塔', v:'闭式冷却塔 × '+Math.max(1,Math.ceil(coolKw/800))},
-    {k:'PUE贡献', v:'-0.12 (液冷vs风冷)'},
-  ])+svgBars(
-    [{l:'GPU发热',v:Math.round(itKw*0.7),u:'kW'},{l:'内存发热',v:Math.round(itKw*0.15),u:'kW'},{l:'电源损耗',v:Math.round(itKw*0.1),u:'kW'},{l:'其他',v:Math.round(itKw*0.05),u:'kW'}],
-    450, 160
+  steps[2].delay=800; steps[2].result=
+    svgPidDiagram('液冷散热系统P&ID — '+coolLabel,[
+      {x:8,y:30,n:'冷却塔',type:'box',fc:'#1a2a4a',sc:'#4ac8ff',w:70},
+      {x:25,y:30,n:'CDU-1',type:'pump'},
+      {x:25,y:70,n:'CDU-2',type:'pump'},
+      {x:45,y:30,n:'分水器',type:'tank'},
+      {x:45,y:70,n:'集水器',type:'tank'},
+      {x:65,y:30,n:'GPU机柜行',type:'box',fc:'#1a3a2a',sc:'#20c840',w:80},
+      {x:65,y:70,n:'GPU机柜行',type:'box',fc:'#1a3a2a',sc:'#20c840',w:80},
+      {x:85,y:50,n:'膨胀水箱',type:'tank'},
+      {x:85,y:30,n:'补水装置',type:'valve'},
+    ],[
+      {x1:15,y1:30,x2:22,y2:30,label:'供水',c:'#4ac8ff'},
+      {x1:32,y1:30,x2:42,y2:30,label:'供水',c:'#4ac8ff'},
+      {x1:32,y1:70,x2:42,y2:70,label:'供水',c:'#4ac8ff'},
+      {x1:52,y1:30,x2:62,y2:30,label:'供水'+Math.round(coolKw*1.25)+'L/min',c:'#4ac8ff'},
+      {x1:52,y1:70,x2:62,y2:70,label:'供水',c:'#4ac8ff'},
+      {x1:72,y1:30,x2:42,y2:30,label:'回水',c:'#ff9040',dash:true},
+      {x1:72,y1:70,x2:42,y2:70,label:'回水',c:'#ff9040',dash:true},
+      {x1:82,y1:50,x2:48,y2:50,label:'补水',c:'#20c840'},
+    ],700,260)+
+    tableHtml(
+    ['参数','数值','说明'],
+    [['冷却方式',coolLabel,'主冷却方案'],
+     ['冷却负载',coolKw+' kW','总散热需求'],
+     ['进/出水温度','18~22℃ / 35~40℃','ΔT=16~18℃'],
+     ['流量需求',Math.round(coolKw*2.5)+' L/min','系统总流量'],
+     ['CDU数量',Math.max(2,Math.ceil(coolKw/300))+' 台','液冷分配单元'],
+     ['冷却塔',Math.max(1,Math.ceil(coolKw/800))+' 台闭式','干球温度35℃'],
+     ['PUE贡献','-0.12 (液冷vs风冷)','能效提升'],
+     ['冗余设计','N+1 (CDU) / 2N (冷却塔)','高可用']], true
   );
 
   var pueData=[];
-  for(var pi=0;pi<12;pi++){pueData.push({l:(pi*2)+'时',v:(1.12+Math.random()*0.12+(pi>3&&pi<8?0.08:0))});}
-  steps[3].delay=700; steps[3].result=svgPowerLine(pueData,600,160)+
-    '<div style="color:var(--green);font-size:13px;padding:6px 0;font-weight:700">全年平均PUE: '+pue.toFixed(2)+' | 比行业平均(1.35)低 '+(100-Math.round(pue/1.35*100))+'% | 年节省电费 '+(powerMW*1000*0.17*8760*0.05/10000).toFixed(0)+' 万元</div>';
+  for(var pi=0;pi<24;pi++){pueData.push({l:pi+':00',v:parseFloat((1.12+Math.random()*0.12+(pi>8&&pi<18?0.08:0)).toFixed(3))});}
+  steps[3].delay=700; steps[3].result=
+    svgPowerLine(pueData,700,180)+
+    kpiRow([
+      {v:pue.toFixed(2),l:'设计PUE',color:'var(--green)'},
+      {v:'1.35',l:'行业平均',color:'var(--orange)'},
+      {v:Math.round((1.35-pue)/1.35*100)+'%',l:'节能率',color:'var(--green)'},
+      {v:annualSave+'万/年',l:'年节省电费',color:'var(--blue)'}
+    ])+
+    svgBars([
+      {l:'IT设备',v:Math.round(itKw*0.7),u:'kW'},
+      {l:'GPU计算',v:Math.round(itKw*0.55),u:'kW'},
+      {l:'内存网络',v:Math.round(itKw*0.15),u:'kW'},
+      {l:'液冷系统',v:Math.round(coolKw*0.6),u:'kW'},
+      {l:'UPS损耗',v:Math.round(itKw*0.06),u:'kW'},
+      {l:'照明辅助',v:Math.round(itKw*0.02),u:'kW'}
+    ],700,160)+
+    '<div style="color:var(--text2);font-size:10px;padding:4px 0">能耗分解: IT负荷'+Math.round(itKw*0.7)+'kW + 制冷'+Math.round(coolKw*0.6)+'kW + 配电损耗'+Math.round(itKw*0.06)+'kW | 年耗电量: '+Math.round(powerMW*pue*8760)+'MWh</div>';
 
-  steps[4].delay=800; steps[4].result=svgNodeTree('储能架构',[
-    {l:0, n:'BMS总控', c:'#0d1a2a', s:'#20c840'},
-    {l:1, n:'HSC 飞轮', c:'#1a3a2a', s:'#20c840'},
-    {l:1, n:'BBU 电池包', c:'#2a3a1a', s:'#e3b341'},
-    {l:1, n:'BESS 储能仓', c:'#1a2a4a', s:'#4a9aff'},
-    {l:2, n:'EMS调度', c:'#0d2040', s:'#ff9040'},
-  ], 400, 170)+
-    tableHtml(['参数','HSC飞轮','BBU电池包','BESS储能仓'],
-      [['容量',essMwh*0.05+' MWh',essMwh*0.15+' MWh',essMwh*0.8+' MWh'],
-       ['功率',essPower*0.3+' MW',essPower*0.4+' MW',essPower*0.3+' MW'],
-       ['响应',upTime+'ms',upTime+'ms','500ms'],
-       ['时长','30s','5min','2h'],
-       ['寿命','15年','8年','10年']], true
+  steps[4].delay=800; steps[4].result=
+    svgArchDiagram('混合储能系统架构 — '+essMwh+'MWh',[
+      {name:'能量管理层',boxes:[
+        {n:'EMS调度系统',sub:'AI预测调度',c:'#0d2040',s:'#ff9040'},
+        {n:'BMS总控',sub:'IEC 61850',c:'#0d2040',s:'#ff9040'}
+      ]},
+      {name:'功率变换层',boxes:[
+        {n:'HSC飞轮储能',sub:Math.round(essMwh*0.05)+'MWh/'+Math.round(essPower*0.3)+'MW',c:'#1a3a2a',s:'#20c840'},
+        {n:'BBU电池包',sub:Math.round(essMwh*0.15)+'MWh/'+Math.round(essPower*0.4)+'MW',c:'#2a3a1a',s:'#e3b341'},
+        {n:'BESS磷酸铁锂',sub:Math.round(essMwh*0.8)+'MWh/'+Math.round(essPower*0.3)+'MW',c:'#1a2a4a',s:'#4a9aff'},
+        {n:'PCS变流器',sub:essPower+'MW',c:'#1a2a4a',s:'#4a9aff'}
+      ]},
+      {name:'电池层',boxes:[
+        {n:'飞轮转子',sub:'15年寿命',c:'#1a3a2a',s:'#20c840'},
+        {n:'BBU电芯',sub:'LFP 280Ah',c:'#2a3a1a',s:'#e3b341'},
+        {n:'BESS模组',sub:'液冷温控',c:'#1a2a4a',s:'#4a9aff'}
+      ]}
+    ],700,260)+
+    tableHtml(['储能类型','容量(MWh)','功率(MW)','响应时间','循环寿命','应用场景'],
+      [['HSC飞轮',Math.round(essMwh*0.05),Math.round(essPower*0.3),'≤2ms','15年/不限次','调频+暂态支撑'],
+       ['BBU电池包',Math.round(essMwh*0.15),Math.round(essPower*0.4),'≤10ms','8年/6000次','UPS后备+削峰'],
+       ['BESS储能仓',Math.round(essMwh*0.8),Math.round(essPower*0.3),'≤200ms','10年/6000次','能量时移+需量管理'],
+       ['合计',essMwh,essPower,'—','—','—']], true
     );
 
-  steps[5].delay=600; steps[5].result=svgNodeTree('机柜布局',[
-    {l:0, n:'数据中心 电力模组', c:'#0d1a2a', s:'#4a9aff'},
-    {l:1, n:'GPU区 '+Math.ceil(racks*0.7)+'柜', c:'#1a2a4a', s:'#4a9aff'},
-    {l:1, n:'存储区 '+Math.ceil(racks*0.15)+'柜', c:'#1a3a2a', s:'#20c840'},
-    {l:1, n:'网络区 '+Math.ceil(racks*0.1)+'柜', c:'#2a2a3a', s:'#bc8cff'},
-    {l:1, n:'管理区 '+Math.max(1,Math.ceil(racks*0.05))+'柜', c:'#3a2a1a', s:'#e3b341'},
-  ], 500, 180)+
-    '<div style="color:var(--text2);font-size:11px;padding:6px 0">行间冷却: 每行6柜 + CDU | 单柜功率密度 '+(coolType==='immersion'?'60':'35')+'kW/柜 | 封闭冷通道</div>';
+  steps[5].delay=600; steps[5].result=
+    svgRackLayout('数据中心机柜布局 — '+racks+'柜',4,Math.min(8,racks),
+      [{r:0,c:0,fc:'#1a2a4a',sc:'#4a9aff'},{r:0,c:1,fc:'#1a2a4a',sc:'#4a9aff'},
+       {r:0,c:2,fc:'#1a2a4a',sc:'#4a9aff'},{r:0,c:3,fc:'#1a2a4a',sc:'#4a9aff'},
+       {r:1,c:0,fc:'#1a3a2a',sc:'#20c840'},{r:1,c:1,fc:'#1a3a2a',sc:'#20c840'},
+       {r:2,c:0,fc:'#2a2a3a',sc:'#bc8cff'},
+       {r:3,c:0,fc:'#3a2a1a',sc:'#e3b341'}],
+      700,250)+
+    tableHtml(
+    ['区域','机柜数','功率密度','冷却方式','网络'],
+    [['GPU计算区',Math.ceil(racks*0.7)+'柜',(coolType==='immersion'?'60':'35')+'kW/柜',coolLabel,'InfiniBand 400Gbps'],
+     ['存储区',Math.ceil(racks*0.15)+'柜','15kW/柜','行级空调','NVMe-oF'],
+     ['网络区',Math.ceil(racks*0.1)+'柜','10kW/柜','风冷','—'],
+     ['管理区',Math.max(1,Math.ceil(racks*0.05))+'柜','8kW/柜','风冷','以太网'],
+     ['冷通道',Math.ceil(racks*0.7)+'列','—','封闭冷通道','—'],
+     ['走廊',Math.ceil(racks*0.7)+'条','—','热通道回风','—']], true
+  )+
+    '<div style="color:var(--text2);font-size:10px;padding:4px 0">布局: 每行6柜 + CDU | 封闭冷通道 | 单柜功率密度 '+(coolType==='immersion'?'60':'35')+'kW | 总占地面积: '+Math.round(racks*2.5)+'㎡</div>';
 
-  steps[6].delay=700; steps[6].result=svgBars(
-    [{l:'GPU服务器',v:Math.round(gpuN/8)*80,u:'万'},{l:'液冷系统',v:Math.round(coolKw*0.12),u:'万'},{l:'供配电',v:powerMW*200,u:'万'},{l:'储能系统',v:essMwh*35,u:'万'},
-     {l:'网络设备',v:racks*3,u:'万'},{l:'施工安装',v:Math.round((powerMW*200+coolKw*0.12)*0.2),u:'万'}],550,180)+
-    '<div style="color:var(--green);font-size:13px;padding:6px 0;font-weight:700">设备总投资: 约 '+(Math.round(gpuN/8)*80+Math.round(coolKw*0.12)+powerMW*200+essMwh*35+racks*3)+' 万元</div>';
+  var gpuServerCost=Math.round(gpuN/8)*80;
+  var coolSystemCost=Math.round(coolKw*0.12);
+  var powerCost=powerMW*200;
+  var essCost=essMwh*35;
+  var networkCost=racks*3;
+  var installCost=Math.round((powerCost+coolSystemCost)*0.2);
+  steps[6].delay=700; steps[6].result=
+    svgBars([
+      {l:'GPU服务器',v:gpuServerCost,u:'万'},
+      {l:'供配电',v:powerCost,u:'万'},
+      {l:'液冷系统',v:coolSystemCost,u:'万'},
+      {l:'储能系统',v:essCost,u:'万'},
+      {l:'网络设备',v:networkCost,u:'万'},
+      {l:'施工安装',v:installCost,u:'万'}
+    ],700,180)+
+    kpiRow([
+      {v:totalInvest+'万',l:'设备总投资',color:'var(--orange)'},
+      {v:Math.round(totalInvest*1.2)+'万',l:'项目总投资(含土建)',color:'var(--orange)'},
+      {v:Math.round(totalInvest/racks)+'万/柜',l:'单柜成本',color:'var(--blue)'}
+    ])+tableHtml(
+    ['设备类别','数量','单价(万)','小计(万)','交期'],
+    [['GPU服务器(H100 8卡)',Math.round(gpuN/8)+'台',80,gpuServerCost,'8~12周'],
+     ['液冷CDU',Math.max(2,Math.ceil(coolKw/300))+'台',Math.round(coolSystemCost/Math.max(2,Math.ceil(coolKw/300))),coolSystemCost,'6~8周'],
+     ['UPS 2N',Math.ceil(itKw/500)+'台',50,Math.ceil(itKw/500)*50,'4~6周'],
+     ['BESS储能仓',Math.ceil(essMwh/5)+'组',Math.round(essCost/Math.ceil(essMwh/5)),essCost,'10~14周'],
+     ['交换机(400G)',Math.ceil(racks/12)*2+'台',Math.round(networkCost/Math.ceil(racks/12)/2),networkCost,'2~4周'],
+     ['施工安装','—','—',installCost,'同步']], true
+  );
 
-  steps[7].delay=500; steps[7].result=logLines([
-    {t:'ok',m:'图纸1: 供配电系统图 (SVG) → Syn_PowerDist_'+powerMW+'MW.svg'},
-    {t:'ok',m:'图纸2: 液冷管路图 (SVG) → Syn_Cooling_'+coolType+'.svg'},
-    {t:'ok',m:'图纸3: 机柜布局图 (SVG) → Syn_FloorPlan_'+racks+'racks.svg'},
-    {t:'ok',m:'图纸4: 储能系统图 (SVG) → Syn_ESS_'+essMwh+'MWh.svg'},
-    {t:'ok',m:'BOM明细表: Syn_BOM_v1.xlsx ('+Math.round(gpuN/8)+'类物料)'},
-    {t:'ok',m:'施工方案: Syn_Construction_v1.pdf (含工期'+Math.round(powerMW*0.5)+'个月)'},
-    {t:'info',m:'项目成功率: '+(80+Math.floor(Math.random()*15))+'% | 综合能效评分: A+ | 碳减排: '+(powerMW*0.5*8760*0.001).toFixed(0)+'tCO₂/年'},
-  ]);
+  steps[7].delay=800; steps[7].result=
+    codeBlock('Python','cooling_control.py',
+'import asyncio
+import modbus_tk.defines as cst
+from modbus_tk import modbus_tcp
+
+class CoolingController:
+    """液冷系统智能控制器 — 自动调温"""
+    def __init__(self, cdu_count=4, target_temp=22.0):
+        self.cdu_count = cdu_count
+        self.target_temp = target_temp
+        self.master = modbus_tcp.TcpMaster(host="192.168.1.200", port=502)
+
+    async def read_temps(self):
+        """读取所有CDU温度传感器"""
+        temps = []
+        for i in range(self.cdu_count):
+            raw = self.master.execute(slave=i+1, function_code=cst.READ_HOLDING_REGISTERS, starting_address=0, quantity_of_x=4)
+            inlet = raw[0] / 10.0   # 进水温度 ℃
+            outlet = raw[1] / 10.0  # 出水温度 ℃
+            flow = raw[2] / 10.0    # 流量 L/min
+            power = raw[3] / 10.0   # 制冷功率 kW
+            temps.append({"inlet": inlet, "outlet": outlet, "flow": flow, "power": power})
+        return temps
+
+    async def auto_adjust(self):
+        """PID自适应调温"""
+        temps = await self.read_temps()
+        avg_outlet = sum(t["outlet"] for t in temps) / len(temps)
+        error = avg_outlet - self.target_temp
+        kp = 2.5  # 比例系数
+        adjustment = error * kp
+        # 写入变频器频率调节
+        for i in range(self.cdu_count):
+            freq = max(20, min(50, 35 + adjustment))
+            self.master.execute(slave=i+1, function_code=cst.WRITE_SINGLE_REGISTER, starting_address=100, output_value=int(freq*10))
+        return {"avg_outlet": avg_outlet, "adjustment": adjustment, "freq": freq}
+
+    async def run_loop(self):
+        """主控制循环"""
+        while True:
+            result = await self.auto_adjust()
+            print(f"[Cooling] 出水{result[\'avg_outlet\']:.1f}℃ → 调整{result[\'adjustment\']:.1f}℃ → 频率{result[\'freq\']:.1f}Hz")
+            await asyncio.sleep(5)  # 5秒控制周期')+
+    codeBlock('Python','bms_monitor.py',
+'class BMSMonitor:
+    """电池管理系统 — 实时监控"""
+    def __init__(self, pack_count=32):
+        self.pack_count = pack_count
+        self.alerts = []
+
+    def check_health(self, soc, voltage, current, temp):
+        """电池健康检查"""
+        issues = []
+        if soc < 10: issues.append("SOC过低: {}%".format(soc))
+        if voltage < 3.0: issues.append("电压过低: {}V".format(voltage))
+        if temp > 45: issues.append("温度过高: {}℃".format(temp))
+        if abs(current) > 200: issues.append("电流过大: {}A".format(current))
+        return issues
+
+    def get_soh(self, cycle_count, capacity_fade):
+        """计算SOH健康度"""
+        return max(0, 100 - cycle_count * 0.02 - capacity_fade * 0.5)')+
+    codeBlock('Dockerfile','Dockerfile',
+'FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8080 502
+CMD ["python", "-m", "uvicorn", "cooling_api:app", "--host", "0.0.0.0", "--port", "8080"]');
+
+  steps[8].delay=700; steps[8].result=
+    deployCard('自动化部署清单 — 客户服务器',[
+      {icon:'📦',name:'Docker镜像: cooling-ctl:latest + bms-monitor:latest',status:'ok',label:'就绪'},
+      {icon:'☸️',name:'Kubernetes: cooling namespace + HPA自动扩缩',status:'ok',label:'就绪'},
+      {icon:'🔧',name:'Terraform: 阿里云/AWS/华为云基础设施',status:'ok',label:'就绪'},
+      {icon:'📡',name:'Modbus TCP: 端口502映射 → CDU控制器',status:'ok',label:'就绪'},
+      {icon:'🔒',name:'VPN隧道: WireGuard → 远程运维',status:'ok',label:'就绪'},
+      {icon:'📊',name:'Grafana: 温度/PUE/能耗实时监控',status:'ok',label:'就绪'},
+      {icon:'🔔',name:'告警: 温度超限/PUE异常/设备故障',status:'ok',label:'就绪'},
+      {icon:'💾',name:'时序数据库: InfluxDB + PostgreSQL',status:'ok',label:'就绪'}
+    ])+codeBlock('Terraform','main.tf',
+'resource "alicloud_instance" "cooling_ctrl" {
+  instance_name = "cooling-ctl-${var.project}"
+  instance_type = "ecs.c7.large"
+  image_id      = "ubuntu_22_04_x64_20G"
+  tags = { Project = "DataCenter", Role = "cooling-controller" }
+}
+resource "alicloud_db_instance" "dc_db" {
+  engine           = "PostgreSQL"
+  engine_version   = "15.0"
+  instance_storage = 200
+}');
+
+  steps[9].delay=700; steps[9].result=
+    svgArchDiagram('数据中心系统交付图纸 — '+powerMW+'MW/'+racks+'柜',[
+      {name:'电气系统',boxes:[
+        {n:'供配电系统图',sub:'一次/二次接线',c:'#3a2a1a',s:'#e3b341'},
+        {n:'UPS接线图',sub:'2N冗余拓扑',c:'#3a2a1a',s:'#e3b341'},
+        {n:'储能系统图',sub:essMwh+'MWh',c:'#1a3a2a',s:'#20c840'}
+      ]},
+      {name:'暖通系统',boxes:[
+        {n:'液冷管路图',sub:'P&ID',c:'#1a2a4a',s:'#4ac8ff'},
+        {n:'冷却塔布置图',sub:'室外机',c:'#1a2a4a',s:'#4ac8ff'},
+        {n:'气流组织图',sub:'CFD仿真',c:'#1a2a4a',s:'#4ac8ff'}
+      ]},
+      {name:'建筑结构',boxes:[
+        {n:'机柜平面布局',sub:racks+'柜',c:'#0d2040',s:'#ff9040'},
+        {n:'电缆桥架图',sub:'强弱电分离',c:'#0d2040',s:'#ff9040'},
+        {n:'消防系统图',sub:'气体灭火',c:'#2a2a3a',s:'#bc8cff'}
+      ]}
+    ],700,260);
+
+  steps[10].delay=600; steps[10].result=
+    tableHtml(
+    ['运营模块','配置方案','SLA指标'],
+    [['IT运维','AI自动巡检 + NOC 7×24','可用率 > 99.99%'],
+     ['液冷维护','月度水质检测 + 年度管路清洗','温控精度 ±1℃'],
+     ['电池管理','BMS月度均衡 + 年度容量测试','SOH > 80%'],
+     ['UPS维护','季度电池放电测试 + 年度旁路测试','切换时间 < 10ms'],
+     ['能效优化','AI动态调优PUE + 季度节能评估','PUE < 1.20'],
+     ['安全合规','等保三级 + 消防年检','通过率 100%'],
+     ['备件管理','关键备件本地库存 + 4h到场','MTTR < 4h'],
+     ['数据备份','同城双活 + 异地灾备','RPO=0, RTO<15min']], true
+  )+
+    '<div style="color:var(--text2);font-size:10px;padding:6px 0">运维团队: 运维经理×1 + IT工程师×2 + 暖通工程师×1 + 值班员×4 (轮班) | 年运维费用: '+Math.round(totalInvest*0.03)+'万元</div>';
+
+  steps[11].delay=500; steps[11].result=
+    kpiRow([
+      {v:powerMW+'MW',l:'项目规模',color:'var(--blue)'},
+      {v:pue.toFixed(2),l:'PUE',color:'var(--green)'},
+      {v:annualSave+'万/年',l:'年节省电费',color:'var(--green)'},
+      {v:'A+',l:'能效评级',color:'var(--orange)'}
+    ])+logLines([
+      {t:'ok',m:'📄 数据中心_'+powerMW+'MW_方案报告.pdf — 完整技术方案 (156页)'},
+      {t:'ok',m:'📐 供配电系统图.svg — 一次/二次接线'},
+      {t:'ok',m:'📐 液冷管路P&ID.svg — 系统流程图'},
+      {t:'ok',m:'📐 机柜平面布局.svg — '+racks+'柜布局'},
+      {t:'ok',m:'📐 储能系统架构.svg — '+essMwh+'MWh混合储能'},
+      {t:'ok',m:'📄 BOM清单.xlsx — 全量物料与成本'},
+      {t:'ok',m:'💻 cooling_control.py — 液冷智能控制 (Python)'},
+      {t:'ok',m:'💻 bms_monitor.py — 电池管理系统 (Python)'},
+      {t:'ok',m:'🐳 docker-compose.yml — 容器化部署配置'},
+      {t:'ok',m:'☸️ k8s-deployment.yaml — K8s编排配置'},
+      {t:'ok',m:'🏗 main.tf — Terraform基础设施代码'},
+      {t:'ok',m:'📊 grafana-dashboard.json — 监控面板'},
+      {t:'ok',m:'📋 运营SLA协议 — 服务等级承诺'},
+      {t:'info',m:'🔗 全部交付物打包 → Syn_'+powerMW+'MW_'+coolType+'_'+(new Date().toISOString().slice(0,10))+'.zip'},
+      {t:'info',m:'✅ 一键部署: docker-compose up -d && kubectl apply -f k8s/'},
+    ]);
 
   runSteps('syn-unified-flow', steps, 'synUnifiedBtn');
 }
