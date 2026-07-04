@@ -96892,10 +96892,11 @@ function drawPid(title, nodes, pipes, opts){
   var supplyY=py(18), returnY=py(82);
   /* Supply header */
   svg+='<line x1="30" y1="'+supplyY+'" x2="'+(w-30)+'" y2="'+supplyY+'" stroke="#26A69A" stroke-width="2.5" marker-end="url(#pidArrmech)"/>';
-  svg+='<text x="40" y="'+(supplyY-6)+'" font-size="7" fill="#26A69A" font-family="'+th.fontMono+'">供液主管 SUPPLY DN'+Math.round(coolKw*0.08+50)+'</text>';
+   var dnVal=Math.round((opts.coolKw||0)*0.08+50);
+   svg+='<text x="40" y="'+(supplyY-6)+'" font-size="7" fill="#26A69A" font-family="'+th.fontMono+'">供液主管 SUPPLY DN'+dnVal+'</text>';
   /* Return header */
   svg+='<line x1="'+(w-30)+'" y1="'+returnY+'" x2="30" y2="'+returnY+'" stroke="#FF7043" stroke-width="2.5" stroke-dasharray="8 3" marker-end="url(#pidArrmech)"/>';
-  svg+='<text x="40" y="'+(returnY+14)+'" font-size="7" fill="#FF7043" font-family="'+th.fontMono+'">回液主管 RETURN DN'+Math.round(coolKw*0.08+50)+'</text>';
+  svg+='<text x="40" y="'+(returnY+14)+'" font-size="7" fill="#FF7043" font-family="'+th.fontMono+'">回液主管 RETURN DN'+dnVal+'</text>';
 
   /* ── Draw nodes ── */
   for(var ni=0;ni<nodes.length;ni++){
@@ -97590,7 +97591,7 @@ function synUnifiedFlow(){
          {style:'mech',label:'回液管路(虚线)'},
          {style:'control',label:'控制/补水管'},
          {style:'data',label:'仪表信号'}
-       ]})+
+       ],coolKw:coolKw})+
     tableHtml(
     ['参数','数值','说明'],
     [['冷却方式',coolLabel,'主冷却方案'],
