@@ -96898,37 +96898,31 @@ function drawPid(title, nodes, pipes, opts){
   svg+='<line x1="'+(w-30)+'" y1="'+returnY+'" x2="30" y2="'+returnY+'" stroke="#FF7043" stroke-width="2.5" stroke-dasharray="8 3" marker-end="url(#pidArrmech)"/>';
   svg+='<text x="40" y="'+(returnY+14)+'" font-size="7" fill="#FF7043" font-family="'+th.fontMono+'">回液主管 RETURN DN'+dnVal+'</text>';
 
-  /* ── Draw nodes ── */
-  for(var ni=0;ni<nodes.length;ni++){
-    var nd=nodes[ni]; var cx=px(nd.x), cy=py(nd.y);
-    var c=nd.sc||th.power; var nW=nd.w||70; var nH=nd.h||36;
-    var lbl=nd.n||''; var tag=nd.tag||'';
+      /* ── Draw nodes ── */
+      for(var ni=0;ni<nodes.length;ni++){
+        var nd=nodes[ni]; var cx=px(nd.x), cy=py(nd.y);
+        var c=nd.sc||th.power; var nW=nd.w||70; var nH=nd.h||36;
+        var lbl=nd.n||''; var tag=nd.tag||'';
 
-    if(nd.type==='pump'){
-      svg+=_pump(cx,cy,c,nW*0.5);
-      if(tag) svg+=_tagLabel(cx,cy-nW*0.25-8,c,tag,lbl);
-    }else if(nd.type==='valve'){
-      svg+=_valve(cx,cy,c,nd.vtype||'gate',nW*0.4);
-      if(tag) svg+=_tagLabel(cx,cy-nW*0.2-8,c,tag,lbl);
-    }else if(nd.type==='tank'){
-      svg+=_tank(cx,cy,c,nW,nH);
-      if(tag) svg+=_tagLabel(cx,cy-nH/2-12,c,tag,lbl);
-    }else if(nd.type==='exchanger'){
-      svg+=_heatex(cx,cy,c,nW,nH);
-      if(tag) svg+=_tagLabel(cx,cy-nH/2-12,c,tag,lbl);
-    }else if(nd.type==='cooling_tower'){
-      svg+=_coolingtower(cx,cy,c,nW,nH);
-      if(tag) svg+=_tagLabel(cx,cy+nH/2+12,c,tag,lbl);
-    }else if(nd.type==='manifold'){
-      svg+=_manifold(cx,cy,c,nW,nH,lbl);
-      if(tag) svg+='<text x="'+cx+'" y="'+(cy-nH/2-6)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+tag+'</text>';
-    }else if(nd.type==='gpu'){
-      svg+=_gpuserver(cx,cy,c,nW,nH,lbl);
-    }else{
-      svg+='<rect x="'+(cx-nW/2)+'" y="'+(cy-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+(nd.fc||th.boxFill)+'" stroke="'+c+'" stroke-width="1.3"/>';
-      svg+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+lbl+'</text>';
-    }
-  }
+        if(nd.type==='pump'){
+          svg+=_pump(cx,cy,c,nW,tag);
+        }else if(nd.type==='valve'){
+          svg+=_valve(cx,cy,c,nd.vtype||'gate',nW,tag);
+        }else if(nd.type==='tank'){
+          svg+=_tank(cx,cy,c,nW,nH,tag);
+        }else if(nd.type==='exchanger'){
+          svg+=_heatex(cx,cy,c,nW,nH,tag);
+        }else if(nd.type==='cooling_tower'){
+          svg+=_coolingtower(cx,cy,c,nW,nH,tag);
+        }else if(nd.type==='manifold'){
+          svg+=_manifold(cx,cy,c,nW,nH,lbl,tag);
+        }else if(nd.type==='gpu'){
+          svg+=_gpuserver(cx,cy,c,nW,nH,tag);
+        }else{
+          svg+='<rect x="'+(cx-nW/2)+'" y="'+(cy-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+(nd.fc||th.boxFill)+'" stroke="'+c+'" stroke-width="1.3"/>';
+          svg+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+lbl+'</text>';
+        }
+      }
 
   /* ── Draw branch pipes ── */
   for(var pi=0;pi<pipes.length;pi++){
@@ -97539,81 +97533,75 @@ function synUnifiedFlow(){
 
   steps[2].delay=800; steps[2].result=
     drawPid('液冷散热系统P&ID图 — '+coolLabel,[
-      {x:8,y:50,n:'冷却塔 E-101',type:'cooling_tower',sc:'#26A69A',w:30,h:40},
-      {x:20,y:30,n:'循环泵A P-101A',type:'pump',sc:'#1976D2',w:16,h:16},
-      {x:20,y:70,n:'循环泵B P-101B',type:'pump',sc:'#1976D2',w:16,h:16},
-      {x:28,y:30,n:'V-101 闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:10,h:10},
-      {x:28,y:70,n:'V-102 闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:10,h:10},
-      {x:40,y:50,n:'板式换热器 E-102',type:'exchanger',sc:'#1976D2',w:36,h:24},
-      {x:58,y:12,n:'分水器',type:'manifold',sc:'#1976D2',w:36,h:10},
-      {x:58,y:88,n:'集水器',type:'manifold',sc:'#FF7043',w:36,h:10},
-      {x:68,y:28,n:'GPU行A R-101',type:'gpu',sc:'#26A69A',w:32,h:18},
-      {x:78,y:28,n:'GPU行B R-102',type:'gpu',sc:'#26A69A',w:32,h:18},
-      {x:88,y:28,n:'GPU行C R-103',type:'gpu',sc:'#26A69A',w:32,h:18},
-      {x:68,y:72,n:'GPU行D R-104',type:'gpu',sc:'#26A69A',w:32,h:18},
-      {x:78,y:72,n:'GPU行E R-105',type:'gpu',sc:'#26A69A',w:32,h:18},
-      {x:88,y:72,n:'GPU行F R-106',type:'gpu',sc:'#26A69A',w:32,h:18},
-      {x:95,y:12,n:'V-103 补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',w:8,h:8},
-      {x:95,y:88,n:'V-104 止回阀',type:'valve',vtype:'check',sc:'#E53935',w:8,h:8},
-      {x:95,y:50,n:'膨胀水箱 T-101',type:'tank',sc:'#AB47BC',w:18,h:18},
+      /* ── Left: Cooling tower and primary loop (aligned) ── */
+      {x:10,y:50,n:'冷却塔',type:'cooling_tower',sc:'#26A69A',w:25,h:34,tag:'CT-101'},
+      {x:28,y:28,n:'泵A',type:'pump',sc:'#1976D2',w:12,h:12,tag:'P-101A'},
+      {x:28,y:72,n:'泵B',type:'pump',sc:'#1976D2',w:12,h:12,tag:'P-101B'},
+      {x:38,y:28,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:8,h:8,tag:'V-101'},
+      {x:38,y:72,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:8,h:8,tag:'V-102'},
+      /* ── Center: Heat exchanger (no overlap with pipes) ── */
+      {x:52,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:28,h:24,tag:'HX-101'},
+      /* ── Right: Manifolds and GPUs (clear vertical corridors) ── */
+      {x:70,y:18,n:'分水器',type:'manifold',sc:'#26A69A',w:30,h:8,tag:'MS-101'},
+      {x:70,y:82,n:'集水器',type:'manifold',sc:'#FF7043',w:30,h:8,tag:'MR-101'},
+      /* GPU rows spaced vertically to allow clean pipe drops from above/below */
+      {x:82,y:30,n:'GPU-1',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-101'},
+      {x:82,y:42,n:'GPU-2',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-102'},
+      {x:82,y:58,n:'GPU-3',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-103'},
+      {x:82,y:70,n:'GPU-4',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-104'},
+      /* ── Far right: Utilities (aligned) ── */
+      {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:12,h:12,tag:'TK-101'},
+      {x:95,y:18,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',w:6,h:6,tag:'V-103'},
+      {x:95,y:82,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',w:6,h:6,tag:'V-104'},
     ],[
-      /* ── Primary loop: Tower → Pumps → Valves → HE ── */
-      /* Tower right → up to pump A level → horizontal to pump A inlet */
-      {points:[{x:23,y:42},{x:23,y:30},{x:12,y:30}],c:'#26A69A',style:'mech'},
-      /* Tower right → down to pump B level → horizontal to pump B inlet */
-      {points:[{x:23,y:58},{x:23,y:70},{x:12,y:70}],c:'#26A69A',style:'mech'},
-      /* Pump A outlet → horizontal to V-101 inlet */
-      {points:[{x:28,y:30},{x:23,y:30}],c:'#1976D2',style:'mech'},
-      /* Pump B outlet → horizontal to V-102 inlet */
-      {points:[{x:28,y:70},{x:23,y:70}],c:'#1976D2',style:'mech'},
-      /* V-101 outlet → down to corridor → right to HE cold inlet (left side) */
-      {points:[{x:33,y:30},{x:33,y:42},{x:22,y:42}],c:'#1976D2',style:'mech'},
-      /* V-102 outlet → up to corridor → right to HE cold inlet (left side) */
-      {points:[{x:33,y:70},{x:33,y:58},{x:22,y:58}],c:'#1976D2',style:'mech'},
-      /* ── HE → Supply manifold ── */
-      /* HE right outlet → up to supply manifold level → right to manifold center */
-      {points:[{x:58,y:38},{x:58,y:17}],c:'#26A69A',style:'mech',label:'供液 '+Math.round(coolKw*1.25)+' L/min'},
-      /* ── Supply manifold → GPU top row (3 branches) ── */
-      {points:[{x:68,y:17},{x:68,y:19}],c:'#26A69A',style:'mech'},
-      {points:[{x:78,y:17},{x:78,y:19}],c:'#26A69A',style:'mech'},
-      {points:[{x:88,y:17},{x:88,y:19}],c:'#26A69A',style:'mech'},
-      /* ── GPU bottom row → Return manifold (3 branches) ── */
-      {points:[{x:68,y:81},{x:68,y:83}],c:'#FF7043',style:'mech',dash:true},
-      {points:[{x:78,y:81},{x:78,y:83}],c:'#FF7043',style:'mech',dash:true},
-      {points:[{x:88,y:81},{x:88,y:83}],c:'#FF7043',style:'mech',dash:true},
-      /* ── Return manifold → HE → Tower ── */
-      /* Return manifold center → down to corridor → left to HE bottom outlet */
-      {points:[{x:58,y:83},{x:58,y:62},{x:22,y:62}],c:'#FF7043',style:'mech',dash:true,label:'回液'},
-      /* HE bottom outlet → left corridor → down to tower inlet */
-      {points:[{x:22,y:62},{x:8,y:62},{x:8,y:70}],c:'#FF7043',style:'mech',dash:true},
-      /* ── Expansion tank ── */
-      /* Tank top → up to supply manifold level (makeup) */
-      {points:[{x:95,y:41},{x:95,y:17}],c:'#AB47BC',style:'control',label:'补水'},
-      /* Tank bottom → down to return manifold level (overflow) */
-      {points:[{x:95,y:59},{x:95,y:83}],c:'#AB47BC',style:'control',dash:true,label:'溢流'},
-      /* Tank → pressurize to supply manifold */
-      {points:[{x:95,y:17},{x:76,y:17}],c:'#AB47BC',style:'control',dash:true},
-      /* ── Pump backup interconnection (outside HE zone, left side) ── */
-      {points:[{x:12,y:38},{x:12,y:62},{x:20,y:62}],c:'#1976D2',style:'control',dash:true,label:'备用'},
-      /* ── Supply header stub (left end) ── */
-      {points:[{x:23,y:8},{x:23,y:17}],c:'#26A69A',style:'mech'},
-      /* ── Return header stub (left end) ── */
-      {points:[{x:8,y:83},{x:8,y:92}],c:'#FF7043',style:'mech',dash:true}
+      /* ── Primary loop: Tower → Pumps → HE (clear corridors only) ── */
+      /* Tower right stub → vertical corridor (avoiding tower area) → horizontal to pump inlet */
+      {points:[{x:22,y:50},{x:22,y:28},{x:22,y:28}],c:'#26A69A',style:'mech',label:'DN'+Math.round((opts.coolKw||0)*0.08+40)},
+      /* Tower right stub → vertical corridor (avoiding tower area) → horizontal to pump inlet */
+      {points:[{x:22,y:50},{x:22,y:72},{x:22,y:72}],c:'#26A69A',style:'mech'},
+      /* Pump outlet → short horizontal to valve inlet */
+      {points:[{x:34,y:28},{x:38,y:28}],c:'#1976D2',style:'mech'},
+      {points:[{x:34,y:72},{x:38,y:72}],c:'#1976D2',style:'mech'},
+      /* Valve outlet → vertical corridor (no overlap) → horizontal to HE inlet */
+      {points:[{x:42,y:28},{x:42,y:38},{x:38,y:38}],c:'#1976D2',style:'mech'},
+      {points:[{x:42,y:72},{x:42,y:62},{x:38,y:62}],c:'#1976D2',style:'mech'},
+      /* ── HE → Supply manifold (outer corridor, no equipment crossings) ── */
+      {points:[{x:66,y:38},{x:66,y:24},{x:52,y:24},{x:52,y:18}],c:'#26A69A',style:'mech',label:'供液 '+Math.round(coolKw*1.25)+' L/min'},
+      /* ── Supply manifold → GPU rows (dedicated vertical corridors only) ── */
+      {points:[{x:82,y:22},{x:82,y:25}],c:'#26A69A',style:'mech'},
+      {points:[{x:82,y:22},{x:82,y:37}],c:'#26A69A',style:'mech'},
+      {points:[{x:82,y:22},{x:82,y:53}],c:'#26A69A',style:'mech'},
+      /* ── GPU rows → Return manifold (dedicated vertical corridors only) ── */
+      {points:[{x:82,y:75},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true},
+      {points:[{x:82,y:65},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true},
+      {points:[{x:82,y:45},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true,label:'回液'},
+      /* ── Return manifold → HE → Tower (outer corridor only) ── */
+      {points:[{x:52,y:78},{x:52,y:74},{x:66,y:74}],c:'#FF7043',style:'mech',dash:true},
+      {points:[{x:38,y:62},{x:38,y:68},{x:10,y:68},{x:10,y:69}],c:'#FF7043',style:'mech',dash:true},
+      /* ── Expansion tank (outermost corridor, no equipment crossings) ── */
+      {points:[{x:89,y:50},{x:89,y:18},{x:95,y:18}],c:'#AB47BC',style:'control',label:'补水'},
+      {points:[{x:89,y:50},{x:89,y:82},{x:95,y:82}],c:'#AB47BC',style:'control',dash:true,label:'溢流'},
+      {points:[{x:89,y:24},{x:82,y:24}],c:'#AB47BC',style:'control',dash:true},
+      /* ── Pump backup (outer corridor only, no overlap with HE) ── */
+      {points:[{x:22,y:34},{x:22,y:66},{x:28,y:66}],c:'#1976D2',style:'control',dash:true,label:'备用'},
+      /* ── Supply/return header connections (directly to manifolds) ── */
+      {points:[{x:22,y:12},{x:22,y:24},{x:52,y:24},{x:52,y:18}],c:'#26A69A',style:'mech'},
+      {points:[{x:10,y:76},{x:10,y:88}],c:'#FF7043',style:'mech',dash:true}
     ],{w:850,h:400,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.0',scale:'1:50',
        instruments:[
-         {x:20,y:18,tag:'TI',sub:'TI-101 供水温度',sc:'#42A5F5',sx:20,sy:30},
-         {x:40,y:38,tag:'TI',sub:'TI-102 供液温度',sc:'#42A5F5',sx:40,sy:50},
-         {x:40,y:62,tag:'TI',sub:'TI-103 回水温度',sc:'#42A5F5',sx:40,sy:50,dash:true},
-         {x:58,y:6,tag:'PI',sub:'PI-101 供液压',sc:'#f0883e',sx:58,sy:12},
-         {x:58,y:94,tag:'PI',sub:'PI-102 回液压',sc:'#f0883e',sx:58,sy:88},
-         {x:33,y:18,tag:'FI',sub:'FI-101 流量',sc:'#3fb950',sx:33,sy:30},
-         {x:95,y:38,tag:'LI',sub:'LI-101 液位',sc:'#AB47BC',sx:95,sy:50}
+         {x:28,y:16,tag:'TI',sub:'TI-101',sc:'#42A5F5',sx:28,sy:28},
+         {x:52,y:30,tag:'TI',sub:'TI-102',sc:'#42A5F5',sx:52,sy:38},
+         {x:52,y:70,tag:'TI',sub:'TI-103',sc:'#42A5F5',sx:52,sy:62},
+         {x:70,y:12,tag:'PI',sub:'PI-101',sc:'#f0883e',sx:70,sy:18},
+         {x:70,y:88,tag:'PI',sub:'PI-102',sc:'#f0883e',sx:70,sy:82},
+         {x:38,y:16,tag:'FI',sub:'FI-101',sc:'#3fb950',sx:38,sy:28},
+         {x:95,y:38,tag:'LI',sub:'LI-101',sc:'#AB47BC',sx:95,sy:50}
        ],
        legend:[
-         {style:'mech',label:'冷却水管路(实线)'},
-         {style:'mech',label:'回液管路(虚线)'},
-         {style:'control',label:'控制/补水管'},
-         {style:'data',label:'仪表信号'}
+         {style:'mech',label:'冷却水供液管路'},
+         {style:'mech',label:'冷却水回液管路'},
+         {style:'control',label:'控制/补水管路'},
+         {style:'data',label:'仪表信号管路'}
        ],coolKw:coolKw})+
     tableHtml(
     ['参数','数值','说明'],
