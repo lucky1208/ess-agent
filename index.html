@@ -77800,592 +77800,173 @@ function chLcSvgLine(x1,y1,x2,y2,color,dash,green){
 
 function chLcRenderProductSvg(plan){
   var p=plan.params;
-  var W=820,H=400;
-  var html='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="液冷超充系统总览">'+chLcSvgDefs();
-  html+='<rect width="'+W+'" height="'+H+'" fill="#08111d"/>';
-  html+='<rect width="'+W+'" height="'+H+'" fill="url(#lcGrid)" opacity="0.4"/>';
-
-  /* ── Cabinet cross-section (left 40%) ── */
-  var cx=30,cy=40,cw=160,ch2=290;
-  html+='<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch2+'" rx="4" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="6 3"/>';
-  html+='<text x="'+(cx+cw/2)+'" y="'+(cy-8)+'" text-anchor="middle" fill="#64748b" font-size="8" font-weight="600">液冷超充柜剖面</text>';
-
-  /* Cabinet body */
-  html+='<rect x="'+(cx+10)+'" y="'+(cy+10)+'" width="'+(cw-20)+'" height="'+(ch2-20)+'" rx="6" fill="#0f1a2e" stroke="#334155" stroke-width="1.5"/>';
-  /* Top cover */
-  html+='<rect x="'+(cx+14)+'" y="'+(cy+14)+'" width="'+(cw-28)+'" height="18" rx="3" fill="#1e293b" stroke="#64748b" stroke-width="0.8"/>';
-  html+='<text x="'+(cx+cw/2)+'" y="'+(cy+26)+'" text-anchor="middle" fill="#94a3b8" font-size="7">顶盖 · 防护IP54</text>';
-  /* SiC modules zone */
-  html+='<rect x="'+(cx+14)+'" y="'+(cy+38)+'" width="'+(cw-28)+'" height="62" rx="2" fill="#0c2d1e" stroke="#22c55e" stroke-width="0.8" stroke-dasharray="3 2"/>';
-  html+='<text x="'+(cx+cw/2)+'" y="'+(cy+50)+'" text-anchor="middle" fill="#22c55e" font-size="7" font-weight="600">SiC功率模块层</text>';
-  for(var si=0;si<Math.min(6,plan.moduleCount);si++){
-    var sx=cx+20+si*22,sy=cy+56;
-    html+='<rect x="'+sx+'" y="'+sy+'" width="18" height="34" rx="2" fill="#0a1f16" stroke="#22c55e" stroke-width="0.8"/>';
-    html+='<text x="'+(sx+9)+'" y="'+(sy+14)+'" text-anchor="middle" fill="#4ade80" font-size="5">SiC</text>';
-    html+='<text x="'+(sx+9)+'" y="'+(sy+24)+'" text-anchor="middle" fill="#22c55e" font-size="5">'+plan.modulePower+'kW</text>';
-  }
-  if(plan.moduleCount>6) html+='<text x="'+(cx+cw/2)+'" y="'+(cy+100)+'" text-anchor="middle" fill="#64748b" font-size="6">+'+Math.max(0,plan.moduleCount-6)+'块</text>';
-  /* DC busbar zone */
-  html+='<rect x="'+(cx+14)+'" y="'+(cy+106)+'" width="'+(cw-28)+'" height="36" rx="2" fill="#1a1a3e" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="3 2"/>';
-  html+='<text x="'+(cx+cw/2)+'" y="'+(cy+120)+'" text-anchor="middle" fill="#ef4444" font-size="7" font-weight="600">DC母排 · '+p.voltage+'VDC</text>';
-  html+='<line x1="'+(cx+20)+'" y1="'+(cy+130)+'" x2="'+(cx+cw-20)+'" y2="'+(cy+130)+'" stroke="#ef4444" stroke-width="2"/>';
-  html+='<line x1="'+(cx+20)+'" y1="'+(cy+136)+'" x2="'+(cx+cw-20)+'" y2="'+(cy+136)+'" stroke="#60a5fa" stroke-width="1.5"/>';
-  /* Controller zone */
-  html+='<rect x="'+(cx+14)+'" y="'+(cy+148)+'" width="'+(cw-28)+'" height="36" rx="2" fill="#1a1a3e" stroke="#a78bfa" stroke-width="0.8" stroke-dasharray="3 2"/>';
-  html+='<text x="'+(cx+cw/2)+'" y="'+(cy+162)+'" text-anchor="middle" fill="#a78bfa" font-size="7" font-weight="600">主控 · BMS · 计量</text>';
-  html+='<rect x="'+(cx+22)+'" y="'+(cy+168)+'" width="30" height="12" rx="2" fill="#0b0e1a" stroke="#a78bfa" stroke-width="0.5"/>';
-  html+='<text x="'+(cx+37)+'" y="'+(cy+177)+'" text-anchor="middle" fill="#c4b5fd" font-size="5">DSP</text>';
-  html+='<rect x="'+(cx+56)+'" y="'+(cy+168)+'" width="30" height="12" rx="2" fill="#0b0e1a" stroke="#a78bfa" stroke-width="0.5"/>';
-  html+='<text x="'+(cx+71)+'" y="'+(cy+177)+'" text-anchor="middle" fill="#c4b5fd" font-size="5">BMS</text>';
-  html+='<rect x="'+(cx+90)+'" y="'+(cy+168)+'" width="44" height="12" rx="2" fill="#0b0e1a" stroke="#a78bfa" stroke-width="0.5"/>';
-  html+='<text x="'+(cx+112)+'" y="'+(cy+177)+'" text-anchor="middle" fill="#c4b5fd" font-size="5">计量</text>';
-  /* Cooling plate zone */
-  html+='<rect x="'+(cx+14)+'" y="'+(cy+190)+'" width="'+(cw-28)+'" height="44" rx="2" fill="#0c2d1e" stroke="#22c55e" stroke-width="0.8" stroke-dasharray="3 2"/>';
-  html+='<text x="'+(cx+cw/2)+'" y="'+(cy+202)+'" text-anchor="middle" fill="#22c55e" font-size="7" font-weight="600">液冷散热板</text>';
-  /* Cooling channels visualization */
-  for(var ci=0;ci<4;ci++){
-    var ccy=cy+210+ci*6;
-    html+='<path d="M'+(cx+22)+' '+ccy+' Q'+(cx+40)+' '+(ccy-3)+' '+(cx+60)+' '+ccy+' T'+(cx+cw-22)+' '+ccy+'" fill="none" stroke="#22c55e" stroke-width="0.8" opacity="0.6"/>';
-  }
-  html+='<text x="'+(cx+cw/2)+'" y="'+(cy+230)+'" text-anchor="middle" fill="#4ade80" font-size="5">'+plan.coolant+'</text>';
-  /* Bottom: fans + cables */
-  html+='<rect x="'+(cx+14)+'" y="'+(cy+240)+'" width="'+(cw-28)+'" height="32" rx="2" fill="#0b1520" stroke="#64748b" stroke-width="0.8" stroke-dasharray="3 2"/>';
-  html+='<text x="'+(cx+cw/2)+'" y="'+(cy+254)+'" text-anchor="middle" fill="#94a3b8" font-size="7">风扇 · 底盘 · 进出线</text>';
-  for(var fi=0;fi<3;fi++){
-    html+='<circle cx="'+(cx+30+fi*40)+'" cy="'+(cy+262)+'" r="8" fill="none" stroke="#64748b" stroke-width="0.8"/>';
-    html+='<line x1="'+(cx+22+fi*40)+'" y1="'+(cy+262)+'" x2="'+(cx+38+fi*40)+'" y2="'+(cy+262)+'" stroke="#64748b" stroke-width="0.5"/>';
-    html+='<line x1="'+(cx+30+fi*40)+'" y1="'+(cy+254)+'" x2="'+(cx+30+fi*40)+'" y2="'+(cy+270)+'" stroke="#64748b" stroke-width="0.5"/>';
-  }
-
-  /* ── Right side: Component callout table ── */
-  var tx=220,ty=40;
-  html+='<text x="'+tx+'" y="'+(ty)+'" fill="#f8fafc" font-size="14" font-weight="700">'+chLcEsc(plan.title)+'</text>';
-  html+='<text x="'+tx+'" y="'+(ty+18)+'" fill="#94a3b8" font-size="10">'+chLcEsc(plan.sceneLabel+' · '+plan.protocolLabel+' · '+p.grid+'接入 · '+p.guns+'枪液冷')+'</text>';
-  html+='<line x1="'+tx+'" y1="'+(ty+26)+'" x2="'+(tx+560)+'" y2="'+(ty+26)+'" stroke="#1e293b" stroke-width="0.8"/>';
-
-  var comps=[
-    {n:'SiC功率模块',q:plan.moduleCount+'块',s:plan.modulePower+'kW/块',c:'#22c55e',ic:'power'},
-    {n:'DC母排/功率路由',q:'1组',s:p.voltage+'V / '+plan.dcCurrent+'A',c:'#ef4444',ic:'bus'},
-    {n:'主控/BMS/计量',q:'1套',s:'DSP+BMS+电能表',c:'#a78bfa',ic:'ctrl'},
-    {n:'液冷散热板',q:'1组',s:plan.coolant+' · '+plan.flow+'L/min',c:'#22c55e',ic:'cool'},
-    {n:'风扇/底盘/进出线',q:'3组',s:'IP54防护 · 强制风冷',c:'#64748b',ic:'fan'},
-    {n:'液冷CDU',q:plan.cdu,s:'N+1冗余',c:'#38bdf8',ic:'cdu'},
-    {n:'功率模块驱动',q:plan.moduleCount+'路',s:'PFC+DC-DC',c:'#38bdf8',ic:'drv'},
-  ];
-  comps.forEach(function(cm,i){
-    var ry=ty+38+i*38;
-    /* Connector line from cabinet */
-    var cabY=cy+28+i*38;
-    if(cabY<cy+ch2-10){
-      html+='<line x1="'+(cx+cw-10)+'" y1="'+cabY+'" x2="'+tx+'" y2="'+(ry+12)+'" stroke="#334155" stroke-width="0.6" stroke-dasharray="3 2"/>';
-    }
-    /* Row background */
-    html+='<rect x="'+tx+'" y="'+ry+'" width="560" height="32" rx="4" fill="#0b1520" stroke="#1e293b" stroke-width="0.5"/>';
-    /* Color indicator */
-    html+='<rect x="'+tx+'" y="'+ry+'" width="3" height="32" rx="1" fill="'+cm.c+'"/>';
-    /* Icon circle */
-    html+='<circle cx="'+(tx+22)+'" cy="'+(ry+16)+'" r="10" fill="'+cm.c+'" opacity="0.15" stroke="'+cm.c+'" stroke-width="0.8"/>';
-    html+='<text x="'+(tx+22)+'" y="'+(ry+20)+'" text-anchor="middle" fill="'+cm.c+'" font-size="8" font-weight="700">'+String(i+1).padStart(2,'0')+'</text>';
-    /* Name */
-    html+='<text x="'+(tx+42)+'" y="'+(ry+14)+'" fill="#e5edf7" font-size="11" font-weight="600">'+chLcEsc(cm.n)+'</text>';
-    html+='<text x="'+(tx+42)+'" y="'+(ry+26)+'" fill="#64748b" font-size="8">'+chLcEsc(cm.s)+'</text>';
-    /* Quantity badge */
-    html+='<text x="'+(tx+530)+'" y="'+(ry+14)+'" text-anchor="end" fill="'+cm.c+'" font-size="10" font-weight="600">'+chLcEsc(cm.q)+'</text>';
-  });
-
-  /* ── KPI bar at bottom ── */
-  var ky=H-50;
-  html+='<rect x="0" y="'+ky+'" width="'+W+'" height="22" fill="#0b1520" opacity="0.8"/>';
-  var kpis=[p.power+'kW',p.guns+'枪',p.voltage+'V',plan.moduleCount+'×'+plan.modulePower+'kW',plan.cdu,plan.flow+'L/min'];
-  kpis.forEach(function(ki,ki2){
-    html+='<text x="'+(30+ki2*135)+'" y="'+(ky+15)+'" fill="#94a3b8" font-size="9">'+chLcEsc(ki)+'</text>';
-  });
-
-  /* ── CAD title block ── */
-  html+=chLcTitleBlock(W,H,'系统总览 — '+plan.sceneLabel,'液冷超充柜剖面 · 组件分层标注','SYN-OV-001','V2.0','NTS');
-
-  html+='</svg>';
-  return html;
+  return (function(plan) { return drawArch('液冷超充系统总览 — '+plan.sceneLabel, [
+      {name:'结构层 STRUCTURE',zone:'zoneA',color:'#607D8B',boxes:[
+        {icon:'server',n:'液冷超充柜',s:'IP54 · 户外型',c:'#101418',sc:'#78909C'},
+        {icon:'gear',n:'顶盖与结构件',s:'钣金·铝合金',c:'#101418',sc:'#607D8B'},
+        {icon:'gear',n:'底盘·进出线',s:'底部进线·防鼠',c:'#101418',sc:'#607D8B'}
+      ]},
+      {name:'功率层 POWER',zone:'zoneB',color:'#1976D2',boxes:[
+        {icon:'pcs',n:'SiC功率模块 × '+plan.moduleCount,s:plan.modulePower+'kW/块 · 总'+plan.params.power+'kW',c:'#0c1a30',sc:'#1976D2'},
+        {icon:'sw',n:'DC母排/功率路由',s:plan.params.voltage+'VDC · '+plan.dcCurrent+'A',c:'#0c1a30',sc:'#EF5350'},
+        {icon:'server',n:'直流计量',s:'0.5S级 · '+plan.gunCurrent+'A',c:'#0c1a30',sc:'#1976D2'}
+      ]},
+      {name:'控制层 CONTROL',zone:'zoneC',color:'#7B1FA2',boxes:[
+        {icon:'server',n:'主控/通信',s:'DSP+MCU · 4G/以太网',c:'#2a1a3a',sc:'#AB47BC'},
+        {icon:'gear',n:'BMS/绝缘监测',s:'CAN · IMD+RCM',c:'#2a1a3a',sc:'#AB47BC'},
+        {icon:'scada',n:'云端/OCPP',s:'OCPP 2.0.1 · 远程运维',c:'#2a1a3a',sc:'#06B6D4'}
+      ]},
+      {name:'散热层 COOLING',zone:'zoneA',color:'#00897B',boxes:[
+        {icon:'cdu',n:'液冷板/CDU',s:plan.coolant+' · '+plan.flow+'L/min',c:'#0c2018',sc:'#26A69A'},
+        {icon:'pump',n:'冷却循环泵组',s:'1+1冗余',c:'#0c2018',sc:'#26A69A'},
+        {icon:'gear',n:'换热器·储液罐',s:plan.heatKw+'kW HEX',c:'#0c2018',sc:'#26A69A'}
+      ]}
+    ],{w:720,h:380,theme:'industrial',drawingNo:'CH-OVERVIEW-001',ver:'V2.0',scale:'NTS',
+       legend:[{style:'power',label:'功率连接'},{style:'data',label:'数据通信'},{style:'control',label:'控制信号'},{style:'mech',label:'冷却管路'}]});
+    })(plan);
 }
 
 function chLcRenderSystemSvg(plan){
   var p=plan.params;
-  var W=880,H=420;
-  var html='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="液冷超充系统框图">'+chLcSvgDefs();
-  html+='<rect width="'+W+'" height="'+H+'" fill="#08111d"/>';
-  html+='<rect width="'+W+'" height="'+H+'" fill="url(#lcGrid)" opacity="0.3"/>';
-
-  /* ── Zone backgrounds ── */
-  html+='<rect x="14" y="14" width="180" height="340" rx="6" fill="url(#lcZone2)" stroke="#334155" stroke-width="0.6" stroke-dasharray="4 2"/>';
-  html+='<text x="104" y="32" text-anchor="middle" fill="#60a5fa" font-size="9" font-weight="600" opacity="0.7">⚡ 电网接入</text>';
-  html+='<rect x="210" y="14" width="300" height="340" rx="6" fill="url(#lcZone1)" stroke="#334155" stroke-width="0.6" stroke-dasharray="4 2"/>';
-  html+='<text x="360" y="32" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="600" opacity="0.7">🔋 功率变换</text>';
-  html+='<rect x="524" y="14" width="180" height="340" rx="6" fill="url(#lcZone3)" stroke="#334155" stroke-width="0.6" stroke-dasharray="4 2"/>';
-  html+='<text x="614" y="32" text-anchor="middle" fill="#22c55e" font-size="9" font-weight="600" opacity="0.7">🔌 充电输出</text>';
-  html+='<rect x="720" y="14" width="146" height="340" rx="6" fill="#0f1020" stroke="#334155" stroke-width="0.6" stroke-dasharray="4 2"/>';
-  html+='<text x="793" y="32" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="600" opacity="0.7">🧠 控制/云</text>';
-
-  /* ── Power flow (top row: left to right) ── */
-  function _box(x,y,w,h,t,s,c){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="5" fill="#0b1520" stroke="'+c+'" stroke-width="1.2"/><text x="'+(x+w/2)+'" y="'+(y+h/2-2)+'" text-anchor="middle" fill="#e5edf7" font-size="10" font-weight="600">'+t+'</text>'+(s?'<text x="'+(x+w/2)+'" y="'+(y+h/2+11)+'" text-anchor="middle" fill="#94a3b8" font-size="7">'+s+'</text>':'')+'</g>';}
-  function _arr(x1,y1,x2,y2,c,dash){
-    c=c||'#38bdf8'; var m='lcArrow'; if(c==='#22c55e')m='lcGreenArrow'; else if(c==='#f59e0b')m='lcOrangeArrow'; else if(c==='#ef4444')m='lcRedArrow'; else if(c==='#a78bfa')m='lcPurpleArrow';
-    return '<path d="M'+x1+' '+y1+' L'+x2+' '+y2+'" stroke="'+c+'" stroke-width="1.8" fill="none" '+(dash?'stroke-dasharray="5 4"':'')+' marker-end="url(#'+m+')"/>';
-  }
-
-  var row1=50;
-  html+='<g>'+_box(28,row1,110,42,'电网接入',p.grid+' · 3Φ','#60a5fa')+'</g>';
-  html+='<g>'+_box(154,row1,110,42,'箱变',plan.transformer+'kVA','#60a5fa')+'</g>';
-  html+='<g>'+_box(280,row1,110,42,'AC配电柜',plan.acb+'A ACB','#60a5fa')+'</g>';
-  html+='<g>'+_box(406,row1,120,42,'PFC整流','SiC '+plan.moduleCount+'块','#38bdf8')+'</g>';
-  html+='<g>'+_box(542,row1,120,42,'DC/DC隔离',p.voltage+'VDC','#f59e0b')+'</g>';
-  html+='<g>'+_box(678,row1,88,42,'功率路由','PRU/均流','#06b6d4')+'</g>';
-  html+=_arr(138,row1+21,154,row1+21)+_arr(264,row1+21,280,row1+21)+_arr(390,row1+21,406,row1+21)+_arr(526,row1+21,542,row1+21)+_arr(662,row1+21,678,row1+21);
-
-  /* ── Gun outputs (vertical stack) ── */
-  var gunX=700;
-  for(var gi=0;gi<Math.min(4,p.guns);gi++){
-    var gy=108+gi*52;
-    html+='<g>'+_box(gunX,gy,100,40,'液冷枪 '+(gi+1),gi===0?plan.protocolLabel:'动态分配','#38bdf8')+'</g>';
-    html+=_arr(738,row1+42,gunX+50,gy,'#38bdf8');
-  }
-  if(p.guns>4) html+='<text x="'+(gunX+50)+'" y="'+(108+4*52+10)+'" text-anchor="middle" fill="#64748b" font-size="8">共'+p.guns+'枪</text>';
-
-  /* ── Energy storage (bottom-left) ── */
-  html+='<g>'+_box(28,210,130,56,'储能电池','1000VDC · 可选','#22c55e')+'</g>';
-  html+='<g>'+_box(178,210,140,56,'液冷核心单元','CDU '+plan.cdu+' · N+1','#22c55e')+'</g>';
-  html+='<g>'+_box(338,210,150,56,'控制保护单元','主控 · BMS · 计量 · IMD','#a78bfa')+'</g>';
-  html+=_arr(158,238,178,238,'#22c55e',true)+_arr(318,238,338,238,'#22c55e',true);
-
-  /* ── Cloud platform ── */
-  html+='<g>'+_box(600,220,130,56,'平台/云端','OCPP 2.0.1 · 运维','#94a3b8')+'</g>';
-  html+=_arr(488,238,600,248,'#a78bfa',true);
-
-  /* ── Cooling loop (bottom-right) ── */
-  html+='<g>'+_box(750,140,100,40,'冷却塔','散热','#22c55e')+'</g>';
-  html+='<g>'+_box(750,200,100,40,'循环泵组','N+1冗余','#22c55e')+'</g>';
-  html+='<g>'+_box(750,260,100,40,'传感器组','#TI/#PI/#FI','#f59e0b')+'</g>';
-
-  /* ── Cooling flow path ── */
-  html+='<path d="M614 266 L614 320 L750 320 L750 280" stroke="#22c55e" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#lcGreenArrow)"/>';
-  html+='<path d="M750 160 L750 140 L614 140 L614 240" stroke="#22c55e" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#lcGreenArrow)"/>';
-
-  /* ── Signal paths (dashed) ── */
-  html+='<path d="M412 266 L412 300 L793 300 L793 276" stroke="#a78bfa" stroke-width="1" fill="none" stroke-dasharray="3 3" marker-end="url(#lcPurpleArrow)"/>';
-  html+='<path d="M678 50 L678 90 L793 90 L793 140" stroke="#a78bfa" stroke-width="1" fill="none" stroke-dasharray="3 3" marker-end="url(#lcPurpleArrow)"/>';
-
-  /* ── Dimension lines ── */
-  html+='<line x1="28" y1="375" x2="790" y2="375" stroke="#1e293b" stroke-width="0.5"/>';
-  html+='<text x="420" y="388" text-anchor="middle" fill="#475569" font-size="8">功率流 ━━━▶ &nbsp;&nbsp; 冷却/储能流 - - -▶ &nbsp;&nbsp; 通信/控制 ╌╌╌▶</text>';
-
-  /* ── CAD title block ── */
-  html+=chLcTitleBlock(W,H,'液冷超充系统框图 — '+plan.sceneLabel,'功率流 · 冷却流 · 通信流 · '+p.guns+'枪 '+plan.moduleCount+'模块','SYN-ARCH-002','V2.0','NTS');
-
-  /* ── Legend ── */
-  html+=chLcLegend(28,H-70,[
-    {color:'#38bdf8',label:'功率流 AC/DC',style:'solid'},
-    {color:'#22c55e',label:'冷却液回路',style:'dashed'},
-    {color:'#a78bfa',label:'通信与控制',style:'dot'},
-    {color:'#ef4444',label:'DC母线',style:'thick'},
-  ],140);
-
-  html+='</svg>';
-  return html;
+  return (function(plan) { return drawArch('液冷超充系统框图 — '+plan.sceneLabel, [
+      {name:'电网侧 GRID',zone:'zoneA',color:'#FFB300',boxes:[
+        {icon:'grid',n:plan.params.grid+'接入',s:'3Φ AC · '+plan.acb+'A',c:'#2a1f0a',sc:'#FFB300'},
+        {icon:'transformer',n:'箱变',s:plan.transformer+'kVA',c:'#2a1f0a',sc:'#FFB300'},
+        {icon:'sw',n:'AC配电柜',s:'ACB '+plan.acb+'A',c:'#2a1f0a',sc:'#FFB300'}
+      ]},
+      {name:'功率变换 CONVERSION',zone:'zoneB',color:'#1976D2',boxes:[
+        {icon:'pcs',n:'PFC整流模块',s:'SiC '+plan.moduleCount+'块',c:'#0c1a30',sc:'#1976D2'},
+        {icon:'sw',n:'DC母线',s:plan.params.voltage+'VDC · '+plan.dcCurrent+'A',c:'#0c1a30',sc:'#EF5350'},
+        {icon:'pcs',n:'DC/DC隔离',s:'LLC谐振',c:'#0c1a30',sc:'#1976D2'},
+        {icon:'sw',n:'功率路由PRU',s:plan.pdu,c:'#0c1a30',sc:'#00BCD4'}
+      ]},
+      {name:'充电输出 OUTPUT',zone:'zoneC',color:'#26A69A',boxes:[
+        {icon:'ev',n:'液冷充电枪 × '+plan.params.guns,s:plan.gunCurrent+'A/枪',c:'#0c2018',sc:'#26A69A'},
+        {icon:'battery',n:'储能电池 可选',s:'1000VDC',c:'#0c2018',sc:'#66BB6A'}
+      ]},
+      {name:'控制/管理 CONTROL',zone:'zoneA',color:'#7B1FA2',boxes:[
+        {icon:'server',n:'液冷核心单元',s:'CDU '+plan.cdu,c:'#2a1a3a',sc:'#AB47BC'},
+        {icon:'scada',n:'控制保护单元',s:'主控·BMS·计量',c:'#2a1a3a',sc:'#AB47BC'},
+        {icon:'cloud',n:'平台/云端',s:'OCPP 2.0.1',c:'#2a1a3a',sc:'#06B6D4'}
+      ]}
+    ],{w:800,h:380,theme:'industrial',drawingNo:'CH-ARCH-001',ver:'V2.0',scale:'NTS',
+       legend:[{style:'power',label:'功率流 AC/DC'},{style:'bus',label:'DC高压母线'},{style:'mech',label:'冷却液回路'},{style:'data',label:'通信与控制'}]});
+    })(plan);
 }
 
 function chLcRenderElectricalSvg(plan){
   var p=plan.params;
-  var W=880,H=420;
-  var html='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="电气拓扑主回路">'+chLcSvgDefs();
-  html+='<rect width="'+W+'" height="'+H+'" fill="#08111d"/>';
-  html+='<rect width="'+W+'" height="'+H+'" fill="url(#lcGrid)" opacity="0.3"/>';
-
-  function _box(x,y,w,h,t,s,c){
-    return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="5" fill="#0b1520" stroke="'+c+'" stroke-width="1.2"/><text x="'+(x+w/2)+'" y="'+(y+h/2-2)+'" text-anchor="middle" fill="#e5edf7" font-size="10" font-weight="600">'+t+'</text>'+(s?'<text x="'+(x+w/2)+'" y="'+(y+h/2+11)+'" text-anchor="middle" fill="#94a3b8" font-size="7">'+s+'</text>':'');
-  }
-  function _arr(x1,y1,x2,y2,c,dash){
-    c=c||'#cbd5e1'; var m='lcArrow'; if(c==='#ef4444')m='lcRedArrow'; else if(c==='#22c55e')m='lcGreenArrow'; else if(c==='#a78bfa')m='lcPurpleArrow'; else if(c==='#f59e0b')m='lcOrangeArrow';
-    return '<path d="M'+x1+' '+y1+' L'+x2+' '+y2+'" stroke="'+c+'" stroke-width="1.8" fill="none" '+(dash?'stroke-dasharray="5 4"':'')+' marker-end="url(#'+m+')"/>';
-  }
-
-  /* ── Title ── */
-  html+='<text x="28" y="32" fill="#f8fafc" font-size="13" font-weight="700">电气主回路单线图</text>';
-  html+='<text x="28" y="48" fill="#64748b" font-size="9">DC BUS: '+p.voltage+'VDC / '+plan.dcCurrent+'A &nbsp;&nbsp;|&nbsp;&nbsp; '+plan.moduleCount+'×'+plan.modulePower+'kW SiC模块 &nbsp;&nbsp;|&nbsp;&nbsp; '+plan.gunCurrent+'A/枪</text>';
-  html+='<line x1="28" y1="56" x2="'+(W-28)+'" y2="56" stroke="#1e293b" stroke-width="0.5"/>';
-
-  /* ── Zone backgrounds ── */
-  html+='<rect x="14" y="66" width="852" height="110" rx="5" fill="#0f1a2e" stroke="#1e293b" stroke-width="0.5"/>';
-  html+='<text x="28" y="82" fill="#475569" font-size="8" font-weight="600">主回路 POWER CIRCUIT</text>';
-  html+='<rect x="14" y="186" width="852" height="110" rx="5" fill="#10151f" stroke="#1e293b" stroke-width="0.5"/>';
-  html+='<text x="28" y="202" fill="#475569" font-size="8" font-weight="600">辅助/保护 AUXILIARY & PROTECTION</text>';
-
-  /* ── Main circuit (row 1) ── */
-  var my1=100;
-  /* AC input */
-  html+='<text x="36" y="'+(my1-8)+'" fill="#94a3b8" font-size="7">3Φ AC</text>';
-  html+='<line x1="36" y1="'+(my1+10)+'" x2="36" y2="'+(my1+30)+'" stroke="#cbd5e1" stroke-width="2.5"/>';
-  html+='<text x="42" y="'+(my1+22)+'" fill="#cbd5e1" font-size="7">L1 L2 L3</text>';
-  /* ACB */
-  html+='<rect x="56" y="'+(my1+6)+'" width="40" height="28" rx="3" fill="#0b1520" stroke="#cbd5e1" stroke-width="1.2"/>';
-  html+='<line x1="66" y1="'+(my1+10)+'" x2="66" y2="'+(my1+30)+'" stroke="#cbd5e1" stroke-width="1.5"/>';
-  html+='<line x1="86" y1="'+(my1+10)+'" x2="86" y2="'+(my1+30)+'" stroke="#cbd5e1" stroke-width="1.5"/>';
-  html+='<circle cx="76" cy="'+(my1+14)+'" r="4" fill="none" stroke="#f59e0b" stroke-width="1"/>';
-  html+='<text x="76" y="'+(my1+46)+'" text-anchor="middle" fill="#f59e0b" font-size="7">'+plan.acb+'A</text>';
-  html+='<text x="76" y="'+(my1+54)+'" text-anchor="middle" fill="#64748b" font-size="6">ACB</text>';
-  html+=_arr(96,my1+20,120,my1+20);
-
-  /* EMI Filter */
-  html+='<rect x="120" y="'+(my1+4)+'" width="50" height="32" rx="3" fill="#0b1520" stroke="#94a3b8" stroke-width="1.2"/>';
-  html+='<path d="M130 '+(my1+12)+' Q135 '+(my1+20)+' 140 '+(my1+12)+' T150 '+(my1+12)+' T160 '+(my1+12)+'" fill="none" stroke="#94a3b8" stroke-width="0.8"/>';
-  html+='<path d="M130 '+(my1+24)+' Q135 '+(my1+32)+' 140 '+(my1+24)+' T150 '+(my1+24)+' T160 '+(my1+24)+'" fill="none" stroke="#94a3b8" stroke-width="0.8"/>';
-  html+='<text x="145" y="'+(my1+52)+'" text-anchor="middle" fill="#94a3b8" font-size="7">EMI</text>';
-  html+='<text x="145" y="'+(my1+60)+'" text-anchor="middle" fill="#64748b" font-size="6">滤波器</text>';
-  html+=_arr(170,my1+20,196,my1+20);
-
-  /* PFC Rectifier */
-  html+='<rect x="196" y="'+(my1+2)+'" width="80" height="36" rx="3" fill="#0b1520" stroke="#38bdf8" stroke-width="1.2"/>';
-  /* PFC symbol: AC->DC wave */
-  html+='<path d="M210 '+(my1+20)+' Q220 '+(my1+10)+' 230 '+(my1+20)+' Q240 '+(my1+30)+' 250 '+(my1+20)+'" fill="none" stroke="#38bdf8" stroke-width="1"/>';
-  html+='<line x1="250" y1="'+(my1+14)+'" x2="264" y2="'+(my1+14)+'" stroke="#38bdf8" stroke-width="1.5"/>';
-  html+='<line x1="250" y1="'+(my1+26)+'" x2="264" y2="'+(my1+26)+'" stroke="#38bdf8" stroke-width="1.5"/>';
-  html+='<text x="236" y="'+(my1+48)+'" text-anchor="middle" fill="#38bdf8" font-size="7">PFC整流</text>';
-  html+='<text x="236" y="'+(my1+56)+'" text-anchor="middle" fill="#64748b" font-size="6">SiC '+plan.moduleCount+'块</text>';
-  html+=_arr(276,my1+20,308,my1+20,'#ef4444');
-
-  /* DC Bus bar (thick red line) */
-  html+='<rect x="308" y="'+(my1-2)+'" width="60" height="44" rx="3" fill="#0b1520" stroke="#ef4444" stroke-width="1.5"/>';
-  html+='<line x1="316" y1="'+(my1+10)+'" x2="360" y2="'+(my1+10)+'" stroke="#ef4444" stroke-width="3"/>';
-  html+='<line x1="316" y1="'+(my1+30)+'" x2="360" y2="'+(my1+30)+'" stroke="#60a5fa" stroke-width="2"/>';
-  html+='<text x="338" y="'+(my1+48)+'" text-anchor="middle" fill="#ef4444" font-size="7" font-weight="600">DC母线</text>';
-  html+='<text x="338" y="'+(my1+56)+'" text-anchor="middle" fill="#64748b" font-size="6">'+p.voltage+'V</text>';
-
-  /* DC/DC Isolation */
-  html+='<rect x="384" y="'+(my1+2)+'" width="80" height="36" rx="3" fill="#0b1520" stroke="#f59e0b" stroke-width="1.2"/>';
-  /* Transformer symbol */
-  html+='<circle cx="414" cy="'+(my1+20)+'" r="10" fill="none" stroke="#f59e0b" stroke-width="1"/>';
-  html+='<circle cx="434" cy="'+(my1+20)+'" r="10" fill="none" stroke="#f59e0b" stroke-width="1"/>';
-  html+='<text x="424" y="'+(my1+48)+'" text-anchor="middle" fill="#f59e0b" font-size="7">DC/DC隔离</text>';
-  html+='<text x="424" y="'+(my1+56)+'" text-anchor="middle" fill="#64748b" font-size="6">LLC谐振</text>';
-  html+=_arr(464,my1+20,492,my1+20,'#ef4444');
-
-  /* DC Metering */
-  html+='<rect x="492" y="'+(my1+4)+'" width="60" height="32" rx="3" fill="#0b1520" stroke="#94a3b8" stroke-width="1.2"/>';
-  html+='<text x="522" y="'+(my1+16)+'" text-anchor="middle" fill="#94a3b8" font-size="8">⚡</text>';
-  html+='<text x="522" y="'+(my1+30)+'" text-anchor="middle" fill="#e5edf7" font-size="7" font-weight="600">计量</text>';
-  html+='<text x="522" y="'+(my1+52)+'" text-anchor="middle" fill="#94a3b8" font-size="7">DC meter</text>';
-  html+=_arr(552,my1+20,578,my1+20);
-
-  /* Contactor + fuse */
-  html+='<rect x="578" y="'+(my1+4)+'" width="50" height="32" rx="3" fill="#0b1520" stroke="#ef4444" stroke-width="1.2"/>';
-  html+='<line x1="588" y1="'+(my1+12)+'" x2="588" y2="'+(my1+28)+'" stroke="#ef4444" stroke-width="1.5"/>';
-  html+='<line x1="618" y1="'+(my1+12)+'" x2="618" y2="'+(my1+28)+'" stroke="#ef4444" stroke-width="1.5"/>';
-  html+='<line x1="596" y1="'+(my1+20)+'" x2="610" y2="'+(my1+14)+'" stroke="#ef4444" stroke-width="1.2"/>';
-  html+='<text x="603" y="'+(my1+52)+'" text-anchor="middle" fill="#ef4444" font-size="7">接触器</text>';
-
-  /* Gun output (multiple) */
-  html+='<line x1="628" y1="'+(my1+20)+'" x2="660" y2="'+(my1+20)+'" stroke="#38bdf8" stroke-width="1.8"/>';
-  for(var gi=0;gi<Math.min(4,p.guns);gi++){
-    var gx=660,gy=my1-8+gi*24;
-    html+='<rect x="'+gx+'" y="'+gy+'" width="70" height="20" rx="3" fill="#0b1520" stroke="#38bdf8" stroke-width="1"/>';
-    html+='<text x="'+(gx+35)+'" y="'+(gy+13)+'" text-anchor="middle" fill="#38bdf8" font-size="7">枪'+(gi+1)+' '+plan.gunCurrent+'A</text>';
-    html+='<line x1="'+gx+'" y1="'+(gy+10)+'" x2="'+(gx-12)+'" y2="'+(my1+20)+'" stroke="#38bdf8" stroke-width="0.8"/>';
-  }
-
-  /* ── Auxiliary/Protection (row 2) ── */
-  var my2=224;
-  html+='<rect x="40" y="'+my2+'" width="100" height="36" rx="3" fill="#0b1520" stroke="#94a3b8" stroke-width="1"/>';
-  html+='<text x="90" y="'+(my2+15)+'" text-anchor="middle" fill="#94a3b8" font-size="8">辅助电源</text>';
-  html+='<text x="90" y="'+(my2+28)+'" text-anchor="middle" fill="#64748b" font-size="7">AC/DC 24V</text>';
-  html+='<rect x="160" y="'+my2+'" width="110" height="36" rx="3" fill="#0b1520" stroke="#a78bfa" stroke-width="1"/>';
-  html+='<text x="215" y="'+(my2+15)+'" text-anchor="middle" fill="#a78bfa" font-size="8">主控DSP/FPGA</text>';
-  html+='<text x="215" y="'+(my2+28)+'" text-anchor="middle" fill="#64748b" font-size="7">策略+联锁</text>';
-  html+='<rect x="290" y="'+my2+'" width="100" height="36" rx="3" fill="#0b1520" stroke="#22c55e" stroke-width="1"/>';
-  html+='<text x="340" y="'+(my2+15)+'" text-anchor="middle" fill="#22c55e" font-size="8">绝缘监测IMD</text>';
-  html+='<text x="340" y="'+(my2+28)+'" text-anchor="middle" fill="#64748b" font-size="7">IEC 61557</text>';
-  html+='<rect x="410" y="'+my2+'" width="100" height="36" rx="3" fill="#0b1520" stroke="#22c55e" stroke-width="1"/>';
-  html+='<text x="460" y="'+(my2+15)+'" text-anchor="middle" fill="#22c55e" font-size="8">漏电检测RCM</text>';
-  html+='<text x="460" y="'+(my2+28)+'" text-anchor="middle" fill="#64748b" font-size="7">30mA/0.1s</text>';
-  html+='<rect x="530" y="'+my2+'" width="100" height="36" rx="3" fill="#0b1520" stroke="#22c55e" stroke-width="1"/>';
-  html+='<text x="580" y="'+(my2+15)+'" text-anchor="middle" fill="#22c55e" font-size="8">BMS通信</text>';
-  html+='<text x="580" y="'+(my2+28)+'" text-anchor="middle" fill="#64748b" font-size="7">CAN/GB/T</text>';
-  html+='<rect x="650" y="'+my2+'" width="100" height="36" rx="3" fill="#0b1520" stroke="#f59e0b" stroke-width="1"/>';
-  html+='<text x="700" y="'+(my2+15)+'" text-anchor="middle" fill="#f59e0b" font-size="8">急停/温控</text>';
-  html+='<text x="700" y="'+(my2+28)+'" text-anchor="middle" fill="#64748b" font-size="7">硬件安全链</text>';
-
-  /* ── Protection chain bar ── */
-  html+='<rect x="40" y="'+(my2+52)+'" width="'+(W-80)+'" height="28" rx="4" fill="#1a0e0e" stroke="#ef4444" stroke-width="0.8"/>';
-  var protItems=['ACB '+plan.acb+'A','MCCB '+plan.mccb+'A','CT '+plan.ct,'预充回路','急停按钮','接触器粘连','绝缘监测','漏电保护'];
-  protItems.forEach(function(pi,pii){
-    html+='<text x="'+(70+pii*100)+'" y="'+(my2+70)+'" fill="#fca5a5" font-size="7">'+chLcEsc(pi)+'</text>';
-    if(pii<protItems.length-1) html+='<text x="'+(115+pii*100)+'" y="'+(my2+70)+'" fill="#ef4444" font-size="7">|</text>';
-  });
-
-  /* ── Wiring connections (dashed) ── */
-  html+='<path d="M236 136 L236 196" stroke="#a78bfa" stroke-width="0.8" stroke-dasharray="3 3"/>';
-  html+='<path d="M424 136 L424 196" stroke="#a78bfa" stroke-width="0.8" stroke-dasharray="3 3"/>';
-  html+='<path d="M580 136 L580 196" stroke="#22c55e" stroke-width="0.8" stroke-dasharray="3 3"/>';
-
-  /* ── CAD title block ── */
-  html+=chLcTitleBlock(W,H,'电气主回路拓扑图 — '+plan.sceneLabel,plan.acb+'A ACB · '+p.voltage+'VDC · '+plan.moduleCount+'块SiC · '+p.guns+'枪','SYN-ELEC-001','V2.0','1:50');
-
-  /* ── Legend ── */
-  html+=chLcLegend(28,H-68,[
-    {color:'#cbd5e1',label:'AC 380/690V',style:'solid'},
-    {color:'#ef4444',label:'DC 高压母线',style:'thick'},
-    {color:'#38bdf8',label:'DC 充电输出',style:'solid'},
-    {color:'#a78bfa',label:'控制信号',style:'dot'},
-    {color:'#22c55e',label:'保护/监测',style:'dashed'},
-  ],120);
-
-  html+='</svg>';
-  return html;
+  return (function(plan) { return drawSld('电气主回路单线图 — '+plan.acb+'A ACB', [
+      {name:plan.params.grid+' 交流进线 AC INLET',color:'#FFB300',items:[
+        {n:plan.params.grid+' 3Φ AC',s:plan.acb+'A',icon:'grid'},
+        {n:'ACB 断路器',s:plan.acb+'A',icon:'sw'},
+        {n:'CT/PT 计量',s:'0.2S级',icon:'gear'},
+        {n:'EMI 滤波器',s:'传导骚扰',icon:'gear'}
+      ]},
+      {name:'AC/DC 整流 RECTIFIER',color:'#1976D2',items:[
+        {n:'PFC 整流模块',s:'SiC ×'+plan.moduleCount,icon:'pcs'},
+        {n:'DC 母线',s:plan.params.voltage+'VDC / '+plan.dcCurrent+'A',icon:'sw'},
+        {n:'预充回路',s:'软启保护',icon:'gear'},
+        {n:'放电回路',s:'安全泄放',icon:'gear'}
+      ]},
+      {name:'DC/DC 输出 OUTPUT',color:'#26A69A',items:[
+        {n:'DC/DC 隔离',s:'LLC谐振',icon:'pcs'},
+        {n:'直流计量',s:plan.gunCurrent+'A / 0.5S',icon:'server'},
+        {n:'直流接触器',s:plan.gunCurrent+'A',icon:'sw'},
+        {n:'液冷枪 × '+plan.params.guns,s:plan.protocolLabel,icon:'ev'}
+      ]},
+      {name:'保护监测 PROTECTION',color:'#E53935',items:[
+        {n:'绝缘监测 IMD',s:'IEC 61557',icon:'gear'},
+        {n:'漏电检测 RCM',s:'30mA / 0.1s',icon:'gear'},
+        {n:'BMS 通信',s:'CAN / '+plan.protocolLabel,icon:'server'},
+        {n:'硬件安全链',s:'急停 · 过温',icon:'gear'}
+      ]}
+    ],{w:820,h:360,theme:'industrial',drawingNo:'CH-ELEC-001',ver:'V2.0',scale:'1:50',
+       legend:[{style:'bus',label:'交流/直流母线'},{style:'power',label:'电力线路'},{style:'control',label:'控制信号'}]});
+    })(plan);
 }
 
 function chLcRenderCoolingSvg(plan){
-  var W=880,H=440;
-  var html='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="液冷系统原理图">'+chLcSvgDefs();
-  html+='<rect width="'+W+'" height="'+H+'" fill="#08111d"/>';
-  html+='<rect width="'+W+'" height="'+H+'" fill="url(#lcGrid)" opacity="0.3"/>';
-
-  /* ── Title ── */
-  html+='<text x="28" y="32" fill="#f8fafc" font-size="13" font-weight="700">液冷散热系统P&ID原理图</text>';
-  html+='<text x="28" y="48" fill="#64748b" font-size="9">'+plan.coolant+' · '+plan.flow+'L/min · '+plan.pressure+' · '+plan.cdu+'</text>';
-  html+='<line x1="28" y1="56" x2="'+(W-28)+'" y2="56" stroke="#1e293b" stroke-width="0.5"/>';
-
-  /* ── Zone backgrounds ── */
-  html+='<rect x="14" y="66" width="200" height="310" rx="5" fill="#0c1a12" stroke="#22c55e" stroke-width="0.5" stroke-dasharray="4 2"/>';
-  html+='<text x="114" y="82" text-anchor="middle" fill="#22c55e" font-size="8" font-weight="600" opacity="0.7">一次回路 PRIMARY</text>';
-  html+='<rect x="226" y="66" width="360" height="310" rx="5" fill="#0c1a12" stroke="#22c55e" stroke-width="0.5" stroke-dasharray="4 2"/>';
-  html+='<text x="406" y="82" text-anchor="middle" fill="#22c55e" font-size="8" font-weight="600" opacity="0.7">冷却模块群 COOLING MODULES</text>';
-  html+='<rect x="598" y="66" width="130" height="310" rx="5" fill="#1a1a0e" stroke="#f59e0b" stroke-width="0.5" stroke-dasharray="4 2"/>';
-  html+='<text x="663" y="82" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="600" opacity="0.7">传感器 SUITE</text>';
-  html+='<rect x="740" y="66" width="126" height="310" rx="5" fill="#0f1a2e" stroke="#64748b" stroke-width="0.5" stroke-dasharray="4 2"/>';
-  html+='<text x="803" y="82" text-anchor="middle" fill="#64748b" font-size="8" font-weight="600" opacity="0.7">辅助系统 AUX</text>';
-
-  /* ── Supply header (top, green solid line) ── */
-  html+='<line x1="30" y1="100" x2="760" y2="100" stroke="#22c55e" stroke-width="2.5"/>';
-  html+='<text x="36" y="95" fill="#22c55e" font-size="8" font-weight="600">供液主管 SUPPLY</text>';
-  html+='<text x="680" y="95" fill="#22c55e" font-size="7">→ DN'+Math.round(plan.flow*0.08+30)+'</text>';
-
-  /* ── Return header (bottom, blue dashed line) ── */
-  html+='<line x1="30" y1="340" x2="760" y2="340" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="8 3"/>';
-  html+='<text x="36" y="358" fill="#38bdf8" font-size="8" font-weight="600">回液主管 RETURN</text>';
-  html+='<text x="680" y="358" fill="#38bdf8" font-size="7">← DN'+Math.round(plan.flow*0.08+30)+'</text>';
-
-  /* ── Cooling Tower (far left) ── */
-  var ctX=36,ctY=170,ctW=80,ctH=120;
-  /* Tower body (trapezoid) */
-  html+='<polygon points="'+(ctX+10)+','+(ctY+20)+' '+(ctX+ctW-10)+','+(ctY+20)+' '+(ctX+ctW)+','+(ctY+ctH-10)+' '+ctX+','+(ctY+ctH-10)+'" fill="#0a1f16" stroke="#22c55e" stroke-width="1.2"/>';
-  /* Fan at top */
-  html+='<circle cx="'+(ctX+ctW/2)+'" cy="'+(ctY+20)+'" r="12" fill="none" stroke="#22c55e" stroke-width="0.8"/>';
-  html+='<line x1="'+(ctX+ctW/2-8)+'" y1="'+(ctY+20)+'" x2="'+(ctX+ctW/2+8)+'" y2="'+(ctY+20)+'" stroke="#22c55e" stroke-width="0.6"/>';
-  html+='<line x1="'+(ctX+ctW/2)+'" y1="'+(ctY+12)+'" x2="'+(ctX+ctW/2)+'" y2="'+(ctY+28)+'" stroke="#22c55e" stroke-width="0.6"/>';
-  /* Water level line */
-  html+='<line x1="'+(ctX+10)+'" y1="'+(ctY+ctH-30)+'" x2="'+(ctX+ctW-10)+'" y2="'+(ctY+ctH-30)+'" stroke="#22c55e" stroke-width="0.6" stroke-dasharray="3 2"/>';
-  html+='<text x="'+(ctX+ctW/2)+'" y="'+(ctY+ctH-18)+'" text-anchor="middle" fill="#4ade80" font-size="6">液位</text>';
-  /* Label */
-  html+='<text x="'+(ctX+ctW/2)+'" y="'+(ctY+ctH+14)+'" text-anchor="middle" fill="#22c55e" font-size="8" font-weight="600">冷却塔</text>';
-  html+='<text x="'+(ctX+ctW/2)+'" y="'+(ctY+ctH+24)+'" text-anchor="middle" fill="#64748b" font-size="6">'+Math.ceil(plan.heatKw/800)+'台闭式</text>';
-
-  /* ── Plate Heat Exchanger ── */
-  var hxX=136,hxY=160,hxW=70,hxH=80;
-  html+='<rect x="'+hxX+'" y="'+hxY+'" width="'+hxW+'" height="'+hxH+'" rx="3" fill="#0a1f16" stroke="#22c55e" stroke-width="1.2"/>';
-  /* Wave coils */
-  for(var wi=0;wi<4;wi++){
-    var wy=hxY+15+wi*16;
-    html+='<path d="M'+(hxX+6)+' '+wy+' Q'+(hxX+18)+' '+(wy-8)+' '+(hxX+30)+' '+wy+' T'+(hxX+hxW-6)+' '+wy+'" fill="none" stroke="#22c55e" stroke-width="0.8" opacity="0.7"/>';
-  }
-  html+='<text x="'+(hxX+hxW/2)+'" y="'+(hxY+hxH+14)+'" text-anchor="middle" fill="#22c55e" font-size="8" font-weight="600">板式换热器</text>';
-  html+='<text x="'+(hxX+hxW/2)+'" y="'+(hxY+hxH+24)+'" text-anchor="middle" fill="#64748b" font-size="6">HEX '+plan.heatKw+'kW</text>';
-
-  /* ── Expansion Tank ── */
-  var tkX=136,tkY=280,tkW=50,tkH=40;
-  html+='<rect x="'+tkX+'" y="'+tkY+'" width="'+tkW+'" height="'+tkH+'" rx="8" fill="#0a1f16" stroke="#22c55e" stroke-width="1"/>';
-  html+='<line x1="'+(tkX+5)+'" y1="'+(tkY+tkH*0.3)+'" x2="'+(tkX+tkW-5)+'" y2="'+(tkY+tkH*0.3)+'" stroke="#22c55e" stroke-width="0.6" stroke-dasharray="2 2"/>';
-  html+='<text x="'+(tkX+tkW/2)+'" y="'+(tkY+tkH+12)+'" text-anchor="middle" fill="#22c55e" font-size="7">膨胀水箱</text>';
-
-  /* ── Circulation Pump ── */
-  var pmX=230,pmY=175,pmR=20;
-  html+='<circle cx="'+pmX+'" cy="'+pmY+'" r="'+pmR+'" fill="#0a1f16" stroke="#22c55e" stroke-width="1.5"/>';
-  /* Impeller symbol */
-  html+='<path d="M'+(pmX-pmR*0.4)+','+(pmY+pmR*0.3)+' L'+(pmX+pmR*0.7)+','+pmY+' L'+(pmX-pmR*0.4)+','+(pmY-pmR*0.3)+' Z" fill="#22c55e" opacity="0.6" stroke="#22c55e" stroke-width="0.8"/>';
-  html+='<text x="'+pmX+'" y="'+(pmY+pmR+14)+'" text-anchor="middle" fill="#22c55e" font-size="8" font-weight="600">循环泵</text>';
-  html+='<text x="'+pmX+'" y="'+(pmY+pmR+24)+'" text-anchor="middle" fill="#64748b" font-size="6">N+1冗余</text>';
-
-  /* ── Pipe connections: Tower → HX → Pump → Supply header ── */
-  html+='<line x1="'+(ctX+ctW/2)+'" y1="'+(ctY+ctH-10)+'" x2="'+(ctX+ctW/2)+'" y2="'+(hxY+hxH/2)+'" stroke="#22c55e" stroke-width="1.5" marker-end="url(#lcFlowArr)"/>';
-  html+='<line x1="'+(hxX+hxW)+'" y1="'+(hxY+hxH/2)+'" x2="'+(pmX-pmR)+'" y2="'+pmY+'" stroke="#22c55e" stroke-width="1.5" marker-end="url(#lcFlowArr)"/>';
-  html+='<line x1="'+(pmX+pmR)+'" y1="'+pmY+'" x2="'+(pmX+pmR)+'" y2="'+100+'" stroke="#22c55e" stroke-width="1.5" marker-end="url(#lcFlowArr)"/>';
-  html+='<line x1="'+(ctX+ctW/2)+'" y1="'+100+'" x2="'+(ctX+ctW/2)+'" y2="'+(ctY+20)+'" stroke="#22c55e" stroke-width="1" stroke-dasharray="4 3"/>';
-
-  /* ── Cooling Modules (center, parallel vertical drops) ── */
-  var modX=280,modW=110,modH=40;
-  var modNames=['PFC功率模块','DC/DC模块','功率路由PRU','枪线/母排'];
-  for(var mi=0;mi<Math.min(4,plan.moduleCount);mi++){
-    var my=120+mi*54;
-    html+='<rect x="'+modX+'" y="'+my+'" width="'+modW+'" height="'+modH+'" rx="4" fill="#0b1520" stroke="#38bdf8" stroke-width="1"/>';
-    html+='<text x="'+(modX+modW/2)+'" y="'+(my+16)+'" text-anchor="middle" fill="#38bdf8" font-size="8" font-weight="600">'+chLcEsc(modNames[mi]||'模块'+(mi+1))+'</text>';
-    html+='<text x="'+(modX+modW/2)+'" y="'+(my+28)+'" text-anchor="middle" fill="#64748b" font-size="6">'+plan.modulePower+'kW × '+(Math.ceil(plan.moduleCount/4))+'</text>';
-    /* Supply drop from header to module */
-    html+='<line x1="'+(modX+modW/4)+'" y1="'+100+'" x2="'+(modX+modW/4)+'" y2="'+my+'" stroke="#22c55e" stroke-width="1.2" marker-end="url(#lcFlowArr)"/>';
-    /* Return from module to return header */
-    html+='<line x1="'+(modX+modW*3/4)+'" y1="'+(my+modH)+'" x2="'+(modX+modW*3/4)+'" y2="'+340+'" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="5 3"/>';
-  }
-  /* Extra module indicator */
-  if(plan.moduleCount>4){
-    html+='<text x="'+(modX+modW/2)+'" y="'+(120+4*54+10)+'" text-anchor="middle" fill="#64748b" font-size="7">... 共'+plan.moduleCount+'模块</text>';
-  }
-
-  /* ── Valve symbols (gate valve IEC style) ── */
-  function _valve(x,y,c){
-    return '<polygon points="'+x+','+(y-6)+' '+(x-6)+','+y+' '+x+','+(y+6)+'" fill="#0a1f16" stroke="'+c+'" stroke-width="1"/>'
-      +'<polygon points="'+x+','+(y-6)+' '+(x+6)+','+y+' '+x+','+(y+6)+'" fill="#0a1f16" stroke="'+c+'" stroke-width="1"/>'
-      +'<line x1="'+x+'" y1="'+(y-6)+'" x2="'+x+'" y2="'+(y-10)+'" stroke="'+c+'" stroke-width="0.8"/>';
-  }
-  html+=_valve(pmX-50,pmY,'#22c55e');
-  html+='<text x="'+(pmX-50)+'" y="'+(pmY+18)+'" text-anchor="middle" fill="#64748b" font-size="5">V-101</text>';
-  html+=_valve(pmX+50,pmY,'#22c55e');
-  html+='<text x="'+(pmX+50)+'" y="'+(pmY+18)+'" text-anchor="middle" fill="#64748b" font-size="5">V-102</text>';
-
-  /* ── Sensor suite (right zone) ── */
-  var sensors=[
-    {n:'TI-101',t:'温度',y:120,c:'#f59e0b'},
-    {n:'TI-102',t:'温度',y:180,c:'#f59e0b'},
-    {n:'PI-101',t:'压力',y:240,c:'#f59e0b'},
-    {n:'FI-101',t:'流量',y:300,c:'#f59e0b'},
-  ];
-  sensors.forEach(function(s){
-    html+='<circle cx="663" cy="'+s.y+'" r="12" fill="#0b1520" stroke="'+s.c+'" stroke-width="1.2"/>';
-    html+='<text x="663" y="'+(s.y+3)+'" text-anchor="middle" fill="'+s.c+'" font-size="7" font-weight="700">'+s.n+'</text>';
-    html+='<text x="663" y="'+(s.y+22)+'" text-anchor="middle" fill="#94a3b8" font-size="6">'+s.t+'</text>';
-    /* Connect to supply/return */
-    html+='<line x1="651" y1="'+s.y+'" x2="640" y2="'+s.y+'" stroke="'+s.c+'" stroke-width="0.6" stroke-dasharray="2 2"/>';
-  });
-
-  /* ── Auxiliary (far right) ── */
-  html+='<rect x="760" y="120" width="100" height="36" rx="3" fill="#0b1520" stroke="#64748b" stroke-width="0.8"/>';
-  html+='<text x="810" y="138" text-anchor="middle" fill="#94a3b8" font-size="7">补水阀组</text>';
-  html+='<text x="810" y="150" text-anchor="middle" fill="#64748b" font-size="6">自动/手动</text>';
-  html+='<rect x="760" y="180" width="100" height="36" rx="3" fill="#0b1520" stroke="#64748b" stroke-width="0.8"/>';
-  html+='<text x="810" y="198" text-anchor="middle" fill="#94a3b8" font-size="7">排气阀</text>';
-  html+='<text x="810" y="210" text-anchor="middle" fill="#64748b" font-size="6">自动排气</text>';
-  html+='<rect x="760" y="240" width="100" height="36" rx="3" fill="#0b1520" stroke="#64748b" stroke-width="0.8"/>';
-  html+='<text x="810" y="258" text-anchor="middle" fill="#94a3b8" font-size="7">排污阀</text>';
-  html+='<text x="810" y="270" text-anchor="middle" fill="#64748b" font-size="6">定期排放</text>';
-  html+='<rect x="760" y="300" width="100" height="36" rx="3" fill="#0b1520" stroke="#22c55e" stroke-width="0.8"/>';
-  html+='<text x="810" y="318" text-anchor="middle" fill="#22c55e" font-size="7">水质检测</text>';
-  html+='<text x="810" y="330" text-anchor="middle" fill="#64748b" font-size="6">电导率/pH</text>';
-
-  /* ── KPI bar ── */
-  html+='<rect x="14" y="'+(H-48)+'" width="'+(W-28)+'" height="20" fill="#0b1520" opacity="0.8"/>';
-  html+='<text x="30" y="'+(H-34)+'" fill="#22c55e" font-size="8">进液温度: 18~22℃ &nbsp;&nbsp; 回液温度: 35~40℃ &nbsp;&nbsp; ΔT=16~18℃ &nbsp;&nbsp; 流量: '+plan.flow+'L/min &nbsp;&nbsp; 压力: '+plan.pressure+'</text>';
-
-  /* ── CAD title block ── */
-  html+=chLcTitleBlock(W,H,'液冷散热系统P&ID — '+plan.coolant,plan.cdu+' · '+plan.flow+'L/min · '+plan.heatKw+'kW HEX','SYN-PID-COOL-001','V2.0','1:50');
-
-  /* ── Legend ── */
-  html+=chLcLegend(28,H-72,[
-    {color:'#22c55e',label:'供液管路 SUPPLY',style:'solid'},
-    {color:'#38bdf8',label:'回液管路 RETURN',style:'dashed'},
-    {color:'#f59e0b',label:'仪表/传感器',style:'dot'},
-    {color:'#64748b',label:'辅助管路',style:'solid'},
-  ],140);
-
-  html+='</svg>';
-  return html;
+  var p=plan.params;
+  return (function(plan) { return drawPid('液冷散热系统P&ID — '+plan.coolant, [
+      {x:10,y:50,n:'冷却塔',type:'cooling_tower',sc:'#26A69A',w:25,h:34,tag:'CT-01'},
+      {x:25,y:28,n:'循环泵A',type:'pump',sc:'#1976D2',w:12,h:12,tag:'P-01A'},
+      {x:25,y:72,n:'循环泵B',type:'pump',sc:'#1976D2',w:12,h:12,tag:'P-01B'},
+      {x:35,y:28,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:8,h:8,tag:'V-01'},
+      {x:35,y:72,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:8,h:8,tag:'V-02'},
+      {x:50,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:28,h:24,tag:'HX-01'},
+      {x:68,y:18,n:'分水器',type:'manifold',sc:'#26A69A',w:30,h:8,tag:'MS-01'},
+      {x:68,y:82,n:'集水器',type:'manifold',sc:'#FF7043',w:30,h:8,tag:'MR-01'},
+      {x:82,y:30,n:'模块1',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'PFC-1'},
+      {x:82,y:42,n:'模块2',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'PFC-2'},
+      {x:82,y:58,n:'模块3',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'DC/DC-1'},
+      {x:82,y:70,n:'模块4',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'DC/DC-2'},
+      {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:12,h:12,tag:'TK-01'},
+    ],[
+      {points:[{x:22,y:50},{x:22,y:28}],c:'#26A69A',style:'mech'},
+      {points:[{x:22,y:50},{x:22,y:72}],c:'#26A69A',style:'mech'},
+      {points:[{x:31,y:28},{x:35,y:28}],c:'#1976D2',style:'mech'},
+      {points:[{x:31,y:72},{x:35,y:72}],c:'#1976D2',style:'mech'},
+      {points:[{x:39,y:28},{x:39,y:38},{x:50,y:38}],c:'#1976D2',style:'mech'},
+      {points:[{x:39,y:72},{x:39,y:62},{x:50,y:62}],c:'#1976D2',style:'mech'},
+      {points:[{x:64,y:38},{x:64,y:22},{x:68,y:22},{x:68,y:18}],c:'#26A69A',style:'mech',label:'供液'},
+      {points:[{x:82,y:22},{x:82,y:25}],c:'#26A69A',style:'mech'},
+      {points:[{x:82,y:22},{x:82,y:37}],c:'#26A69A',style:'mech'},
+      {points:[{x:82,y:75},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true},
+      {points:[{x:82,y:65},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true},
+      {points:[{x:68,y:82},{x:68,y:78},{x:64,y:78},{x:64,y:62}],c:'#FF7043',style:'mech',dash:true,label:'回液'},
+      {points:[{x:22,y:12},{x:22,y:22},{x:68,y:22}],c:'#26A69A',style:'mech'},
+      {points:[{x:10,y:88},{x:10,y:80}],c:'#FF7043',style:'mech',dash:true},
+      {points:[{x:89,y:50},{x:89,y:18},{x:95,y:18}],c:'#AB47BC',style:'control',label:'补水'},
+      {points:[{x:89,y:50},{x:89,y:82},{x:95,y:82}],c:'#AB47BC',style:'control',dash:true,label:'溢流'},
+    ],{w:850,h:400,theme:'siemens',drawingNo:'CH-PID-001',ver:'V2.0',scale:'1:50',
+       instruments:[
+         {x:25,y:16,tag:'TI',sub:'TI-01',sc:'#42A5F5',sx:25,sy:28},
+         {x:50,y:22,tag:'TI',sub:'TI-02',sc:'#42A5F5',sx:50,sy:38},
+         {x:68,y:12,tag:'PI',sub:'PI-01',sc:'#f0883e',sx:68,sy:18},
+         {x:68,y:88,tag:'PI',sub:'PI-02',sc:'#f0883e',sx:68,sy:82},
+         {x:35,y:16,tag:'FI',sub:'FI-01',sc:'#3fb950',sx:35,sy:28},
+         {x:95,y:38,tag:'LI',sub:'LI-01',sc:'#AB47BC',sx:95,sy:50}
+       ],
+       legend:[
+         {style:'mech',label:'供液管路'},
+         {style:'mech',label:'回液管路'},
+         {style:'control',label:'控制/补水'},
+         {style:'data',label:'仪表信号'}
+       ],coolKw:plan.heatKw});
+    })(plan);
 }
 
 function chLcRenderControlSvg(plan){
   var p=plan.params;
-  var W=780,H=420;
-  var html='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="控制逻辑框图">'+chLcSvgDefs();
-  html+='<rect width="'+W+'" height="'+H+'" fill="#08111d"/>';
-  html+='<rect width="'+W+'" height="'+H+'" fill="url(#lcGrid)" opacity="0.3"/>';
-
-  /* ── Title ── */
-  html+='<text x="28" y="32" fill="#f8fafc" font-size="13" font-weight="700">超充液冷控制逻辑架构</text>';
-  html+='<text x="28" y="48" fill="#64748b" font-size="9">站控层 · 功率控制层 · 液冷联锁层 · 安全链 · '+plan.protocolLabel+'</text>';
-  html+='<line x1="28" y1="56" x2="'+(W-28)+'" y2="56" stroke="#1e293b" stroke-width="0.5"/>';
-
-  /* ── Layer zones (top to bottom) ── */
-  var layers=[
-    {name:'站控/管理层 STATION CONTROL',y:66,h:80,color:'#60a5fa',bg:'#0f1a2e'},
-    {name:'功率控制层 POWER CONTROL',y:156,h:80,color:'#38bdf8',bg:'#0c1a2e'},
-    {name:'液冷联锁层 COOLING INTERLOCK',y:246,h:80,color:'#22c55e',bg:'#0c1a12'},
-    {name:'安全链 SAFETY CHAIN',y:336,h:52,color:'#ef4444',bg:'#1a0e0e'},
-  ];
-  layers.forEach(function(l){
-    html+='<rect x="14" y="'+l.y+'" width="'+(W-28)+'" height="'+l.h+'" rx="5" fill="'+l.bg+'" stroke="'+l.color+'" stroke-width="0.5" stroke-dasharray="4 2"/>';
-    html+='<text x="28" y="'+(l.y+14)+'" fill="'+l.color+'" font-size="8" font-weight="600" opacity="0.7">'+l.name+'</text>';
-  });
-
-  function _box(x,y,w,h,t,s,c){
-    return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="5" fill="#0b1520" stroke="'+c+'" stroke-width="1.2"/><text x="'+(x+w/2)+'" y="'+(y+h/2-2)+'" text-anchor="middle" fill="#e5edf7" font-size="10" font-weight="600">'+t+'</text>'+(s?'<text x="'+(x+w/2)+'" y="'+(y+h/2+11)+'" text-anchor="middle" fill="#94a3b8" font-size="7">'+s+'</text>':'');
-  }
-  function _arr(x1,y1,x2,y2,c,dash){
-    c=c||'#38bdf8'; var m='lcArrow'; if(c==='#22c55e')m='lcGreenArrow'; else if(c==='#ef4444')m='lcRedArrow'; else if(c==='#60a5fa')m='lcArrow'; else if(c==='#a78bfa')m='lcPurpleArrow';
-    return '<path d="M'+x1+' '+y1+' L'+x2+' '+y2+'" stroke="'+c+'" stroke-width="1.5" fill="none" '+(dash?'stroke-dasharray="4 3"':'')+' marker-end="url(#'+m+')"/>';
-  }
-
-  /* ── Layer 1: Station Control ── */
-  var l1y=80;
-  html+=_box(40,l1y,120,48,'用户/平台','扫码·预约·支付·远程','#94a3b8');
-  html+=_box(180,l1y,120,48,'车辆BMS',plan.protocolLabel,'#22c55e');
-  html+=_box(320,l1y,140,48,'站级控制器','EMS调度·功率分配·OCPP','#a78bfa');
-  html+=_box(480,l1y,130,48,'云端平台','OCPP 2.0.1·运维监控','#94a3b8');
-  html+=_box(630,l1y,120,48,'计费系统','电量计费·结算·报表','#64748b');
-  html+=_arr(160,l1y+24,180,l1y+24)+_arr(300,l1y+24,320,l1y+24);
-  html+=_arr(460,l1y+24,480,l1y+24,'#a78bfa',true)+_arr(610,l1y+24,630,l1y+24,'#64748b',true);
-
-  /* ── Layer 2: Power Control ── */
-  var l2y=170;
-  html+=_box(40,l2y,140,50,'主控MCU/DSP','策略与联锁·PID控制','#38bdf8');
-  html+=_box(200,l2y,120,48,'PFC驱动','SiC模块驱动','#38bdf8');
-  html+=_box(340,l2y,120,48,'DC/DC驱动','LLC谐振控制','#38bdf8');
-  html+=_box(480,l2y,120,48,'接触器控制','预充·闭合·断开','#f59e0b');
-  html+=_box(620,l2y,120,48,'均流控制','功率路由PRU','#06b6d4');
-  /* Power down from station to power control */
-  html+=_arr(390,l1y+48,390,l2y,'#60a5fa');
-  html+=_arr(540,l1y+48,540,l2y,'#60a5fa');
-  /* Lateral power flow */
-  html+=_arr(180,l2y+24,200,l2y+24)+_arr(320,l2y+24,340,l2y+24)+_arr(460,l2y+24,480,l2y+24)+_arr(600,l2y+24,620,l2y+24);
-
-  /* ── Layer 3: Cooling Interlock ── */
-  var l3y=260;
-  html+=_box(40,l3y,140,48,'液冷控制器','温升PID·流量联锁','#22c55e');
-  html+=_box(200,l3y,120,48,'冷却泵控制','变频·N+1切换','#22c55e');
-  html+=_box(340,l3y,120,48,'阀门控制','开度·通断','#22c55e');
-  html+=_box(480,l3y,120,48,'温度监测','TI多点巡检','#f59e0b');
-  html+=_arr(110,l2y+50,110,l3y,'#22c55e',true);
-  html+=_arr(180,l3y+24,200,l3y+24,'#22c55e');
-  html+=_arr(320,l3y+24,340,l3y+24,'#22c55e');
-  html+=_arr(460,l3y+24,480,l3y+24,'#22c55e');
-
-  /* ── Layer 4: Safety Chain ── */
-  var l4y=342;
-  var safetyItems=['急停','过流','过温','漏液','绝缘故障','接触器粘连','通信超时','水温异常'];
-  safetyItems.forEach(function(si,si2){
-    var sx=40+si2*90;
-    html+='<rect x="'+sx+'" y="'+l4y+'" width="80" height="28" rx="3" fill="#0b1520" stroke="#ef4444" stroke-width="1"/>';
-    html+='<text x="'+(sx+40)+'" y="'+(l4y+18)+'" text-anchor="middle" fill="#fca5a5" font-size="8">'+chLcEsc(si)+'</text>';
-    html+='<line x1="'+(sx+40)+'" y1="'+(l4y-4)+'" x2="'+(sx+40)+'" y2="'+l4y+'" stroke="#ef4444" stroke-width="0.8"/>';
-  });
-  /* Safety chain link line */
-  html+='<line x1="40" y1="'+(l4y+14)+'" x2="'+(40+8*90)+'" y2="'+(l4y+14)+'" stroke="#ef4444" stroke-width="1.5" opacity="0.4"/>';
-
-  /* ── Vertical safety chain connection ── */
-  html+='<path d="M390 218 L390 260" stroke="#ef4444" stroke-width="1" stroke-dasharray="3 3"/>';
-  html+='<path d="M390 308 L390 342" stroke="#ef4444" stroke-width="1" stroke-dasharray="3 3"/>';
-
-  /* ── Protocol annotations ── */
-  html+='<text x="'+(W-28)+'" y="64" text-anchor="end" fill="#475569" font-size="7">CAN/Modbus TCP/IEC 61850</text>';
-  html+='<text x="'+(W-28)+'" y="154" text-anchor="end" fill="#475569" font-size="7">SPI/PWM/CAN FD</text>';
-  html+='<text x="'+(W-28)+'" y="244" text-anchor="end" fill="#475569" font-size="7">4-20mA/DI-DO/CAN</text>';
-
-  /* ── CAD title block ── */
-  html+=chLcTitleBlock(W,H,'控制逻辑架构图 — '+plan.sceneLabel,'站控·功率·液冷·安全链 · '+plan.protocolLabel,'SYN-CTRL-001','V2.0','NTS');
-
-  html+='</svg>';
-  return html;
+  return (function(plan) { return drawArch('超充液冷控制逻辑架构 — '+plan.protocolLabel, [
+      {name:'站控/管理层 STATION',zone:'zoneA',color:'#7B1FA2',boxes:[
+        {icon:'cloud',n:'用户/平台',s:'扫码·预约·支付',c:'#2a1a3a',sc:'#AB47BC'},
+        {icon:'scada',n:'云端OCPP',s:'OCPP 2.0.1',c:'#2a1a3a',sc:'#AB47BC'},
+        {icon:'server',n:'站级控制器',s:'EMS·功率分配',c:'#2a1a3a',sc:'#AB47BC'},
+        {icon:'gear',n:'计费系统',s:'电量·结算·报表',c:'#2a1a3a',sc:'#06B6D4'}
+      ]},
+      {name:'功率控制层 POWER',zone:'zoneB',color:'#1976D2',boxes:[
+        {icon:'server',n:'主控 MCU/DSP',s:'策略·联锁·PID',c:'#0c1a30',sc:'#1976D2'},
+        {icon:'pcs',n:'PFC 模块驱动',s:'SiC ×N',c:'#0c1a30',sc:'#1976D2'},
+        {icon:'pcs',n:'DC/DC 驱动',s:'LLC谐振',c:'#0c1a30',sc:'#1976D2'},
+        {icon:'sw',n:'接触器控制',s:'预充·通断',c:'#0c1a30',sc:'#F57C00'}
+      ]},
+      {name:'液冷联锁层 COOLING',zone:'zoneC',color:'#00897B',boxes:[
+        {icon:'cdu',n:'液冷控制器',s:'温升PID·流量',c:'#0c2018',sc:'#26A69A'},
+        {icon:'pump',n:'冷却泵控制',s:'变频·N+1切换',c:'#0c2018',sc:'#26A69A'},
+        {icon:'gear',n:'阀门控制',s:'开度·通断',c:'#0c2018',sc:'#26A69A'},
+        {icon:'gear',n:'温度监测',s:'多点TI巡检',c:'#0c2018',sc:'#F57C00'}
+      ]},
+      {name:'安全链 SAFETY',zone:'zoneA',color:'#E53935',boxes:[
+        {icon:'gear',n:'急停 · 过流',s:'硬件级切断',c:'#1a0e0e',sc:'#E53935'},
+        {icon:'gear',n:'过温 · 漏液',s:'传感器联锁',c:'#1a0e0e',sc:'#E53935'},
+        {icon:'gear',n:'绝缘 · 粘连',s:'IMD+诊断',c:'#1a0e0e',sc:'#E53935'},
+        {icon:'gear',n:'通信超时',s:'安全降级',c:'#1a0e0e',sc:'#E53935'}
+      ]}
+    ],{w:760,h:400,theme:'industrial',drawingNo:'CH-CTRL-001',ver:'V2.0',scale:'NTS',
+       legend:[{style:'data',label:'数据通信'},{style:'control',label:'控制信号'},{style:'power',label:'功率驱动'},{style:'alarm',label:'安全联锁'}]});
+    })(plan);
 }
 
 function chLcRenderBomTable(plan){
