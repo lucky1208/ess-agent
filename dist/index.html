@@ -91553,85 +91553,201 @@ function aidcRenderLayout(){
 // RENDER BOM — 分类BOM表 + 经济性分析仪表盘
 // ─────────────────────────────────────────────────────────────────────────────
 function aidcRenderBom(){
-  const R=LAST_AIDC_RESULT;if(!R)return;
+  const R=LAST_AIDC_RESULT; if(!R) return;
   document.getElementById('aidcBomEmpty').style.display='none';
   document.getElementById('aidcBomContent').style.display='block';
-  const bom=R.bom||[],E=R.economics||{},S=R.storage||{};
-  const bomByCategory={IT设备:[],供电设备:[],储能设备:[],散热设备:[],弱电监控:[]};
-  bom.forEach(b=>{
-    const n=b.item||'';
-    if(/GPU|服务器|交换机|存储/i.test(n))bomByCategory.IT设备.push(b);
-    else if(/UPS|变压器|柴发|断路器|STS|PDU/i.test(n))bomByCategory.供电设备.push(b);
-    else if(/HSC|BBU|BMS|超级电容|电池模组|储能变流器/i.test(n))bomByCategory.储能设备.push(b);
-    else if(/CDU|冷却塔|水泵|冷水机|Manifold/i.test(n))bomByCategory.散热设备.push(b);
-    else bomByCategory['弱电监控'].push(b);
+  const P=R.power||{}, C=R.compute||{}, Cl=R.cooling||{};
+  const E=R.economics||{};
+  const itKw=C.itLoadKw||12000;
+  const gpuN=C.gpuCount||1024;
+  const gpuRacks=C.gpuRacks||18;
+  const rackPow=C.rackPower||40;
+  const cduN=(Cl.cdu||[{}])[0]?.qty||4;
+  const cduCap=(Cl.cdu||[{}])[0]?.cap||300;
+  const volt=P.voltage||'10';
+  const sstCap=Math.ceil(itKw*1.35/2000)*2000;
+  const essMwh=Math.round(itKw*0.5/1000*20);
+  const totalHeat=Math.round(gpuRacks*rackPow);
+
+  const SECTIONS=[
+    {
+      title:'① IT算力系统',color:'#58a6ff',icon:'🖥',
+      items:[
+        {no:'IT-001',name:'GPU加速服务器',spec:`8×H100 SXM5 80GB，双路Xeon，1TB RAM，8×NVMe 7.68TB`,brand:'NVIDIA/HPE/Inspur',std:'PICMG 3.0',qty:Math.ceil(gpuN/8),unit:'台',price:420,note:`共${gpuN}卡 GPU`},
+        {no:'IT-002',name:'InfiniBand HDR交换机',spec:'400Gbps，64端口，QSFP56',brand:'NVIDIA Quantum-2',std:'IB HDR',qty:Math.ceil(gpuN/64)+2,unit:'台',price:35,note:'Fat-Tree无阻塞拓扑'},
+        {no:'IT-003',name:'NVMe全闪存储节点',spec:'24×30.72TB NVMe SSD，100GbE dual',brand:'Pure/NetApp',std:'NVMe-oF',qty:Math.ceil(gpuN/128),unit:'台',price:180,note:'训练数据存储'},
+        {no:'IT-004',name:'GPU机柜（液冷型）',spec:`${rackPow}kW/柜，冷板液冷，42U，含PDU`,brand:'维谛/科华',std:'IEC 62368',qty:gpuRacks,unit:'个',price:8,note:`IT总功率${itKw}kW`},
+        {no:'IT-005',name:'25GbE TOR交换机',spec:'48×25GbE+8×100GbE，管理网络',brand:'Arista 7050CX',std:'IEEE 802.3',qty:Math.ceil(gpuRacks/12),unit:'台',price:12,note:'机柜接入交换机'},
+        {no:'IT-006',name:'带外管理服务器',spec:'2U，双路CPU，BMC，IPMI2.0',brand:'H3C/华为',std:'IPMI 2.0',qty:4,unit:'台',price:3,note:'DCIM/运维管理'},
+      ]
+    },
+    {
+      title:'② 供电系统（SST方案）',color:'#00d4ff',icon:'⚡',
+      items:[
+        {no:'PS-001',name:'固态变压器 SST',spec:`${volt}kV→1500VDC，${sstCap}kVA，SiC MOSFET，η≥98.5%，PF>0.99`,brand:'ABB/Siemens/维谛',std:'IEC 62477-1',qty:2,unit:'台',price:280,note:'2N冗余，取代传统变压器'},
+        {no:'PS-002',name:'中压断路器QF',spec:`${volt}kV，SF₆气体绝缘，630A，遥控分合闸`,brand:'施耐德/ABB',std:'IEC 62271-100',qty:4,unit:'台',price:18,note:'每路进线2台'},
+        {no:'PS-003',name:'有源PFC模块',spec:'三相，100kW，THD<3%，功率因数>0.99',brand:'英飞特/伊顿',std:'IEC 61000-3-12',qty:4,unit:'套',price:8,note:'与SST集成'},
+        {no:'PS-004',name:'DC-DC变换模块 (1500V→48V)',spec:'1500VDC输入，48VDC输出，300kW，η≥97%',brand:'维谛/Vertiv',std:'IEC 62477',qty:Math.ceil(itKw/300)+2,unit:'台',price:12,note:'IT直流供电，N+1'},
+        {no:'PS-005',name:'DC-AC逆变器 (AC旁路)',spec:`1500VDC→400VAC，${Math.ceil(itKw*0.2/1000)}MVA，含STS`,brand:'科华/伊顿',std:'IEC 62040-1',qty:2,unit:'台',price:45,note:'AC兼容旁路'},
+        {no:'PS-006',name:'智能PDU列头柜',spec:'三相40A，32路C13+4路C19，远程监控，IP66',brand:'APC/维谛',std:'IEC 60364-7',qty:gpuRacks*2,unit:'个',price:0.8,note:'每柜A+B双路'},
+        {no:'PS-007',name:'避雷器 SA',spec:`${volt}kV，氧化锌型，残压≤2.5倍相电压`,brand:'施耐德',std:'IEC 60099-4',qty:6,unit:'组',price:2,note:'每路进线3组'},
+        {no:'PS-008',name:'应急柴油发电机组',spec:`${(P.generators||[{}])[0]?.cap||2000}kW，无刷同步，储油8h，含ATS`,brand:'卡特彼勒/康明斯',std:'GB/T 2820',qty:2,unit:'台',price:120,note:'A+B路各1台'},
+        {no:'PS-009',name:'高压电流互感器 CT',spec:`${volt}kV，精度0.2S，2000/5A，P10`,brand:'西门子',std:'IEC 61869-2',qty:6,unit:'只',price:1.2,note:'计量与保护'},
+      ]
+    },
+    {
+      title:'③ 储能系统（DC耦合）',color:'#e3b341',icon:'🔋',
+      items:[
+        {no:'ES-001',name:'磷酸铁锂电池模组',spec:'280Ah棱柱电芯，3.2V，8P×14S=112V模组',brand:'比亚迪/宁德',std:'IEC 62619',qty:Math.ceil(essMwh*1000/36),unit:'组',price:0.8,note:`总容量${essMwh}MWh`},
+        {no:'ES-002',name:'电池管理系统 BMS',spec:'主动均衡，SOC精度±1%，CAN 2.0B，IEC 62933',brand:'科陆/南都',std:'IEC 62933-5-2',qty:Math.ceil(essMwh/2),unit:'套',price:2.5,note:'簇级BMS+从控'},
+        {no:'ES-003',name:'DC-DC双向变换器（储能专用）',spec:'1500VDC Bus↔920VDC电池，500kW，η≥97.5%，双向',brand:'ABB/海博思创',std:'IEC 62477',qty:Math.ceil(essMwh/2)+1,unit:'台',price:18,note:'N+1，无需PCS逆变'},
+        {no:'ES-004',name:'消防气体灭火系统',spec:'七氟丙烷，响应时间<30s，配感烟感温探测器',brand:'海湾/泰科',std:'GB 50370',qty:Math.ceil(essMwh/2),unit:'套',price:3,note:'每簇独立'},
+        {no:'ES-005',name:'电池预制舱',spec:'20ft标准集装箱，IP54，含结构/消防/通风',brand:'阳光/固德威',std:'GB/T 36276',qty:Math.ceil(essMwh/1.5),unit:'个',price:15,note:`共${essMwh}MWh`},
+      ]
+    },
+    {
+      title:'④ 液冷散热系统',color:'#3fb950',icon:'💧',
+      items:[
+        {no:'CL-001',name:'冷却分配单元 CDU',spec:`${cduCap}kW，供水${Cl.supplyTemp||35}℃/回水${Cl.returnTemp||45}℃，变频泵，316L不锈钢`,brand:'Vertiv/Asetek/Airedale',std:'IEC 60068-2',qty:cduN,unit:'台',price:28,note:`N+1配置，总散热${totalHeat}kW`},
+        {no:'CL-002',name:'GPU服务器液冷冷板套件',spec:'铜制歧管+冷板，适配H100 SXM5，含快插接头',brand:'Cooler Master/定制',std:'ASHRAE A2',qty:Math.ceil(gpuN/8),unit:'套',price:3.5,note:'每服务器1套'},
+        {no:'CL-003',name:'分集水器 Manifold',spec:`304不锈钢，${Cl.dn||'DN100'}，${gpuRacks}路分支，含流量平衡阀`,brand:'昱能/定制',std:'GB/T 18883',qty:Math.ceil(gpuRacks/20),unit:'套',price:6,note:'含管道固定支架'},
+        {no:'CL-004',name:'板式换热器 HEX（一/二次隔离）',spec:'钛板，换热量2000kW，ΔT=5℃，DN100接口',brand:'阿法拉伐/GEA',std:'ISO 14692',qty:2,unit:'台',price:22,note:'1用1备'},
+        {no:'CL-005',name:'冷水机组（机械制冷）',spec:`${(Cl.chiller||[{}])[0]?.cap||1500}kW，螺杆式变频，COP≥5.5，R134a`,brand:'特灵/约克',std:'GB/T 18430',qty:(Cl.chiller||[{}])[0]?.qty||3,unit:'台',price:85,note:'冬季自然冷却'},
+        {no:'CL-006',name:'冷却塔（闭式）',spec:`${(Cl.coolingTower||[{}])[0]?.cap||2000}kW，闭式逆流，FRP材质，变频风机`,brand:'BAC/马利',std:'GB/T 7190',qty:(Cl.coolingTower||[{}])[0]?.qty||3,unit:'台',price:35,note:'室外散热'},
+        {no:'CL-007',name:'变频循环水泵',spec:'DN100，Q=800m³/h，H=32m，变频，304不锈钢',brand:'格兰富/凯泉',std:'IEC 60034',qty:Math.ceil(totalHeat/1000)*2,unit:'台',price:4.5,note:'N+1，一次+二次各1组'},
+        {no:'CL-008',name:'膨胀定压补液装置',spec:'300L囊式气压罐，定压0.4MPa，含补液泵',brand:'方圆/科泰',std:'GB 150',qty:1,unit:'套',price:2.5,note:'二次侧定压'},
+        {no:'CL-009',name:'液冷管路（304不锈钢）',spec:`${Cl.dn||'DN100'}主管，DN50支管，保温橡塑50mm，含弯头三通`,brand:'振宏/伟星',std:'GB/T 14976',qty:1,unit:'批',price:35,note:`设计压力${Cl.pressureDesign||'1.6MPa'}`},
+        {no:'CL-010',name:'全自动截止/调节阀',spec:'DN50，气动执行器，Cv=250，PN16',brand:'霍尼韦尔/Belimo',std:'IEC 60534',qty:gpuRacks*2+12,unit:'只',price:0.6,note:'每机柜供回水各1只'},
+        {no:'CL-011',name:'漏液检测系统',spec:'感应绳式，灵敏度≤5ml，MODBUS输出，响应<5s',brand:'尼尔森/雷迪',std:'IEC 60529',qty:gpuRacks+4,unit:'套',price:0.8,note:'每机柜+主管沿线'},
+        {no:'CL-012',name:'水质处理装置',spec:'在线电导仪+杀菌过滤+缓蚀剂加药，SS304',brand:'鹏鑫/威立雅',std:'ASHRAE 189.1',qty:1,unit:'套',price:8,note:'纯化水水质维护'},
+      ]
+    },
+    {
+      title:'⑤ 监控与自动化',color:'#a78bfa',icon:'📡',
+      items:[
+        {no:'DC-001',name:'DCIM数据中心管理平台',spec:'动态环境监控，资产管理，能耗分析，3D可视化',brand:'维谛/华为',std:'TIA-942',qty:1,unit:'套',price:45,note:'含服务器+软件license'},
+        {no:'DC-002',name:'PLC可编程控制器',spec:'冗余CPU，16AI+16AO+64DI+64DO，IEC 61131-3',brand:'西门子S7-400/ABB AC800',std:'IEC 61131-3',qty:2,unit:'套',price:18,note:'冷却系统自动化控制'},
+        {no:'DC-003',name:'工业以太网交换机',spec:'24口Managed，-40~85℃，环网冗余，IP30',brand:'赫斯曼/凤凰',std:'IEEE 802.3',qty:6,unit:'台',price:2.5,note:'控制网络骨干'},
+        {no:'DC-004',name:'能耗计量仪表',spec:'三相多功能，0.2S精度，RS485/Modbus，谐波分析',brand:'东方威思顿/斯菲尔',std:'IEC 62053',qty:Math.ceil(gpuRacks/4)+10,unit:'块',price:0.4,note:'IT+冷却+UPS分项计量'},
+        {no:'DC-005',name:'温湿度传感器',spec:'Pt1000，精度±0.2℃，RS485，IP54',brand:'Vaisala/罗卓尼克',std:'IEC 60068',qty:gpuRacks*4+20,unit:'只',price:0.15,note:'机柜进出风+管道'},
+        {no:'DC-006',name:'压差变送器',spec:'0~100kPa，精度±0.25%，4~20mA，HART',brand:'E+H/罗斯蒙特',std:'IEC 60770',qty:cduN+8,unit:'只',price:0.6,note:'CDU及水泵监测'},
+        {no:'DC-007',name:'流量计（电磁式）',spec:'DN100，精度±0.3%，4~20mA，PROFIBUS',brand:'E+H/Krohne',std:'IEC 60770',qty:cduN+4,unit:'台',price:2.2,note:'CDU及总管'},
+        {no:'DC-008',name:'视频监控系统',spec:'4K 360°，AI人脸/行为识别，含NVR+存储',brand:'海康/大华',std:'GB 50395',qty:1,unit:'套',price:15,note:'含门禁联动'},
+        {no:'DC-009',name:'气体探测器',spec:'SF₆+H₂+CO，4~20mA，防爆ExdIICT6',brand:'华瑞/OLDHAM',std:'GB 16808',qty:12,unit:'只',price:0.8,note:'配电室+电池室'},
+      ]
+    },
+  ];
+
+  let grandTotal=0;
+  let html=`<div style="display:flex;flex-direction:column;gap:14px">`;
+
+  const costMap={
+    'IT算力':E.capexIT||Math.round(gpuN*42+gpuRacks*8),
+    '供配电(SST)':E.capexPower||Math.round(sstCap*0.28+600),
+    '储能系统':E.capexStorage||Math.round(essMwh*150),
+    '液冷散热':E.capexCooling||Math.round(totalHeat*0.18+200),
+    '监控自动化':E.capexNet||120,
+    '土建安装':E.capexCivil||Math.round(itKw*0.08+500),
+  };
+  const costTotal=Object.values(costMap).reduce((a,b)=>a+b,0);
+
+  html+=`<div style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:14px">`;
+  html+=`<div style="font-size:12px;font-weight:700;color:#e6edf3;margin-bottom:10px">
+    📊 投资组成概览  &nbsp; 总CAPEX: <span style="color:#3fb950;font-size:16px">${costTotal}万元</span></div>`;
+  html+=`<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">`;
+  Object.entries(costMap).forEach(([k,v])=>{
+    const pct=((v/costTotal)*100).toFixed(0);
+    const colors={'IT算力':'#58a6ff','供配电(SST)':'#00d4ff','储能系统':'#e3b341',
+                  '液冷散热':'#3fb950','监控自动化':'#a78bfa','土建安装':'#f0883e'};
+    const c=colors[k]||'#8b949e';
+    html+=`<div style="background:#161b22;border:1px solid ${c}33;border-radius:6px;padding:10px;text-align:center">
+      <div style="font-size:8.5px;color:#8b949e;margin-bottom:3px">${k}</div>
+      <div style="font-size:16px;font-weight:700;color:${c}">${v}</div>
+      <div style="font-size:8px;color:#6e7681">万元 (${pct}%)</div>
+      <div style="margin-top:5px;height:3px;background:${c}33;border-radius:2px">
+        <div style="height:3px;width:${pct}%;background:${c};border-radius:2px"></div></div>
+    </div>`;
   });
-  let total=0;bom.forEach(b=>{total+=b.total||0;});
-  const catColors={'IT设备':'#58a6ff','供电设备':'#e3b341','储能设备':'#06b6d4','散热设备':'#3fb950','弱电监控':'#a78bfa'};
-  let html=`<div style="background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:16px;">`;
-  html+=`<div style="font-size:13px;font-weight:700;color:#e6edf3;margin-bottom:14px;">📋 BOM设备清单</div>`;
-  Object.keys(bomByCategory).forEach(cat=>{
-    const items=bomByCategory[cat];if(!items.length)return;
-    const catTotal=items.reduce((s,b)=>s+(b.total||0),0);
-    html+=`<div style="margin-bottom:12px;">`;
-    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:${catColors[cat]}18;border-left:3px solid ${catColors[cat]};border-radius:0 4px 4px 0;margin-bottom:4px;">`;
-    html+=`<span style="font-size:11px;font-weight:700;color:${catColors[cat]};">${cat}</span>`;
-    html+=`<span style="font-size:11px;color:${catColors[cat]};">${catTotal.toFixed(0)} 万元</span></div>`;
-    html+=`<table style="width:100%;border-collapse:collapse;font-size:10.5px;">`;
-    html+=`<tr style="background:#161b22;"><th style="padding:5px 8px;text-align:left;color:#8b949e;font-weight:600;">设备名称</th><th style="padding:5px 8px;text-align:right;color:#8b949e;font-weight:600;">数量</th><th style="padding:5px 8px;text-align:center;color:#8b949e;font-weight:600;">单位</th><th style="padding:5px 8px;text-align:right;color:#8b949e;font-weight:600;">单价(万元)</th><th style="padding:5px 8px;text-align:right;color:#8b949e;font-weight:600;">合计(万元)</th></tr>`;
-    items.forEach((b,i)=>{
-      html+=`<tr style="border-bottom:1px solid #21262d;${i%2?'background:#0d1117;':'background:#161b2244;'}">`;
-      html+=`<td style="padding:5px 8px;color:#e6edf3;">${b.item}</td>`;
-      html+=`<td style="padding:5px 8px;text-align:right;color:#e6edf3;font-weight:600;">${b.qty}</td>`;
-      html+=`<td style="padding:5px 8px;text-align:center;color:#8b949e;">${b.unit||'台'}</td>`;
-      html+=`<td style="padding:5px 8px;text-align:right;color:#8b949e;">${b.price}</td>`;
-      html+=`<td style="padding:5px 8px;text-align:right;color:#e3b341;font-weight:600;">${b.total}</td></tr>`;
+  html+=`</div></div>`;
+
+  SECTIONS.forEach(sec=>{
+    const secTotal=sec.items.reduce((s,it)=>s+it.qty*(it.price||0),0);
+    grandTotal+=secTotal;
+    html+=`<div style="background:#0d1117;border:1px solid #21262d;border-radius:8px;overflow:hidden">`;
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;
+      padding:8px 14px;background:${sec.color}18;border-bottom:1px solid ${sec.color}44">
+      <span style="font-size:12px;font-weight:700;color:${sec.color}">${sec.icon} ${sec.title}</span>
+      <span style="font-size:11px;color:${sec.color};font-weight:600">
+        小计: ${secTotal.toFixed(0)} 万元</span></div>`;
+    html+=`<div style="overflow-x:auto">`;
+    html+=`<table style="width:100%;border-collapse:collapse;font-size:10.5px;min-width:900px">`;
+    html+=`<tr style="background:#161b22">
+      <th style="padding:5px 10px;text-align:left;color:#8b949e;border:1px solid #21262d;white-space:nowrap">编号</th>
+      <th style="padding:5px 10px;text-align:left;color:#8b949e;border:1px solid #21262d">设备名称</th>
+      <th style="padding:5px 10px;text-align:left;color:#8b949e;border:1px solid #21262d">规格型号</th>
+      <th style="padding:5px 10px;text-align:left;color:#8b949e;border:1px solid #21262d;white-space:nowrap">品牌参考</th>
+      <th style="padding:5px 10px;text-align:left;color:#8b949e;border:1px solid #21262d;white-space:nowrap">执行标准</th>
+      <th style="padding:5px 10px;text-align:right;color:#8b949e;border:1px solid #21262d;white-space:nowrap">数量</th>
+      <th style="padding:5px 10px;text-align:center;color:#8b949e;border:1px solid #21262d;white-space:nowrap">单位</th>
+      <th style="padding:5px 10px;text-align:right;color:#8b949e;border:1px solid #21262d;white-space:nowrap">单价(万)</th>
+      <th style="padding:5px 10px;text-align:right;color:#8b949e;border:1px solid #21262d;white-space:nowrap">合计(万)</th>
+      <th style="padding:5px 10px;text-align:left;color:#8b949e;border:1px solid #21262d">备注</th>
+    </tr>`;
+    sec.items.forEach((it,i)=>{
+      const tot=(it.qty*(it.price||0)).toFixed(0);
+      const bg=i%2?'background:#0d1117':'background:#161b2244';
+      html+=`<tr style="${bg}">
+        <td style="padding:5px 10px;color:#6e7681;border:1px solid #21262d;font-family:monospace;white-space:nowrap;font-size:10px">${it.no}</td>
+        <td style="padding:5px 10px;color:#e6edf3;border:1px solid #21262d;font-weight:600">${it.name}</td>
+        <td style="padding:5px 10px;color:#8b949e;border:1px solid #21262d;font-size:10px">${it.spec}</td>
+        <td style="padding:5px 10px;color:#58a6ff;border:1px solid #21262d;font-size:10px;white-space:nowrap">${it.brand}</td>
+        <td style="padding:5px 10px;color:#3fb950;border:1px solid #21262d;font-size:10px;white-space:nowrap">${it.std}</td>
+        <td style="padding:5px 10px;text-align:right;color:#e6edf3;border:1px solid #21262d;font-weight:700">${it.qty}</td>
+        <td style="padding:5px 10px;text-align:center;color:#6e7681;border:1px solid #21262d">${it.unit}</td>
+        <td style="padding:5px 10px;text-align:right;color:#8b949e;border:1px solid #21262d">${it.price}</td>
+        <td style="padding:5px 10px;text-align:right;color:#e3b341;border:1px solid #21262d;font-weight:700">${tot}</td>
+        <td style="padding:5px 10px;color:#6e7681;border:1px solid #21262d;font-size:10px">${it.note}</td>
+      </tr>`;
     });
-    html+='</table></div>';
+    html+='</table></div></div>';
   });
-  html+=`<div style="padding:8px 10px;background:#238636;border-radius:4px;display:flex;justify-content:space-between;margin-top:4px;"><span style="font-size:12px;font-weight:700;color:#fff;">设备合计</span><span style="font-size:12px;font-weight:700;color:#fff;">${total.toFixed(0)} 万元</span></div>`;
-  // 费用组成
-  html+=`<div style="margin-top:16px;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">`;
-  [
-    {k:'IT设备',v:E.capexIT,c:'#58a6ff'},
-    {k:'供配电',v:E.capexPower,c:'#e3b341'},
-    {k:'储能系统',v:E.capexStorage,c:'#06b6d4'},
-    {k:'冷却系统',v:E.capexCooling,c:'#3fb950'},
-    {k:'土建',v:E.capexCivil,c:'#f0883e'},
-    {k:'网络',v:E.capexNet,c:'#a78bfa'}
-  ].forEach(i=>{
-    const pct=E.capex?((i.v||0)/E.capex*100).toFixed(0):0;
-    html+=`<div style="background:#161b22;border:1px solid #21262d;border-radius:6px;padding:8px;text-align:center;"><div style="font-size:9px;color:#8b949e;margin-bottom:3px;">${i.k}</div><div style="font-size:13px;font-weight:700;color:${i.c};">${(i.v||0)}</div><div style="font-size:9px;color:#6e7681;">万元 (${pct}%)</div></div>`;
-  });
-  html+=`</div>`;
-  html+=`</div>`;
-  // 经济性分析
-  html+=`<div style="background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:16px;margin-top:12px;">`;
-  html+=`<div style="font-size:13px;font-weight:700;color:#e6edf3;margin-bottom:14px;">💰 经济性分析</div>`;
-  html+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">`;
-  [
-    {label:'初投资CAPEX',val:(E.capex||0)+'万元',sub:'设备+安装+调试',color:'#58a6ff'},
-    {label:'年运营成本',val:(E.opexAnnual||0)+'万元',sub:'电费+运维+人工',color:'#f0883e'},
-    {label:'10年TCO',val:(E.tco10y||0)+'万元',sub:'总拥有成本',color:'#f85149'},
-    {label:'IRR内部收益率',val:E.irr+'%',sub:'NPV: '+E.npv10+'万元',color:'#3fb950'}
+
+  html+=`<div style="background:#238636;border-radius:6px;padding:10px 14px;
+    display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:13px;font-weight:700;color:#fff">📋 设备总计</span>
+    <span style="font-size:18px;font-weight:700;color:#fff">${grandTotal.toFixed(0)} 万元</span></div>`;
+
+  html+=`<div style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:14px">`;
+  html+=`<div style="font-size:12px;font-weight:700;color:#e6edf3;margin-bottom:12px">💰 经济性分析</div>`;
+  html+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">`;
+  [{label:'初投资CAPEX',val:(E.capex||costTotal)+'万元',sub:'设备+安装+调试',color:'#58a6ff'},
+   {label:'年运营成本',val:(E.opexAnnual||Math.round(itKw*8760*(0.32*0.35+1.05*0.65)/10000/10))+'万元',sub:'电费+运维',color:'#f0883e'},
+   {label:'10年TCO',val:(E.tco10y||Math.round(costTotal*2.3))+'万元',sub:'总拥有成本',color:'#f85149'},
+   {label:'IRR',val:(E.irr||18)+'%',sub:'NPV: '+(E.npv10||Math.round(costTotal*0.4))+'万元',color:'#3fb950'},
   ].forEach(k=>{
-    html+=`<div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:12px;"><div style="font-size:9px;color:#8b949e;margin-bottom:4px;">${k.label}</div><div style="font-size:20px;font-weight:700;color:${k.color};">${k.val}</div><div style="font-size:9px;color:#6e7681;">${k.sub}</div></div>`;
+    html+=`<div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:12px">
+      <div style="font-size:9px;color:#8b949e;margin-bottom:4px">${k.label}</div>
+      <div style="font-size:20px;font-weight:700;color:${k.color}">${k.val}</div>
+      <div style="font-size:9px;color:#6e7681">${k.sub}</div></div>`;
   });
   html+=`</div>`;
-  html+=`<table style="width:100%;border-collapse:collapse;font-size:11px;">`;
-  html+=`<tr style="background:#161b22;"><th style="padding:7px 10px;text-align:left;color:#8b949e;font-weight:600;">经济指标</th><th style="padding:7px 10px;text-align:right;color:#8b949e;font-weight:600;">数值</th><th style="padding:7px 10px;text-align:left;color:#8b949e;font-weight:600;">说明</th></tr>`;
+  const perTflops=(costTotal/((C.totalFlops||gpuN*989/1e6)||1)).toFixed(1);
+  const kwPerTflops=((itKw/(gpuN*989/1000))*1000).toFixed(1);
+  html+=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">`;
   [
-    ['年度电费',E.electricityAnnual+'万元','峰谷电价加权，含制冷用电'],
-    ['年度运维人工',E.opexSalary+'万元','运维团队 ~'+Math.ceil((E.opexSalary||0)/12/2)+'人'],
-    ['年度维保费',E.opexMaint+'万元','设备折旧2.5%/年'],
-    ['PUE节省(年)',E.pueSavingAnnual+'万元','相比PUE=1.4的节约'],
-    ['液冷额外节省',E.liquidSavingAnnual+'万元','相比传统风冷额外节约'],
-    ['度电IT成本',E.energyIntensity+'元/kWh','单位IT能耗综合电费'],
-    ['单TFLOPS投资',E.costPerTflops+'万元/PFLOPS','算力性价比指标']
-  ].forEach(([k,v,s],i)=>{
-    html+=`<tr style="border-bottom:1px solid #21262d;${i%2?'':'background:#161b2244;'}"><td style="padding:6px 10px;color:#e6edf3;">${k}</td><td style="padding:6px 10px;text-align:right;color:#e3b341;font-weight:600;">${v}</td><td style="padding:6px 10px;color:#8b949e;font-size:10px;">${s}</td></tr>`;
+    ['GPU数量',gpuN+'卡','#58a6ff'],
+    ['IT总功率',itKw+'kW','#f0883e'],
+    ['设计PUE',(C.pueTarget||1.25),'#3fb950'],
+    ['$/TFLOPS',perTflops+'万元','#e3b341'],
+    ['W/TFLOPS',kwPerTflops+'W','#a78bfa'],
+  ].forEach(([l,v,c])=>{
+    html+=`<div style="background:#161b22;border:1px solid #21262d;border-radius:6px;
+      padding:8px;text-align:center">
+      <div style="font-size:9px;color:#8b949e">${l}</div>
+      <div style="font-size:15px;font-weight:700;color:${c};margin-top:3px">${v}</div></div>`;
   });
-  html+=`</table></div>`;
+  html+=`</div></div></div>`;
+
   document.getElementById('aidcBomTable').innerHTML=html;
 }
 
@@ -92608,138 +92724,228 @@ function aidcDrawDualPowerSvg(R){
 //  Full P&ID style, orthogonal pipes, IEC pump/valve/sensor symbols.
 // ════════════════════════════════════════════════════════════════════════════
 function aidcDrawLiquidSvg(R){
-  const Cl=R.cooling||{},C=R.compute||{};
-  const cduD=(Cl.cdu||[{}])[0],ctD=(Cl.coolingTower||[{}])[0],chD=(Cl.chiller||[{}])[0];
-  const W=1020, H=680;
-  let s=_svgOpen(W,H,'液冷系统P&ID（管道仪表流程图）',
-    `${R.projName||''} | 供水${Cl.supplyTemp||35}℃ / 回水${Cl.returnTemp||45}℃ | ${Cl.dn||'DN100'} | 设计压力${Cl.pressureDesign||'1.6MPa'}`);
+  const Cl=R.cooling||{}, C=R.compute||{};
+  const cduD=(Cl.cdu||[{}])[0], ctD=(Cl.coolingTower||[{}])[0], chD=(Cl.chiller||[{}])[0];
+  const nRacks=Math.min(5, C.gpuRacks||4);
+  const rackPow=C.rackPower||40;
+  const totHeat=Math.round(nRacks*rackPow);
+  const supTemp=Cl.supplyTemp||35, retTemp=Cl.returnTemp||45;
+  const dn=Cl.dn||'DN100';
+  const cduCap=cduD?.cap||300, cduN=cduD?.qty||4;
+  const flow=Math.round(totHeat*0.86/(4.18*(retTemp-supTemp)));
 
-  // Key x-positions (each column, no overlap, min 20px gap between boxes)
-  const X_CWT=110,  X_CH=110,  X_HEX=290, X_CDU=470, X_MF=660, X_RACK=810;
-  const CWT_Y=90,  CWT_W=90, CWT_H=80;
-  const CH_Y=260,  CH_W=90,  CH_H=70;
-  const ET_Y=68,   ET_X=290, ET_W=80, ET_H=44;
-  const HEX_Y=165, HEX_W=90, HEX_H=60;
-  const P1_X=290,  P1_Y=310;
-  const P2_X=470,  P2_Y=380;
-  const CDU_Y=130, CDU_W=110,CDU_H=70;
-  const MF_Y=180,  MF_W=80,  MF_H=24;
-  const RACK_W=64, RACK_H=80,RACK_GAP=20;
-  const nRacks=Math.min(5,C.gpuRacks||4);
+  const W=1060, H=700;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"
+    style="width:100%;background:#090d14;display:block;border-radius:6px;font-family:monospace">`;
 
-  // Zone fills
-  s+=`<rect x="12" y="50" width="195" height="${H-62}" rx="4" fill="#090f18" stroke="#1a3a5a55" stroke-width="1"/>`;
-  s+=`<text x="109" y="62" text-anchor="middle" font-size="8.5" fill="#4ac8ff55">室外冷源区</text>`;
-  s+=`<rect x="217" y="50" width="225" height="${H-62}" rx="4" fill="#09180d" stroke="#1a3a2055" stroke-width="1"/>`;
-  s+=`<text x="330" y="62" text-anchor="middle" font-size="8.5" fill="#3fb95055">机房制冷站</text>`;
-  s+=`<rect x="452" y="50" width="200" height="${H-62}" rx="4" fill="#090d18" stroke="#1a203a55" stroke-width="1"/>`;
-  s+=`<text x="552" y="62" text-anchor="middle" font-size="8.5" fill="#58a6ff55">CDU间</text>`;
-  s+=`<rect x="662" y="50" width="${W-674}" rx="4" height="${H-62}" fill="#0a090d" stroke="#2a1a3a55" stroke-width="1"/>`;
-  s+=`<text x="${662+(W-674)/2}" y="62" text-anchor="middle" font-size="8.5" fill="#e3b34155">IT机柜区</text>`;
+  s+=`<defs>
+    <marker id="ms" viewBox="0 0 8 6" refX="7" refY="3" markerWidth="6" markerHeight="5" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#3fb950" opacity="0.85"/></marker>
+    <marker id="mr" viewBox="0 0 8 6" refX="7" refY="3" markerWidth="6" markerHeight="5" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#f85149" opacity="0.85"/></marker>
+    <marker id="mp" viewBox="0 0 8 6" refX="7" refY="3" markerWidth="6" markerHeight="5" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#4ac8ff" opacity="0.85"/></marker>
+    <marker id="mb" viewBox="0 0 8 6" refX="7" refY="3" markerWidth="6" markerHeight="5" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#58a6ff" opacity="0.85"/></marker>
+  </defs>`;
 
-  // ── Outdoor: Cooling Tower ────────────────────────────────────────────
-  s+=_symCT2(X_CWT-CWT_W/2, CWT_Y, CWT_W, CWT_H, '#4ac8ff', 'CWT', `${ctD?.cap||2000}kW×${ctD?.qty||3}`);
+  s+=`<text x="${W/2}" y="20" text-anchor="middle" font-size="14" font-weight="700"
+    fill="#e6edf3">液冷系统P&amp;ID（管道仪表流程图）</text>`;
+  s+=`<text x="${W/2}" y="36" text-anchor="middle" font-size="9" fill="#8b949e">
+    ${R.projName||''} | 散热量${totHeat}kW | 供${supTemp}℃/回${retTemp}℃ | ${dn} | 流量${flow}L/min |
+    CDU ${cduCap}kW×${cduN}(N+1) | IEC/ISO 10628</text>`;
 
-  // ── Outdoor: Chiller ──────────────────────────────────────────────────
-  s+=_symCH(X_CH-CH_W/2, CH_Y, CH_W, CH_H, '#58a6ff', 'CH', `${chD?.cap||1500}kW×${chD?.qty||3}`);
-  s+=`<text x="${X_CH}" y="${CH_Y+CH_H+15}" text-anchor="middle" font-size="7.5" fill="#58a6ffaa">COP ${chD?.cop||5.5} | 螺杆变频</text>`;
+  s+=`<rect x="10" y="44" width="165" height="${H-54}" rx="4" fill="#0a1520" stroke="#1a3a5a44" stroke-width="1"/>`;
+  s+=`<text x="93" y="56" text-anchor="middle" font-size="8.5" fill="#4ac8ff44">室外冷源区</text>`;
+  s+=`<rect x="180" y="44" width="205" height="${H-54}" rx="4" fill="#091509" stroke="#1a3a2044" stroke-width="1"/>`;
+  s+=`<text x="283" y="56" text-anchor="middle" font-size="8.5" fill="#3fb95044">机房制冷站</text>`;
+  s+=`<rect x="390" y="44" width="200" height="${H-54}" rx="4" fill="#090d1a" stroke="#1a203a44" stroke-width="1"/>`;
+  s+=`<text x="490" y="56" text-anchor="middle" font-size="8.5" fill="#58a6ff44">CDU机房</text>`;
+  s+=`<rect x="595" y="44" width="110" height="${H-54}" rx="4" fill="#100d05" stroke="#3a2a0044" stroke-width="1"/>`;
+  s+=`<text x="650" y="56" text-anchor="middle" font-size="8.5" fill="#e3b34144">分集水器</text>`;
+  s+=`<rect x="710" y="44" width="${W-720}" height="${H-54}" rx="4" fill="#0a0a0d" stroke="#2a1a3a44" stroke-width="1"/>`;
+  s+=`<text x="${710+(W-720)/2}" y="56" text-anchor="middle" font-size="8.5" fill="#a78bfa44">IT机柜区</text>`;
 
-  // ── Expansion Tank ────────────────────────────────────────────────────
-  s+=_symBOX(ET_X-ET_W/2,ET_Y,ET_W,ET_H,'#8b949e','膨胀水箱','定压补液','ET');
+  const CWT={cx:90, cy:108, w:90, h:80, x:45, y:68};
+  const CH ={cx:90, cy:270, w:90, h:80, x:45, y:230};
+  const HX ={cx:283, cy:150, w:90, h:90, x:238, y:100};
+  const ET ={cx:283, cy:85, w:80, h:34, x:243, y:68};
+  const P1 ={cx:220, cy:255, r:16};
+  const P2 ={cx:490, cy:390, r:16};
+  const CDU={cx:490, cy:155, w:110,h:80, x:435, y:115};
+  const MF ={cx:650, cy:280, w:80, h:22, x:610, y:269};
+  const RACK_X=722, RACK_W=62, RACK_H=78, RACK_GAP=16;
 
-  // ── Plate HEX ─────────────────────────────────────────────────────────
-  s+=_symHEX(X_HEX-HEX_W/2,HEX_Y,HEX_W,HEX_H,'#e3b341','HEX');
-  s+=`<text x="${X_HEX}" y="${HEX_Y+HEX_H+14}" text-anchor="middle" font-size="8" fill="#e3b341aa">板式换热器</text>`;
+  function pipe(x1,y1,x2,y2,col,dash,wt,mkr){
+    col=col||'#3fb950'; wt=wt||1.6;
+    const dk=dash?`stroke-dasharray="${dash}"`:'';
+    const mk=mkr?`marker-end="url(#${mkr})"`:'';
+    s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${wt}" ${dk} ${mk}/>`;
+  }
+  function pline(pts,col,dash,wt,mkr){
+    col=col||'#3fb950'; wt=wt||1.6;
+    const dk=dash?`stroke-dasharray="${dash}"`:'';
+    const mk=mkr?`marker-end="url(#${mkr})"`:'';
+    const d=pts.map((p,i)=>i===0?`M${p[0]},${p[1]}`:`L${p[0]},${p[1]}`).join(' ');
+    s+=`<path d="${d}" fill="none" stroke="${col}" stroke-width="${wt}" stroke-linejoin="round" ${dk} ${mk}/>`;
+  }
 
-  // ── Primary Pump P1 ───────────────────────────────────────────────────
-  s+=_symPUMP(P1_X,P1_Y,16,'#4ac8ff','P1');
-  s+=`<text x="${P1_X}" y="${P1_Y+30}" text-anchor="middle" font-size="8" fill="#4ac8ffaa">一次泵</text>`;
+  const cwm=CWT.w*0.14;
+  s+=`<polygon points="${CWT.x+cwm},${CWT.y} ${CWT.x+CWT.w-cwm},${CWT.y} ${CWT.x+CWT.w},${CWT.y+CWT.h} ${CWT.x},${CWT.y+CWT.h}" fill="#4ac8ff10" stroke="#4ac8ff" stroke-width="1.6"/>`;
+  s+=`<line x1="${CWT.x+cwm}" y1="${CWT.y+CWT.h*0.35}" x2="${CWT.x+CWT.w-cwm}" y2="${CWT.y+CWT.h*0.35}" stroke="#4ac8ff" stroke-width="0.8" opacity="0.5"/>`;
+  s+=`<line x1="${CWT.x+cwm}" y1="${CWT.y+CWT.h*0.6}" x2="${CWT.x+CWT.w-cwm}" y2="${CWT.y+CWT.h*0.6}" stroke="#4ac8ff" stroke-width="0.8" opacity="0.5"/>`;
+  s+=`<text x="${CWT.cx}" y="${CWT.y+CWT.h/2+4}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#4ac8ff">CWT</text>`;
+  s+=`<text x="${CWT.cx}" y="${CWT.y+CWT.h+14}" text-anchor="middle" font-size="8" fill="#4ac8ffaa">${ctD?.cap||2000}kW×${ctD?.qty||3}</text>`;
 
-  // ── Secondary Pump P2 ─────────────────────────────────────────────────
-  s+=_symPUMP(P2_X,P2_Y,16,'#3fb950','P2');
-  s+=`<text x="${P2_X}" y="${P2_Y+30}" text-anchor="middle" font-size="8" fill="#3fb950aa">二次泵</text>`;
+  s+=`<rect x="${CH.x}" y="${CH.y}" width="${CH.w}" height="${CH.h}" rx="4" fill="#58a6ff10" stroke="#58a6ff" stroke-width="1.6"/>`;
+  s+=`<ellipse cx="${CH.cx}" cy="${CH.y+CH.h*0.42}" rx="${CH.w*0.28}" ry="${CH.h*0.22}" fill="none" stroke="#58a6ff" stroke-width="1"/>`;
+  s+=`<text x="${CH.cx}" y="${CH.y+CH.h-10}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#58a6ff">CH</text>`;
+  s+=`<text x="${CH.cx}" y="${CH.y+CH.h+14}" text-anchor="middle" font-size="8" fill="#58a6ffaa">${chD?.cap||1500}kW×${chD?.qty||3}</text>`;
+  s+=`<text x="${CH.cx}" y="${CH.y+CH.h+25}" text-anchor="middle" font-size="7.5" fill="#58a6ff88">COP ${chD?.cop||5.5}</text>`;
 
-  // ── CDU ───────────────────────────────────────────────────────────────
-  s+=_symCDU(X_CDU-CDU_W/2,CDU_Y,CDU_W,CDU_H,'#3fb950','CDU',`${cduD?.cap||300}kW×${cduD?.qty||4}`);
+  s+=`<rect x="${ET.x}" y="${ET.y}" width="${ET.w}" height="${ET.h}" rx="3" fill="#8b949e10" stroke="#8b949e" stroke-width="1.4"/>`;
+  s+=`<text x="${ET.cx}" y="${ET.y+ET.h/2+4}" text-anchor="middle" font-size="8.5" fill="#8b949e">膨胀罐</text>`;
 
-  // ── Manifold ──────────────────────────────────────────────────────────
-  const mfPorts=nRacks;
-  s+=_symMF(X_MF-MF_W/2,MF_Y,MF_W,MF_H,'#e3b341',mfPorts);
-  s+=`<text x="${X_MF}" y="${MF_Y+MF_H+28}" text-anchor="middle" font-size="8" fill="#e3b341aa">分集水器</text>`;
+  s+=`<rect x="${HX.x}" y="${HX.y}" width="${HX.w}" height="${HX.h}" rx="3" fill="#e3b34110" stroke="#e3b341" stroke-width="1.6"/>`;
+  s+=`<line x1="${HX.x}" y1="${HX.y}" x2="${HX.x+HX.w}" y2="${HX.y+HX.h}" stroke="#e3b341" stroke-width="0.8" opacity="0.5"/>`;
+  s+=`<line x1="${HX.x+HX.w}" y1="${HX.y}" x2="${HX.x}" y2="${HX.y+HX.h}" stroke="#e3b341" stroke-width="0.8" opacity="0.5"/>`;
+  s+=`<text x="${HX.cx}" y="${HX.y+HX.h/2-2}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e3b341">HEX</text>`;
+  s+=`<text x="${HX.cx}" y="${HX.y+HX.h/2+12}" text-anchor="middle" font-size="8" fill="#e3b341aa">板式换热器</text>`;
 
-  // ── IT Racks ──────────────────────────────────────────────────────────
-  const RACK_START_Y=80;
+  s+=`<circle cx="${P1.cx}" cy="${P1.cy}" r="${P1.r}" fill="#4ac8ff18" stroke="#4ac8ff" stroke-width="1.5"/>`;
+  s+=`<polygon points="${P1.cx-7},${P1.cy-4} ${P1.cx+9},${P1.cy} ${P1.cx-7},${P1.cy+4}" fill="#4ac8ff" opacity="0.9"/>`;
+  s+=`<text x="${P1.cx}" y="${P1.cy+P1.r+12}" text-anchor="middle" font-size="8" fill="#4ac8ffaa">P1一次泵</text>`;
+
+  s+=`<circle cx="${P2.cx}" cy="${P2.cy}" r="${P2.r}" fill="#3fb95018" stroke="#3fb950" stroke-width="1.5"/>`;
+  s+=`<polygon points="${P2.cx-7},${P2.cy-4} ${P2.cx+9},${P2.cy} ${P2.cx-7},${P2.cy+4}" fill="#3fb950" opacity="0.9"/>`;
+  s+=`<text x="${P2.cx}" y="${P2.cy+P2.r+12}" text-anchor="middle" font-size="8" fill="#3fb950aa">P2二次泵</text>`;
+
+  s+=`<rect x="${CDU.x}" y="${CDU.y}" width="${CDU.w}" height="${CDU.h}" rx="3" fill="#3fb95010" stroke="#3fb950" stroke-width="1.6"/>`;
+  s+=`<line x1="${CDU.x+8}" y1="${CDU.y+CDU.h*0.35}" x2="${CDU.x+CDU.w-8}" y2="${CDU.y+CDU.h*0.35}" stroke="#3fb950" stroke-width="1" opacity="0.6"/>`;
+  s+=`<line x1="${CDU.x+8}" y1="${CDU.y+CDU.h*0.55}" x2="${CDU.x+CDU.w-8}" y2="${CDU.y+CDU.h*0.55}" stroke="#3fb950" stroke-width="1" opacity="0.6"/>`;
+  s+=`<text x="${CDU.cx}" y="${CDU.y+CDU.h/2+4}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#3fb950">CDU</text>`;
+  s+=`<text x="${CDU.cx}" y="${CDU.y+CDU.h-9}" text-anchor="middle" font-size="7.5" fill="#3fb950cc">${cduCap}kW×${cduN}</text>`;
+
+  s+=`<rect x="${MF.x}" y="${MF.y}" width="${MF.w}" height="${MF.h}" rx="${MF.h/2}" fill="#e3b34118" stroke="#e3b341" stroke-width="1.5"/>`;
+  s+=`<text x="${MF.cx}" y="${MF.y+MF.h/2+4}" text-anchor="middle" font-size="8" font-weight="700" fill="#e3b341">Mfld</text>`;
+  s+=`<text x="${MF.cx}" y="${MF.y+MF.h+14}" text-anchor="middle" font-size="7.5" fill="#e3b341aa">分集水器</text>`;
+
   for(let i=0;i<nRacks;i++){
-    const ry=RACK_START_Y+i*(RACK_H+RACK_GAP);
-    s+=_symRACK(X_RACK,ry,RACK_W,RACK_H,'#58a6ff',`R${i+1}`,`${C.rackPower||40}kW`);
-    // Supply: manifold top port i → up to supply rail → right → down to rack left mid
-    const mfPx=X_MF-MF_W/2+8+(i*(MF_W-16)/(mfPorts-1||1));
+    const ry=74+i*(RACK_H+RACK_GAP);
+    s+=`<rect x="${RACK_X}" y="${ry}" width="${RACK_W}" height="${RACK_H}" rx="2" fill="#58a6ff0d" stroke="#58a6ff" stroke-width="1.4"/>`;
+    for(let u=0;u<5;u++){
+      s+=`<rect x="${RACK_X+4}" y="${ry+8+u*12}" width="${RACK_W-8}" height="9" rx="1" fill="#58a6ff${u%2?'1e':'16'}" stroke="#58a6ff44" stroke-width="0.5"/>`;
+    }
+    s+=`<text x="${RACK_X+RACK_W/2}" y="${ry+RACK_H-9}" text-anchor="middle" font-size="8" font-weight="700" fill="#58a6ff">R${i+1}</text>`;
+    s+=`<text x="${RACK_X-6}" y="${ry+6}" text-anchor="end" font-size="7.5" fill="#58a6ff88">${rackPow}kW</text>`;
+  }
+
+  const MF_PORT_MARGIN=10;
+  function mfPortX(i, total){
+    if(total<=1) return MF.cx;
+    return MF.x + MF_PORT_MARGIN + i*(MF.w-2*MF_PORT_MARGIN)/(total-1);
+  }
+
+  const SUP_HDR_Y = 68;
+  const RET_HDR_Y = 560;
+  const VSUP_X = 712;
+  const VRET_X = 722+RACK_W+14;
+  const VCHAN_MID2=380;
+
+  pipe(P1.cx+P1.r, P1.cy, VCHAN_MID2, P1.cy, '#3fb950','','1.5');
+  pipe(VCHAN_MID2, P1.cy, VCHAN_MID2, CDU.cy, '#3fb950','','1.5');
+  pipe(VCHAN_MID2, CDU.cy, CDU.x, CDU.cy, '#3fb950','','1.5','ms');
+
+  pipe(CDU.x+CDU.w, CDU.cy, 570, CDU.cy, '#3fb950','','1.5');
+  pipe(570, CDU.cy, 570, P2.cy, '#3fb950','','1.5');
+  pipe(570, P2.cy, P2.cx+P2.r, P2.cy, '#3fb950','','1.5','ms');
+
+  pipe(P2.cx+P2.r, P2.cy, MF.cx, P2.cy, '#3fb950','','1.5');
+  pipe(MF.cx, P2.cy, MF.cx, MF.y, '#3fb950','','1.5','ms');
+
+  for(let i=0;i<nRacks;i++){
+    const ry=74+i*(RACK_H+RACK_GAP);
     const rackMidY=ry+RACK_H/2;
-    const supRailY=MF_Y-20;
-    // Valve on supply branch before rack
-    const valveX=X_RACK-16;
-    s+=_rtp([[mfPx,MF_Y-14],[mfPx,supRailY],[X_RACK-28,supRailY],[X_RACK-28,rackMidY],[valveX-5,rackMidY]],'#3fb950','','1.2');
-    s+=_symVALVE(valveX,rackMidY,5,'#ff9040','');
-    s+=`<line x1="${valveX+5}" y1="${rackMidY}" x2="${X_RACK}" y2="${rackMidY}" stroke="#3fb950" stroke-width="1.2"/>`;
-    // Return: rack right → right → down to return rail → left to manifold bottom port
-    const retRailY=MF_Y+MF_H+20;
-    s+=_rtp([[X_RACK+RACK_W,rackMidY],[X_RACK+RACK_W+14,rackMidY],[X_RACK+RACK_W+14,retRailY],[mfPx,retRailY],[mfPx,MF_Y+MF_H+14]],'#f85149','5,3','1.2');
-    // Leak sensor on return branch
-    s+=_symSEN(X_RACK+RACK_W+26,ry+RACK_H-10,5,'#f85149','~','');
-  }
-  if(C.gpuRacks>nRacks){
-    s+=`<text x="${X_RACK+RACK_W/2}" y="${RACK_START_Y+nRacks*(RACK_H+RACK_GAP)+14}" text-anchor="middle" font-size="9" fill="#6e7681">⋯共${C.gpuRacks}柜</text>`;
+    const portX=mfPortX(i,nRacks);
+    const portTopY=MF.y;
+    const valX=VSUP_X-12;
+    pline([[portX,portTopY],[portX,SUP_HDR_Y],[VSUP_X,SUP_HDR_Y],[VSUP_X,rackMidY],[valX+5,rackMidY]],'#3fb950','','1.2');
+    s+=`<line x1="${valX-6}" y1="${rackMidY-6}" x2="${valX+6}" y2="${rackMidY+6}" stroke="#ff9040" stroke-width="1.5"/>`;
+    s+=`<line x1="${valX+6}" y1="${rackMidY-6}" x2="${valX-6}" y2="${rackMidY+6}" stroke="#ff9040" stroke-width="1.5"/>`;
+    s+=`<circle cx="${valX}" cy="${rackMidY}" r="6" fill="none" stroke="#ff9040" stroke-width="1.2"/>`;
+    pipe(valX+6, rackMidY, RACK_X, rackMidY, '#3fb950','','1.2','ms');
   }
 
-  // ── Pipe routing — all orthogonal ─────────────────────────────────────
-  // Primary loop (CWT side): CWT bottom → P1 → HEX primary in
-  // CWT outlet: vertical down from CWT bottom-center → horizontal right to HEX left
-  const cwtBot=CWT_Y+CWT_H, hexLeft=X_HEX-HEX_W/2, hexRight=X_HEX+HEX_W/2;
-  s+=_rtp([[X_CWT,cwtBot],[X_CWT,HEX_Y+HEX_H/2-10],[hexLeft,HEX_Y+HEX_H/2-10]],'#4ac8ff','','1.5');
-  // CWT inlet: from HEX primary out → horizontal left above chiller → up to CWT
-  s+=_rtp([[hexLeft,HEX_Y+HEX_H/2+10],[X_CWT-30,HEX_Y+HEX_H/2+10],[X_CWT-30,CWT_Y+CWT_H/2],[X_CWT-CWT_W/2,CWT_Y+CWT_H/2]],'#4ac8ff','3,2','1.2');
+  for(let i=0;i<nRacks;i++){
+    const ry=74+i*(RACK_H+RACK_GAP);
+    const rackMidY=ry+RACK_H/2;
+    const portX=mfPortX(i,nRacks);
+    const portBotY=MF.y+MF.h;
+    s+=`<circle cx="${RACK_X+RACK_W+18}" cy="${ry+RACK_H-12}" r="5" fill="none" stroke="#f85149" stroke-width="1.3"/>`;
+    s+=`<text x="${RACK_X+RACK_W+18}" y="${ry+RACK_H-9}" text-anchor="middle" font-size="7" fill="#f85149">~</text>`;
+    pline([[RACK_X+RACK_W, rackMidY],[VRET_X, rackMidY],[VRET_X, RET_HDR_Y],[portX, RET_HDR_Y],[portX, portBotY]],'#f85149','5,3','1.2','mr');
+  }
 
-  // Chiller → HEX (machine cooling)
-  s+=_rtp([[X_CH+CH_W/2,CH_Y+CH_H/2],[hexLeft+4,CH_Y+CH_H/2],[hexLeft+4,HEX_Y+HEX_H-8],[hexLeft,HEX_Y+HEX_H-8]],'#58a6ff','','1.3');
+  const CDU_RET_X=CDU.cx;
+  pline([[MF.cx, MF.y+MF.h],[MF.cx,500],[CDU_RET_X,500],[CDU_RET_X,CDU.y+CDU.h]],'#f85149','5,3','1.4','mr');
 
-  // HEX secondary → P1 → up → CDU supply
-  s+=_rtp([[hexRight,HEX_Y+HEX_H/2],[P1_X,HEX_Y+HEX_H/2],[P1_X,P1_Y-16]],'#3fb950','','1.5');
-  s+=`<line x1="${P1_X}" y1="${P1_Y+16}" x2="${P1_X}" y2="${P1_Y+80}" stroke="#3fb950" stroke-width="1.5"/>`;
-  s+=`<line x1="${P1_X}" y1="${P1_Y+80}" x2="${X_CDU-CDU_W/2}" y2="${P1_Y+80}" stroke="#3fb950" stroke-width="1.5"/>`;
-  s+=`<line x1="${X_CDU-CDU_W/2}" y1="${P1_Y+80}" x2="${X_CDU-CDU_W/2}" y2="${CDU_Y+CDU_H/2}" stroke="#3fb950" stroke-width="1.5"/>`;
+  const VCHAN_LEFT=52;
+  const VCHAN_MID1=185;
+  const LANE_P1=340;
+  const HEX_PRI_IN_Y=HX.y+HX.h*0.65;
+  pline([[CWT.cx,CWT.y+CWT.h],[CWT.cx,LANE_P1],[VCHAN_MID1,LANE_P1],[VCHAN_MID1,HEX_PRI_IN_Y],[HX.x,HEX_PRI_IN_Y]],'#4ac8ff','','1.5','mp');
 
-  // CDU secondary out → P2 → Manifold supply
-  s+=`<line x1="${X_CDU+CDU_W/2}" y1="${CDU_Y+CDU_H/2}" x2="${P2_X+30}" y2="${CDU_Y+CDU_H/2}" stroke="#3fb950" stroke-width="1.5"/>`;
-  s+=`<line x1="${P2_X+30}" y1="${CDU_Y+CDU_H/2}" x2="${P2_X+30}" y2="${P2_Y}" stroke="#3fb950" stroke-width="1.5"/>`;
-  s+=`<line x1="${P2_X-16}" y1="${P2_Y}" x2="${P2_X+30}" y2="${P2_Y}" stroke="#3fb950" stroke-width="1.5"/>`;
-  // P2 → Manifold top
-  s+=`<line x1="${X_MF}" y1="${P2_Y}" x2="${X_MF}" y2="${MF_Y-14}" stroke="#3fb950" stroke-width="1.5"/>`;
-  // But need to go from P2_X (left of pump) to X_MF
-  s+=_rtp([[P2_X+16,P2_Y],[X_MF,P2_Y],[X_MF,MF_Y-14]],'#3fb950','','1.5');
+  const HEX_PRI_OUT_Y=HX.y+HX.h*0.35;
+  const CWT_LEFT_MID_Y=CWT.cy;
+  pline([[HX.x,HEX_PRI_OUT_Y],[VCHAN_LEFT,HEX_PRI_OUT_Y],[VCHAN_LEFT,CWT_LEFT_MID_Y],[CWT.x,CWT_LEFT_MID_Y]],'#4ac8ff','3,2','1.2','mp');
 
-  // Manifold return → CDU return
-  const retComY=MF_Y+MF_H+20+nRacks*(RACK_H+RACK_GAP)/2; // horizontal return rail
-  const retRailY2=MF_Y+MF_H+20;
-  s+=_rtp([[X_MF,MF_Y+MF_H+14],[X_MF,retRailY2],[X_CDU,retRailY2],[X_CDU,CDU_Y+CDU_H]],'#f85149','5,3','1.4');
+  const CH_HEX_Y=HEX_PRI_IN_Y+12;
+  pline([[CH.x+CH.w,CH.cy],[175,CH.cy],[175,CH_HEX_Y],[HX.x,CH_HEX_Y]],'#58a6ff','','1.3','mb');
 
-  // Expansion tank → secondary supply line
-  s+=_rtp([[ET_X,ET_Y+ET_H],[ET_X,P2_Y-8],[P2_X+30,P2_Y-8]],'#8b949e','3,2','1');
+  pline([[ET.cx,ET.y+ET.h],[230,ET.y+ET.h],[230,P1.cy+20],[VCHAN_MID2-10,P1.cy+20]],'#8b949e','3,2','1','');
+  pipe(VCHAN_MID2-10, P1.cy+20, VCHAN_MID2-10, 430, '#8b949e','3,2','1');
+  pipe(VCHAN_MID2-10, 430, 565, 430, '#8b949e','3,2','1');
+  pipe(565, 430, 565, P2.cy+P2.r+30, '#8b949e','3,2','1');
 
-  // Sensors
-  s+=_symFM(X_CDU+CDU_W/2+20,CDU_Y+CDU_H/2,8,'#8b949e','');
-  s+=_symSEN(X_CDU+CDU_W/2+20,CDU_Y+CDU_H/2-26,7,'#e3b341','T','T供');
-  s+=_symSEN(X_CDU+CDU_W/2+20,CDU_Y+CDU_H/2+26,7,'#f85149','T','T回');
-  s+=_symSEN(P2_X+30,CDU_Y+20,7,'#8b949e','P','DP');
+  function sensor(cx,cy,ltr,col){
+    s+=`<circle cx="${cx}" cy="${cy}" r="8" fill="none" stroke="${col}" stroke-width="1.3"/>`;
+    s+=`<text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="8" fill="${col}">${ltr}</text>`;
+  }
+  sensor(555,155,'T','#e3b341');
+  s+=`<text x="568" y="152" font-size="7.5" fill="#e3b34188">T供</text>`;
+  sensor(555,500,'T','#f85149');
+  s+=`<text x="568" y="497" font-size="7.5" fill="#f8514988">T回</text>`;
+  s+=`<circle cx="${MF.cx}" cy="350" r="8" fill="none" stroke="#8b949e" stroke-width="1.4"/>`;
+  s+=`<line x1="${MF.cx-6}" y1="350" x2="${MF.cx+6}" y2="350" stroke="#8b949e" stroke-width="1"/>`;
+  s+=`<text x="${MF.cx}" y="354" text-anchor="middle" font-size="7" fill="#8b949e">FM</text>`;
+  sensor(570+22, CDU.cy,'P','#8b949e');
+  s+=`<text x="${570+34}" y="${CDU.cy+4}" font-size="7.5" fill="#8b949e88">DP</text>`;
 
-  s+=_legend([
-    {type:'line',color:'#3fb950',thick:1.5,label:'供水（CDU→机柜）'},
-    {type:'line',color:'#f85149',dash:'5,3',label:'回水（机柜→CDU）'},
-    {type:'line',color:'#4ac8ff',label:'一次冷却水（CWT）'},
-    {type:'line',color:'#58a6ff',label:'冷冻水（机械制冷）'},
-    {type:'line',color:'#8b949e',dash:'3,2',label:'补液/膨胀'},
-  ],W-192,H-116);
-  s+=`<text x="${W/2}" y="${H-22}" text-anchor="middle" font-size="8" fill="#6e7681">管材: ${Cl.material||'304不锈钢'} | 主管${Cl.dn||'DN100'} | 设计压力${Cl.pressureDesign||'1.6MPa'} | 保温橡塑50mm | ${Cl.glycol||'纯化水'}</text>`;
-  s+=`<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="8" fill="#6e7681">漏液绳(每柜)+CDU传感器+快速关断阀 响应&lt;5s | 冗余: CDU N+1 水泵N+1</text>`;
+  s+=`<text x="720" y="${SUP_HDR_Y-4}" font-size="8" fill="#3fb950aa" font-family="monospace">供水总管 (${dn}) ${flow}L/min →</text>`;
+  s+=`<text x="720" y="${RET_HDR_Y+12}" font-size="8" fill="#f85149aa" font-family="monospace">← 回水总管 (${dn})</text>`;
+  for(let ax=730;ax<RACK_X;ax+=60){
+    s+=`<polygon points="${ax},${SUP_HDR_Y-5} ${ax+8},${SUP_HDR_Y} ${ax},${SUP_HDR_Y+5}" fill="#3fb950" opacity="0.6"/>`;
+    s+=`<polygon points="${ax+8},${RET_HDR_Y-5} ${ax},${RET_HDR_Y} ${ax+8},${RET_HDR_Y+5}" fill="#f85149" opacity="0.6"/>`;
+  }
+
+  const LX=10, LY=H-108;
+  s+=`<rect x="${LX}" y="${LY}" width="200" height="100" rx="4" fill="#161b22" stroke="#30363d" stroke-width="1"/>`;
+  s+=`<text x="${LX+8}" y="${LY+14}" font-size="9.5" font-weight="700" fill="#e6edf3">图例</text>`;
+  const legends=[['#3fb950','','供水管 (CDU→机柜)'],['#f85149','5,3','回水管 (机柜→CDU)'],['#4ac8ff','','一次冷却水管'],['#58a6ff','','冷冻水管 (机械制冷)'],['#8b949e','3,2','补液/膨胀管'],['#ff9040','','截止阀']];
+  legends.forEach(([col,dash,lbl],i)=>{
+    const ly=LY+24+i*13;
+    if(col==='#ff9040'){
+      s+=`<circle cx="${LX+14}" cy="${ly+2}" r="5" fill="none" stroke="${col}" stroke-width="1.2"/>`;
+    } else {
+      s+=`<line x1="${LX+6}" y1="${ly+2}" x2="${LX+26}" y2="${ly+2}" stroke="${col}" stroke-width="1.5" ${dash?`stroke-dasharray="${dash}"`:''} />`;
+    }
+    s+=`<text x="${LX+32}" y="${ly+6}" font-size="8.5" fill="#8b949e">${lbl}</text>`;
+  });
+
+  s+=`<text x="${W/2}" y="${H-22}" text-anchor="middle" font-size="8" fill="#6e7681">
+    管材: ${Cl.material||'304不锈钢'} | 主管${dn} | 设计压力${Cl.pressureDesign||'1.6MPa'} | 保温橡塑50mm | 冷却液: ${Cl.glycol||'纯化水'}</text>`;
+  s+=`<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="8" fill="#6e7681">
+    漏液绳(每柜)+CDU三重传感器+气动快关阀 响应&lt;5s | CDU N+1 | 水泵N+1 | IEC/ISO 10628</text>`;
   s+='</svg>';
   document.getElementById('aidcLiquidSvg').innerHTML=s;
 }
