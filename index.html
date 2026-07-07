@@ -36673,11 +36673,24 @@ function loadIecSymbol(symbolId) {
 
   // PRIMARY: inline bundle (works on Vercel serverless, no FS IO)
   if (INLINE_FILES && INLINE_FILES[sym.filename]) {
-    const innerSvg = INLINE_FILES[sym.filename];
-    const vb = sym.viewBox || `0 0 ${sym.width} ${sym.height}`;
-    const parts = vb.split(/\s+/).map(Number);
-    const w = parts[2] || sym.width || 100;
-    const h = parts[3] || sym.height || 60;
+    let innerSvg = INLINE_FILES[sym.filename];
+    let vb = sym.viewBox;
+    let w = sym.width;
+    let h = sym.height;
+    // Compute bounding box from path transforms if viewBox seems too small
+    const translates = innerSvg.match(/translate\(([\d.]+),([\d.]+)\)/g);
+    if (translates) {
+      let maxX = 0, maxY = 0;
+      for (const t of translates) {
+        const tm = t.match(/translate\(([\d.]+),([\d.]+)\)/);
+        if (tm) { maxX = Math.max(maxX, parseFloat(tm[1])); maxY = Math.max(maxY, parseFloat(tm[2])); }
+      }
+      if (maxX > w || maxY > h) {
+        w = maxX + 20;
+        h = maxY + 20;
+        vb = `0 0 ${w} ${h}`;
+      }
+    }
     const result = { w, h, viewBox: vb, innerSvg, name: sym.name };
     IEC_CACHE.set(symbolId, result);
     return result;
@@ -37360,11 +37373,34 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
     const spanSlots = Math.abs(slotIndexOf(b, positions) - slotIndexOf(a, positions));
     let d, segs = [];
     if (Math.abs(pa.y - pb.y) < 0.5 && spanSlots <= 1) {
-      // Aligned ports and adjacent columns: a single straight line is fine
-      const lineEndX = pb.x;
-      d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${lineEndX.toFixed(1)} ${pb.y.toFixed(1)}`;
-      segs = [{ x1: pa.x, y1: pa.y, x2: pb.x, y2: pb.y }];
-      out.push(`<line x1="${pa.x.toFixed(1)}" y1="${pa.y.toFixed(1)}" x2="${pb.x.toFixed(1)}" y2="${pb.y.toFixed(1)}" stroke="black" stroke-width="2"/>`);
+      // Aligned ports and adjacent columns: check if straight line crosses any intermediate node
+      const hSeg = { x1: pa.x, y1: pa.y, x2: pb.x, y2: pb.y };
+      let crossesNode = false;
+      for (const k in positions) {
+        if (k === conn.from || k === conn.to) continue;
+        const nb = positions[k];
+        const pad = 4;
+        const bx1 = nb.x - pad, bx2 = nb.x + nb.w + pad, by1 = nb.y - pad, by2 = nb.y + nb.h + pad;
+        if (pa.y > by1 && pa.y < by2 && Math.max(pa.x, pb.x) > bx1 && Math.min(pa.x, pb.x) < bx2) { crossesNode = true; break; }
+      }
+      if (crossesNode) {
+        // Route via trunk channel below
+        const dropX1 = pa.x + 20;
+        const dropX2 = pb.x - 20;
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+        segs = [
+          { x1: pa.x, y1: pa.y, x2: dropX1, y2: pa.y },
+          { x1: dropX1, y1: pa.y, x2: dropX1, y2: trunkY },
+          { x1: dropX1, y1: trunkY, x2: dropX2, y2: trunkY },
+          { x1: dropX2, y1: trunkY, x2: dropX2, y2: pb.y },
+          { x1: dropX2, y1: pb.y, x2: pb.x, y2: pb.y }
+        ];
+      } else {
+        const lineEndX = pb.x;
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${lineEndX.toFixed(1)} ${pb.y.toFixed(1)}`;
+        segs = [{ x1: pa.x, y1: pa.y, x2: pb.x, y2: pb.y }];
+      }
+      out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else if (spanSlots > 1) {
       // Long connection: drop to the trunk channel, run, then climb to the dst.
       const dropX1 = pa.x + 20;

@@ -36673,11 +36673,24 @@ function loadIecSymbol(symbolId) {
 
   // PRIMARY: inline bundle (works on Vercel serverless, no FS IO)
   if (INLINE_FILES && INLINE_FILES[sym.filename]) {
-    const innerSvg = INLINE_FILES[sym.filename];
-    const vb = sym.viewBox || `0 0 ${sym.width} ${sym.height}`;
-    const parts = vb.split(/\s+/).map(Number);
-    const w = parts[2] || sym.width || 100;
-    const h = parts[3] || sym.height || 60;
+    let innerSvg = INLINE_FILES[sym.filename];
+    let vb = sym.viewBox;
+    let w = sym.width;
+    let h = sym.height;
+    // Compute bounding box from path transforms if viewBox seems too small
+    const translates = innerSvg.match(/translate\(([\d.]+),([\d.]+)\)/g);
+    if (translates) {
+      let maxX = 0, maxY = 0;
+      for (const t of translates) {
+        const tm = t.match(/translate\(([\d.]+),([\d.]+)\)/);
+        if (tm) { maxX = Math.max(maxX, parseFloat(tm[1])); maxY = Math.max(maxY, parseFloat(tm[2])); }
+      }
+      if (maxX > w || maxY > h) {
+        w = maxX + 20;
+        h = maxY + 20;
+        vb = `0 0 ${w} ${h}`;
+      }
+    }
     const result = { w, h, viewBox: vb, innerSvg, name: sym.name };
     IEC_CACHE.set(symbolId, result);
     return result;
