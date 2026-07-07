@@ -27,14 +27,25 @@ MARKER = "// __INLINE_IEC_DATA__"
 def extract_inner_svg(svg_text: str, fallback_w: float, fallback_h: float) -> dict:
     m = svg_text.strip()
     vb_match = re.search(r'viewBox="([\d.\s\-]+)"', m)
-    vb = vb_match.group(1) if vb_match else f"0 0 {fallback_w} {fallback_h}"
-    parts = vb.split()
-    try:
-        w = float(parts[2]) if len(parts) > 2 else fallback_w
-        h = float(parts[3]) if len(parts) > 3 else fallback_h
-    except (ValueError, IndexError):
-        w = fallback_w
-        h = fallback_h
+    vb = vb_match.group(1) if vb_match else None
+    # Parse actual width/height from <svg> tag (more reliable than index.json)
+    w_match = re.search(r'<svg[^>]+width="([\d.]+)"', m)
+    h_match = re.search(r'<svg[^>]+height="([\d.]+)"', m)
+    actual_w = float(w_match.group(1)) if w_match else fallback_w
+    actual_h = float(h_match.group(1)) if h_match else fallback_h
+    if vb:
+        parts = vb.split()
+        try:
+            w = float(parts[2]) if len(parts) > 2 else actual_w
+            h = float(parts[3]) if len(parts) > 3 else actual_h
+        except (ValueError, IndexError):
+            w = actual_w
+            h = actual_h
+    else:
+        # No viewBox in SVG file — derive from actual width/height
+        w = actual_w
+        h = actual_h
+        vb = f"0 0 {w} {h}"
     inner_match = re.search(r'<svg[^>]*>([\s\S]*)</svg>', m)
     inner_svg = inner_match.group(1) if inner_match else m
     if 'xlink:' in inner_svg and 'xmlns:xlink' not in inner_svg:
