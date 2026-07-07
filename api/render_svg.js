@@ -64,25 +64,32 @@ const CATEGORY_TO_LAYER = {
   diesel: 0,
   source: 0,
   grid: 0,
+  ems: 0,                     // [inferTopology R6] top-level EMS next to source
   // battery (left-center)
   battery: 1,
   battery_rack: 1,
+  bms: 1,                     // [inferTopology R5] BMS lives with battery racks
   // dc bus
   dc_bus: 2,
   bus_dc: 2,
+  fuse: 2,                    // [inferTopology R8] DC fuse near DC bus
   // pcs
   pcs: 3,
   ups: 3,
   controller: 3,
+  ct: 3,                      // [inferTopology R2] CT near PCS for AC-side metering
   // ac bus
   ac_bus: 4,
   bus_ac: 4,
   bus: 4,
-  // right side: transformer + load + protection
+  // right side: transformer + load + protection + metering
   transformer: 5,
   protection: 5,
   switching: 5,
   load: 5,
+  pt: 5,                      // [inferTopology R7] PT near transformer/grid-tie
+  disconnector: 5,            // [inferTopology R4] disconnector near transformer LV
+  surge_arrester: 5,          // [inferTopology R3] LA near transformer HV
 };
 
 // IEC symbol id picked per category (id matches docs/iec_symbols_index.json)
@@ -105,6 +112,14 @@ const CATEGORY_TO_IEC = [
   ['controller',     ['iec_0050']],                                  // generic converter as proxy
   ['load',           ['iec_0050']],                                  // generic
   ['pv',             ['iec_0353']],                                  // reuse battery cell icon
+  // === Auto-injected by inferTopology() ===
+  ['ct',             ['iec_0273']],                                  // Current transformer (form 1)
+  ['pt',             ['iec_0301']],                                  // Voltage transformer (form 1)
+  ['fuse',           ['iec_0105']],                                  // Fuse, general symbol
+  ['disconnector',   ['iec_0083']],                                  // Disconnector / isolator
+  ['surge_arrester', ['iec_0115']],                                  // Surge diverter / lightning arrester
+  ['bms',            ['iec_0050']],                                  // reuse converter as proxy
+  ['ems',            ['iec_0050']],                                  // reuse converter as proxy
 ];
 
 // ====================== IEC SYMBOL LIBRARY ======================
@@ -36922,19 +36937,157 @@ function compileAidc(uem) {
 
 function compileUem(uem) {
   const ptype = (uem.project && uem.project.type) || 'ess';
-  if (ptype === 'ess') return compileEss(uem);
-  if (ptype === 'microgrid') return compileMicrogrid(uem);
-  if (ptype === 'aidc') return compileAidc(uem);
+  let compiled;
+  if (ptype === 'ess' || ptype === 'industrial') compiled = compileEss(uem);
+  else if (ptype === 'microgrid') compiled = compileMicrogrid(uem);
+  else if (ptype === 'aidc') compiled = compileAidc(uem);
   // hybrid: union of ess + microgrid
-  if (ptype === 'hybrid') {
+  else if (ptype === 'hybrid') {
     const ess = compileEss(uem);
     const mg = compileMicrogrid(uem);
     const seen = new Set(ess.components.map(c => c.id));
     for (const c of mg.components) if (!seen.has(c.id)) { ess.components.push(c); seen.add(c.id); }
-    return ess;
+    compiled = ess;
+  } else if (ptype === 'battery_swap') compiled = compileBatterySwap(uem);
+  else return { components: [], connections: [], note: `unknown type ${ptype}` };
+  // Topology completion: add protection / metering / management devices that
+  // the LLM rarely outputs but every real electrical schematic needs. Marked
+  // `auto: true` so the BOM distinguishes inferred vs specified components.
+  const inferred = inferTopology(compiled.components, compiled.connections || [], uem);
+  compiled.inferred = inferred;
+  return compiled;
+}
+
+// ====================== TOPOLOGY COMPLETION (inferTopology) ======================
+// Mirrors IEC 60617 / GB 50054 / GB 51048 design conventions. The LLM only
+// outputs major power equipment (battery / pcs / transformer / bus); it
+// rarely includes the protection, metering, isolation, and management
+// devices that every real schematic needs. This pass fills those in so the
+// rendered SLD looks like an engineering drawing instead of a block diagram.
+//
+// Rules (each is "if upstream exists and the missing category is not yet
+// present, inject one component tagged with the rule id"):
+//
+//   R1  PCS AC side            -> ACB (QF) for short-circuit + overload protection
+//   R2  PCS AC side            -> CT for metering and differential protection
+//   R3  Transformer HV side    -> Surge arrester (避雷器) for lightning protection
+//   R4  Transformer LV side    -> Disconnector (刀闸) for safe isolation
+//   R5  Battery rack           -> BMS for cell-level monitoring / balancing
+//   R6  ESS / microgrid        -> Top-level EMS for dispatch + SCADA
+//   R7  KV-level grid-tie      -> PT for voltage metering + synchronizing check
+//   R8  DC bus                 -> DC fuse for short-circuit protection
+//
+// Conservative: only ADDS components. Never modifies existing connections.
+// The new components get a `layer_hint` so assignLayers() can drop them next
+// to the device they protect, keeping the main power flow visually clean.
+function inferTopology(components, connections, uem) {
+  const result = { added: 0, rules: [], components: [] };
+  if (!Array.isArray(components) || components.length === 0) return result;
+
+  const ptype = (uem && uem.project && uem.project.type) || 'ess';
+  const elec = (uem && uem.electrical) || {};
+  const voltageStr = String(elec.voltage_level || '');
+
+  const hasCat = (cat) => components.some(c => c.category === cat);
+  const existingIds = new Set(components.map(c => c.id));
+  const newComps = [];
+  let seq = 1;
+  const uniqId = (prefix) => {
+    let id;
+    do { id = `${prefix}-AUTO-${seq++}`; }
+    while (existingIds.has(id) || newComps.some(c => c.id === id));
+    return id;
+  };
+
+  // R1: PCS AC side protection (ACB)
+  // Existing compileEss only adds a single QF for the grid side. If PCS is
+  // present we still need a dedicated ACB on the PCS AC output.
+  if (hasCat('pcs') && !components.some(c => c.category === 'protection' && /pcs|pcs-ac|pcb/i.test(c.ref || c.id || ''))) {
+    newComps.push({
+      id: uniqId('QF'), category: 'protection', ref: 'QF-PCS',
+      model: 'ACB-PCS', qty: 1, auto: true, rule: 'R1', layer_hint: 5,
+      params: { type: 'ACB', scope: 'PCS AC-side short-circuit and overload protection' }
+    });
+    result.rules.push('R1 PCS AC-side ACB (断路器)');
   }
-  if (ptype === 'battery_swap') return compileBatterySwap(uem);
-  return { components: [], connections: [], note: `unknown type ${ptype}` };
+
+  // R2: PCS AC side current transformer
+  if (hasCat('pcs') && !hasCat('ct')) {
+    newComps.push({
+      id: uniqId('CT'), category: 'ct', ref: 'CT-PCS',
+      model: 'CT-PCS', qty: 1, auto: true, rule: 'R2', layer_hint: 3,
+      params: { scope: 'PCS AC-side current measurement and differential protection' }
+    });
+    result.rules.push('R2 PCS AC-side CT (电流互感器)');
+  }
+
+  // R3: Transformer HV-side surge arrester
+  if (hasCat('transformer') && !hasCat('surge_arrester')) {
+    newComps.push({
+      id: uniqId('LA'), category: 'surge_arrester', ref: 'LA',
+      model: '避雷器', qty: 1, auto: true, rule: 'R3', layer_hint: 5,
+      params: { scope: 'Transformer HV-side lightning / surge protection' }
+    });
+    result.rules.push('R3 Transformer HV-side 避雷器 (Surge Arrester)');
+  }
+
+  // R4: Transformer LV-side disconnector (safe isolation)
+  if (hasCat('transformer') && !hasCat('disconnector')) {
+    newComps.push({
+      id: uniqId('QS'), category: 'disconnector', ref: 'QS',
+      model: '隔离开关', qty: 1, auto: true, rule: 'R4', layer_hint: 5,
+      params: { scope: 'Transformer LV-side isolation for maintenance safety' }
+    });
+    result.rules.push('R4 Transformer LV-side 隔离开关 (Disconnector)');
+  }
+
+  // R5: Battery management system (one per battery cluster)
+  if (hasCat('battery_rack') && !hasCat('bms')) {
+    newComps.push({
+      id: uniqId('BMS'), category: 'bms', ref: 'BMS',
+      model: '电池管理系统', qty: 1, auto: true, rule: 'R5', layer_hint: 1,
+      params: { scope: 'Cell-level monitoring, balancing, SOC/SOH, protection' }
+    });
+    result.rules.push('R5 Battery cluster BMS (电池管理系统)');
+  }
+
+  // R6: Top-level EMS for ESS / microgrid / hybrid
+  if (['ess', 'microgrid', 'hybrid'].includes(ptype) && !hasCat('ems')) {
+    newComps.push({
+      id: uniqId('EMS'), category: 'ems', ref: 'EMS',
+      model: '能量管理系统', qty: 1, auto: true, rule: 'R6', layer_hint: 0,
+      params: { scope: 'Top-level dispatch, SCADA, remote control' }
+    });
+    result.rules.push('R6 Top-level EMS (能量管理系统)');
+  }
+
+  // R7: KV-level grid-tie voltage transformer
+  if (/KV/i.test(voltageStr) && voltageStr.toUpperCase() !== '380V' && !hasCat('pt')) {
+    newComps.push({
+      id: uniqId('PT'), category: 'pt', ref: 'PT',
+      model: '电压互感器', qty: 1, auto: true, rule: 'R7', layer_hint: 5,
+      params: { scope: 'Grid-tie voltage metering + synchronizing check' }
+    });
+    result.rules.push('R7 Grid-tie PT (电压互感器)');
+  }
+
+  // R8: DC bus short-circuit fuse
+  if (hasCat('dc_bus') && !hasCat('fuse')) {
+    newComps.push({
+      id: uniqId('FU'), category: 'fuse', ref: 'FU',
+      model: 'DC熔断器', qty: 1, auto: true, rule: 'R8', layer_hint: 2,
+      params: { scope: 'DC bus short-circuit protection (熔断器)' }
+    });
+    result.rules.push('R8 DC bus 熔断器 (Fuse)');
+  }
+
+  // Append inferred components (no connection rewiring in v1 — keep main power flow clean).
+  if (newComps.length > 0) {
+    for (const c of newComps) components.push(c);
+    result.added = newComps.length;
+    result.components = newComps;
+  }
+  return result;
 }
 
 // ====================== BATTERY SWAP STATION (BSS) ======================
@@ -37036,19 +37189,28 @@ function isBusCategory(cat) {
 
 function assignLayers(components) {
   // Group components by horizontal-layer index 0..5. Preserve order within each layer.
+  // Components may carry an explicit `layer_hint` (set by inferTopology) to
+  // override the category default — this keeps inferred protection/metering
+  // devices next to the equipment they protect instead of all stacking up
+  // on layer 5.
   const buckets = [[], [], [], [], [], []];
   for (const c of components) {
-    let slot = CATEGORY_TO_LAYER[c.category];
-    if (slot == null) {
-      // id-based fallback
-      const idLower = (c.id || '').toLowerCase();
-      if (idLower.startsWith('pv') || idLower.startsWith('wt') || idLower.startsWith('gen') || idLower.startsWith('grid') || idLower.startsWith('mains')) slot = 0;
-      else if (idLower.startsWith('bat')) slot = 1;
-      else if (idLower.startsWith('dc')) slot = 2;
-      else if (idLower.startsWith('pcs')) slot = 3;
-      else if (idLower.startsWith('ac')) slot = 4;
-      else if (idLower.startsWith('xf') || idLower.startsWith('t') || idLower.startsWith('load') || idLower.startsWith('qf') || idLower.startsWith('pdu')) slot = 5;
-      else slot = 5;
+    let slot;
+    if (typeof c.layer_hint === 'number' && c.layer_hint >= 0 && c.layer_hint <= 5) {
+      slot = c.layer_hint;
+    } else {
+      slot = CATEGORY_TO_LAYER[c.category];
+      if (slot == null) {
+        // id-based fallback
+        const idLower = (c.id || '').toLowerCase();
+        if (idLower.startsWith('pv') || idLower.startsWith('wt') || idLower.startsWith('gen') || idLower.startsWith('grid') || idLower.startsWith('mains') || idLower.startsWith('ems')) slot = 0;
+        else if (idLower.startsWith('bat') || idLower.startsWith('bms')) slot = 1;
+        else if (idLower.startsWith('dc') || idLower.startsWith('fu')) slot = 2;
+        else if (idLower.startsWith('pcs') || idLower.startsWith('ct')) slot = 3;
+        else if (idLower.startsWith('ac')) slot = 4;
+        else if (idLower.startsWith('xf') || idLower.startsWith('t') || idLower.startsWith('load') || idLower.startsWith('qf') || idLower.startsWith('pdu') || idLower.startsWith('la') || idLower.startsWith('qs') || idLower.startsWith('pt')) slot = 5;
+        else slot = 5;
+      }
     }
     if (slot < 0 || slot > 5) slot = 5;
     buckets[slot].push(c);
@@ -37165,7 +37327,8 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
         out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 14).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
         continue;
       }
-      // Regular node: IEC symbol inside a box, ref above, model below
+      // Regular node: background rect + IEC symbol inside a box, ref above, model below
+      out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" height="${p.h}" fill="white" stroke="#333" stroke-width="1"/>`);
       const symId = findIecIdByCategory(c.category);
       if (symId) {
         const sym = loadIecSymbol(symId);
@@ -37176,9 +37339,8 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
         const sy = p.y + (p.h - sh) / 2;
         out.push(`<svg x="${sx.toFixed(1)}" y="${sy.toFixed(1)}" width="${sw.toFixed(1)}" height="${sh.toFixed(1)}" viewBox="${sym.viewBox}">${sym.innerSvg}</svg>`);
       }
-out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" height="${p.h}" fill="white" stroke="#333" stroke-width="1"/>`);
-        out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#222">${escapeXml(c.ref || c.id)}</text>`);
-        out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 14).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
+      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#222">${escapeXml(c.ref || c.id)}</text>`);
+      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 14).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
     }
   }
 
@@ -37526,6 +37688,9 @@ export default async function handler(req, res) {
       components: compiled.components.length,
       connections: (compiled.connections || []).length,
       symbols_loaded: IEC_CACHE.size,
+      inferred: compiled.inferred || { added: 0, rules: [], components: [] },
+      inferred_added: (compiled.inferred && compiled.inferred.added) || 0,
+      inferred_rules: (compiled.inferred && compiled.inferred.rules) || [],
       total_w: totalW,
       total_h: totalH,
       latency_ms: latency,

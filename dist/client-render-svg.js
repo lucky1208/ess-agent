@@ -36809,7 +36809,7 @@ function compileAidc(uem) {
 
 function compileUem(uem) {
   const ptype = (uem.project && uem.project.type) || 'ess';
-  if (ptype === 'ess') return compileEss(uem);
+  if (ptype === 'ess' || ptype === 'industrial') return compileEss(uem);
   if (ptype === 'microgrid') return compileMicrogrid(uem);
   if (ptype === 'aidc') return compileAidc(uem);
   // hybrid: union of ess + microgrid
@@ -37052,7 +37052,8 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
         out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 14).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
         continue;
       }
-      // Regular node: IEC symbol inside a box, ref above, model below
+      // Regular node: background rect + IEC symbol inside a box, ref above, model below
+      out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" height="${p.h}" fill="white" stroke="#333" stroke-width="1"/>`);
       const symId = findIecIdByCategory(c.category);
       if (symId) {
         const sym = loadIecSymbol(symId);
@@ -37063,9 +37064,8 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
         const sy = p.y + (p.h - sh) / 2;
         out.push(`<svg x="${sx.toFixed(1)}" y="${sy.toFixed(1)}" width="${sw.toFixed(1)}" height="${sh.toFixed(1)}" viewBox="${sym.viewBox}">${sym.innerSvg}</svg>`);
       }
-out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" height="${p.h}" fill="white" stroke="#333" stroke-width="1"/>`);
-        out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#222">${escapeXml(c.ref || c.id)}</text>`);
-        out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 14).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
+      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#222">${escapeXml(c.ref || c.id)}</text>`);
+      out.push(`<text x="${(p.x + p.w / 2).toFixed(1)}" y="${(p.y + p.h + 14).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#333">${escapeXml(c.model || '')}</text>`);
     }
   }
 

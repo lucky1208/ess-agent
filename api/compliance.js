@@ -263,7 +263,7 @@ function compileAidc(uem) {
 
 function compileUem(uem) {
   const ptype = (uem.project && uem.project.type) || 'ess';
-  if (ptype === 'ess') return compileEss(uem);
+  if (ptype === 'ess' || ptype === 'industrial') return compileEss(uem);
   if (ptype === 'microgrid') return compileMicrogrid(uem);
   if (ptype === 'aidc') return compileAidc(uem);
   if (ptype === 'hybrid') {
