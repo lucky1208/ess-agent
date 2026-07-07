@@ -37417,6 +37417,30 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
     return null;
   }
 
+  function safeClimbX(targetX, targetY, fromY, excludeFrom, excludeTo) {
+    let cx = targetX;
+    for (let pass = 0; pass < 10; pass++) {
+      let found = false;
+      for (const k in positions) {
+        if (k === excludeFrom || k === excludeTo) continue;
+        const nb = positions[k];
+        const pad = 4;
+        const bx1 = nb.x - pad, bx2 = nb.x + nb.w + pad, by1 = nb.y - pad, by2 = nb.y + nb.h + pad;
+        if (cx > bx1 && cx < bx2) {
+          const minY = Math.min(targetY, fromY);
+          const maxY = Math.max(targetY, fromY);
+          if (maxY > by1 && minY < by2) {
+            cx = bx2 + 15;
+            found = true;
+            break;
+          }
+        }
+      }
+      if (!found) break;
+    }
+    return cx;
+  }
+
   for (const conn of (compiled.connections || [])) {
     const a = positions[conn.from];
     const b = positions[conn.to];
@@ -37438,7 +37462,7 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
       }
       if (crossesNode) {
         const dropX1 = pa.x + 20;
-        const dropX2 = pb.x - 20;
+        const dropX2 = safeClimbX(pb.x - 20, pb.y, trunkY, conn.from, conn.to);
         d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
         segs = [
           { x1: pa.x, y1: pa.y, x2: dropX1, y2: pa.y },
@@ -37456,7 +37480,7 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
     } else if (spanSlots > 1) {
       // Long connection: drop to the trunk channel, run, then climb to the dst.
       const dropX1 = pa.x + 20;
-      const dropX2 = pb.x - 20;
+      const dropX2 = safeClimbX(pb.x - 20, pb.y, trunkY, conn.from, conn.to);
       d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
       segs = [
         { x1: pa.x, y1: pa.y, x2: dropX1, y2: pa.y },
@@ -37468,7 +37492,7 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else if (spanSlots === 0) {
       // Same-layer connection (e.g. QF→XF): route vertical segment to the right of both nodes
-      const rightX = Math.max(pa.x, pb.x) + 40;
+      const rightX = safeClimbX(Math.max(pa.x, pb.x) + 40, pb.y, pa.y, conn.from, conn.to);
       d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${rightX.toFixed(1)} ${pa.y.toFixed(1)} L ${rightX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
       segs = [
         { x1: pa.x, y1: pa.y, x2: rightX, y2: pa.y },
@@ -37486,7 +37510,7 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
       if (conflict && conflict.id !== conn.from && conflict.id !== conn.to) {
         // 改走 trunk 通道绕行
         const dropX1 = pa.x + 20;
-        const dropX2 = pb.x - 20;
+        const dropX2 = safeClimbX(pb.x - 20, pb.y, trunkY, conn.from, conn.to);
         d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
         segs = [
           { x1: pa.x, y1: pa.y, x2: dropX1, y2: pa.y },
