@@ -37053,8 +37053,10 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
       const p = positions[c.id];
       if (!p) continue;
       if (p.isBus) {
-        // Bus bar: thick horizontal line + end caps + label above + voltage below
+        // Bus bar: background rect + thick horizontal line + end caps + label above + voltage below
         const yMid = p.y + p.h / 2;
+        // Light background rectangle so bus bar is visually distinct from connection lines
+        out.push(`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w}" height="${p.h}" fill="#e8f0fe" stroke="#1a3a6e" stroke-width="1.5" rx="4"/>`);
         out.push(`<line x1="${p.x.toFixed(1)}" y1="${yMid.toFixed(1)}" x2="${(p.x + p.w).toFixed(1)}" y2="${yMid.toFixed(1)}" stroke="#1a3a6e" stroke-width="${BUS_THICKNESS}" stroke-linecap="round"/>`);
         // end caps (small filled circles)
         out.push(`<circle cx="${p.x.toFixed(1)}" cy="${yMid.toFixed(1)}" r="5" fill="#1a3a6e"/>`);
@@ -37149,11 +37151,33 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
     const spanSlots = Math.abs(slotIndexOf(b, positions) - slotIndexOf(a, positions));
     let d, segs = [];
     if (Math.abs(pa.y - pb.y) < 0.5 && spanSlots <= 1) {
-      // Aligned ports and adjacent columns: a single straight line is fine
-      const lineEndX = pb.x;
-      d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${lineEndX.toFixed(1)} ${pb.y.toFixed(1)}`;
-      segs = [{ x1: pa.x, y1: pa.y, x2: pb.x, y2: pb.y }];
-      out.push(`<line x1="${pa.x.toFixed(1)}" y1="${pa.y.toFixed(1)}" x2="${pb.x.toFixed(1)}" y2="${pb.y.toFixed(1)}" stroke="black" stroke-width="2"/>`);
+      // Aligned ports and adjacent columns: check if straight line crosses any intermediate node
+      const hSeg = { x1: pa.x, y1: pa.y, x2: pb.x, y2: pb.y };
+      let crossesNode = false;
+      for (const k in positions) {
+        if (k === conn.from || k === conn.to) continue;
+        const nb = positions[k];
+        const pad = 4;
+        const bx1 = nb.x - pad, bx2 = nb.x + nb.w + pad, by1 = nb.y - pad, by2 = nb.y + nb.h + pad;
+        if (pa.y > by1 && pa.y < by2 && Math.max(pa.x, pb.x) > bx1 && Math.min(pa.x, pb.x) < bx2) { crossesNode = true; break; }
+      }
+      if (crossesNode) {
+        const dropX1 = pa.x + 20;
+        const dropX2 = pb.x - 20;
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+        segs = [
+          { x1: pa.x, y1: pa.y, x2: dropX1, y2: pa.y },
+          { x1: dropX1, y1: pa.y, x2: dropX1, y2: trunkY },
+          { x1: dropX1, y1: trunkY, x2: dropX2, y2: trunkY },
+          { x1: dropX2, y1: trunkY, x2: dropX2, y2: pb.y },
+          { x1: dropX2, y1: pb.y, x2: pb.x, y2: pb.y }
+        ];
+      } else {
+        const lineEndX = pb.x;
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${lineEndX.toFixed(1)} ${pb.y.toFixed(1)}`;
+        segs = [{ x1: pa.x, y1: pa.y, x2: pb.x, y2: pb.y }];
+      }
+      out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else if (spanSlots > 1) {
       // Long connection: drop to the trunk channel, run, then climb to the dst.
       const dropX1 = pa.x + 20;
@@ -37167,12 +37191,23 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
         { x1: dropX2, y1: pb.y, x2: pb.x, y2: pb.y }
       ];
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
+    } else if (spanSlots === 0) {
+      // Same-layer connection (e.g. QF→XF): route vertical segment to the right of both nodes
+      const rightX = Math.max(pa.x, pb.x) + 40;
+      d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${rightX.toFixed(1)} ${pa.y.toFixed(1)} L ${rightX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      segs = [
+        { x1: pa.x, y1: pa.y, x2: rightX, y2: pa.y },
+        { x1: rightX, y1: pa.y, x2: rightX, y2: pb.y },
+        { x1: rightX, y1: pb.y, x2: pb.x, y2: pb.y }
+      ];
+      out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else {
       // Adjacent column but ports at different Y: simple 4-vertex ortho at src-Y
       const midX = (pa.x + pb.x) / 2;
-      // 检查 midX 处的竖直段是否穿过任何节点 (除 a, b)
       const vSeg = { x1: midX, y1: pa.y, x2: midX, y2: pb.y };
-      const conflict = segmentCrossesNodeBox(vSeg, conn.from) && segmentCrossesNodeBox(vSeg, conn.to);
+      const conflictFrom = segmentCrossesNodeBox(vSeg, conn.from);
+      const conflictTo = segmentCrossesNodeBox(vSeg, conn.to);
+      const conflict = conflictFrom || conflictTo;
       if (conflict && conflict.id !== conn.from && conflict.id !== conn.to) {
         // 改走 trunk 通道绕行
         const dropX1 = pa.x + 20;
