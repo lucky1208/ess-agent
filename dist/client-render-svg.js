@@ -37008,9 +37008,21 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
     const a = positions[conn.from];
     const b = positions[conn.to];
     if (!a || !b) continue;
-    const pa = getPort(a, 'right');
-    const pb = getPort(b, 'left');
     const spanSlots = Math.abs(slotIndexOf(b, positions) - slotIndexOf(a, positions));
+    let pa, pb;
+    if (spanSlots === 0 && Math.abs((a.x + a.w / 2) - (b.x + b.w / 2)) < NODE_WIDTH * 0.6) {
+      // Vertically stacked in same layer: connect bottom of upper to top of lower
+      if (a.y < b.y) {
+        pa = { x: a.x + a.w / 2, y: a.y + a.h };  // bottom of upper
+        pb = { x: b.x + b.w / 2, y: b.y };          // top of lower
+      } else {
+        pa = { x: a.x + a.w / 2, y: a.y };          // top of lower (but from=a, so this is source)
+        pb = { x: b.x + b.w / 2, y: b.y + b.h };    // bottom of upper
+      }
+    } else {
+      pa = getPort(a, 'right');
+      pb = getPort(b, 'left');
+    }
     let d, segs = [];
     if (Math.abs(pa.y - pb.y) < 0.5 && spanSlots <= 1) {
       // Aligned ports and adjacent columns: check if straight line crosses any intermediate node
@@ -37097,9 +37109,11 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
       }
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else {
-      // Adjacent column but ports at different Y: simple 4-vertex ortho at src-Y
-      const midX = (pa.x + pb.x) / 2;
-      const vSeg = { x1: midX, y1: pa.y, x2: midX, y2: pb.y };
+      // Adjacent column but ports at different Y: route vertical to the right of dst, not midpoint
+      // This prevents the final H-segment from cutting through the dst's zone from the left
+      const rightOfDst = pb.x + NODE_WIDTH / 2 + 40;
+      const midX = Math.max(pa.x + 40, rightOfDst);
+      const vSeg = { x1: midX, y1: Math.min(pa.y, pb.y), x2: midX, y2: Math.max(pa.y, pb.y) };
       const conflictFrom = segmentCrossesNodeBox(vSeg, conn.from);
       const conflictTo = segmentCrossesNodeBox(vSeg, conn.to);
       const conflict = conflictFrom || conflictTo;
