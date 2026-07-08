@@ -38607,7 +38607,7 @@ ACC AC一体柜专题
     <div class="sec-title" style="margin-bottom:8px">AI 模型选择 (5 Provider)</div>
     <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5">从 5 个 LLM provider 中选择,系统会自动 fallback 到本地规则引擎。Qwen3 本地默认无需 API key。</div>
     <div class="form-group" style="margin-bottom:14px"><label class="form-label">AI 模型</label>
-      <select class="form-input" id="aiProvider" style="font-size:13px" onchange="(function(sel){var lbl=document.getElementById('aiProviderKeyLabel');if(lbl)lbl.textContent=AI_PROVIDER_LABEL[sel.value]||sel.value;})(this)">
+      <select class="form-input" id="aiProvider" style="font-size:13px">
         <option value="qwen-local" selected>Qwen3 本地 (llama-server, 默认)</option>
         <option value="deepseek">DeepSeek V4 (云端, 需 API key)</option>
         <option value="glm">GLM-5.2 智谱 (云端, 需 API key)</option>
@@ -38617,8 +38617,8 @@ ACC AC一体柜专题
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px">
-        <div style="font-size:11px;color:var(--text2)">Provider Key</div>
-        <div id="aiProviderKeyLabel" style="font-size:12px;font-weight:600;color:var(--green);margin-top:2px">qwen-local (无 key)</div>
+        <div style="font-size:11px;color:var(--text2)">API Key <span style="color:var(--text3)">(可选, 留空用服务器环境变量)</span></div>
+        <input type="password" id="aiApiKey" class="form-input" placeholder="输入 API Key 或留空" style="font-size:12px;margin-top:4px;width:100%;box-sizing:border-box">
       </div>
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px">
         <div style="font-size:11px;color:var(--text2)">预计耗时</div>
@@ -42590,13 +42590,7 @@ var AI_PROVIDER_LABEL = {
 };
 
 function aiDesignOnShow(){
-  // 切到该 tab 时,同步 provider label + 默认 SLD 子 tab
-  var sel = document.getElementById('aiProvider');
-  if (sel) {
-    var v = sel.value || 'qwen-local';
-    var labelEl = document.getElementById('aiProviderKeyLabel');
-    if (labelEl) labelEl.textContent = AI_PROVIDER_LABEL[v] || v;
-  }
+  // 切到该 tab 时,同步默认 SLD 子 tab
   aiDesignShowSub(aiDesignSubTab || 'sld');
 }
 
@@ -42649,7 +42643,8 @@ function aiDesignCollectForm(){
       redundancy: (document.getElementById('aiRedundancy') || {}).value || 'N+1',
       special_text: (document.getElementById('aiSpecial') || {}).value || ''
     },
-    ai_provider: AI_PROVIDER_KEY_MAP[(document.getElementById('aiProvider') || {}).value] || 'qwen3_local'
+    ai_provider: AI_PROVIDER_KEY_MAP[(document.getElementById('aiProvider') || {}).value] || 'qwen3_local',
+    api_key: (document.getElementById('aiApiKey') || {}).value || ''
   };
 }
 
