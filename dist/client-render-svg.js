@@ -37109,27 +37109,32 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
       }
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else {
-      // Adjacent column but ports at different Y: route vertical to the right of dst, not midpoint
-      // This prevents the final H-segment from cutting through the dst's zone from the left
-      const rightOfDst = pb.x + NODE_WIDTH / 2 + 40;
-      const midX = Math.max(pa.x + 40, rightOfDst);
-      const vSeg = { x1: midX, y1: Math.min(pa.y, pb.y), x2: midX, y2: Math.max(pa.y, pb.y) };
-      const conflictFrom = segmentCrossesNodeBox(vSeg, conn.from);
-      const conflictTo = segmentCrossesNodeBox(vSeg, conn.to);
-      const conflict = conflictFrom || conflictTo;
-      if (conflict && conflict.id !== conn.from && conflict.id !== conn.to) {
-        // 改走 trunk 通道绕行
-        const dropX1 = pa.x + 20;
-        const dropX2 = safeClimbX(pb.x - 20, pb.y, trunkY, conn.from, conn.to);
-        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      // Adjacent column but ports at different Y.
+      // Check if dst is inside a zone → route BELOW the zone to avoid cutting through it.
+      let dstZoneBottom = null;
+      for (const zkey in zoneBoxes) {
+        const zb = zoneBoxes[zkey];
+        if (zb.nodes.includes(conn.to)) {
+          dstZoneBottom = zb.y2;
+          break;
+        }
+      }
+      if (dstZoneBottom !== null) {
+        // Route below zone: drop → horizontal below zone → climb to dst
+        const belowY = dstZoneBottom + 30;
+        let climbX = pb.x;
+        climbX = safeClimbX(climbX, pb.y, belowY, conn.from, conn.to);
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${pa.x.toFixed(1)} ${belowY.toFixed(1)} L ${climbX.toFixed(1)} ${belowY.toFixed(1)} L ${climbX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
         segs = [
-          { x1: pa.x, y1: pa.y, x2: dropX1, y2: pa.y },
-          { x1: dropX1, y1: pa.y, x2: dropX1, y2: trunkY },
-          { x1: dropX1, y1: trunkY, x2: dropX2, y2: trunkY },
-          { x1: dropX2, y1: trunkY, x2: dropX2, y2: pb.y },
-          { x1: dropX2, y1: pb.y, x2: pb.x, y2: pb.y }
+          { x1: pa.x, y1: pa.y, x2: pa.x, y2: belowY },
+          { x1: pa.x, y1: belowY, x2: climbX, y2: belowY },
+          { x1: climbX, y1: belowY, x2: climbX, y2: pb.y },
+          { x1: climbX, y1: pb.y, x2: pb.x, y2: pb.y }
         ];
       } else {
+        // No zone: route vertical to the right of dst
+        const rightOfDst = pb.x + NODE_WIDTH / 2 + 40;
+        const midX = Math.max(pa.x + 40, rightOfDst);
         d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
         segs = [
           { x1: pa.x, y1: pa.y, x2: midX, y2: pa.y },
