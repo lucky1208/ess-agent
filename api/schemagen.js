@@ -810,6 +810,13 @@ function runtimeBackfill(uem) {
   }
   uem.electrical = elec;
 
+  // Fix created_at to ISO 8601 date-time format
+  if (uem.project) {
+    if (!uem.project.created_at || !/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(uem.project.created_at)) {
+      uem.project.created_at = new Date().toISOString();
+    }
+  }
+
   // 注入 R-special-001 (通信协议必填),Track B 规则
   if (!Array.isArray(uem.special_requirements)) {
     uem.special_requirements = [];
