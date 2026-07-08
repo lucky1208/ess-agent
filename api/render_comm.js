@@ -57,6 +57,8 @@ const FONT_LEGEND      = 'font-family="Microsoft YaHei, Arial, sans-serif" font-
 const WIDTH = 900;
 const HEIGHT = 640;
 
+import { PCS_UNIT_KW, DC_BUS_VOLTAGE } from './compile_uem.js';
+
 // ====================== 工具函数 ======================
 function safeNum(v, dflt = 0) {
   if (v === null || v === undefined || v === '') return dflt;
@@ -167,10 +169,10 @@ function inferTopology(uem) {
   // 去重
   const uniqProtocols = [...new Set(protocols.map(p => p.trim()).filter(Boolean))];
 
-  // PCS 数量推算: 250kW/台
+  // PCS 数量推算: 使用共享编译器常量
   const cap = safeNum(elec.capacity_kwh, 0);
   const power = safeNum(elec.power_kw, 0);
-  const pcsCount = power > 0 ? Math.min(Math.max(2, Math.ceil(power / 250)), 4) : 2;  // 2-4 台
+  const pcsCount = power > 0 ? Math.ceil(power / PCS_UNIT_KW) + 1 : 2;  // N+1 冗余
 
   // BMS 数量推算: 1 Master + ceil(cap / 500) Slave, 最多 4
   const bmsSlaveCount = cap > 0 ? Math.min(Math.max(1, Math.ceil(cap / 500)), 4) : 1;

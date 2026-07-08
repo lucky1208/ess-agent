@@ -21,6 +21,8 @@
 //   5. 升压变 XF 仅在 10kV/35kV 项目显示
 // =========================================================================
 
+import { compileUem, CELL_VOLTAGE, CELL_CAPACITY_AH, DC_BUS_VOLTAGE, PCS_UNIT_KW } from './compile_uem.js';
+
 // ====================== 颜色方案 ======================
 const COLOR_PV        = '#F5A623';  // 橙 — 光伏
 const COLOR_WIND      = '#00BCD4';  // 青 — 风电
@@ -149,9 +151,8 @@ function inferBlocks(uem) {
 
   // ----- 列 2: 储能 + DC Bus -----
   if (cap_kwh > 0) {
-    const cellV = 3.2, cellAh = 280;
-    const stringsS = Math.ceil(768 / cellV);
-    const perPackKwh = (stringsS * cellV * cellAh) / 1000;
+    const stringsS = Math.ceil(DC_BUS_VOLTAGE / CELL_VOLTAGE);
+    const perPackKwh = (stringsS * CELL_VOLTAGE * CELL_CAPACITY_AH) / 1000;
     const packsP = Math.max(1, Math.ceil(cap_kwh / perPackKwh));
     nodes.push({
       id: 'BAT', kind: 'storage', category: 'battery', color: COLOR_BATTERY,
@@ -186,8 +187,7 @@ function inferBlocks(uem) {
 
   // ----- 列 3: PCS 转换层 -----
   if (power_kw > 0) {
-    const pcsUnit = 125;
-    const pcsCount = Math.ceil(power_kw / pcsUnit) + 1;
+    const pcsCount = Math.ceil(power_kw / PCS_UNIT_KW) + 1;
     nodes.push({
       id: 'PCS', kind: 'convert', category: 'pcs', color: COLOR_PCS,
       title: 'PCS 变流器',

@@ -4,7 +4,7 @@
 <meta name="version" content="2026.06.24-aidc-v2">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preload" href="gb60kw_schematic.svg" as="image">
+<link rel="preload" href="/assets/gb60kw_schematic-DgaywTWl.svg" as="image">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>
@@ -37270,6 +37270,7 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
   out.push(`<text x="${PAGE_PADDING_X}" y="44" text-anchor="start" font-family="Arial, sans-serif" font-size="9" fill="#666">${escapeXml(meta)}</text>`);
 
   // ====================== ZONE BACKGROUNDS ======================
+  // Group nodes into colored zones by their layer/category for visual clarity
   const ZONE_DEFS = [
     { name: '电源侧', nameEn: 'Source', categories: ['source','grid','pv','wind','diesel'], color: '#fff8e1', border: '#f9a825', dash: '6,3' },
     { name: '电池侧', nameEn: 'Battery', categories: ['battery','battery_rack'], color: '#e8f5e9', border: '#43a047', dash: '6,3' },
@@ -37278,6 +37279,7 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
     { name: 'AC母线', nameEn: 'AC Bus', categories: ['ac_bus','bus_ac','bus'], color: '#e0f7fa', border: '#00838f', dash: '6,3' },
     { name: '变压/保护/负荷', nameEn: 'T&L', categories: ['transformer','protection','switching','load'], color: '#fbe9e7', border: '#d84315', dash: '6,3' },
   ];
+  // Compute zone bounding boxes from positions
   const zoneBoxes = {};
   for (const z of ZONE_DEFS) { zoneBoxes[z.nameEn] = { x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity, nodes: [], def: z }; }
   for (const layer of layers) {
@@ -37290,6 +37292,7 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
         if (z.categories.includes(cat)) { matched = z; break; }
       }
       if (!matched) {
+        // id-based fallback
         const idLower = (c.id || '').toLowerCase();
         if (idLower.startsWith('grid') || idLower.startsWith('pv') || idLower.startsWith('wt')) matched = ZONE_DEFS[0];
         else if (idLower.startsWith('bat')) matched = ZONE_DEFS[1];
@@ -37306,6 +37309,7 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
       zb.nodes.push(c.id);
     }
   }
+  // Draw zone backgrounds (before nodes so they appear behind)
   for (const key in zoneBoxes) {
     const zb = zoneBoxes[key];
     if (zb.nodes.length === 0) continue;
@@ -37411,6 +37415,8 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
     return null;
   }
 
+  // Find a safe X for a vertical climb that avoids crossing any node boxes.
+  // Returns the rightmost safe X that doesn't cross any intermediate node.
   function safeClimbX(targetX, targetY, fromY, excludeFrom, excludeTo) {
     let cx = targetX;
     for (let pass = 0; pass < 10; pass++) {
@@ -37455,6 +37461,7 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
         if (pa.y > by1 && pa.y < by2 && Math.max(pa.x, pb.x) > bx1 && Math.min(pa.x, pb.x) < bx2) { crossesNode = true; break; }
       }
       if (crossesNode) {
+        // Route via trunk channel below
         const dropX1 = pa.x + 20;
         const dropX2 = safeClimbX(pb.x - 20, pb.y, trunkY, conn.from, conn.to);
         d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
@@ -38405,13 +38412,13 @@ ACC AC一体柜专题
 </h3>
 <div class="device-grid" style="margin-bottom:0">
 <div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('ACC_DETAIL','ACC-480-P750 AC一体柜')">
-<div class="dev-img-wrap"><img src="images/products/X-522_X261_product.jpeg" alt="ACC-480" onerror="this.style.display='none'"></div>
+<div class="dev-img-wrap"><img src="/assets/X-522_X261_product-Tukia3DJ.jpeg" alt="ACC-480" onerror="this.style.display='none'"></div>
 <div class="dev-header"><div><div class="dev-name">ACC-480-P750 AC一体机</div><div class="dev-model">ACC-480-P750-UL</div></div><span class="dev-badge badge-orange">480kWh</span></div>
 <div class="dev-specs"><span class="spec-item">750kW内置PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈10t</span></div>
 <div class="dev-features"><span class="feature-tag">PCS+升压变+开关柜一体</span><span class="feature-tag">即插即用</span><span class="feature-tag">最大4并→1.92MWh</span></div>
 </div>
 <div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('LL760_DETAIL','760kWh液冷储能柜')">
-<div class="dev-img-wrap"><img src="images/products/GRID-5M_product.jpeg" alt="760LL" onerror="this.style.display='none'"></div>
+<div class="dev-img-wrap"><img src="/assets/GRID-5M_product-CI7pnyej.jpeg" alt="760LL" onerror="this.style.display='none'"></div>
 <div class="dev-header"><div><div class="dev-name">760kWh液冷储能柜</div><div class="dev-model">光储充一体化标准柜</div></div><span class="dev-badge badge-green">760kWh</span></div>
 <div class="dev-specs"><span class="spec-item">380kW PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈38t</span></div>
 <div class="dev-features"><span class="feature-tag">光储充一体化</span><span class="feature-tag">7000次循环</span><span class="feature-tag">最大8并→6.08MWh</span></div>
@@ -38795,7 +38802,7 @@ ACC AC一体柜专题
 <div class="sec-title" style="margin-bottom:0" data-i18n="mg_energy_title">能源管理 Agent</div>
 <div style="font-size:11px;color:var(--text2)" data-i18n="mg_energy_desc">调试期 · 运营期 · 验收期 — 三期共用一入口，交付闭环</div>
 </div>
-<div style="margin-bottom:12px"><img src="ems_module_design_overview.svg" style="width:100%;max-width:900px;border-radius:8px;border:1px solid var(--border)" onerror="this.style.display='none'"></div>
+<div style="margin-bottom:12px"><img src="/assets/ems_module_design_overview-C-80ZA8D.svg" style="width:100%;max-width:900px;border-radius:8px;border:1px solid var(--border)" onerror="this.style.display='none'"></div>
 <div class="sw-tabs" id="energyTabs" style="margin-bottom:16px;flex-wrap:wrap">
 <div class="sw-tab active" onclick="mgShowEnergy('startup')">系统启动</div>
 <div class="sw-tab" onclick="mgShowEnergy('monitor')">实时监控</div>
@@ -38878,7 +38885,7 @@ ACC AC一体柜专题
 <div class="sub-tab" onclick="mgTradingShowTab('monitor')">📊 实时监控</div>
 <div class="sub-tab" onclick="mgTradingShowTab('revenue')">💰 收益分析</div>
 </nav>
-<div id="mgTradeTab-logic"><div class="mg-card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:var(--text1)">储能站电力交易与能量管理控制架构</div><button class="btn" onclick="mgDownloadTradingSVG()" style="font-size:10px;padding:4px 10px;background:#1a2a3a;color:#4a90d9;border:1px solid #4a90d944;border-radius:4px;cursor:pointer">📥 下载图片</button></div><div style="font-size:11px;color:var(--text2);margin-bottom:12px">市场信号→PPC报价→EMS决策→PCS执行→BMS反馈→电网交互—闭环</div><img src="images/储能电站电力交易与能量管理完整控制链路与通信架构.png" alt="储能站电力交易与能量管理控制架构" style="width:100%;height:auto;border-radius:8px;display:block"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="mg-card"><h3>📋 交易时序</h3><div id="mgTradingTimeline"></div></div><div class="mg-card"><h3>⚙️ 控制参数</h3><div id="mgTradingParams"></div></div></div></div>
+<div id="mgTradeTab-logic"><div class="mg-card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:var(--text1)">储能站电力交易与能量管理控制架构</div><button class="btn" onclick="mgDownloadTradingSVG()" style="font-size:10px;padding:4px 10px;background:#1a2a3a;color:#4a90d9;border:1px solid #4a90d944;border-radius:4px;cursor:pointer">📥 下载图片</button></div><div style="font-size:11px;color:var(--text2);margin-bottom:12px">市场信号→PPC报价→EMS决策→PCS执行→BMS反馈→电网交互—闭环</div><img src="/assets/%E5%82%A8%E8%83%BD%E7%94%B5%E7%AB%99%E7%94%B5%E5%8A%9B%E4%BA%A4%E6%98%93%E4%B8%8E%E8%83%BD%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%8C%E6%95%B4%E6%8E%A7%E5%88%B6%E9%93%BE%E8%B7%AF%E4%B8%8E%E9%80%9A%E4%BF%A1%E6%9E%B6%E6%9E%84-VdQqSee2.png" alt="储能站电力交易与能量管理控制架构" style="width:100%;height:auto;border-radius:8px;display:block"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="mg-card"><h3>📋 交易时序</h3><div id="mgTradingTimeline"></div></div><div class="mg-card"><h3>⚙️ 控制参数</h3><div id="mgTradingParams"></div></div></div></div>
 <div id="mgTradeTab-discharge" style="display:none"><div class="mg-card" style="margin-bottom:16px"><div style="font-size:14px;font-weight:700;color:var(--text1);margin-bottom:8px">储能放电启动—7步可视化</div><div id="mgDischargeSteps"></div></div><div class="mg-card"><div style="font-size:14px;font-weight:700;color:var(--text1);margin-bottom:8px">放电过程监控</div><div id="mgDischargeMonitor" style="background:#0a0c0f;border-radius:6px;padding:12px;font-family:Consolas,monospace;font-size:11px;color:#a5d6ff;height:300px;overflow-y:auto"></div><div style="margin-top:8px;display:flex;gap:8px"><button class="btn btn-primary" onclick="mgStartDischarge()">▶ 启动放电</button><button class="btn" onclick="mgStopDischarge()">⏹ 停止</button><button class="btn" onclick="mgClearDischargeLog()">清空</button></div></div></div>
 <div id="mgTradeTab-code" style="display:none">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
