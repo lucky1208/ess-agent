@@ -37072,9 +37072,10 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
     return s.y1 + t * (s.y2 - s.y1);
   }
   // AABB 检查: 线段 s 是否穿过 node box (除自身端点 node)
-  function segmentCrossesNodeBox(s, excludeNodeId) {
+  function segmentCrossesNodeBox(s, excludeNodeIds) {
+    const excludeSet = new Set(Array.isArray(excludeNodeIds) ? excludeNodeIds : (excludeNodeIds ? [excludeNodeIds] : []));
     for (const b of nodeBoxes) {
-      if (excludeNodeId && (b.id === excludeNodeId)) continue;
+      if (excludeSet.has(b.id)) continue;
       // 端点 node 不算穿过 (端点本来就要连)
       // 判断线段 (x1,y1)-(x2,y2) 与矩形 (x1,y1,x2,y2) 是否相交
       // 用 Liang-Barsky 简化: 检测线段两端点是否在矩形内 + 矩形 4 边是否穿过线段
@@ -37166,31 +37167,45 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
       ];
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else if (spanSlots === 0) {
-      // Same-layer connection (e.g. QF→XF, GRID→XF): route vertical segment to the right of both nodes
-      // Check if horizontal segment from pa.x to rightX crosses any intermediate node
-      let rightX = Math.max(pa.x, pb.x) + 40;
-      rightX = safeClimbX(rightX, pb.y, pa.y, conn.from, conn.to);
-      // Also check horizontal crossing: does the h-segment from pa.x to rightX pass through any box?
-      const hSeg = { x1: Math.min(pa.x, rightX), y1: pa.y, x2: Math.max(pa.x, rightX), y2: pa.y };
-      const hConflict = segmentCrossesNodeBox(hSeg, null);
-      if (hConflict) {
-        // Route below all nodes instead
-        const allY2 = Object.values(positions).map(p => p.y + p.h);
-        const belowY = Math.max(...allY2) + 40;
-        rightX = safeClimbX(rightX, pb.y, belowY, conn.from, conn.to);
-        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${pa.x.toFixed(1)} ${belowY.toFixed(1)} L ${rightX.toFixed(1)} ${belowY.toFixed(1)} L ${rightX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      // Same-layer connection (e.g. QF→XF, GRID→XF).
+      // Strategy: place vertical segment between src and dst (if possible), or below all nodes.
+      const halfW = NODE_WIDTH / 2;
+      const gap = 40;
+      // Try placing vertical at midpoint between the two ports
+      let midX = (pa.x + pb.x) / 2;
+      // Check vertical segment from midX doesn't cross any box (excluding src/dst)
+      const vSeg = { x1: midX, y1: Math.min(pa.y, pb.y), x2: midX, y2: Math.max(pa.y, pb.y) };
+      const vConflict = segmentCrossesNodeBox(vSeg, [conn.from, conn.to]);
+      if (vConflict) {
+        // Shift midX right of the conflicting node
+        midX = vConflict.x2 + gap;
+      }
+      // Check if horizontal from pa.x to midX crosses any box (excluding src/dst)
+      const hSegA = { x1: Math.min(pa.x, midX), y1: pa.y, x2: Math.max(pa.x, midX), y2: pa.y };
+      const hConflictA = segmentCrossesNodeBox(hSegA, [conn.from, conn.to]);
+      // Check if horizontal from midX to pb.x crosses any box (excluding src/dst)
+      const hSegB = { x1: Math.min(midX, pb.x), y1: pb.y, x2: Math.max(midX, pb.x), y2: pb.y };
+      const hConflictB = segmentCrossesNodeBox(hSegB, [conn.from, conn.to]);
+      if (!hConflictA && !hConflictB) {
+        // Midpoint routing works
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
         segs = [
-          { x1: pa.x, y1: pa.y, x2: pa.x, y2: belowY },
-          { x1: pa.x, y1: belowY, x2: rightX, y2: belowY },
-          { x1: rightX, y1: belowY, x2: rightX, y2: pb.y },
-          { x1: rightX, y1: pb.y, x2: pb.x, y2: pb.y }
+          { x1: pa.x, y1: pa.y, x2: midX, y2: pa.y },
+          { x1: midX, y1: pa.y, x2: midX, y2: pb.y },
+          { x1: midX, y1: pb.y, x2: pb.x, y2: pb.y }
         ];
       } else {
-        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${rightX.toFixed(1)} ${pa.y.toFixed(1)} L ${rightX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+        // Route below all nodes
+        const allY2 = Object.values(positions).map(p => p.y + p.h);
+        const belowY = Math.max(...allY2) + 40;
+        let belowX = Math.max(pa.x, pb.x) + 40;
+        belowX = safeClimbX(belowX, pb.y, belowY, conn.from, conn.to);
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${pa.x.toFixed(1)} ${belowY.toFixed(1)} L ${belowX.toFixed(1)} ${belowY.toFixed(1)} L ${belowX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
         segs = [
-          { x1: pa.x, y1: pa.y, x2: rightX, y2: pa.y },
-          { x1: rightX, y1: pa.y, x2: rightX, y2: pb.y },
-          { x1: rightX, y1: pb.y, x2: pb.x, y2: pb.y }
+          { x1: pa.x, y1: pa.y, x2: pa.x, y2: belowY },
+          { x1: pa.x, y1: belowY, x2: belowX, y2: belowY },
+          { x1: belowX, y1: belowY, x2: belowX, y2: pb.y },
+          { x1: belowX, y1: pb.y, x2: pb.x, y2: pb.y }
         ];
       }
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
