@@ -1,38 +1,14 @@
-// api/render_svg.js
-// ESS Agent — L5 SVG Renderer (Node.js port of AI auto-schematic render_svg.py)
-// =========================================================================
-// Endpoint: POST /api/render-svg
-// Body:     { uem: <UEM JSON>, type: "sld" }
-// Returns:  { ok, svg, size_kb, layers, components, symbols_loaded, latency_ms }
-//
-// Design:
-//   1. Inline a minimal UEM compiler (no cross-file imports -> fast cold start)
-//   2. Lazy-load IEC 60617 SVG symbols from the source repo (NEVER copy the
-//      1.5MB / 373-file library into ess-platform; resolve via env var or
-//      sibling-directory walk).
-//   3. 7-layer vertical Sugiyama-style SLD layout:
-//        PV(100) → BAT(200) → DC_BUS(300) → PCS(400) → AC_BUS(500) → XF(600) → GRID(700)
-//      The numeric tag is the LAYER slot (higher = top in SVG y-axis = source side).
-//   4. Each node is rendered as:
-//        <svg viewBox=...>   <- inner IEC symbol (PNG base64 inline)
-//        <rect>              <- node bounding box
-//        <text>              <- ref code (top, bold)
-//        <text>              <- model / label (bottom)
-//   5. Connections: simple vertical lines between adjacent layers (or polyline
-//      when src/dst are not vertically aligned).
-//
-// IEC_SYMBOLS_DIR resolution (in order):
-//   a) process.env.IEC_SYMBOLS_DIR
-//   b) <repo-root>/iec_symbols_svg
-//   c) walk up from __dirname looking for AI auto-schematic/iec_symbols_svg
-// =========================================================================
+// client-render-svg.js
+// Plan B: 客户端 SLD renderer,前端 inline 版本,绕开 Vercel 函数 hang
+// 由 tools/build_client_renderer.js 从 api/render_svg.js 自动生成
+// ==========================================================================
+(function(){
+"use strict";
+// Note: IEC_INDEX, INLINE_FILES, IEC_CACHE are initialized at the bottom of
+// this IIFE (after IEC_SYMBOLS_INDEX + IEC_SYMBOLS_FILES are declared as const).
+var IEC_DIR = null;
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { compileUem, voltageToLevelV, safeNum, CELL_VOLTAGE, CELL_CAPACITY_AH, DC_BUS_VOLTAGE, PCS_UNIT_KW } from './compile_uem.js';
-
-const __filename = fileURLToPath(import.meta.url);
+// ===== extracted lines 36..119 =====
 const __dirname = path.dirname(__filename);
 
 // ====================== CONFIG ======================
@@ -117,6 +93,8 @@ const CATEGORY_TO_IEC = [
   ['ct',             ['iec_0273']],                                  // Current transformer (form 1)
   ['pt',             ['iec_0301']],                                  // Voltage transformer (form 1)
   ['fuse',           ['iec_0105']],                                  // Fuse, general symbol
+
+// ===== extracted lines 120..36631 =====
   ['disconnector',   ['iec_0083']],                                  // Disconnector / isolator
   ['surge_arrester', ['iec_0115']],                                  // Surge diverter / lightning arrester
   ['bms',            ['iec_0050']],                                  // reuse converter as proxy
@@ -36629,99 +36607,8 @@ const IEC_SYMBOLS_FILES = Object.freeze({
 <path d="M0,0 L3,0 L3,5 L0,5 Z " fill="#000000" transform="translate(176,184)"/>
 <path d="M0,0 L2,0 L2,2 L0,2 Z " fill="#000000" transform="translate(17,189)"/>
 <path d="M0,0 L2,0 L2,2 L0,2 Z " fill="#000000" transform="translate(57,189)"/>
-<path d="M0,0 L2,0 L2,2 L0,2 Z " fill="#000000" transform="translate(97,189)"/>
-<path d="M0,0 L3,0 L3,2 L0,2 Z " fill="#000000" transform="translate(136,189)"/>
-<path d="M0,0 L3,0 L3,74 L0,74 Z " fill="#000000" transform="translate(179,189)"/>
-<path d="M0,0 L3,0 L3,2 L0,2 Z " fill="#000000" transform="translate(216,189)"/>
-<path d="M0,0 L2,0 L2,3 L0,3 Z " fill="#000000" transform="translate(17,226)"/>
-<path d="M0,0 L2,0 L2,3 L0,3 Z " fill="#000000" transform="translate(57,226)"/>
-<path d="M0,0 L2,0 L2,3 L0,3 Z " fill="#000000" transform="translate(97,226)"/>
-<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(136,226)"/>
-<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(216,226)"/>
-<path d="M0,0 L2,0 L2,2 L0,2 Z " fill="#000000" transform="translate(17,261)"/>
-<path d="M0,0 L2,0 L2,2 L0,2 Z " fill="#000000" transform="translate(57,261)"/>
-<path d="M0,0 L2,0 L2,2 L0,2 Z " fill="#000000" transform="translate(97,261)"/>
-<path d="M0,0 L3,0 L3,2 L0,2 Z " fill="#000000" transform="translate(136,261)"/>
-<path d="M0,0 L3,0 L3,2 L0,2 Z " fill="#000000" transform="translate(216,261)"/>
-`,
-});
-// ============ END INLINE IEC SYMBOL DATA ============
-let IEC_INDEX = null;        // populated from inline const below
-let IEC_DIR = null;          // not used in production; left null intentionally
-let IEC_CACHE = new Map();   // id -> { viewBox, innerSvg, w, h, name }
-let INDEX_LOAD_ATTEMPTED = false;
-// eslint-disable-next-line no-unused-vars
-const INLINE_FILES = IEC_SYMBOLS_FILES;  // direct const from inline block
-IEC_INDEX = { symbols: IEC_SYMBOLS_INDEX };
-INDEX_LOAD_ATTEMPTED = true;
-if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
-  console.log('[render_svg.js] using INLINE IEC library: ' + Object.keys(IEC_SYMBOLS_FILES || {}).length + ' files');
-}
 
-function resolveIecDir() {
-  // (a) env override (works on Vercel via project env var)
-  if (process.env.IEC_SYMBOLS_DIR && fs.existsSync(process.env.IEC_SYMBOLS_DIR)) {
-    return process.env.IEC_SYMBOLS_DIR;
-  }
-  const candidates = [];
-  // (b) Vercel-safe: bundle with the function. api/_iec_symbols_svg/ is
-  //     automatically included in the function bundle (Vercel packs the whole
-  //     api/ directory tree). This is the most reliable path on Vercel —
-  //     vercel.json `includeFiles` is finicky across versions.
-  candidates.push(path.join(__dirname, '_iec_symbols_svg'));
-  candidates.push(path.join(__dirname, '..', '_iec_symbols_svg'));
-  // (c) Vercel production layout: cwd=/var/task, dist/ is the deployed bundle.
-  //     iec_symbols_svg/ is shipped inside dist/ (see scripts/sync-iec-to-dist.ps1).
-  candidates.push(path.join(process.cwd(), 'iec_symbols_svg'));
-  candidates.push(path.join(process.cwd(), 'dist', 'iec_symbols_svg'));
-  // (d) Local dev / sibling repos: walk up to 6 levels looking for iec_symbols_svg
-  //     (ess-platform layout: api/render_svg.js -> ess-platform/, then up to project root)
-  let dir = __dirname;
-  for (let i = 0; i < 6; i++) {
-    dir = path.dirname(dir);
-    candidates.push(path.join(dir, 'iec_symbols_svg'));
-    candidates.push(path.join(dir, 'AI auto-schematic', 'iec_symbols_svg'));
-    candidates.push(path.join(dir, 'AI-auto-schematic', 'iec_symbols_svg'));
-  }
-  // Log resolution for debugging on Vercel (visible in function logs)
-  const found = candidates.find(c => fs.existsSync(path.join(c, 'iec_0013_T-Connection_(form_1).svg')));
-  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
-    console.log('[resolveIecDir] cwd=' + process.cwd() + ' __dirname=' + __dirname);
-    console.log('[resolveIecDir] tried ' + candidates.length + ' paths, found=' + (found || 'NONE'));
-  }
-  if (found) return found;
-  // (e) Fallback: just return the first plausible path so error message is helpful
-  return candidates[0];
-}
-
-function loadIecIndex() {
-  if (INDEX_LOAD_ATTEMPTED) return IEC_INDEX;
-  INDEX_LOAD_ATTEMPTED = true;
-  if (!IEC_DIR) IEC_DIR = resolveIecDir();
-  // Try docs/iec_symbols_index.json first (the canonical curated index),
-  // then fall back to iec_symbols_svg/iec_symbols_index.json.
-  const idxCandidates = [
-    path.join(IEC_DIR, '..', 'docs', 'iec_symbols_index.json'),
-    path.join(IEC_DIR, '..', '..', 'docs', 'iec_symbols_index.json'),
-    path.join(IEC_DIR, 'iec_symbols_index.json'),
-  ];
-  for (const p of idxCandidates) {
-    if (fs.existsSync(p)) {
-      try {
-        const raw = fs.readFileSync(p, 'utf8');
-        IEC_INDEX = JSON.parse(raw);
-        return IEC_INDEX;
-      } catch (e) {
-        // keep trying
-      }
-    }
-  }
-  // Last resort: scan directory and build a minimal index from filenames.
-  if (fs.existsSync(IEC_DIR)) {
-    try {
-      const files = fs.readdirSync(IEC_DIR).filter(f => f.endsWith('.svg'));
-      IEC_INDEX = {
-        symbols: files.map(f => {
+// ===== extracted lines 36725..37380 =====
           const base = f.replace(/^iec_(\d+)_(.+)\.svg$/, '$1_$2');
           const m = f.match(/^iec_(\d+)_(.+)\.svg$/);
           const id = m ? `iec_${m[1]}` : f;
@@ -37378,7 +37265,8 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     return res.status(200).end();
   }
-  if (req.method !== 'POST') {
+
+// ===== extracted lines 37382..37443 =====
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -37441,53 +37329,87 @@ export default async function handler(req, res) {
     else { svg = renderSldSvg(uem, layers, positions, totalW, totalH); drawingTitle = 'SLD 单线图'; }
     const sizeKb = Math.round(svg.length / 102.4) / 10;
 
-    const latency = Date.now() - t0;
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    return res.status(200).json({
+
+
+// ====================== LATE INIT (must come after const declarations) ======================
+var IEC_INDEX = { symbols: IEC_SYMBOLS_INDEX };
+var IEC_CACHE = new Map();
+var INLINE_FILES = IEC_SYMBOLS_FILES;
+
+// ====================== CLIENT EXPORT ======================
+// uem: UEM JSON object
+// type: 'sld' | 'e01' | 'e02' | 'e03'
+// returns: { ok, svg, size_kb, components, connections, latency_ms, error? }
+window.EssAgentRenderSld = function(uem, type) {
+  type = type || 'sld';
+  var t0 = Date.now();
+  try {
+    if (!uem || typeof uem !== 'object') {
+      return { ok: false, error: 'invalid UEM body' };
+    }
+    if (!uem.project || !uem.electrical) {
+      return { ok: false, error: 'UEM missing project/electrical section' };
+    }
+    // Patch: 'industrial' reuses 'ess' compileEss logic (not in source compileUem switch)
+    var ptype = (uem.project && uem.project.type) || 'ess';
+    var compiled;
+    if (ptype === 'industrial' || ptype === 'ess') {
+      compiled = compileEss(uem);
+    } else {
+      compiled = compileUem(uem);
+    }
+    if (!compiled.components.length) {
+      return { ok: false, error: 'compileUem returned no components' };
+    }
+    var components = compiled.components;
+    var connections = compiled.connections || [];
+    if (type === 'e01') {
+      var keep = { GRID:1, MV_SWGR:1, MV_PT:1, TR:1 };
+      components = components.filter(function(c){ return !!keep[c.id]; });
+      connections = connections.filter(function(c){ return !!keep[c.from] && !!keep[c.to]; });
+    } else if (type === 'e02') {
+      var keep2 = { TR:1, LV_SWGR:1, AC_BUS:1, CHG_CTRL:1 };
+      components = components.filter(function(c){ return !!keep2[c.id]; });
+      connections = connections.filter(function(c){ return !!keep2[c.from] && !!keep2[c.to]; });
+    } else if (type === 'e03') {
+      components = components.filter(function(c){ return (c.zone && c.zone.split(',').indexOf('dc') >= 0) || c.id === 'BAT_CAB'; });
+      var dcIds = {};
+      for (var i = 0; i < components.length; i++) dcIds[components[i].id] = 1;
+      connections = connections.filter(function(c){ return !!dcIds[c.from] && !!dcIds[c.to]; });
+    }
+    if (!components.length) {
+      return { ok: false, error: 'no components after type=' + type + ' filter' };
+    }
+    var layers = assignLayers(components);
+    var layout = computeLayout(layers);
+    var svg, drawingTitle;
+    if (type === 'e01')      { svg = renderE01MvOneLine(uem, layers, layout.positions, layout.totalW, layout.totalH); drawingTitle = 'E-01 10kV 一次接线图'; }
+    else if (type === 'e02') { svg = renderE02LvOneLine(uem, layers, layout.positions, layout.totalW, layout.totalH); drawingTitle = 'E-02 低压 AC 配电单线图'; }
+    else if (type === 'e03') { svg = renderE03DcSystem(uem, layers, layout.positions, layout.totalW, layout.totalH); drawingTitle = 'E-03 充电模块-DC 系统图'; }
+    else                     { svg = renderSldSvg(uem, layers, layout.positions, layout.totalW, layout.totalH); drawingTitle = 'SLD 单线图'; }
+    return {
       ok: true,
-      svg,
-      type,
+      svg: svg,
+      type: type,
       drawing_title: drawingTitle,
-      size_kb: sizeKb,
+      size_kb: Math.round(svg.length / 102.4) / 10,
       layers: layers.length,
       components: compiled.components.length,
       connections: (compiled.connections || []).length,
       symbols_loaded: IEC_CACHE.size,
-      inferred: compiled.inferred || { added: 0, rules: [], components: [] },
-      inferred_added: (compiled.inferred && compiled.inferred.added) || 0,
-      inferred_rules: (compiled.inferred && compiled.inferred.rules) || [],
-      total_w: totalW,
-      total_h: totalH,
-      latency_ms: latency,
-      iec_dir: IEC_DIR,
+      total_w: layout.totalW,
+      total_h: layout.totalH,
+      latency_ms: Date.now() - t0,
       iec_index_loaded: !!IEC_INDEX && (IEC_INDEX.symbols || []).length > 0,
-    });
-  } catch (err) {
-    return res.status(500).json({ ok: false, error: String(err && err.message || err), stack: err && err.stack });
+    };
+  } catch (e) {
+    return { ok: false, error: String(e && e.message || e), stack: e && e.stack };
   }
+};
+
+// Debug: log when client renderer loads
+if (typeof console !== 'undefined' && console.log) {
+  console.log('[client-render-svg.js] loaded; IEC_SYMBOLS_FILES count = ' + Object.keys(IEC_SYMBOLS_FILES || {}).length);
 }
 
-// ====================== CLI TEST (for local dev) ======================
-// node api/render_svg.js <uem.json> [out.svg]
-// Use a sentinel env var so the CLI block only runs when explicitly invoked.
-// Vercel functions never set RENDER_SVG_CLI=1, so the block is dead in production.
-if (process.env.RENDER_SVG_CLI === '1') {
-  const uemPath = process.argv[2];
-  const outPath = process.argv[3];
-  if (!uemPath) {
-    console.error('Usage: RENDER_SVG_CLI=1 node api/render_svg.js <uem.json> [out.svg]');
-    process.exit(1);
-  }
-  const uem = JSON.parse(fs.readFileSync(uemPath, 'utf8'));
-  loadIecIndex();
-  const compiled = compileUem(uem);
-  const layers = assignLayers(compiled.components);
-  const { positions, totalW, totalH } = computeLayout(layers);
-  const svg = renderSldSvg(uem, layers, positions, totalW, totalH);
-  if (outPath) fs.writeFileSync(outPath, svg, 'utf8');
-  console.log(`OK: ${outPath || '(stdout)'} (${totalW}x${totalH}, ${layers.length} layers, ${compiled.components.length} components, ${svg.length} chars)`);
-}
-
-// Also export the internals for unit testing.
-export { compileUem, assignLayers, computeLayout, renderSldSvg, loadIecSymbol, findIecIdByCategory };
+})();
