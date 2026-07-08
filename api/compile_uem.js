@@ -155,28 +155,72 @@ function compileMicrogrid(uem) {
       qty: packsParallel,
       params: { total_kwh: Math.round(packsParallel * perPackKwh * 10) / 10 }
     });
-    const pcsCount = Math.ceil(power / PCS_UNIT_KW);
+    const pcsCount = Math.ceil(power / PCS_UNIT_KW) + 1;
     components.push({
       id: 'PCS', category: 'pcs', ref: 'PCS',
       model: `PCS-${PCS_UNIT_KW}kW`,
       qty: pcsCount,
-      params: { unit_kw: PCS_UNIT_KW, total_kw: pcsCount * PCS_UNIT_KW }
+      params: { unit_kw: PCS_UNIT_KW, total_kw: pcsCount * PCS_UNIT_KW, redundancy: 'N+1' }
     });
   }
+
+  // DC Bus (if battery present)
+  if (cap > 0) {
+    components.push({ id: 'DC_BUS', category: 'dc_bus', ref: 'DC+', model: `DC-${DC_BUS_VOLTAGE}V-${Math.floor(power)}kW`, qty: 1, params: { voltage_v: DC_BUS_VOLTAGE, type: 'dc' } });
+  }
+
+  const voltage = elec.voltage_level || '380V';
+  const lvSideV = 380;
   components.push({
     id: 'AC_BUS', category: 'bus', ref: 'AC',
-    model: `AC-${elec.voltage_level || '380V'}-${Math.floor(power + pvKw + dieselKw + windKw)}kW`,
+    model: `AC-${lvSideV}V-${Math.floor(power + pvKw + dieselKw + windKw)}kW`,
     qty: 1,
-    params: { voltage_v: voltageToLevelV(elec.voltage_level || '380V') }
+    params: { voltage_v: lvSideV }
   });
+
+  // Transformer for kV-level projects
+  if (String(voltage).toUpperCase().includes('KV') && voltage !== '380V') {
+    const xfKva = nextStandard(power * 1.1);
+    components.push({
+      id: 'XF', category: 'transformer', ref: 'T1',
+      model: `${xfKva}kVA-${lvSideV}V/${voltage}`,
+      qty: 1,
+      params: { rating_kva: xfKva, lv_voltage_v: lvSideV, hv_voltage_v: voltageToLevelV(voltage) }
+    });
+  }
+
+  // Protection
+  components.push({
+    id: 'QF', category: 'protection', ref: 'QF1',
+    model: `ACB-${Math.round(power * 1000 / (lvSideV * Math.sqrt(3) * 0.85) * 1.25)}A`,
+    qty: 1,
+    params: { type: 'ACB' }
+  });
+
+  // Grid connection
+  components.push({
+    id: 'GRID', category: 'source', ref: 'GRID',
+    model: voltage, qty: 1,
+    params: { voltage_level: voltage }
+  });
+
   if (loadKw > 0) components.push({ id: 'LOAD', category: 'load', ref: 'LOAD', model: `Load-${Math.floor(loadKw)}kW`, qty: 1, params: { load_kw: loadKw } });
 
+  // Connections
   for (const src of ['PV', 'WT', 'GEN']) {
     if (components.find(c => c.id === src)) connections.push({ from: src, to: 'AC_BUS' });
   }
   if (components.find(c => c.id === 'PCS')) {
-    connections.push({ from: 'BAT', to: 'PCS' });
+    if (components.find(c => c.id === 'DC_BUS')) connections.push({ from: 'BAT', to: 'DC_BUS' });
+    connections.push({ from: components.find(c => c.id === 'DC_BUS') ? 'DC_BUS' : 'BAT', to: 'PCS' });
     connections.push({ from: 'PCS', to: 'AC_BUS' });
+  }
+  connections.push({ from: 'AC_BUS', to: 'QF' });
+  if (components.find(c => c.id === 'XF')) {
+    connections.push({ from: 'QF', to: 'XF' });
+    connections.push({ from: 'GRID', to: 'XF' });
+  } else {
+    connections.push({ from: 'GRID', to: 'QF' });
   }
   if (components.find(c => c.id === 'LOAD')) connections.push({ from: 'AC_BUS', to: 'LOAD' });
   return { components, connections };
@@ -408,15 +452,6 @@ function compileUem(uem) {
 }
 
 // ====================== Exports ======================
-const _exports = {
-  compileUem, compileEss, compileMicrogrid, compileAidc, compileBatterySwap,
-  inferTopology, voltageToLevelV, safeNum, nextStandard,
-  CELL_VOLTAGE, CELL_CAPACITY_AH, DC_BUS_VOLTAGE, PCS_UNIT_KW, REDUNDANCY_PCS,
-};
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = _exports;
-}
-export default _exports;
 export {
   compileUem, compileEss, compileMicrogrid, compileAidc, compileBatterySwap,
   inferTopology, voltageToLevelV, safeNum, nextStandard,
