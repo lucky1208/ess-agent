@@ -37047,6 +37047,51 @@ function renderSldSvg(uem, layers, positions, totalW, totalH) {
   const meta = `UEM v${uem.schema_version || '1.0'} | ${elec.capacity_kwh || '-'} kWh | ${elec.power_kw || '-'} kW | ${elec.voltage_level || '-'}`;
   out.push(`<text x="${PAGE_PADDING_X}" y="44" text-anchor="start" font-family="Arial, sans-serif" font-size="9" fill="#666">${escapeXml(meta)}</text>`);
 
+  // ====================== ZONE BACKGROUNDS ======================
+  const ZONE_DEFS = [
+    { name: '电源侧', nameEn: 'Source', categories: ['source','grid','pv','wind','diesel'], color: '#fff8e1', border: '#f9a825', dash: '6,3' },
+    { name: '电池侧', nameEn: 'Battery', categories: ['battery','battery_rack'], color: '#e8f5e9', border: '#43a047', dash: '6,3' },
+    { name: 'DC母线', nameEn: 'DC Bus', categories: ['dc_bus','bus_dc'], color: '#e3f2fd', border: '#1565c0', dash: '6,3' },
+    { name: '变流器', nameEn: 'PCS', categories: ['pcs','ups','controller','inverter'], color: '#f3e5f5', border: '#7b1fa2', dash: '6,3' },
+    { name: 'AC母线', nameEn: 'AC Bus', categories: ['ac_bus','bus_ac','bus'], color: '#e0f7fa', border: '#00838f', dash: '6,3' },
+    { name: '变压/保护/负荷', nameEn: 'T&L', categories: ['transformer','protection','switching','load'], color: '#fbe9e7', border: '#d84315', dash: '6,3' },
+  ];
+  const zoneBoxes = {};
+  for (const z of ZONE_DEFS) { zoneBoxes[z.nameEn] = { x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity, nodes: [], def: z }; }
+  for (const layer of layers) {
+    for (const c of layer) {
+      const p = positions[c.id];
+      if (!p) continue;
+      const cat = (c.category || '').toLowerCase();
+      let matched = null;
+      for (const z of ZONE_DEFS) {
+        if (z.categories.includes(cat)) { matched = z; break; }
+      }
+      if (!matched) {
+        const idLower = (c.id || '').toLowerCase();
+        if (idLower.startsWith('grid') || idLower.startsWith('pv') || idLower.startsWith('wt')) matched = ZONE_DEFS[0];
+        else if (idLower.startsWith('bat')) matched = ZONE_DEFS[1];
+        else if (idLower.startsWith('dc')) matched = ZONE_DEFS[2];
+        else if (idLower.startsWith('pcs')) matched = ZONE_DEFS[3];
+        else if (idLower.startsWith('ac')) matched = ZONE_DEFS[4];
+        else matched = ZONE_DEFS[5];
+      }
+      const zb = zoneBoxes[matched.nameEn];
+      zb.x1 = Math.min(zb.x1, p.x - 12);
+      zb.y1 = Math.min(zb.y1, p.y - 20);
+      zb.x2 = Math.max(zb.x2, p.x + p.w + 12);
+      zb.y2 = Math.max(zb.y2, p.y + p.h + 20);
+      zb.nodes.push(c.id);
+    }
+  }
+  for (const key in zoneBoxes) {
+    const zb = zoneBoxes[key];
+    if (zb.nodes.length === 0) continue;
+    const d = zb.def;
+    out.push(`<rect x="${zb.x1.toFixed(1)}" y="${zb.y1.toFixed(1)}" width="${(zb.x2 - zb.x1).toFixed(1)}" height="${(zb.y2 - zb.y1).toFixed(1)}" fill="${d.color}" stroke="${d.border}" stroke-width="1.2" stroke-dasharray="${d.dash}" rx="8"/>`);
+    out.push(`<text x="${(zb.x1 + 8).toFixed(1)}" y="${(zb.y1 + 14).toFixed(1)}" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="${d.border}">${escapeXml(d.name)}</text>`);
+  }
+
   // Draw nodes
   for (const layer of layers) {
     for (const c of layer) {
