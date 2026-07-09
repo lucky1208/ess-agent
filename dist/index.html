@@ -38333,6 +38333,7 @@ select.form-input{appearance:auto}
 <div class="sub-tab" onclick="showChargingPage('ch-software')" data-i18n="ch_software">软件平台</div>
 <div class="sub-tab" onclick="showChargingPage('ch-proto')" data-i18n="ch_proto">通信协议</div>
 <div class="sub-tab" onclick="showChargingPage('ch-cooling')" data-i18n="ch_cooling">超充液冷</div>
+<div class="sub-tab" onclick="showChargingPage('ch-flash')" data-i18n="ch_flash">⭐ 闪充系统</div>
 <div class="sub-tab" onclick="showChargingPage('ch-evcc')" data-i18n="ch_evcc">EVCC/SECC</div>
 <div class="sub-tab" onclick="showChargingPage('ch-bom')" data-i18n="ch_bom">BOM清单</div>
 <div class="sub-tab" onclick="showChargingPage('ch-platform')" data-i18n="ch_platform">平台互联互通</div>
@@ -40886,6 +40887,521 @@ if __name__ == "__main__":
 <div id="chLcDashboard"></div>
 </div>
 
+<div id="page-ch-flash" class="charging-content" style="display:none;padding:24px 32px">
+<div style="background:linear-gradient(135deg,#0a1628 0%,#0d2137 50%,#0a1628 100%);border-radius:12px;padding:32px;margin-bottom:24px;border:1px solid #1e3a5f">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+<div style="width:48px;height:48px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px">⚡</div>
+<div>
+<h2 style="margin:0;color:#f8fafc;font-size:22px">Flash Charging System · 闪充系统</h2>
+<p style="margin:4px 0 0;color:#94a3b8;font-size:13px">从10kV电网到车辆电池的完整MW级闪充系统研发平台 · 覆盖配电/高压/液冷/BMS/EMS/功率调度全链路</p>
+</div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<span style="padding:4px 12px;background:#f59e0b22;color:#f59e0b;border-radius:20px;font-size:11px;font-weight:600">1MW+ 功率等级</span>
+<span style="padding:4px 12px;background:#ef444422;color:#ef4444;border-radius:20px;font-size:11px;font-weight:600">SiC 主功率拓扑</span>
+<span style="padding:4px 12px;background:#3b82f622;color:#3b82f6;border-radius:20px;font-size:11px;font-weight:600">液冷母排 + 液冷枪</span>
+<span style="padding:4px 12px;background:#10b98122;color:#10b981;border-radius:20px;font-size:11px;font-weight:600">ISO 15118 / OCPP 2.0.1</span>
+<span style="padding:4px 12px;background:#8b5cf622;color:#8b5cf6;border-radius:20px;font-size:11px;font-weight:600">储能联动 EMS</span>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px">
+<div onclick="showFlashSubTab('overview')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">🏠</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">系统概览</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">Architecture Overview</div>
+</div>
+<div onclick="showFlashSubTab('arch')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">📐</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">系统框图</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">System Architecture</div>
+</div>
+<div onclick="showFlashSubTab('power')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">🔌</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">主功率拓扑</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">Main Power Topology</div>
+</div>
+<div onclick="showFlashSubTab('cooling')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">❄️</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">液冷系统</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">Liquid Cooling</div>
+</div>
+<div onclick="showFlashSubTab('hv')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">⚡</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">高压配电</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">HV Distribution</div>
+</div>
+<div onclick="showFlashSubTab('dispatch')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">📊</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">功率调度</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">Power Dispatch</div>
+</div>
+<div onclick="showFlashSubTab('bms')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">🔋</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">BMS与协议</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">BMS & Protocols</div>
+</div>
+<div onclick="showFlashSubTab('battery')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">📦</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">电池侧</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">Battery Side</div>
+</div>
+<div onclick="showFlashSubTab('thermal')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">🌡️</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">热管理</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">Thermal Management</div>
+</div>
+<div onclick="showFlashSubTab('reviewer')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">🔍</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">AI Reviewer</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">智能审查</div>
+</div>
+<div onclick="showFlashSubTab('bom')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="font-size:22px;margin-bottom:8px">📋</div>
+<div style="font-size:13px;font-weight:700;color:var(--text1)">BOM清单</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">Bill of Materials</div>
+</div>
+</div>
+
+<div id="flashSubTab-overview" style="display:block">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+<div class="mg-card">
+<h3 style="margin:0 0 12px;color:var(--text1);font-size:15px">⚡ 系统能量流</h3>
+<div style="font-family:monospace;font-size:12px;line-height:2;color:var(--text1);background:var(--bg3);padding:16px;border-radius:8px">
+<div style="text-align:center;color:#f59e0b;font-weight:700;margin-bottom:8px">10kV 电网接入</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:var(--text1)">配电变压器 10kV/400V</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:var(--text1)">AC400V 母线</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:#3b82f6;font-weight:700">PFC 整流 (多模块并联)</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:#ef4444;font-weight:700">1000V DC Bus</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:var(--text1)">SiC DC/DC 模块</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:#8b5cf6;font-weight:700">功率动态分配</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:#3b82f6">液冷母排系统</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:#10b981;font-weight:700">液冷充电枪 1000A</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:var(--text1)">车端高压接口</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:var(--text1)">BMS 控制</div>
+<div style="text-align:center;color:#64748b">│</div>
+<div style="text-align:center;color:#06b6d4">电池液冷热管理</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 12px;color:var(--text1);font-size:15px">🗺️ 全栈覆盖范围</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #f59e0b">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">配电系统</div>
+<div style="font-size:11px;color:var(--text2)">10kV→400V→DC Bus</div>
+</div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #ef4444">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">主功率拓扑</div>
+<div style="font-size:11px;color:var(--text2)">PFC + SiC DC/DC</div>
+</div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #3b82f6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">液冷系统</div>
+<div style="font-size:11px;color:var(--text2)">母排+枪+热管理</div>
+</div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #8b5cf6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">功率调度</div>
+<div style="font-size:11px;color:var(--text2)">动态分配+削峰填谷</div>
+</div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #10b981">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">BMS/协议</div>
+<div style="font-size:11px;color:var(--text2)">ISO15118+OCPP</div>
+</div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #06b6d4">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">储能联动</div>
+<div style="font-size:11px;color:var(--text2)">PCS+SOC调度</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-arch" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">📐 闪充系统架构图</h3>
+<span style="font-size:11px;color:var(--text2)">GPT5.5 参考架构 · 从电网到车辆的完整功率路径</span>
+</div>
+<img src="闪充 系统架构图.png" alt="闪充系统架构图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: 闪充 系统架构图.png</div>'">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">能量流 Energy Flow</h3>
+<div style="font-size:11px;color:var(--text2);line-height:1.8">电网→变压器→PFC→DC Bus→DC/DC→分配→枪→EV</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;color:var(--text1);font-size:13px">控制流 Control Flow</h3>
+<div style="font-size:11px;color:var(--text2);line-height:1.8">EMS→调度→功率模块→BMS反馈→闭环控制</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">冷却流 Cooling Flow</h3>
+<div style="font-size:11px;color:var(--text2);line-height:1.8">冷却液→泵→冷板→母排→枪→换热器→散热</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-power" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🔌 主功率原理图</h3>
+<span style="font-size:11px;color:var(--text2)">GPT5.5 参考设计 · SiC主功率拓扑 + PFC整流</span>
+</div>
+<img src="闪充主功率原理图.png" alt="闪充主功率原理图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: 闪充主功率原理图.png</div>'">
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">2-Level</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">经典两电平逆变拓扑</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">NPC</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">中点钳位三电平</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">T-Type</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">T型三电平拓扑</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Vienna</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">三相Vienna整流</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Totem Pole PFC</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">图腾柱无桥PFC</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">LLC / CLLC</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">谐振软开关DC/DC</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #f97316">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">DAB</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">双有源桥DC/DC</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #a855f7">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Interleaved</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">交错并联Boost/Buck</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-cooling" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">❄️ 闪充站冷却系统图</h3>
+<span style="font-size:11px;color:var(--text2)">GPT5.5 参考设计 · 全站液冷热管理</span>
+</div>
+<img src="闪充站冷却系统图.png" alt="闪充站冷却系统图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: 闪充站冷却系统图.png</div>'">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">冷却液回路</h3>
+<div style="font-size:11px;color:var(--text2);line-height:2">
+<div>• 冷却液类型: 50%乙二醇水溶液</div>
+<div>• 流量: 20-40 L/min (可调)</div>
+<div>• 进出口温差: ≤5°C</div>
+<div>• 工作压力: 2-4 bar</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">关键部件</h3>
+<div style="font-size:11px;color:var(--text2);line-height:2">
+<div>• 循环泵: 磁力泵/离心泵</div>
+<div>• 换热器: 板式换热器</div>
+<div>• 膨胀罐: 定压补水</div>
+<div>• 过滤器: 25μm精密过滤</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-hv" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">⚡ 高压配电系统</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px">
+<div style="padding:14px;background:var(--bg3);border-radius:8px;text-align:center;border:2px solid #f59e0b">
+<div style="font-size:20px;font-weight:800;color:#f59e0b">10kV</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">电网接入</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;text-align:center;border:2px solid #3b82f6">
+<div style="font-size:20px;font-weight:800;color:#3b82f6">400V</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">交流母线</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;text-align:center;border:2px solid #ef4444">
+<div style="font-size:20px;font-weight:800;color:#ef4444">1000V</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">DC母线</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;text-align:center;border:2px solid #10b981">
+<div style="font-size:20px;font-weight:800;color:#10b981">1500V</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">高压平台</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">配电设备</h3>
+<div style="font-size:11px;color:var(--text2);line-height:2">
+<div>• 高压断路器 (ACB/MCCB)</div>
+<div>• 熔断器 (Fuse)</div>
+<div>• 浪涌保护器 (SPD)</div>
+<div>• 电流互感器 (CT)</div>
+<div>• 电压互感器 (PT)</div>
+<div>• 绝缘监测 (IMD)</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">安全系统</h3>
+<div style="font-size:11px;color:var(--text2);line-height:2">
+<div>• 接地系统 (PE)</div>
+<div>• 漏电保护 (RCD)</div>
+<div>• 温度监测</div>
+<div>• 电弧检测 (AFDD)</div>
+<div>• 联锁保护</div>
+<div>• 应急断电 (E-Stop)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-dispatch" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">📊 功率调度策略</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
+<div style="padding:16px;background:var(--bg3);border-radius:8px;text-align:center">
+<div style="font-size:11px;color:var(--text2);margin-bottom:4px">总功率</div>
+<div style="font-size:28px;font-weight:800;color:#f59e0b">1000kW</div>
+</div>
+<div style="padding:16px;background:var(--bg3);border-radius:8px;text-align:center">
+<div style="font-size:11px;color:var(--text2);margin-bottom:4px">充电枪数</div>
+<div style="font-size:28px;font-weight:800;color:#3b82f6">4 枪</div>
+</div>
+<div style="padding:16px;background:var(--bg3);border-radius:8px;text-align:center">
+<div style="font-size:11px;color:var(--text2);margin-bottom:4px">单枪均分</div>
+<div style="font-size:28px;font-weight:800;color:#10b981">250kW</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 12px;font-size:13px;color:var(--text1)">动态功率分配模式</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="padding:12px;background:var(--bg3);border-radius:6px;border-left:3px solid #10b981">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">均分模式</div>
+<div style="font-size:11px;color:var(--text2)">250 + 250 + 250 + 250 kW</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:6px;border-left:3px solid #f59e0b">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">优先模式</div>
+<div style="font-size:11px;color:var(--text2)">800 + 200 kW (快充优先)</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:6px;border-left:3px solid #3b82f6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">削峰填谷</div>
+<div style="font-size:11px;color:var(--text2)">峰时降功率 / 谷时满充</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:6px;border-left:3px solid #8b5cf6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">储能联动</div>
+<div style="font-size:11px;color:var(--text2)">PCS+SOC联合调度</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-bms" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">🔋 BMS与充电协议</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px">
+<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #f59e0b">
+<div style="font-size:13px;font-weight:700;color:var(--text1)">CCS2</div>
+<div style="font-size:10px;color:var(--text2)">欧标 Combo</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #ef4444">
+<div style="font-size:13px;font-weight:700;color:var(--text1)">GB/T</div>
+<div style="font-size:10px;color:var(--text2)">国标直流</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #3b82f6">
+<div style="font-size:13px;font-weight:700;color:var(--text1)">ChaoJi</div>
+<div style="font-size:10px;color:var(--text2)">下一代超充</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #10b981">
+<div style="font-size:13px;font-weight:700;color:var(--text1)">ISO 15118</div>
+<div style="font-size:10px;color:var(--text2)">PLC通信</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #8b5cf6">
+<div style="font-size:13px;font-weight:700;color:var(--text1)">OCPP 2.0.1</div>
+<div style="font-size:10px;color:var(--text2)">站端协议</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #06b6d4">
+<div style="font-size:13px;font-weight:700;color:var(--text1)">CAN / CANFD</div>
+<div style="font-size:10px;color:var(--text2)">BMS总线</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">BMS功能</h3>
+<div style="font-size:11px;color:var(--text2);line-height:2">
+<div>• SOC/SOH 估算</div>
+<div>• 均衡控制</div>
+<div>• 过压/欠压/过温保护</div>
+<div>• 充电状态机</div>
+<div>• 预充电控制</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">协议栈</h3>
+<div style="font-size:11px;color:var(--text2);line-height:2">
+<div>• PLC (ISO 15118)</div>
+<div>• TCP/IP (OCPP)</div>
+<div>• CAN 2.0B (BMS)</div>
+<div>• Modbus (电表)</div>
+<div>• MQTT (云端)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-battery" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">📦 电池侧架构</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px">
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #f59e0b">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Pack</div>
+<div style="font-size:11px;color:var(--text2)">电池包总成</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #3b82f6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Module</div>
+<div style="font-size:11px;color:var(--text2)">模组单元</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #10b981">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Cell</div>
+<div style="font-size:11px;color:var(--text2)">电芯单体</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #8b5cf6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">HV Junction Box</div>
+<div style="font-size:11px;color:var(--text2)">高压配电盒</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #ef4444">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Fuse + Contactor</div>
+<div style="font-size:11px;color:var(--text2)">熔断器+接触器</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #06b6d4">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Pre-charge</div>
+<div style="font-size:11px;color:var(--text2)">预充电路</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-thermal" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">🌡️ 热管理系统</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Heat Source</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">功率模块、母排、充电枪</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Cooling Loop</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">液冷回路设计</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Pump + Valve</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">循环泵+比例阀</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Radiator + Fan</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">散热器+风机</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Flow Sensor</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">流量+温度传感</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Control Logic</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">PID控制+故障诊断</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-reviewer" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">🔍 AI Reviewer · 智能图纸审查</h3>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">上传EPLAN/KiCad/CAD/PDF图纸，AI自动检查IEC标准合规性</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px">
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #ef4444">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">IEC 60617</div>
+<div style="font-size:11px;color:var(--text2)">图形符号标准</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #f59e0b">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">IEC 61082</div>
+<div style="font-size:11px;color:var(--text2)">电气文件编制</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #3b82f6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">GB 4728</div>
+<div style="font-size:11px;color:var(--text2)">电气简图用图形符号</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #10b981">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">IEC 81346</div>
+<div style="font-size:11px;color:var(--text2)">产品结构与编码</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 12px;font-size:13px;color:var(--text1)">AI自动检查项</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">QF编号错误检测</div>
+<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">PE遗漏检查</div>
+<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">CT方向错误</div>
+<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">SPD位置错误</div>
+<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">绝缘距离不足</div>
+<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">导线编号重复</div>
+<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">线径错误</div>
+<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">接地系统检查</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="flashSubTab-bom" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">📋 闪充系统BOM</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px">
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Electrical BOM</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">SiC MOSFET、Driver、传感器</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Mechanical BOM</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">柜体、母排、结构件</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Cooling BOM</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">泵、阀、换热器、冷却液</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Communication BOM</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">PLC、CAN、OCPP模块</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">HV BOM</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">断路器、熔断器、SPD</div>
+</div>
+<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
+<div style="font-size:12px;font-weight:700;color:var(--text1)">Safety BOM</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">接地、绝缘、联锁</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
 <div id="page-ch-evcc" class="charging-content" style="display:none;padding:24px 32px">
 <div class="sec-title">EVCC/SECC Agent</div>
 <div style="font-size:12px;color:var(--text2);margin-bottom:16px">电动汽车控制器(EVCC)与供电设备控制器(SECC)硬件+软件全栈方案：芯片选型 + 电路板外设接口 + 可运行 Python 程序 + 通信演示</div>
@@ -42205,7 +42721,7 @@ aidc_dw_title:'图纸汇总 Agent',aidc_dw_desc:'所有AIDC图纸集中展示与
 aidc_dw_arch:'AIDC系统架构图',aidc_dw_wiring:'AIDC电气一次接线图',aidc_dw_dual:'AIDC双路供电拓扑图',aidc_dw_liquid:'AIDC液冷管路图',
 ess_layout:'平面布置图',ess_cable:'电缆走向图',ess_principle:'PCS-BESS电气原理图',
 lang_btn_zh:'中文',lang_btn_en:'English',lang_btn_ar:'العربية',
-mg_arch_panorama:'微网(Microgrid) 架构全景图',mg_arch_ac_topo:'一、微网电力拓扑总览（交流微网）',mg_arch_hybrid:'二、交直流混合微网架构（推荐方案）',mg_arch_topo_compare:'三、四种典型微网拓扑对比',mg_arch_mode_switch:'四、微网运行模式切换',mg_arch_protection:'五、电气二次接线图',mg_arch_comm:'六、通信控制网络',mg_arch_params:'七、关键参数速查',mg_arch_logic:'八、微网并离网控制逻辑图',cat_charging:'充电智能体',ch_design:'方案设计',ch_elec:'电气设计',ch_software:'软件平台',ch_proto:'通信协议',ch_cooling:'超充液冷',ch_evcc:'EVCC/SECC',ch_bom:'BOM清单',ch_skill:'核心Skill',ch_design_title:'充电站方案设计 Agent',ch_design_desc:'输入站点类型、车位、目标功率，AI自动生成站级方案、单线图、BOM与投资估算',ch_elec_title:'电气设计 Agent',ch_elec_desc:'基于IEC 60617/61851标准生成工程级原理图，支持欧标/国标移动充电桩、固定式超充堆电气设计',ch_elec_mobile_eu:'欧标移动充电桩原理图',ch_elec_cabinet:'超充堆一次图',
+mg_arch_panorama:'微网(Microgrid) 架构全景图',mg_arch_ac_topo:'一、微网电力拓扑总览（交流微网）',mg_arch_hybrid:'二、交直流混合微网架构（推荐方案）',mg_arch_topo_compare:'三、四种典型微网拓扑对比',mg_arch_mode_switch:'四、微网运行模式切换',mg_arch_protection:'五、电气二次接线图',mg_arch_comm:'六、通信控制网络',mg_arch_params:'七、关键参数速查',mg_arch_logic:'八、微网并离网控制逻辑图',cat_charging:'充电智能体',ch_design:'方案设计',ch_elec:'电气设计',ch_software:'软件平台',ch_proto:'通信协议',ch_cooling:'超充液冷',ch_flash:'闪充系统',ch_evcc:'EVCC/SECC',ch_bom:'BOM清单',ch_skill:'核心Skill',ch_design_title:'充电站方案设计 Agent',ch_design_desc:'输入站点类型、车位、目标功率，AI自动生成站级方案、单线图、BOM与投资估算',ch_elec_title:'电气设计 Agent',ch_elec_desc:'基于IEC 60617/61851标准生成工程级原理图，支持欧标/国标移动充电桩、固定式超充堆电气设计',ch_elec_mobile_eu:'欧标移动充电桩原理图',ch_elec_cabinet:'超充堆一次图',
 mg_ems_arch_title:'eBlock 微网能量管理系统(EMS)架构',mg_ems_overview:'一、总体架构（四层）',mg_ems_protocol:'二、通信协议 & 连接总线',mg_ems_eblock:'三、单台eBlock内部架构',mg_ems_delay:'四、关键通信时延（时序图）',mg_ems_network:'五、网络拓扑',
 mg_schedule_title:'微网调度优化',mg_schedule_obj:'一、优化目标函数',mg_schedule_constraints:'二、约束条件',mg_schedule_layers:'三、调度策略层级',mg_schedule_scenarios:'四、典型调度场景',
 mg_sw_pill_dispatch:'调度',mg_sw_pill_trading:'交易',mg_sw_pill_datacenter:'数据中台',
@@ -42339,7 +42855,7 @@ aidc_dw_title:'Drawing Summary Agent',aidc_dw_desc:'All AIDC drawings centralize
 aidc_dw_arch:'AIDC System Architecture',aidc_dw_wiring:'AIDC Single-line Diagram',aidc_dw_dual:'AIDC Dual-feed Power Topology',aidc_dw_liquid:'AIDC Liquid Cooling Diagram',
 ess_layout:'Floor Plan',ess_cable:'Cable Routing',ess_principle:'PCS-BESS Schematic',
 lang_btn_zh:'Chinese',lang_btn_en:'English',lang_btn_ar:'Arabic',
-mg_arch_panorama:'Microgrid Architecture Overview',mg_arch_ac_topo:'1. Microgrid Power Topology Overview (AC Microgrid)',mg_arch_hybrid:'2. AC/DC Hybrid Microgrid Architecture (Recommended)',mg_arch_topo_compare:'3. Four Typical Microgrid Topology Comparison',mg_arch_mode_switch:'4. Microgrid Operation Mode Switching',mg_arch_protection:'5. Microgrid Electrical Secondary Wiring Diagram',mg_arch_comm:'6. Communication & Control Network',mg_arch_params:'7. Key Parameters Quick Reference',mg_arch_logic:'8. Microgrid Grid-Connected/Islanded Control Logic Diagram',cat_charging:'Charging Solution Agent',ch_design:'Design',ch_elec:'Electrical',ch_software:'Software Platform',ch_proto:'Protocols',ch_cooling:'Liquid-Cooled HPC',ch_evcc:'EVCC/SECC',ch_bom:'BOM',ch_skill:'Core Skills',ch_design_title:'Charging Station Design Agent',ch_design_desc:'Input site type/parking/power targets, AI auto-generates station plan, SLD, BOM & investment',ch_elec_title:'Electrical Design Agent',ch_elec_desc:'Engineering schematics based on IEC 60617/61851. Supports EU-standard mobile charger & fixed HPC cabinet.',ch_elec_mobile_eu:'EU Mobile Charger Schematic',ch_elec_cabinet:'HPC Cabinet SLD',
+mg_arch_panorama:'Microgrid Architecture Overview',mg_arch_ac_topo:'1. Microgrid Power Topology Overview (AC Microgrid)',mg_arch_hybrid:'2. AC/DC Hybrid Microgrid Architecture (Recommended)',mg_arch_topo_compare:'3. Four Typical Microgrid Topology Comparison',mg_arch_mode_switch:'4. Microgrid Operation Mode Switching',mg_arch_protection:'5. Microgrid Electrical Secondary Wiring Diagram',mg_arch_comm:'6. Communication & Control Network',mg_arch_params:'7. Key Parameters Quick Reference',mg_arch_logic:'8. Microgrid Grid-Connected/Islanded Control Logic Diagram',cat_charging:'Charging Solution Agent',ch_design:'Design',ch_elec:'Electrical',ch_software:'Software Platform',ch_proto:'Protocols',ch_cooling:'Liquid-Cooled HPC',ch_flash:'Flash Charging',ch_evcc:'EVCC/SECC',ch_bom:'BOM',ch_skill:'Core Skills',ch_design_title:'Charging Station Design Agent',ch_design_desc:'Input site type/parking/power targets, AI auto-generates station plan, SLD, BOM & investment',ch_elec_title:'Electrical Design Agent',ch_elec_desc:'Engineering schematics based on IEC 60617/61851. Supports EU-standard mobile charger & fixed HPC cabinet.',ch_elec_mobile_eu:'EU Mobile Charger Schematic',ch_elec_cabinet:'HPC Cabinet SLD',
 mg_ems_arch_title:'eBlock Microgrid EMS Architecture',mg_ems_overview:'1. Overall Architecture (4 Layers)',mg_ems_protocol:'2. Communication Protocols & Bus',mg_ems_eblock:'3. Single eBlock Internal Architecture',mg_ems_delay:'4. Key Communication Latency (Sequence Diagram)',mg_ems_network:'5. Network Topology',
 mg_schedule_title:'Microgrid Dispatch Optimization',mg_schedule_obj:'1. Optimization Objective Function',mg_schedule_constraints:'2. Constraints',mg_schedule_layers:'3. Dispatch Strategy Hierarchy',mg_schedule_scenarios:'4. Typical Dispatch Scenarios',
 mg_sw_pill_dispatch:'Dispatch',mg_sw_pill_trading:'Trading',mg_sw_pill_datacenter:'Data Platform',
@@ -42473,7 +42989,7 @@ aidc_dw_title:'وكيل ملخص الرسوم',aidc_dw_desc:'عرض وتحميل
 aidc_dw_arch:'هيكل نظام AIDC',aidc_dw_wiring:'مخطط التوصيل أحادي الخط AIDC',aidc_dw_dual:'طوبولوجيا الطاقة المزدوجة AIDC',aidc_dw_liquid:'مخطط التبريد السائل AIDC',
 ess_layout:'مخطط الأرضية',ess_cable:'توجيه الكابلات',ess_principle:'مخطط PCS-BESS',
 lang_btn_zh:'الصينية',lang_btn_en:'الإنجليزية',lang_btn_ar:'العربية',
-mg_arch_panorama:'نظرة شاملة على بنية الشبكة المصغرة',mg_arch_ac_topo:'1. نظرة عامة على طوبولوجيا طاقة الشبكة المصغرة (شبكة مصغرة AC)',mg_arch_hybrid:'2. بنية الشبكة المصغرة الهجينة AC/DC (موصى بها)',mg_arch_topo_compare:'3. مقارنة أربع طوبولوجيات نموذجية للشبكة المصغرة',mg_arch_mode_switch:'4. تبديل وضع تشغيل الشبكة المصغرة',mg_arch_protection:'5. مخطط التوصيلات الثانوية للشبكة المصغرة',mg_arch_comm:'6. شبكة الاتصال والتحكم',mg_arch_params:'7. مرجع سريع للمعلمات الرئيسية',mg_arch_logic:'8. مخطط منطق التحكم في الشبكة/الجزيرة للشبكة المصغرة',cat_charging:'وكيل حلول الشحن',ch_design:'التصميم',ch_elec:'الكهربائي',ch_software:'منصة البرمجيات',ch_proto:'البروتوكولات',ch_cooling:'التبريد السائل',ch_evcc:'EVCC/SECC',ch_bom:'قائمة المواد',ch_skill:'المهارات',ch_design_title:'وكيل تصميم محطة الشحن',ch_design_desc:'...',ch_elec_title:'وكيل التصميم الكهربائي',ch_elec_desc:'...',ch_elec_mobile_eu:'...',ch_elec_cabinet:'...',
+mg_arch_panorama:'نظرة شاملة على بنية الشبكة المصغرة',mg_arch_ac_topo:'1. نظرة عامة على طوبولوجيا طاقة الشبكة المصغرة (شبكة مصغرة AC)',mg_arch_hybrid:'2. بنية الشبكة المصغرة الهجينة AC/DC (موصى بها)',mg_arch_topo_compare:'3. مقارنة أربع طوبولوجيات نموذجية للشبكة المصغرة',mg_arch_mode_switch:'4. تبديل وضع تشغيل الشبكة المصغرة',mg_arch_protection:'5. مخطط التوصيلات الثانوية للشبكة المصغرة',mg_arch_comm:'6. شبكة الاتصال والتحكم',mg_arch_params:'7. مرجع سريع للمعلمات الرئيسية',mg_arch_logic:'8. مخطط منطق التحكم في الشبكة/الجزيرة للشبكة المصغرة',cat_charging:'وكيل حلول الشحن',ch_design:'التصميم',ch_elec:'الكهربائي',ch_software:'منصة البرمجيات',ch_proto:'البروتوكولات',ch_cooling:'التبريد السائل',ch_flash:'شحن سريع',ch_evcc:'EVCC/SECC',ch_bom:'قائمة المواد',ch_skill:'المهارات',ch_design_title:'وكيل تصميم محطة الشحن',ch_design_desc:'...',ch_elec_title:'وكيل التصميم الكهربائي',ch_elec_desc:'...',ch_elec_mobile_eu:'...',ch_elec_cabinet:'...',
 mg_ems_arch_title:'بنية نظام إدارة طاقة الشبكة المصغرة eBlock',mg_ems_overview:'1. البنية العامة (4 طبقات)',mg_ems_protocol:'2. بروتوكولات الاتصال وناقل الربط',mg_ems_eblock:'3. البنية الداخلية لوحدة eBlock واحدة',mg_ems_delay:'4. زمن الاتصال الرئيسي (مخطط التسلسل)',mg_ems_network:'5. طوبولوجيا الشبكة',
 mg_schedule_title:'تحسين توزيع الشبكة المصغرة',mg_schedule_obj:'1. دالة الهدف التحسينية',mg_schedule_constraints:'2. القيود',mg_schedule_layers:'3. التسلسل الهرمي لاستراتيجية التوزيع',mg_schedule_scenarios:'4. سيناريوهات التوزيع النموذجية',
 mg_sw_pill_dispatch:'التوزيع',mg_sw_pill_trading:'التداول',mg_sw_pill_datacenter:'منصة البيانات',
@@ -43991,7 +44507,7 @@ function bsShowPage(id){
 // ========== Charging Agent Logic ==========
 function showChargingPage(id){
   document.querySelectorAll('#chargingNav .sub-tab').forEach(t=>t.classList.remove('active'));
-  const subPages=['ch-design','ch-elec','ch-software','ch-proto','ch-cooling','ch-evcc','ch-bom','ch-platform'];
+  const subPages=['ch-design','ch-elec','ch-software','ch-proto','ch-cooling','ch-flash','ch-evcc','ch-bom','ch-platform'];
   const tabIdx=subPages.indexOf(id);
   if(tabIdx>=0) document.querySelectorAll('#chargingNav .sub-tab')[tabIdx].classList.add('active');
   document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
@@ -44002,10 +44518,18 @@ function showChargingPage(id){
   if(id==='ch-software') chDrawSwArch();
   if(id==='ch-proto') chShowProto('ocpp');
   if(id==='ch-cooling') chDrawCooling();
+  if(id==='ch-flash') showFlashSubTab('overview');
   if(id==='ch-evcc'){ setTimeout(()=>{ showEvccSubTab('chips'); },50); }
 
   if(id==='ch-platform') chShowPlatform('guowang');
 
+}
+function showFlashSubTab(tab){
+  var tabs=['overview','arch','power','cooling','hv','dispatch','bms','battery','thermal','reviewer','bom'];
+  tabs.forEach(function(t){
+    var el=document.getElementById('flashSubTab-'+t);
+    if(el) el.style.display=(t===tab)?'block':'none';
+  });
 }
 function chCalcPower(){
   const guns=parseInt((document.getElementById('chGunCount')||{}).value||0);
