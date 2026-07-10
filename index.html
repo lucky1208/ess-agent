@@ -41235,34 +41235,109 @@ if __name__ == "__main__":
 </div>
 
 <div id="flashSubTab-bom" style="display:none">
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px;padding:16px;background:var(--bg3);border-radius:10px;border-left:4px solid #f59e0b">
+<div><div style="font-size:10px;color:var(--text2)">项目名称</div><div style="font-size:13px;font-weight:700;color:var(--text1)">1MW 液冷闪充站</div></div>
+<div><div style="font-size:10px;color:var(--text2)">系统功率</div><div style="font-size:13px;font-weight:700;color:var(--text1)">1000 kW</div></div>
+<div><div style="font-size:10px;color:var(--text2)">直流电压</div><div style="font-size:13px;font-weight:700;color:var(--text1)">1000 VDC</div></div>
+<div><div style="font-size:10px;color:var(--text2)">充电电流</div><div style="font-size:13px;font-weight:700;color:var(--text1)">1000 A</div></div>
+<div><div style="font-size:10px;color:var(--text2)">BOM版本</div><div style="font-size:13px;font-weight:700;color:var(--text1)">V1.0</div></div>
+<div><div style="font-size:10px;color:var(--text2)">生成时间</div><div style="font-size:13px;font-weight:700;color:var(--text1)">2026-07-10</div></div>
+</div>
+<style>
+.fbom-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.fbom-tbl th{background:#1a2a3a;color:#cbd5e1;padding:7px 8px;text-align:left;font-weight:600;border:1px solid #2a3a4a;white-space:nowrap}
+.fbom-tbl td{padding:6px 8px;border:1px solid #232f3d;color:var(--text1);vertical-align:top}
+.fbom-tbl tr:nth-child(even){background:rgba(255,255,255,.02)}
+.fbom-tag{color:#f59e0b;font-weight:700}
+.fbom-mfr{color:#3b82f6;font-weight:600}
+</style>
+
 <div class="mg-card" style="margin-bottom:20px">
-<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">📋 闪充系统BOM</h3>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px">
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Electrical BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">SiC MOSFET、Driver、传感器</div>
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">① 主功率电气 BOM · 采购级</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Main Power Electrical BOM · 配电保护 / 进线 / 隔离</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">QF1</td><td>主进线空气断路器</td><td class="fbom-mfr">Schneider / Masterpact MTZ2 16</td><td>4P 1600A · AC1000V · Icu 65kA</td><td>1</td><td>10kV侧总保护</td><td>ABB Emax2</td><td>框架断路器</td></tr>
+<tr><td class="fbom-tag">KM1~KM4</td><td>DC 主接触器</td><td class="fbom-mfr">TE Connectivity / KILOVAC EV200AAANA</td><td>900VDC 500A · 线圈12V</td><td>4</td><td>功率回路通断</td><td>Panasonic AM</td><td>预充并联</td></tr>
+<tr><td class="fbom-tag">FU1/FU2</td><td>DC 熔断器</td><td class="fbom-mfr">Bussmann / 170M6810</td><td>1250A / 1000VDC · aR</td><td>2</td><td>短路保护</td><td>Ferraz</td><td>gPV 特性</td></tr>
+<tr><td class="fbom-tag">SPD1</td><td>浪涌保护器</td><td class="fbom-mfr">Phoenix Contact / VAL-MS-T1/T2</td><td>1000VDC · Type I+II</td><td>2</td><td>防雷过压保护</td><td>DEHN</td><td>双极</td></tr>
+<tr><td class="fbom-tag">IMD1</td><td>绝缘监测仪</td><td class="fbom-mfr">Bender / Iso685-D</td><td>0~1000VDC · 50kΩ</td><td>1</td><td>直流绝缘监测</td><td>Schoeffner</td><td>符合IEC61557</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Mechanical BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">柜体、母排、结构件</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">② PFC 整流模块 BOM · SiC</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">PFC Rectifier Module BOM · AC400V → DC1000V</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">PFC-M1~16</td><td>图腾柱 PFC 模块</td><td class="fbom-mfr">Infy Power / IPM-62.5K-1000</td><td>62.5kW · AC400V→DC1000V</td><td>16</td><td>AC/DC 整流</td><td>UUC Power</td><td>多模块并联</td></tr>
+<tr><td class="fbom-tag">U1</td><td>SiC MOSFET</td><td class="fbom-mfr">Wolfspeed / CAB450M12XM3</td><td>1200V · 450A</td><td>32</td><td>高频开关</td><td>ST SiC</td><td>每模块2颗</td></tr>
+<tr><td class="fbom-tag">L1</td><td>Boost 电感</td><td class="fbom-mfr">定制件 / Sendust Core</td><td>220µH · 150A</td><td>16</td><td>功率因数校正</td><td>铁硅铝</td><td>非标定制</td></tr>
+<tr><td class="fbom-tag">Cbus</td><td>DC Link 电容</td><td class="fbom-mfr">TDK EPCOS / B25690A</td><td>1000V · 6800µF</td><td>16</td><td>母线稳压</td><td>KEMET</td><td>薄膜电容</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Cooling BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">泵、阀、换热器、冷却液</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">③ SiC DC/DC 模块 BOM · 双向</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">SiC DC/DC Module BOM · 1000V↔200~1000V 隔离变换</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">DAB-M1~16</td><td>双向 DAB 模块</td><td class="fbom-mfr">StarCharge / DAB-62.5K</td><td>62.5kW · 1000V↔200~1000V</td><td>16</td><td>电压匹配/隔离</td><td>Sinexcel</td><td>双有源桥</td></tr>
+<tr><td class="fbom-tag">T1</td><td>高频变压器</td><td class="fbom-mfr">定制 / 纳米晶磁芯</td><td>100kHz · 70kW</td><td>16</td><td>隔离传能</td><td>铁氧体</td><td>非标定制</td></tr>
+<tr><td class="fbom-tag">U2</td><td>SiC 功率模块</td><td class="fbom-mfr">Rohm / BSM600D12P3G001</td><td>1200V · 600A</td><td>32</td><td>高频开关</td><td>Wolfspeed</td><td>每模块2颗</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Communication BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">PLC、CAN、OCPP模块</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">④ 液冷系统 BOM · 1000A</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Liquid Cooling System BOM · 泵 / 换热器 / 枪 / 传感</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">P1</td><td>冷却循环泵</td><td class="fbom-mfr">Grundfos / CRN 15-10</td><td>25m³/h · H=20m</td><td>2</td><td>冷却液循环</td><td>Wilo</td><td>一用一备</td></tr>
+<tr><td class="fbom-tag">HX1</td><td>板式换热器</td><td class="fbom-mfr">Alfa Laval / CB110</td><td>500kW · SS316</td><td>1</td><td>热量交换</td><td>SWEP</td><td>不锈钢</td></tr>
+<tr><td class="fbom-tag">GUN1/GUN2</td><td>液冷充电枪</td><td class="fbom-mfr">Phoenix Contact / CHARX connect pro</td><td>1000A · 1000VDC</td><td>4</td><td>车辆接口</td><td> thermal management</td><td>带液冷</td></tr>
+<tr><td class="fbom-tag">FT1</td><td>流量传感器</td><td class="fbom-mfr">Krohne / OPTIFLUX 1300</td><td>0~30m³/h · 4~20mA</td><td>2</td><td>流量监测</td><td>Endress</td><td>电磁式</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">HV BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">断路器、熔断器、SPD</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">⑤ 电池包 BOM · 1024V / 215kWh</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Battery Pack BOM · 电芯 / 模组 / 高压盒 / BMS</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">CELL</td><td>LFP 电芯</td><td class="fbom-mfr">EVE / LF280K</td><td>3.2V · 280Ah</td><td>320</td><td>能量存储</td><td>CATL</td><td>磷酸铁锂</td></tr>
+<tr><td class="fbom-tag">MOD1~20</td><td>电池模组</td><td class="fbom-mfr">定制 / 1P16S</td><td>51.2V · 280Ah</td><td>20</td><td>串并联单元</td><td>—</td><td>非标定制</td></tr>
+<tr><td class="fbom-tag">HVJB1</td><td>高压盒</td><td class="fbom-mfr">定制 / HVJB-1000</td><td>1000V · 1000A</td><td>1</td><td>高压配电</td><td>—</td><td>含熔断器</td></tr>
+<tr><td class="fbom-tag">BMU1</td><td>BMS 主控</td><td class="fbom-mfr">NXP / S32K344</td><td>CAN FD · Ethernet</td><td>1</td><td>电池管理</td><td>TI</td><td>车规级</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Safety BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">接地、绝缘、联锁</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">⑥ 线缆 BOM · 高压</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Cable BOM · 母排 / 高压电缆 / 接地 / 通信</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">BUS1</td><td>DC 主母排</td><td class="fbom-mfr">定制 / T2 铜排 镀锡</td><td>100×10mm</td><td>若干</td><td>PFC↔DC Bus</td><td>—</td><td>非标定制</td></tr>
+<tr><td class="fbom-tag">CAB1</td><td>高压电缆</td><td class="fbom-mfr">Prysmian / EV Cable</td><td>240mm² · 1500VDC</td><td>若干</td><td>DC/DC↔充电枪</td><td>Leoni</td><td>液冷兼容</td></tr>
+<tr><td class="fbom-tag">PE1</td><td>PE 接地线</td><td class="fbom-mfr">远东电缆 / 国标</td><td>95mm² · 黄绿双色</td><td>若干</td><td>保护接地</td><td>上上</td><td>—</td></tr>
+<tr><td class="fbom-tag">CAN1</td><td>CAN FD 总线</td><td class="fbom-mfr">Belden / 9841</td><td>2×0.75mm² 屏蔽双绞</td><td>若干</td><td>BMS 通信</td><td>LAPP</td><td>—</td></tr>
+</tbody>
+</table>
 </div>
-</div>
+
+<div style="font-size:11px;color:var(--text2);padding:12px;background:var(--bg3);border-radius:8px;border-left:3px solid #8b5cf6;line-height:1.8">
+<b style="color:var(--text1)">BOM 说明：</b>以上为 1MW 液冷闪充系统采购级 BOM 示例，关键字段含 <b>位号(Tag)</b>、<b>完整型号(Manufacturer+Model)</b>、<b>关键参数(电压/电流/功率)</b>、<b>基本功能说明</b>、<b>数量</b>、<b>备选供应商</b>。实际项目应根据站点功率、枪数、是否含储能动态生成，并支持导出 Excel / ERP / SAP / PLM。
 </div>
 </div>
 
