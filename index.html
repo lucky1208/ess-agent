@@ -38280,8 +38280,7 @@ select.form-input{appearance:auto}
 <div class="sub-tab" onclick="showChargingPage('ch-elec')" data-i18n="ch_elec">电气设计</div>
 <div class="sub-tab" onclick="showChargingPage('ch-software')" data-i18n="ch_software">软件平台</div>
 <div class="sub-tab" onclick="showChargingPage('ch-proto')" data-i18n="ch_proto">通信协议</div>
-<div class="sub-tab" onclick="showChargingPage('ch-cooling')" data-i18n="ch_cooling">超充液冷</div>
-<div class="sub-tab" onclick="showChargingPage('ch-flash')" data-i18n="ch_flash">⭐ 闪充系统</div>
+<div class="sub-tab" onclick="showChargingPage('ch-flash')" data-i18n="ch_flash">⭐ 闪充液冷</div>
 <div class="sub-tab" onclick="showChargingPage('ch-evcc')" data-i18n="ch_evcc">EVCC/SECC</div>
 <div class="sub-tab" onclick="showChargingPage('ch-bom')" data-i18n="ch_bom">BOM清单</div>
 <div class="sub-tab" onclick="showChargingPage('ch-platform')" data-i18n="ch_platform">平台互联互通</div>
@@ -40840,7 +40839,7 @@ if __name__ == "__main__":
 <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
 <div style="width:48px;height:48px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px">⚡</div>
 <div>
-<h2 style="margin:0;color:#f8fafc;font-size:22px">Flash Charging System · 闪充系统</h2>
+<h2 style="margin:0;color:#f8fafc;font-size:22px">Flash Charging System · 闪充液冷</h2>
 <p style="margin:4px 0 0;color:#94a3b8;font-size:13px">从10kV电网到车辆电池的完整MW级闪充系统研发平台 · 覆盖配电/高压/液冷/BMS/EMS/功率调度全链路</p>
 </div>
 </div>
@@ -40851,9 +40850,7 @@ if __name__ == "__main__":
 <span style="padding:4px 12px;background:#10b98122;color:#10b981;border-radius:20px;font-size:11px;font-weight:600">ISO 15118 / OCPP 2.0.1</span>
 <span style="padding:4px 12px;background:#8b5cf622;color:#8b5cf6;border-radius:20px;font-size:11px;font-weight:600">储能联动 EMS</span>
 </div>
-</div>
-
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px">
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:16px">
 <div onclick="showFlashSubTab('arch')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
 <div style="font-size:22px;margin-bottom:8px">📐</div>
 <div style="font-size:13px;font-weight:700;color:var(--text1)">系统框图</div>
@@ -40898,6 +40895,7 @@ if __name__ == "__main__":
 <div style="font-size:22px;margin-bottom:8px">📋</div>
 <div style="font-size:13px;font-weight:700;color:var(--text1)">BOM清单</div>
 <div style="font-size:11px;color:var(--text2);margin-top:4px">Bill of Materials</div>
+</div>
 </div>
 </div>
 
@@ -42506,7 +42504,7 @@ aidc_dw_title:'图纸汇总 Agent',aidc_dw_desc:'所有AIDC图纸集中展示与
 aidc_dw_arch:'AIDC系统架构图',aidc_dw_wiring:'AIDC电气一次接线图',aidc_dw_dual:'AIDC双路供电拓扑图',aidc_dw_liquid:'AIDC液冷管路图',
 ess_layout:'平面布置图',ess_cable:'电缆走向图',ess_principle:'PCS-BESS电气原理图',
 lang_btn_zh:'中文',lang_btn_en:'English',lang_btn_ar:'العربية',
-mg_arch_panorama:'微网(Microgrid) 架构全景图',mg_arch_ac_topo:'一、微网电力拓扑总览（交流微网）',mg_arch_hybrid:'二、交直流混合微网架构（推荐方案）',mg_arch_topo_compare:'三、四种典型微网拓扑对比',mg_arch_mode_switch:'四、微网运行模式切换',mg_arch_protection:'五、电气二次接线图',mg_arch_comm:'六、通信控制网络',mg_arch_params:'七、关键参数速查',mg_arch_logic:'八、微网并离网控制逻辑图',cat_charging:'充电智能体',ch_design:'方案设计',ch_elec:'电气设计',ch_software:'软件平台',ch_proto:'通信协议',ch_cooling:'超充液冷',ch_flash:'闪充系统',ch_evcc:'EVCC/SECC',ch_bom:'BOM清单',ch_skill:'核心Skill',ch_design_title:'充电站方案设计 Agent',ch_design_desc:'输入站点类型、车位、目标功率，AI自动生成站级方案、单线图、BOM与投资估算',ch_elec_title:'电气设计 Agent',ch_elec_desc:'基于IEC 60617/61851标准生成工程级原理图，支持欧标/国标移动充电桩、固定式超充堆电气设计',ch_elec_mobile_eu:'欧标移动充电桩原理图',ch_elec_cabinet:'超充堆一次图',
+mg_arch_panorama:'微网(Microgrid) 架构全景图',mg_arch_ac_topo:'一、微网电力拓扑总览（交流微网）',mg_arch_hybrid:'二、交直流混合微网架构（推荐方案）',mg_arch_topo_compare:'三、四种典型微网拓扑对比',mg_arch_mode_switch:'四、微网运行模式切换',mg_arch_protection:'五、电气二次接线图',mg_arch_comm:'六、通信控制网络',mg_arch_params:'七、关键参数速查',mg_arch_logic:'八、微网并离网控制逻辑图',cat_charging:'充电智能体',ch_design:'方案设计',ch_elec:'电气设计',ch_software:'软件平台',ch_proto:'通信协议',ch_flash:'闪充液冷',ch_evcc:'EVCC/SECC',ch_bom:'BOM清单',ch_skill:'核心Skill',ch_design_title:'充电站方案设计 Agent',ch_design_desc:'输入站点类型、车位、目标功率，AI自动生成站级方案、单线图、BOM与投资估算',ch_elec_title:'电气设计 Agent',ch_elec_desc:'基于IEC 60617/61851标准生成工程级原理图，支持欧标/国标移动充电桩、固定式超充堆电气设计',ch_elec_mobile_eu:'欧标移动充电桩原理图',ch_elec_cabinet:'超充堆一次图',
 mg_ems_arch_title:'eBlock 微网能量管理系统(EMS)架构',mg_ems_overview:'一、总体架构（四层）',mg_ems_protocol:'二、通信协议 & 连接总线',mg_ems_eblock:'三、单台eBlock内部架构',mg_ems_delay:'四、关键通信时延（时序图）',mg_ems_network:'五、网络拓扑',
 mg_schedule_title:'微网调度优化',mg_schedule_obj:'一、优化目标函数',mg_schedule_constraints:'二、约束条件',mg_schedule_layers:'三、调度策略层级',mg_schedule_scenarios:'四、典型调度场景',
 mg_sw_pill_dispatch:'调度',mg_sw_pill_trading:'交易',mg_sw_pill_datacenter:'数据中台',
@@ -42640,7 +42638,7 @@ aidc_dw_title:'Drawing Summary Agent',aidc_dw_desc:'All AIDC drawings centralize
 aidc_dw_arch:'AIDC System Architecture',aidc_dw_wiring:'AIDC Single-line Diagram',aidc_dw_dual:'AIDC Dual-feed Power Topology',aidc_dw_liquid:'AIDC Liquid Cooling Diagram',
 ess_layout:'Floor Plan',ess_cable:'Cable Routing',ess_principle:'PCS-BESS Schematic',
 lang_btn_zh:'Chinese',lang_btn_en:'English',lang_btn_ar:'Arabic',
-mg_arch_panorama:'Microgrid Architecture Overview',mg_arch_ac_topo:'1. Microgrid Power Topology Overview (AC Microgrid)',mg_arch_hybrid:'2. AC/DC Hybrid Microgrid Architecture (Recommended)',mg_arch_topo_compare:'3. Four Typical Microgrid Topology Comparison',mg_arch_mode_switch:'4. Microgrid Operation Mode Switching',mg_arch_protection:'5. Microgrid Electrical Secondary Wiring Diagram',mg_arch_comm:'6. Communication & Control Network',mg_arch_params:'7. Key Parameters Quick Reference',mg_arch_logic:'8. Microgrid Grid-Connected/Islanded Control Logic Diagram',cat_charging:'Charging Solution Agent',ch_design:'Design',ch_elec:'Electrical',ch_software:'Software Platform',ch_proto:'Protocols',ch_cooling:'Liquid-Cooled HPC',ch_flash:'Flash Charging',ch_evcc:'EVCC/SECC',ch_bom:'BOM',ch_skill:'Core Skills',ch_design_title:'Charging Station Design Agent',ch_design_desc:'Input site type/parking/power targets, AI auto-generates station plan, SLD, BOM & investment',ch_elec_title:'Electrical Design Agent',ch_elec_desc:'Engineering schematics based on IEC 60617/61851. Supports EU-standard mobile charger & fixed HPC cabinet.',ch_elec_mobile_eu:'EU Mobile Charger Schematic',ch_elec_cabinet:'HPC Cabinet SLD',
+mg_arch_panorama:'Microgrid Architecture Overview',mg_arch_ac_topo:'1. Microgrid Power Topology Overview (AC Microgrid)',mg_arch_hybrid:'2. AC/DC Hybrid Microgrid Architecture (Recommended)',mg_arch_topo_compare:'3. Four Typical Microgrid Topology Comparison',mg_arch_mode_switch:'4. Microgrid Operation Mode Switching',mg_arch_protection:'5. Microgrid Electrical Secondary Wiring Diagram',mg_arch_comm:'6. Communication & Control Network',mg_arch_params:'7. Key Parameters Quick Reference',mg_arch_logic:'8. Microgrid Grid-Connected/Islanded Control Logic Diagram',cat_charging:'Charging Solution Agent',ch_design:'Design',ch_elec:'Electrical',ch_software:'Software Platform',ch_proto:'Protocols',ch_flash:'Flash Liquid Cooling',ch_evcc:'EVCC/SECC',ch_bom:'BOM',ch_skill:'Core Skills',ch_design_title:'Charging Station Design Agent',ch_design_desc:'Input site type/parking/power targets, AI auto-generates station plan, SLD, BOM & investment',ch_elec_title:'Electrical Design Agent',ch_elec_desc:'Engineering schematics based on IEC 60617/61851. Supports EU-standard mobile charger & fixed HPC cabinet.',ch_elec_mobile_eu:'EU Mobile Charger Schematic',ch_elec_cabinet:'HPC Cabinet SLD',
 mg_ems_arch_title:'eBlock Microgrid EMS Architecture',mg_ems_overview:'1. Overall Architecture (4 Layers)',mg_ems_protocol:'2. Communication Protocols & Bus',mg_ems_eblock:'3. Single eBlock Internal Architecture',mg_ems_delay:'4. Key Communication Latency (Sequence Diagram)',mg_ems_network:'5. Network Topology',
 mg_schedule_title:'Microgrid Dispatch Optimization',mg_schedule_obj:'1. Optimization Objective Function',mg_schedule_constraints:'2. Constraints',mg_schedule_layers:'3. Dispatch Strategy Hierarchy',mg_schedule_scenarios:'4. Typical Dispatch Scenarios',
 mg_sw_pill_dispatch:'Dispatch',mg_sw_pill_trading:'Trading',mg_sw_pill_datacenter:'Data Platform',
@@ -42774,7 +42772,7 @@ aidc_dw_title:'وكيل ملخص الرسوم',aidc_dw_desc:'عرض وتحميل
 aidc_dw_arch:'هيكل نظام AIDC',aidc_dw_wiring:'مخطط التوصيل أحادي الخط AIDC',aidc_dw_dual:'طوبولوجيا الطاقة المزدوجة AIDC',aidc_dw_liquid:'مخطط التبريد السائل AIDC',
 ess_layout:'مخطط الأرضية',ess_cable:'توجيه الكابلات',ess_principle:'مخطط PCS-BESS',
 lang_btn_zh:'الصينية',lang_btn_en:'الإنجليزية',lang_btn_ar:'العربية',
-mg_arch_panorama:'نظرة شاملة على بنية الشبكة المصغرة',mg_arch_ac_topo:'1. نظرة عامة على طوبولوجيا طاقة الشبكة المصغرة (شبكة مصغرة AC)',mg_arch_hybrid:'2. بنية الشبكة المصغرة الهجينة AC/DC (موصى بها)',mg_arch_topo_compare:'3. مقارنة أربع طوبولوجيات نموذجية للشبكة المصغرة',mg_arch_mode_switch:'4. تبديل وضع تشغيل الشبكة المصغرة',mg_arch_protection:'5. مخطط التوصيلات الثانوية للشبكة المصغرة',mg_arch_comm:'6. شبكة الاتصال والتحكم',mg_arch_params:'7. مرجع سريع للمعلمات الرئيسية',mg_arch_logic:'8. مخطط منطق التحكم في الشبكة/الجزيرة للشبكة المصغرة',cat_charging:'وكيل حلول الشحن',ch_design:'التصميم',ch_elec:'الكهربائي',ch_software:'منصة البرمجيات',ch_proto:'البروتوكولات',ch_cooling:'التبريد السائل',ch_flash:'شحن سريع',ch_evcc:'EVCC/SECC',ch_bom:'قائمة المواد',ch_skill:'المهارات',ch_design_title:'وكيل تصميم محطة الشحن',ch_design_desc:'...',ch_elec_title:'وكيل التصميم الكهربائي',ch_elec_desc:'...',ch_elec_mobile_eu:'...',ch_elec_cabinet:'...',
+mg_arch_panorama:'نظرة شاملة على بنية الشبكة المصغرة',mg_arch_ac_topo:'1. نظرة عامة على طوبولوجيا طاقة الشبكة المصغرة (شبكة مصغرة AC)',mg_arch_hybrid:'2. بنية الشبكة المصغرة الهجينة AC/DC (موصى بها)',mg_arch_topo_compare:'3. مقارنة أربع طوبولوجيات نموذجية للشبكة المصغرة',mg_arch_mode_switch:'4. تبديل وضع تشغيل الشبكة المصغرة',mg_arch_protection:'5. مخطط التوصيلات الثانوية للشبكة المصغرة',mg_arch_comm:'6. شبكة الاتصال والتحكم',mg_arch_params:'7. مرجع سريع للمعلمات الرئيسية',mg_arch_logic:'8. مخطط منطق التحكم في الشبكة/الجزيرة للشبكة المصغرة',cat_charging:'وكيل حلول الشحن',ch_design:'التصميم',ch_elec:'الكهربائي',ch_software:'منصة البرمجيات',ch_proto:'البروتوكولات',ch_flash:'تبريد سائل سريع',ch_evcc:'EVCC/SECC',ch_bom:'قائمة المواد',ch_skill:'المهارات',ch_design_title:'وكيل تصميم محطة الشحن',ch_design_desc:'...',ch_elec_title:'وكيل التصميم الكهربائي',ch_elec_desc:'...',ch_elec_mobile_eu:'...',ch_elec_cabinet:'...',
 mg_ems_arch_title:'بنية نظام إدارة طاقة الشبكة المصغرة eBlock',mg_ems_overview:'1. البنية العامة (4 طبقات)',mg_ems_protocol:'2. بروتوكولات الاتصال وناقل الربط',mg_ems_eblock:'3. البنية الداخلية لوحدة eBlock واحدة',mg_ems_delay:'4. زمن الاتصال الرئيسي (مخطط التسلسل)',mg_ems_network:'5. طوبولوجيا الشبكة',
 mg_schedule_title:'تحسين توزيع الشبكة المصغرة',mg_schedule_obj:'1. دالة الهدف التحسينية',mg_schedule_constraints:'2. القيود',mg_schedule_layers:'3. التسلسل الهرمي لاستراتيجية التوزيع',mg_schedule_scenarios:'4. سيناريوهات التوزيع النموذجية',
 mg_sw_pill_dispatch:'التوزيع',mg_sw_pill_trading:'التداول',mg_sw_pill_datacenter:'منصة البيانات',
