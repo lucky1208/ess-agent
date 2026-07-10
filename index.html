@@ -40830,10 +40830,6 @@ if __name__ == "__main__":
 </div>
 </div>
 
-<div id="page-ch-cooling" class="charging-content" style="display:none;padding:24px 32px">
-<div id="chLcDashboard"></div>
-</div>
-
 <div id="page-ch-flash" class="charging-content" style="display:none;padding:24px 32px">
 <div style="background:linear-gradient(135deg,#0a1628 0%,#0d2137 50%,#0a1628 100%);border-radius:12px;padding:32px;margin-bottom:24px;border:1px solid #1e3a5f">
 <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
@@ -44290,7 +44286,7 @@ function bsShowPage(id){
 // ========== Charging Agent Logic ==========
 function showChargingPage(id){
   document.querySelectorAll('#chargingNav .sub-tab').forEach(t=>t.classList.remove('active'));
-  const subPages=['ch-design','ch-elec','ch-software','ch-proto','ch-cooling','ch-flash','ch-evcc','ch-bom','ch-platform'];
+  const subPages=['ch-design','ch-elec','ch-software','ch-proto','ch-flash','ch-evcc','ch-bom','ch-platform'];
   const tabIdx=subPages.indexOf(id);
   if(tabIdx>=0) document.querySelectorAll('#chargingNav .sub-tab')[tabIdx].classList.add('active');
   document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
@@ -44300,12 +44296,9 @@ function showChargingPage(id){
   if(id==='ch-elec') chElecSwitchDiagram('mobile_eu');
   if(id==='ch-software') chDrawSwArch();
   if(id==='ch-proto') chShowProto('ocpp');
-  if(id==='ch-cooling') chDrawCooling();
   if(id==='ch-flash') showFlashSubTab('arch');
   if(id==='ch-evcc'){ setTimeout(()=>{ showEvccSubTab('chips'); },50); }
-
   if(id==='ch-platform') chShowPlatform('guowang');
-
 }
 function showFlashSubTab(tab){
   var tabs=['arch','power','cooling','hv','dispatch','bms','battery','thermal','bom'];
