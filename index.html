@@ -98891,93 +98891,141 @@ function synUnifiedFlow(){
     ],{w:760,h:300,theme:'huawei',drawingNo:'SYN-ARCH-001',ver:'V2.0',scale:'NTS',
        legend:[{style:'data',label:'MQTT/Modbus TCP'},{style:'control',label:'BACnet/IEC 61850'},{style:'power',label:'电力线路'},{style:'mech',label:'冷却管路'}]});
 
-  steps[2].delay=800; steps[2].result=
+steps[2].delay=800; steps[2].result=
     drawPidIec('液冷散热系统P&ID图 — '+coolLabel,[
-      /* ── Left: Cooling Tower & Primary Loop ── */
-      {x:8,y:50,n:'冷却塔',type:'cooling_tower',sc:'#26A69A',w:18,h:28,tag:'CT-101',lbl:'闭式冷却塔'},
-      {x:22,y:30,n:'循环泵A',type:'pump',sc:'#1976D2',sz:14,tag:'P-101A',lbl:'变频'},
-      {x:22,y:70,n:'循环泵B',type:'pump',sc:'#1976D2',sz:14,tag:'P-101B',lbl:'变频'},
-      {x:32,y:30,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-101'},
-      {x:32,y:70,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-102'},
-      {x:42,y:30,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-105'},
-      {x:42,y:70,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-106'},
-      /* ── Center: Plate Heat Exchanger ── */
-      {x:55,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:24,h:20,tag:'HX-101',lbl:'HX-101'},
-      /* ── Right: CDU Manifolds & Cold Plates ── */
-      {x:70,y:20,n:'供液分水器',type:'manifold',sc:'#26A69A',w:28,h:10,tag:'MS-101',lbl:'MS-101'},
-      {x:70,y:80,n:'回液集水器',type:'manifold',sc:'#E53935',w:28,h:10,tag:'MR-101',lbl:'MR-101'},
-      /* CDU Cold Plate Units (4 GPU racks) */
-      {x:82,y:28,n:'CDU-1',type:'cdu',sc:'#26A69A',w:22,h:14,tag:'CDU-101',lbl:'GPU机柜1-2'},
-      {x:82,y:46,n:'CDU-2',type:'cdu',sc:'#26A69A',w:22,h:14,tag:'CDU-102',lbl:'GPU机柜3-4'},
-      {x:82,y:64,n:'CDU-3',type:'cdu',sc:'#26A69A',w:22,h:14,tag:'CDU-103',lbl:'GPU机柜5-6'},
-      {x:82,y:72,n:'CDU-4',type:'cdu',sc:'#26A69A',w:22,h:14,tag:'CDU-104',lbl:'GPU机柜7-8'},
-      /* ── Far Right: Utilities ── */
+      /* ===== 一级冷却回路 ===== */
+      /* Cooling Towers */
+      {x:8,y:25,n:'冷却塔#1',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-101',lbl:'2000kW'},
+      {x:8,y:75,n:'冷却塔#2',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-102',lbl:'2000kW(备)'},
+      /* Primary Pumps */
+      {x:22,y:25,n:'一次泵A',type:'pump',sc:'#1976D2',sz:14,tag:'P-101A',lbl:'变频 160m³/h'},
+      {x:22,y:75,n:'一次泵B',type:'pump',sc:'#1976D2',sz:14,tag:'P-101B',lbl:'变频 160m³/h'},
+      /* Valves */
+      {x:32,y:25,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-101'},
+      {x:32,y:75,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-102'},
+      {x:42,y:25,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-105'},
+      {x:42,y:75,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-106'},
+      /* Heat Exchanger */
+      {x:55,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:24,h:20,tag:'HX-101',lbl:'4000kW'},
+      /* Chiller */
+      {x:55,y:15,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-101',lbl:'1500kW×2'},
+      {x:55,y:85,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-102',lbl:'1500kW×2'},
+
+      /* ===== 二级冷却回路 (CDU Loop) ===== */
+      /* CDU Units (4x 500kW) */
+      {x:72,y:15,n:'CDU-1',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-101',lbl:'500kW Rack01-02'},
+      {x:72,y:35,n:'CDU-2',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-102',lbl:'500kW Rack03-04'},
+      {x:72,y:65,n:'CDU-3',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-103',lbl:'500kW Rack05-06'},
+      {x:72,y:85,n:'CDU-4',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-104',lbl:'500kW Rack07-08'},
+
+      /* Supply/Return Manifolds */
+      {x:68,y:15,n:'供液分水器',type:'manifold',sc:'#26A69A',w:22,h:12,tag:'MS-101',lbl:'SUPPLY HEADER'},
+      {x:68,y:85,n:'回液集水器',type:'manifold',sc:'#E53935',w:22,h:12,tag:'MR-101',lbl:'RETURN HEADER'},
+
+      /* GPU Racks with Cold Plates */
+      {x:86,y:10,n:'Rack-01',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-01',lbl:'GPU×8'},
+      {x:86,y:20,n:'Rack-02',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-02',lbl:'GPU×8'},
+      {x:86,y:30,n:'Rack-03',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-03',lbl:'GPU×8'},
+      {x:86,y:40,n:'Rack-04',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-04',lbl:'GPU×8'},
+      {x:86,y:60,n:'Rack-05',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-05',lbl:'GPU×8'},
+      {x:86,y:70,n:'Rack-06',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-06',lbl:'GPU×8'},
+      {x:86,y:80,n:'Rack-07',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-07',lbl:'GPU×8'},
+      {x:86,y:90,n:'Rack-08',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-08',lbl:'GPU×8'},
+
+      /* Expansion Tank & Makeup */
       {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:14,h:16,tag:'TK-101',lbl:'TK-101'},
       {x:95,y:20,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',sz:8,tag:'V-103'},
       {x:95,y:80,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',sz:8,tag:'V-104'},
+
+      /* AI Thermal Controller (symbolic) */
+      {x:50,y:95,n:'AI热控单元',type:'exchanger',sc:'#8B5CF6',w:24,h:12,tag:'TC-101',lbl:'AI Thermal Controller'},
     ],[
-      /* ── Primary Loop: Tower → Pumps → HE ── */
-      {x1:17,y1:50,x2:22,y2:50,viaY:30,c:'#26A69A',st:'mech',label:'DN'+Math.round(coolKw*0.08+50)},
-      {x1:22,y1:30,x2:22,y2:30,c:'#1976D2',st:'mech'},  /* pump A stub */
-      {x1:22,y1:70,x2:22,y2:70,c:'#1976D2',st:'mech'},  /* pump B stub */
-      {x1:29,y1:30,x2:32,y2:30,c:'#1976D2',st:'mech'},  /* pump out to valve */
-      {x1:29,y1:70,x2:32,y2:70,c:'#1976D2',st:'mech'},
-      {x1:37,y1:30,x2:42,y2:30,c:'#1976D2',st:'mech'},  /* valve to check valve */
-      {x1:37,y1:70,x2:42,y2:70,c:'#1976D2',st:'mech'},
-      {x1:47,y1:30,x2:55,y2:30,viaY:40,c:'#1976D2',st:'mech'},  /* check valve to HE hot in */
-      {x1:47,y1:70,x2:55,y2:70,viaY:60,c:'#1976D2',st:'mech'},  /* check valve to HE hot out */
-      /* ── HE → Supply Header (Supply) ── */
-      {x1:67,y1:38,x2:70,y2:38,viaX:67,c:'#26A69A',st:'mech',label:'供液 '+Math.round(coolKw*1.3)+' L/min'},
-      {x1:67,y1:62,x2:70,y2:62,viaX:67,c:'#E53935',st:'return',dash:true},  /* HE cold out to return header */
-      /* ── Supply Header → CDU Units ── */
-      {x1:82,y1:20,x2:82,y2:22,c:'#26A69A',st:'mech'},   /* CDU-101 supply */
-      {x1:82,y1:20,x2:82,y2:35,c:'#26A69A',st:'mech'},   /* CDU-101 supply down */
-      {x1:82,y1:20,x2:82,y2:42,c:'#26A69A',st:'mech'},   /* CDU-102 supply */
-      {x1:82,y1:20,x2:82,y2:58,c:'#26A69A',st:'mech'},   /* CDU-103 supply */
-      {x1:82,y1:20,x2:82,y2:66,c:'#26A69A',st:'mech'},   /* CDU-104 supply */
-      /* ── CDU Units → Return Header ── */
-      {x1:82,y1:42,x2:82,y2:44,c:'#E53935',st:'return',dash:true},  /* CDU-102 return */
-      {x1:82,y1:58,x2:82,y2:60,c:'#E53935',st:'return',dash:true},  /* CDU-103 return */
-      {x1:82,y1:72,x2:82,y2:74,c:'#E53935',st:'return',dash:true},  /* CDU-104 return */
-      {x1:82,y1:28,x2:82,y2:30,c:'#E53935',st:'return',dash:true,label:'回液'},  /* CDU-101 return */
-      /* ── Return Header → HE Cold In ── */
-      {x1:55,y1:62,x2:67,y2:62,c:'#E53935',st:'return',dash:true},
-      /* ── Return from HE → Tower ── */
-      {x1:55,y1:62,x2:42,y2:62,viaX:48,c:'#E53935',st:'return',dash:true},
-      {x1:42,y1:62,x2:42,y2:50,viaX:22,c:'#E53935',st:'return',dash:true},
-      {x1:22,y1:50,x2:8,y2:50,c:'#E53935',st:'return',dash:true},
-      /* ── Expansion Tank ── */
-      {x1:82,y1:20,x2:89,y2:20,viaX:89,c:'#AB47BC',st:'control',dash:true,label:'补水 DN25'},
-      {x1:89,y1:50,x2:89,y2:20,c:'#AB47BC',st:'control',dash:true},
-      {x1:89,y1:50,x2:89,y2:80,c:'#AB47BC',st:'control',dash:true,label:'溢流 DN25'},
-      {x1:89,y1:50,x2:95,y2:50,c:'#AB47BC',st:'control',dash:true},
-      /* ── Tower Makeup ── */
-      {x1:17,y1:50,x2:17,y2:20,viaX:8,c:'#42A5F5',st:'control',dash:true,label:'自动补水'},
-      /* ── Instruments as pipe tags ── */
-      {x1:22,y1:18,x2:22,y2:28,c:'#42A5F5',st:'inst',label:'TI-101'},
-      {x1:55,y1:35,x2:55,y2:40,c:'#42A5F5',st:'inst',label:'TI-102'},
-      {x1:55,y1:65,x2:55,y2:70,c:'#42A5F5',st:'inst',label:'TI-103'},
-      {x1:70,y1:15,x2:70,y2:20,c:'#f0883e',st:'inst',label:'PI-101'},
-      {x1:70,y1:85,x2:70,y2:80,c:'#f0883e',st:'inst',label:'PI-102'},
-      {x1:32,y1:18,x2:32,y2:28,c:'#3fb950',st:'inst',label:'FI-101'},
-      {x1:95,y1:38,x2:95,y2:45,c:'#AB47BC',st:'inst',label:'LI-101'},
-    ],{w:900,h:480,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.1',scale:'1:50',
+      /* ===== 一级回路管路 ===== */
+      /* Tower headers to pumps */
+      {x1:16,y1:25,x2:22,y2:25,c:'#26A69A',st:'mech',label:'DN200'},
+      {x1:16,y1:75,x2:22,y2:75,c:'#26A69A',st:'mech',label:'DN200'},
+      /* Pump discharge to valves */
+      {x1:29,y1:25,x2:32,y2:25,c:'#1976D2',st:'mech'},
+      {x1:29,y1:75,x2:32,y2:75,c:'#1976D2',st:'mech'},
+      /* Valves to check valves */
+      {x1:37,y1:25,x2:42,y2:25,c:'#1976D2',st:'mech'},
+      {x1:37,y1:75,x2:42,y2:75,c:'#1976D2',st:'mech'},
+      /* Check valves to HE */
+      {x1:47,y1:25,x2:55,y2:40,viaY:40,c:'#1976D2',st:'mech'},
+      {x1:47,y1:75,x2:55,y2:60,viaY:60,c:'#1976D2',st:'mech'},
+      /* HE to Chillers */
+      {x1:55,y1:35,x2:55,y2:25,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
+      {x1:55,y1:65,x2:55,y2:75,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
+
+      /* ===== 二级回路 ===== */
+      /* HE cold side → Supply Header */
+      {x1:67,y1:30,x2:68,y2:15,c:'#26A69A',st:'mech',label:'供液 320m³/h'},
+      {x1:67,y1:70,x2:68,y2:85,c:'#E53935',st:'return',dash:true,label:'回液'},
+
+      /* Supply Header → CDUs */
+      {x1:79,y1:15,x2:72,y2:15,c:'#26A69A',st:'mech'},
+      {x1:79,y1:35,x2:72,y2:35,c:'#26A69A',st:'mech'},
+      {x1:79,y1:65,x2:72,y2:65,c:'#26A69A',st:'mech'},
+      {x1:79,y1:85,x2:72,y2:85,c:'#26A69A',st:'mech'},
+
+      /* CDU → Racks */
+      {x1:82,y1:15,x2:86,y2:10,c:'#26A69A',st:'mech'},
+      {x1:82,y1:20,x2:86,y2:20,c:'#26A69A',st:'mech'},
+      {x1:82,y1:35,x2:86,y2:30,c:'#26A69A',st:'mech'},
+      {x1:82,y1:40,x2:86,y2:40,c:'#26A69A',st:'mech'},
+      {x1:82,y1:65,x2:86,y2:60,c:'#26A69A',st:'mech'},
+      {x1:82,y1:70,x2:86,y2:70,c:'#26A69A',st:'mech'},
+      {x1:82,y1:85,x2:86,y2:80,c:'#26A69A',st:'mech'},
+      {x1:82,y1:90,x2:86,y2:90,c:'#26A69A',st:'mech'},
+
+      /* Racks → Return Header */
+      {x1:93,y1:10,x2:93,y2:20,viaY:20,c:'#E53935',st:'return',dash:true},
+      {x1:93,y1:20,x2:93,y2:30,viaY:30,c:'#E53935',st:'return',dash:true},
+      {x1:93,y1:30,x2:93,y2:40,viaY:40,c:'#E53935',st:'return',dash:true},
+      {x1:93,y1:40,x2:93,y2:50,viaY:50,c:'#E53935',st:'return',dash:true},
+      {x1:93,y1:60,x2:93,y2:70,viaY:70,c:'#E53935',st:'return',dash:true},
+      {x1:93,y1:70,x2:93,y2:80,viaY:80,c:'#E53935',st:'return',dash:true},
+      {x1:93,y1:80,x2:93,y2:90,viaY:90,c:'#E53935',st:'return',dash:true},
+      {x1:93,y1:90,x2:93,y2:95,viaY:95,c:'#E53935',st:'return',dash:true},
+
+      /* Return Header → HE */
+      {x1:68,y1:85,x2:55,y2:65,c:'#E53935',st:'return',dash:true},
+
+      /* Expansion Tank connections */
+      {x1:82,y1:15,x2:89,y2:20,viaX:89,c:'#AB47BC',st:'control',dash:true,label:'补水'},
+      {x1:89,y1:50,x2:89,y2:20,c:'#AB47BC',st:'control',dash:true,label:'溢流'},
+
+      /* AI Controller sensor lines */
+      {x1:50,y1:15,x2:50,y2:25,c:'#8B5CF6',st:'inst',label:'T1-T8'},
+      {x1:50,y1:35,x2:50,y2:45,c:'#8B5CF6',st:'inst',label:'T9-T16'},
+      {x1:50,y1:65,x2:50,y2:75,c:'#8B5CF6',st:'inst',label:'T17-T24'},
+      {x1:50,y1:85,x2:50,y2:95,c:'#8B5CF6',st:'inst',label:'T25-T32'},
+      {x1:68,y1:15,x2:65,y2:15,c:'#f0883e',st:'inst',label:'P1-P8'},
+      {x1:68,y1:85,x2:65,y2:85,c:'#f0883e',st:'inst',label:'P9-P16'},
+      {x1:79,y1:15,x2:75,y2:15,c:'#3fb950',st:'inst',label:'F1-F8'},
+      {x1:79,y1:85,x2:75,y2:85,c:'#3fb950',st:'inst',label:'F9-F16'},
+    ],{w:960,h:500,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.2',scale:'1:50',
        legend:[
-         {style:'mech',label:'冷却水供液管路 (DN'+Math.round(coolKw*0.08+50)+')'},
-         {style:'return',label:'冷却水回液管路'},
-         {style:'control',label:'控制/补水管路'},
-         {style:'inst',label:'仪表信号管路'}
+         {style:'mech',label:'施工侧供液管路 (DN200)'},
+         {style:'return',label:'施工侧回液管路'},
+         {style:'control',label:'冷冻水/补水控制管路'},
+         {style:'inst',label:'AI热控仪表信号 (T/P/F)'}
        ],coolKw:coolKw})+
     tableHtml(
     ['参数','数值','说明'],
-    [['冷却方式',coolLabel,'主冷却方案'],
+    [['冷却方式',coolLabel,'主冷却方案：全液冷冷板+CDU'],
      ['冷却负载',coolKw+' kW','总散热需求'],
-     ['进/出水温度','18~22℃ / 35~40℃','ΔT=16~18℃'],
-     ['流量需求',Math.round(coolKw*2.6)+' L/min','系统总流量'],
-     ['CDU数量',Math.max(2,Math.ceil(coolKw/300))+' 台','液冷分配单元 N+1'],
-     ['冷却塔',Math.max(1,Math.ceil(coolKw/800))+' 台闭式','干球温度35℃'],
-     ['PUE贡献','-0.12 (液冷vs风冷)','能效提升'],
-     ['冗余设计','N+1 (CDU) / 2N (冷却塔)','高可用']], true
+     ['一级回路','2×冷却塔+2×冷水机组','设施侧冷源 N+1'],
+     ['二级回路','4×CDU (500kW)','机柜侧液冷分配 N+1'],
+     ['进/出水温度','32℃ / 42℃','ΔT=10℃'],
+     ['总流量',Math.round(coolKw*2.6)+' L/min','320 m³/h'],
+     ['GPU机柜','8柜 × 8 GPU','冷板式液冷'],
+     ['CDU数量','4 台 (500kW/台)','冗余 N+1'],
+     ['冷却塔','2×2000kW 闭式','干球35℃设计'],
+     ['冷水机组','2×1500kW','变频离心式'],
+     ['AI热控','PID+预测算法','温度/压力/流量/泄漏全监测'],
+     ['PUE','1.15','液冷vs风冷节能15%'],
+     ['冗余设计','2N (冷源) / N+1 (CDU)','Tier III+ 高可用']], true
   );
 
   var pueData=[];
