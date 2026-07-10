@@ -42,6 +42,12 @@ if (fs.existsSync(path.join(src, 'BMS&protocol.png')))
 // Copy reguanli.png as thermal.png (used by flash thermal tab)
 if (fs.existsSync(path.join(src, 'reguanli.png')))
   fs.cpSync(path.join(src, 'reguanli.png'), path.join(dist, 'thermal.png'), { force: true });
+// Copy flash SVG wrappers
+const svgWrappers = ['flash-arch.svg', 'flash-power.svg', 'flash-cooling.svg', 'gaoyapeidian.svg', 'gonglvdiaodu.svg', 'bms-protocol.svg', 'battery-design.svg', 'thermal.svg'];
+svgWrappers.forEach(f => {
+  if (fs.existsSync(path.join(src, f)))
+    fs.cpSync(path.join(src, f), path.join(dist, f), { force: true });
+});
 // Copy images
 const imgSrc = path.join(src, 'images');
 if (fs.existsSync(imgSrc))

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generator: visioncortex VTracer 0.6.12 -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="510" height="290">
+<path d="M0,0 L7,0 L7,3 L0,3 Z " fill="#000000" transform="translate(13,9)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(64,9)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(112,9)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(160,9)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(208,9)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(256,9)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(307,9)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(355,9)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(403,9)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(450,9)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(498,9)"/>
+<path d="M0,0 L7,0 L7,3 L0,3 Z " fill="#000000" transform="translate(13,57)"/>
+<path d="M0,0 L390,0 L390,183 L0,183 Z M4,3 L4,180 L386,180 L386,3 Z " fill="#000000" transform="translate(64,57)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(498,57)"/>
+<path d="M0,0 L7,0 L7,3 L0,3 Z " fill="#000000" transform="translate(13,101)"/>
+<path d="M0,0 L31,0 L31,3 L38,3 L38,6 L27,6 L27,3 L0,3 Z " fill="#000000" transform="translate(146,101)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(498,101)"/>
+<path d="M0,0 L10,0 L10,3 L3,3 L3,6 L-4,6 L-4,3 L0,3 Z " fill="#000000" transform="translate(136,104)"/>
+<path d="M0,0 L7,0 L7,6 L3,6 L3,3 L0,3 Z " fill="#000000" transform="translate(184,107)"/>
+<path d="M0,0 L3,0 L3,7 L-3,7 L-3,10 L-7,10 L-7,3 L0,3 Z " fill="#000000" transform="translate(129,110)"/>
+<path d="M0,0 L3,0 L3,38 L-38,38 L-38,35 L0,35 Z " fill="#000000" transform="translate(160,110)"/>
+<path d="M0,0 L6,0 L6,7 L3,7 L3,4 L0,4 Z " fill="#000000" transform="translate(191,113)"/>
+<path d="M0,0 L3,0 L3,6 L0,6 L0,9 L-4,9 L-4,3 L0,3 Z " fill="#000000" transform="translate(119,120)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(197,120)"/>
+<path d="M0,0 L3,0 L3,6 L0,6 Z " fill="#000000" transform="translate(201,123)"/>
+<path d="M0,0 L3,0 L3,29 L7,29 L7,38 L10,38 L10,44 L7,44 L7,41 L3,41 L3,32 L0,32 Z " fill="#000000" transform="translate(112,129)"/>
+<path d="M0,0 L4,0 L4,3 L7,3 L7,32 L4,32 L4,35 L0,35 L0,29 L4,29 L4,7 L0,7 Z " fill="#000000" transform="translate(204,129)"/>
+<path d="M0,0 L7,0 L7,3 L0,3 Z " fill="#000000" transform="translate(13,145)"/>
+<path d="M0,0 L54,0 L54,3 L0,3 Z " fill="#000000" transform="translate(256,145)"/>
+<path d="M0,0 L55,0 L55,3 L0,3 Z " fill="#000000" transform="translate(351,145)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(498,145)"/>
+<path d="M0,0 L7,0 L7,3 L0,3 Z " fill="#000000" transform="translate(344,148)"/>
+<path d="M0,0 L6,0 L6,3 L0,3 Z " fill="#000000" transform="translate(338,151)"/>
+<path d="M0,0 L11,0 L11,4 L0,4 Z " fill="#000000" transform="translate(327,154)"/>
+<path d="M0,0 L7,0 L7,3 L0,3 Z " fill="#000000" transform="translate(320,158)"/>
+<path d="M0,0 L6,0 L6,3 L0,3 Z " fill="#000000" transform="translate(314,161)"/>
+<path d="M0,0 L3,0 L3,6 L0,6 Z " fill="#000000" transform="translate(201,164)"/>
+<path d="M0,0 L7,0 L7,3 L3,3 L3,6 L0,6 Z " fill="#000000" transform="translate(307,164)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(197,170)"/>
+<path d="M0,0 L4,0 L4,4 L0,4 Z " fill="#000000" transform="translate(122,173)"/>
+<path d="M0,0 L3,0 L3,7 L-3,7 L-3,4 L0,4 Z " fill="#000000" transform="translate(194,173)"/>
+<path d="M0,0 L6,0 L6,6 L3,6 L3,3 L0,3 Z " fill="#000000" transform="translate(126,177)"/>
+<path d="M0,0 L4,0 L4,6 L-7,6 L-7,3 L0,3 Z " fill="#000000" transform="translate(187,180)"/>
+<path d="M0,0 L11,0 L11,3 L14,3 L14,6 L7,6 L7,3 L0,3 Z " fill="#000000" transform="translate(132,183)"/>
+<path d="M0,0 L7,0 L7,3 L0,3 Z " fill="#000000" transform="translate(13,189)"/>
+<path d="M0,0 L7,0 L7,3 L4,3 L4,6 L-27,6 L-27,3 L0,3 Z " fill="#000000" transform="translate(173,186)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(498,189)"/>
+<path d="M0,0 L7,0 L7,3 L0,3 Z " fill="#000000" transform="translate(13,237)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(498,237)"/>
+<path d="M0,0 L7,0 L7,3 L0,3 Z " fill="#000000" transform="translate(13,278)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(64,278)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(112,278)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(160,278)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(208,278)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(256,278)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(307,278)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(355,278)"/>
+<path d="M0,0 L3,0 L3,3 L0,3 Z " fill="#000000" transform="translate(403,278)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(450,278)"/>
+<path d="M0,0 L4,0 L4,3 L0,3 Z " fill="#000000" transform="translate(498,278)"/>
+</svg>
