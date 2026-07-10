@@ -39,6 +39,9 @@ if (fs.existsSync(path.join(src, 'gonglvdiaodu.png')))
 // Copy BMS&protocol.png as bms-protocol.png (used by flash BMS tab)
 if (fs.existsSync(path.join(src, 'BMS&protocol.png')))
   fs.cpSync(path.join(src, 'BMS&protocol.png'), path.join(dist, 'bms-protocol.png'), { force: true });
+// Copy reguanli.png as thermal.png (used by flash thermal tab)
+if (fs.existsSync(path.join(src, 'reguanli.png')))
+  fs.cpSync(path.join(src, 'reguanli.png'), path.join(dist, 'thermal.png'), { force: true });
 // Copy images
 const imgSrc = path.join(src, 'images');
 if (fs.existsSync(imgSrc))
