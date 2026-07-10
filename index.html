@@ -44316,6 +44316,39 @@ function showFlashSubTab(tab){
     if(el) el.style.display=(t===tab)?'block':'none';
   });
 }
+function initFlashZoom(){
+  document.querySelectorAll('div[id^="flashSubTab-"] img[alt]').forEach(function(img){
+    if(img.dataset.fzoom==='1') return;
+    img.dataset.fzoom='1';
+    var scale=1;
+    var wrap=document.createElement('div');
+    wrap.style.cssText='overflow:auto;margin:2px 0';
+    img.parentNode.insertBefore(wrap,img);
+    wrap.appendChild(img);
+    img.style.maxWidth='none';
+    img.style.width='100%';
+    img.style.display='block';
+    img.style.margin='0 auto';
+    var bar=document.createElement('div');
+    bar.style.cssText='display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:8px';
+    var bstyle='width:30px;height:30px;border-radius:6px;border:1px solid var(--text2);background:var(--bg3);color:var(--text1);cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center';
+    var minus=document.createElement('button');
+    var plus=document.createElement('button');
+    var label=document.createElement('span');
+    minus.textContent='−';
+    plus.textContent='+';
+    minus.setAttribute('style',bstyle);
+    plus.setAttribute('style',bstyle);
+    label.style.cssText='font-size:11px;color:var(--text2);min-width:46px;text-align:center';
+    label.textContent='100%';
+    minus.onclick=function(e){e.stopPropagation();scale=Math.max(0.5,scale-0.25);apply();};
+    plus.onclick=function(e){e.stopPropagation();scale=Math.min(4,scale+0.25);apply();};
+    function apply(){img.style.width=(100*scale)+'%';label.textContent=Math.round(scale*100)+'%';}
+    bar.appendChild(minus);bar.appendChild(label);bar.appendChild(plus);
+    wrap.parentNode.insertBefore(bar,wrap);
+  });
+}
+if(document.readyState!=='loading'){initFlashZoom();}else{document.addEventListener('DOMContentLoaded',initFlashZoom);}
 function chCalcPower(){
   const guns=parseInt((document.getElementById('chGunCount')||{}).value||0);
   const pwr=parseInt((document.getElementById('chGunPower')||{}).value||0);
