@@ -40894,11 +40894,6 @@ if __name__ == "__main__":
 <div style="font-size:13px;font-weight:700;color:var(--text1)">热管理</div>
 <div style="font-size:11px;color:var(--text2);margin-top:4px">Thermal Management</div>
 </div>
-<div onclick="showFlashSubTab('reviewer')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
-<div style="font-size:22px;margin-bottom:8px">🔍</div>
-<div style="font-size:13px;font-weight:700;color:var(--text1)">AI Reviewer</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">智能审查</div>
-</div>
 <div onclick="showFlashSubTab('bom')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
 <div style="font-size:22px;margin-bottom:8px">📋</div>
 <div style="font-size:13px;font-weight:700;color:var(--text1)">BOM清单</div>
@@ -41234,44 +41229,6 @@ if __name__ == "__main__":
 <div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
 <div style="font-size:12px;font-weight:700;color:var(--text1)">Control Logic</div>
 <div style="font-size:11px;color:var(--text2);margin-top:4px">PID控制+故障诊断</div>
-</div>
-</div>
-</div>
-</div>
-
-<div id="flashSubTab-reviewer" style="display:none">
-<div class="mg-card" style="margin-bottom:20px">
-<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">🔍 AI Reviewer · 智能图纸审查</h3>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">上传EPLAN/KiCad/CAD/PDF图纸，AI自动检查IEC标准合规性</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px">
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #ef4444">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">IEC 60617</div>
-<div style="font-size:11px;color:var(--text2)">图形符号标准</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #f59e0b">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">IEC 61082</div>
-<div style="font-size:11px;color:var(--text2)">电气文件编制</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #3b82f6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">GB 4728</div>
-<div style="font-size:11px;color:var(--text2)">电气简图用图形符号</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #10b981">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">IEC 81346</div>
-<div style="font-size:11px;color:var(--text2)">产品结构与编码</div>
-</div>
-</div>
-<div class="mg-card">
-<h3 style="margin:0 0 12px;font-size:13px;color:var(--text1)">AI自动检查项</h3>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">QF编号错误检测</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">PE遗漏检查</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">CT方向错误</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">SPD位置错误</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">绝缘距离不足</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">导线编号重复</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">线径错误</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">接地系统检查</div>
 </div>
 </div>
 </div>
@@ -44434,7 +44391,7 @@ function showChargingPage(id){
 
 }
 function showFlashSubTab(tab){
-  var tabs=['arch','power','cooling','hv','dispatch','bms','battery','thermal','reviewer','bom'];
+  var tabs=['arch','power','cooling','hv','dispatch','bms','battery','thermal','bom'];
   tabs.forEach(function(t){
     var el=document.getElementById('flashSubTab-'+t);
     if(el) el.style.display=(t===tab)?'block':'none';
