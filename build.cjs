@@ -27,6 +27,9 @@ if (fs.existsSync(path.join(src, fcool)))
 // Copy yelengxitong.png as c.png (used by flash cooling tab)
 if (fs.existsSync(path.join(src, 'yelengxitong.png')))
   fs.cpSync(path.join(src, 'yelengxitong.png'), path.join(dist, 'c.png'), { force: true });
+// Copy battery design.png as battery-design.png (used by flash battery tab)
+if (fs.existsSync(path.join(src, 'battery design.png')))
+  fs.cpSync(path.join(src, 'battery design.png'), path.join(dist, 'battery-design.png'), { force: true });
 // Copy images
 const imgSrc = path.join(src, 'images');
 if (fs.existsSync(imgSrc))
