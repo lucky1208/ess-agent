@@ -98105,6 +98105,234 @@ function drawPid(title, nodes, pipes, opts){
   svg+='</svg></div>'; return svg;
 }
 
+/* ── V5 P&ID with IEC 60617/62424 symbols ── */
+function drawPidIec(title, nodes, pipes, opts){
+  opts=opts||{}; var w=opts.w||900,h=opts.h||450; var themeName=opts.theme||'huawei';
+  var th=DIAGRAM_THEME[themeName]||DIAGRAM_THEME.huawei; var legendItems=opts.legend||null;
+  var cadH=60; var svgH=h+cadH+(legendItems?24:0);
+  var svg='<div class="arch-svg"><svg width="100%" height="'+svgH+'" viewBox="0 0 '+w+' '+svgH+'" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<defs>';
+  ['mech','data','control','alarm','power','dash'].forEach(function(st){
+    var cc=({power:'#1976D2',data:'#42A5F5',control:'#546E7A',alarm:'#E53935',mech:'#26A69A',dash:'#9E9E9E'})[st];
+    svg+='<marker id="pidArr'+st+'" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="7" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8 Z" fill="'+cc+'"/></marker>';
+  });
+  svg+='<style>.pid-pipe{fill:none;stroke-width:2}.pid-pipe-mech{stroke:#26A69A}.pid-pipe-return{stroke:#E53935;stroke-dasharray:8,4}.pid-pipe-control{stroke:#546E7A;stroke-width:1.5}.pid-pipe-dash{stroke:#9E9E9E;stroke-dasharray:6,3}.pid-pipe-inst{stroke:#42A5F5;stroke-width:1;stroke-dasharray:3,2}</style>';
+  svg+='</defs>';
+  svg+='<rect width="'+w+'" height="'+svgH+'" fill="'+th.bg+'"/>';
+  svg+=_fineGrid(w,h,th);
+
+  var top=32;
+  svg+='<line x1="10" y1="26" x2="'+(w-10)+'" y2="26" stroke="'+th.accent+'" stroke-width="1"/>';
+  svg+='<text x="'+w/2+'" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="'+th.title+'" letter-spacing="0.5">'+title+'</text>';
+
+  function px(pct){ return pct*w/100; }
+  function py(pct){ return top + pct*(h-top-18)/100; }
+
+  /* ── IEC 60617 symbol primitives ── */
+  function _pump(cx,cy,c,sz,tag,label){
+    var r=sz/2;
+    var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5" class="pid-pipe pid-pipe-mech"/>';
+    s+='<path d="M'+(cx-r*0.5)+','+(cy+r*0.3)+' L'+(cx+r*0.7)+','+cy+' L'+(cx-r*0.5)+','+(cy-r*0.3)+' Z" fill="'+c+'" opacity="0.7" stroke="'+c+'" stroke-width="1"/>';
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(r*0.3)+'" fill="none" stroke="'+c+'" stroke-width="1" stroke-dasharray="2,2"/>';
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+r+14)+'" text-anchor="middle" font-size="7" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-r-8)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _valve(cx,cy,c,type,sz,tag,label){
+    var hz=sz/2; var s='';
+    if(type==='gate'){
+      s+='<polygon points="'+cx+','+(cy-hz)+' '+(cx-hz)+','+cy+' '+cx+','+(cy+hz)+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+      s+='<polygon points="'+cx+','+(cy-hz)+' '+(cx+hz)+','+cy+' '+cx+','+(cy+hz)+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+      s+='<line x1="'+cx+'" y1="'+(cy-hz)+'" x2="'+cx+'" y2="'+(cy-hz-6)+'" stroke="'+c+'" stroke-width="1.3"/>';
+      s+='<rect x="'+(cx-5)+'" y="'+(cy-hz-10)+'" width="10" height="4" fill="none" stroke="'+c+'" stroke-width="1"/>';
+    }else if(type==='check'){
+      s+='<polygon points="'+(cx-hz)+','+(cy-hz*0.6)+' '+(cx+hz*0.5)+','+cy+' '+(cx-hz)+','+(cy+hz*0.6)+' Z" fill="'+c+'" opacity="0.6" stroke="'+c+'" stroke-width="1" class="pid-pipe pid-pipe-mech"/>';
+      s+='<line x1="'+(cx+hz*0.5)+'" y1="'+(cy-hz*0.6)+'" x2="'+(cx+hz*0.5)+'" y2="'+(cy+hz*0.6)+'" stroke="'+c+'" stroke-width="1.2"/>';
+    }else if(type==='butterfly'){
+      s+='<line x1="'+(cx-hz)+'" y1="'+cy+'" x2="'+(cx+hz)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+      s+='<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+hz*0.7+'" ry="'+hz*0.4+'" fill="none" stroke="'+c+'" stroke-width="1.2"/>';
+      s+='<line x1="'+cx+'" y1="'+(cy-hz)+'" x2="'+cx+'" y2="'+(cy+hz)+'" stroke="'+c+'" stroke-width="1.2"/>';
+      s+='<circle cx="'+cx+'" cy="'+(cy-hz-2)+'" r="3" fill="'+c+'"/>';
+    }else if(type==='ball'){
+      s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+hz*0.8+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+      s+='<line x1="'+(cx-hz*0.5)+'" y1="'+cy+'" x2="'+(cx+hz*0.5)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.8"/>';
+    }
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+hz+14)+'" text-anchor="middle" font-size="6" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-hz-8)+'" text-anchor="middle" font-size="5.5" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _tank(cx,cy,c,w,h,tag,label){
+    var r=8;
+    var s='<rect x="'+(cx-w/2+r)+'" y="'+(cy-h/2)+'" width="'+(w-2*r)+'" height="'+h+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+    s+='<ellipse cx="'+(cx-w/2+r)+'" cy="'+cy+'" rx="'+r+'" ry="'+h/2+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+    s+='<ellipse cx="'+(cx+w/2-r)+'" cy="'+cy+'" rx="'+r+'" ry="'+h/2+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+(cx-w/2+4)+'" y1="'+(cy+h/4)+'" x2="'+(cx+w/2-4)+'" y2="'+(cy+h/4)+'" stroke="'+c+'" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.6"/>';
+    s+='<line x1="'+cx+'" y1="'+(cy-h/2)+'" x2="'+cx+'" y2="'+(cy-h/2-10)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+cx+'" y1="'+(cy+h/2)+'" x2="'+cx+'" y2="'+(cy+h/2+10)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+h/2+18)+'" text-anchor="middle" font-size="7" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-h/2-10)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _heatex(cx,cy,c,w,h,tag,label){
+    var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="3" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5" class="pid-pipe pid-pipe-mech"/>';
+    for(var zi=0;zi<4;zi++){
+      var zy=cy-h/2+8+zi*(h-16)/4;
+      s+='<path d="M'+(cx-w/2+6)+','+zy+' Q'+(cx-w/2+15)+','+(zy-6)+' '+(cx-w/2+24)+','+zy+' T'+(cx+w/2-6)+','+zy+'" fill="none" stroke="'+c+'" stroke-width="1" opacity="0.6" stroke-dasharray="3,2"/>';
+    }
+    s+='<line x1="'+cx+'" y1="'+(cy-h/2)+'" x2="'+cx+'" y2="'+(cy-h/2-12)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+cx+'" y1="'+(cy+h/2)+'" x2="'+cx+'" y2="'+(cy+h/2+12)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+(cx-w/2)+'" y1="'+cy+'" x2="'+(cx-w/2-12)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+(cx+w/2)+'" y1="'+cy+'" x2="'+(cx+w/2+12)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+h/2+18)+'" text-anchor="middle" font-size="7" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-h/2-12)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _coolingtower(cx,cy,c,w,h,tag,label){
+    var tw=w*0.45; var bw=w*0.85; var th2=h*0.75;
+    var tx=cx-tw/2, ty=cy-th2/2;
+    var bx=cx-bw/2, by=cy+th2/2;
+    var s='<polygon points="'+tx+','+ty+' '+(tx+tw)+','+ty+' '+(bx+bw)+','+by+' '+bx+','+by+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+    s+='<circle cx="'+cx+'" cy="'+(ty-2)+'" r="'+tw*0.28+'" fill="none" stroke="'+c+'" stroke-width="1.2" stroke-dasharray="4,2"/>';
+    s+='<line x1="'+(cx-tw*0.2)+'" y1="'+ty+'" x2="'+(cx+tw*0.2)+'" y2="'+ty+'" stroke="'+c+'" stroke-width="0.8"/>';
+    s+='<line x1="'+cx+'" y1="'+(ty-tw*0.2)+'" x2="'+cx+'" y2="'+(ty+tw*0.2)+'" stroke="'+c+'" stroke-width="0.8"/>';
+    s+='<line x1="'+(bx+10)+'" y1="'+(by-14)+'" x2="'+(bx+bw-10)+'" y2="'+(by-14)+'" stroke="'+c+'" stroke-width="0.8" stroke-dasharray="4,2" opacity="0.6"/>';
+    s+='<line x1="'+cx+'" y1="'+by+'" x2="'+cx+'" y2="'+(by+12)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+(bx+10)+'" y1="'+cy+'" x2="'+(bx-12)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<text x="'+cx+'" y="'+(by+22)+'" text-anchor="middle" font-size="7" fill="'+c+'" font-family="'+th.font+'" font-weight="700">C.T.</text>';
+    if(label){ s+='<text x="'+cx+'" y="'+(by+32)+'" text-anchor="middle" font-size="7" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(ty-14)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _manifold(cx,cy,c,w,h,label,tag){
+    var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="2" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5" class="pid-pipe pid-pipe-mech"/>';
+    s+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+c+'" font-family="'+th.font+'" font-weight="700">'+(label||'')+'</text>';
+    for(var bi=0;bi<4;bi++){
+      var by=cy-h/2+bi*(h/3)+h/6;
+      s+='<line x1="'+(cx+w/2)+'" y1="'+by+'" x2="'+(cx+w/2+12)+'" y2="'+by+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    }
+    s+='<line x1="'+(cx-w/2)+'" y1="'+cy+'" x2="'+(cx-w/2-12)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="2" class="pid-pipe pid-pipe-mech"/>';
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy+h/2+16)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _cdu(cx,cy,c,w,h,label,tag){
+    var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="4" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5" class="pid-pipe pid-pipe-mech"/>';
+    for(var si=0;si<2;si++){
+      var sy=cy-h/2+8+si*(h-20)/2;
+      s+='<rect x="'+(cx-w/2+6)+'" y="'+sy+'" width="'+(w-12)+'" height="'+(h/2-10)+'" rx="2" fill="none" stroke="'+c+'" stroke-width="0.8" opacity="0.5" stroke-dasharray="2,2"/>';
+    }
+    s+='<line x1="'+cx+'" y1="'+(cy-h/2)+'" x2="'+cx+'" y2="'+(cy-h/2-10)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+cx+'" y1="'+(cy+h/2)+'" x2="'+cx+'" y2="'+(cy+h/2+10)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="7" fill="'+c+'" font-family="'+th.font+'" font-weight="700">CDU</text>';
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+h/2+16)+'" text-anchor="middle" font-size="6" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-h/2-12)+'" text-anchor="middle" font-size="5.5" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _instrument(cx,cy,c,tag,sub,lineX,lineY){
+    var r=12;
+    var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5"/>';
+    s+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+tag+'</text>';
+    if(sub){ s+='<text x="'+cx+'" y="'+(cy+r+10)+'" text-anchor="middle" font-size="6" fill="'+th.sub+'" font-family="'+th.fontMono+'">'+sub+'</text>'; }
+    if(lineX!==undefined && lineY!==undefined){
+      s+='<line x1="'+cx+'" y1="'+(cy+r)+'" x2="'+lineX+'" y2="'+lineY+'" stroke="'+c+'" stroke-width="0.8" stroke-dasharray="3 2" class="pid-pipe pid-pipe-inst"/>';
+    }
+    return s;
+  }
+
+  function _route(x1,y1,x2,y2,viaX,viaY){
+    var pts=[x1+','+y1];
+    if(viaX!==undefined){ pts.push(viaX+','+y1); pts.push(viaX+','+viaY); }
+    else if(viaY!==undefined){ pts.push(x1+','+viaY); pts.push(viaX!==undefined?viaX:x2+','+viaY); }
+    pts.push(x2+','+y2);
+    return pts.join(' ');
+  }
+
+  /* ── Main headers ── */
+  var supplyY=py(12), returnY=py(88);
+  var dnMain=Math.round((opts.coolKw||0)*0.08+50);
+  svg+='<line x1="'+px(5)+'" y1="'+supplyY+'" x2="'+px(95)+'" y2="'+supplyY+'" stroke="#26A69A" stroke-width="3" marker-end="url(#pidArrmech)" class="pid-pipe pid-pipe-mech"/>';
+  svg+='<text x="'+px(8)+'" y="'+(supplyY-10)+'" font-size="8" fill="#26A69A" font-family="'+th.fontMono+'" font-weight="700">供液主管 SUPPLY DN'+dnMain+'</text>';
+  svg+='<line x1="'+px(95)+'" y1="'+returnY+'" x2="'+px(5)+'" y2="'+returnY+'" stroke="#E53935" stroke-width="3" stroke-dasharray="10,4" marker-end="url(#pidArrDash)" class="pid-pipe pid-pipe-return"/>';
+  svg+='<text x="'+px(8)+'" y="'+(returnY+16)+'" font-size="8" fill="#E53935" font-family="'+th.fontMono+'" font-weight="700">回液主管 RETURN DN'+dnMain+'</text>';
+
+  /* ── Draw nodes ── */
+  for(var ni=0;ni<nodes.length;ni++){
+    var nd=nodes[ni]; var cx=px(nd.x), cy=py(nd.y);
+    var c=nd.sc||th.mech; var nW=nd.w||70; var nH=nd.h||36;
+    var lbl=nd.n||''; var tag=nd.tag||''; var vtype=nd.vtype||'gate';
+
+    if(nd.type==='pump'){
+      svg+=_pump(cx,cy,c,Math.max(nW,nH),tag,lbl);
+    }else if(nd.type==='valve'){
+      svg+=_valve(cx,cy,c,vtype,Math.max(nW,nH),tag,lbl);
+    }else if(nd.type==='tank'){
+      svg+=_tank(cx,cy,c,nW,nH,tag,lbl);
+    }else if(nd.type==='exchanger'){
+      svg+=_heatex(cx,cy,c,nW,nH,tag,lbl);
+    }else if(nd.type==='cooling_tower'){
+      svg+=_coolingtower(cx,cy,c,nW,nH,tag,lbl);
+    }else if(nd.type==='manifold'){
+      svg+=_manifold(cx,cy,c,nW,nH,lbl,tag);
+    }else if(nd.type==='cdu'){
+      svg+=_cdu(cx,cy,c,nW,nH,lbl,tag);
+    }else{
+      svg+='<rect x="'+(cx-nW/2)+'" y="'+(cy-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+(nd.fc||th.boxFill)+'" stroke="'+c+'" stroke-width="1.3"/>';
+      svg+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+lbl+'</text>';
+      if(tag){ svg+='<text x="'+cx+'" y="'+(cy-nH/2-8)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    }
+  }
+
+  /* ── Draw branch pipes ── */
+  for(var pi=0;pi<pipes.length;pi++){
+    var pp=pipes[pi];
+    var col=pp.c||th.mech; var st=pp.style||'mech';
+    var cls='pid-pipe pid-pipe-'+st;
+    var pts;
+    if(pp.points){
+      pts=pp.points.map(function(p){return px(p.x)+','+py(p.y);}).join(' ');
+    }else if(pp.viaX!==undefined || pp.viaY!==undefined){
+      pts=_route(px(pp.x1),py(pp.y1),px(pp.x2),py(pp.y2),pp.viaX!==undefined?px(pp.viaX):undefined,pp.viaY!==undefined?py(pp.viaY):undefined);
+    }else{
+      var x1=px(pp.x1), y1=py(pp.y1), x2=px(pp.x2), y2=py(pp.y2);
+      pts=connPath(x1,y1,x2,y2,pp.route||'vh');
+    }
+    svg+='<polyline points="'+pts+'" class="'+cls+'" marker-end="url(#pidArr'+st+')"/>';
+    if(pp.label){
+      if(pp.points && pp.points.length>=2){
+        var lp=pp.points; var liA=lp[0], liB=lp[lp.length-1];
+        var isH2=Math.abs(liB.y-liA.y)<Math.abs(liB.x-liA.x);
+        var lx=(px(liA.x)+px(liB.x))/2; var ly=isH2?(Math.min(py(liA.y),py(liB.y))-10):((py(liA.y)+py(liB.y))/2+5);
+        svg+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" font-size="7" fill="'+col+'" font-family="'+th.fontMono+'" font-weight="700">'+pp.label+'</text>';
+      }else{
+        var x1l=px(pp.x1), y1l=py(pp.y1), x2l=px(pp.x2), y2l=py(pp.y2);
+        var isH3=Math.abs(y2l-y1l)<Math.abs(x2l-x1l);
+        var lx2=(x1l+x2l)/2; var ly2=isH3?(Math.min(y1l,y2l)-10):((y1l+y2l)/2+5);
+        svg+='<text x="'+lx2+'" y="'+ly2+'" text-anchor="middle" font-size="7" fill="'+col+'" font-family="'+th.fontMono+'" font-weight="700">'+pp.label+'</text>';
+      }
+    }
+  }
+
+  /* ── Draw instruments ── */
+  if(opts.instruments){
+    for(var ii=0;ii<opts.instruments.length;ii++){
+      var inst=opts.instruments[ii];
+      var ix=px(inst.x), iy=py(inst.y);
+      var ic=inst.sc||'#42A5F5';
+      svg+=_instrument(ix,iy,ic,inst.tag,inst.sub,inst.sx!==undefined?px(inst.sx):undefined,inst.sy!==undefined?py(inst.sy):undefined);
+    }
+  }
+
+  if(legendItems) svg+=_legendBlock(legendItems,w-170,h-20,160,themeName);
+  svg+=_cadTitle(title,opts.drawingNo||'PID-001',opts.ver||'V1.0',opts.scale||'1:50',w,svgH,th);
+  svg+='</svg></div>'; return svg;
+}
+
 /* ── V4 Sankey with professional styling ── */
 function drawSankey(title, flows, opts){
   opts=opts||{}; var w=opts.w||760,h=opts.h||300; var themeName=opts.theme||'huawei';
@@ -98664,84 +98892,89 @@ function synUnifiedFlow(){
        legend:[{style:'data',label:'MQTT/Modbus TCP'},{style:'control',label:'BACnet/IEC 61850'},{style:'power',label:'电力线路'},{style:'mech',label:'冷却管路'}]});
 
   steps[2].delay=800; steps[2].result=
-    drawPid('液冷散热系统P&ID图 — '+coolLabel,[
-      /* ── Left: Cooling tower and primary loop (aligned) ── */
-      {x:10,y:50,n:'冷却塔',type:'cooling_tower',sc:'#26A69A',w:25,h:34,tag:'CT-101'},
-      {x:28,y:28,n:'泵A',type:'pump',sc:'#1976D2',w:12,h:12,tag:'P-101A'},
-      {x:28,y:72,n:'泵B',type:'pump',sc:'#1976D2',w:12,h:12,tag:'P-101B'},
-      {x:38,y:28,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:8,h:8,tag:'V-101'},
-      {x:38,y:72,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:8,h:8,tag:'V-102'},
-      /* ── Center: Heat exchanger (no overlap with pipes) ── */
-      {x:52,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:28,h:24,tag:'HX-101'},
-      /* ── Right: Manifolds and GPUs (clear vertical corridors) ── */
-      {x:70,y:18,n:'分水器',type:'manifold',sc:'#26A69A',w:30,h:8,tag:'MS-101'},
-      {x:70,y:82,n:'集水器',type:'manifold',sc:'#FF7043',w:30,h:8,tag:'MR-101'},
-      /* GPU rows spaced vertically to allow clean pipe drops from above/below */
-      {x:82,y:30,n:'GPU-1',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-101'},
-      {x:82,y:42,n:'GPU-2',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-102'},
-      {x:82,y:58,n:'GPU-3',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-103'},
-      {x:82,y:70,n:'GPU-4',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-104'},
-      /* ── Far right: Utilities (aligned) ── */
-      {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:12,h:12,tag:'TK-101'},
-      {x:95,y:18,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',w:6,h:6,tag:'V-103'},
-      {x:95,y:82,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',w:6,h:6,tag:'V-104'},
+    drawPidIec('液冷散热系统P&ID图 — '+coolLabel,[
+      /* ── Left: Cooling Tower & Primary Loop ── */
+      {x:8,y:50,n:'冷却塔',type:'cooling_tower',sc:'#26A69A',w:18,h:28,tag:'CT-101',lbl:'闭式冷却塔'},
+      {x:22,y:30,n:'循环泵A',type:'pump',sc:'#1976D2',sz:14,tag:'P-101A',lbl:'变频'},
+      {x:22,y:70,n:'循环泵B',type:'pump',sc:'#1976D2',sz:14,tag:'P-101B',lbl:'变频'},
+      {x:32,y:30,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-101'},
+      {x:32,y:70,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-102'},
+      {x:42,y:30,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-105'},
+      {x:42,y:70,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-106'},
+      /* ── Center: Plate Heat Exchanger ── */
+      {x:55,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:24,h:20,tag:'HX-101',lbl:'HX-101'},
+      /* ── Right: CDU Manifolds & Cold Plates ── */
+      {x:70,y:20,n:'供液分水器',type:'manifold',sc:'#26A69A',w:28,h:10,tag:'MS-101',lbl:'MS-101'},
+      {x:70,y:80,n:'回液集水器',type:'manifold',sc:'#E53935',w:28,h:10,tag:'MR-101',lbl:'MR-101'},
+      /* CDU Cold Plate Units (4 GPU racks) */
+      {x:82,y:28,n:'CDU-1',type:'cdu',sc:'#26A69A',w:22,h:14,tag:'CDU-101',lbl:'GPU机柜1-2'},
+      {x:82,y:46,n:'CDU-2',type:'cdu',sc:'#26A69A',w:22,h:14,tag:'CDU-102',lbl:'GPU机柜3-4'},
+      {x:82,y:64,n:'CDU-3',type:'cdu',sc:'#26A69A',w:22,h:14,tag:'CDU-103',lbl:'GPU机柜5-6'},
+      {x:82,y:72,n:'CDU-4',type:'cdu',sc:'#26A69A',w:22,h:14,tag:'CDU-104',lbl:'GPU机柜7-8'},
+      /* ── Far Right: Utilities ── */
+      {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:14,h:16,tag:'TK-101',lbl:'TK-101'},
+      {x:95,y:20,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',sz:8,tag:'V-103'},
+      {x:95,y:80,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',sz:8,tag:'V-104'},
     ],[
-      /* ── Primary loop: Tower → Pumps → HE (clear corridors only) ── */
-      /* Tower right stub → vertical corridor (avoiding tower area) → horizontal to pump inlet */
-      {points:[{x:22,y:50},{x:22,y:28},{x:22,y:28}],c:'#26A69A',style:'mech',label:'DN'+Math.round(coolKw*0.08+40)},
-      /* Tower right stub → vertical corridor (avoiding tower area) → horizontal to pump inlet */
-      {points:[{x:22,y:50},{x:22,y:72},{x:22,y:72}],c:'#26A69A',style:'mech'},
-      /* Pump outlet → short horizontal to valve inlet */
-      {points:[{x:34,y:28},{x:38,y:28}],c:'#1976D2',style:'mech'},
-      {points:[{x:34,y:72},{x:38,y:72}],c:'#1976D2',style:'mech'},
-      /* Valve outlet → vertical corridor (no overlap) → horizontal to HE inlet */
-      {points:[{x:42,y:28},{x:42,y:38},{x:38,y:38}],c:'#1976D2',style:'mech'},
-      {points:[{x:42,y:72},{x:42,y:62},{x:38,y:62}],c:'#1976D2',style:'mech'},
-      /* ── HE → Supply manifold (outer corridor, no equipment crossings) ── */
-      {points:[{x:66,y:38},{x:66,y:24},{x:52,y:24},{x:52,y:18}],c:'#26A69A',style:'mech',label:'供液 '+Math.round(coolKw*1.25)+' L/min'},
-      /* ── Supply manifold → GPU rows (dedicated vertical corridors only) ── */
-      {points:[{x:82,y:22},{x:82,y:25}],c:'#26A69A',style:'mech'},
-      {points:[{x:82,y:22},{x:82,y:37}],c:'#26A69A',style:'mech'},
-      {points:[{x:82,y:22},{x:82,y:53}],c:'#26A69A',style:'mech'},
-      /* ── GPU rows → Return manifold (dedicated vertical corridors only) ── */
-      {points:[{x:82,y:75},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true},
-      {points:[{x:82,y:65},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true},
-      {points:[{x:82,y:45},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true,label:'回液'},
-      /* ── Return manifold → HE → Tower (outer corridor only) ── */
-      {points:[{x:52,y:78},{x:52,y:74},{x:66,y:74}],c:'#FF7043',style:'mech',dash:true},
-      {points:[{x:38,y:62},{x:38,y:68},{x:10,y:68},{x:10,y:69}],c:'#FF7043',style:'mech',dash:true},
-      /* ── Expansion tank (outermost corridor, no equipment crossings) ── */
-      {points:[{x:89,y:50},{x:89,y:18},{x:95,y:18}],c:'#AB47BC',style:'control',label:'补水'},
-      {points:[{x:89,y:50},{x:89,y:82},{x:95,y:82}],c:'#AB47BC',style:'control',dash:true,label:'溢流'},
-      {points:[{x:89,y:24},{x:82,y:24}],c:'#AB47BC',style:'control',dash:true},
-      /* ── Pump backup (outer corridor only, no overlap with HE) ── */
-      {points:[{x:22,y:34},{x:22,y:66},{x:28,y:66}],c:'#1976D2',style:'control',dash:true,label:'备用'},
-      /* ── Supply/return header connections (directly to manifolds) ── */
-      {points:[{x:22,y:12},{x:22,y:24},{x:52,y:24},{x:52,y:18}],c:'#26A69A',style:'mech'},
-      {points:[{x:10,y:76},{x:10,y:88}],c:'#FF7043',style:'mech',dash:true}
-    ],{w:850,h:400,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.0',scale:'1:50',
-       instruments:[
-         {x:28,y:16,tag:'TI',sub:'TI-101',sc:'#42A5F5',sx:28,sy:28},
-         {x:52,y:30,tag:'TI',sub:'TI-102',sc:'#42A5F5',sx:52,sy:38},
-         {x:52,y:70,tag:'TI',sub:'TI-103',sc:'#42A5F5',sx:52,sy:62},
-         {x:70,y:12,tag:'PI',sub:'PI-101',sc:'#f0883e',sx:70,sy:18},
-         {x:70,y:88,tag:'PI',sub:'PI-102',sc:'#f0883e',sx:70,sy:82},
-         {x:38,y:16,tag:'FI',sub:'FI-101',sc:'#3fb950',sx:38,sy:28},
-         {x:95,y:38,tag:'LI',sub:'LI-101',sc:'#AB47BC',sx:95,sy:50}
-       ],
+      /* ── Primary Loop: Tower → Pumps → HE ── */
+      {x1:17,y1:50,x2:22,y2:50,viaY:30,c:'#26A69A',st:'mech',label:'DN'+Math.round(coolKw*0.08+50)},
+      {x1:22,y1:30,x2:22,y2:30,c:'#1976D2',st:'mech'},  /* pump A stub */
+      {x1:22,y1:70,x2:22,y2:70,c:'#1976D2',st:'mech'},  /* pump B stub */
+      {x1:29,y1:30,x2:32,y2:30,c:'#1976D2',st:'mech'},  /* pump out to valve */
+      {x1:29,y1:70,x2:32,y2:70,c:'#1976D2',st:'mech'},
+      {x1:37,y1:30,x2:42,y2:30,c:'#1976D2',st:'mech'},  /* valve to check valve */
+      {x1:37,y1:70,x2:42,y2:70,c:'#1976D2',st:'mech'},
+      {x1:47,y1:30,x2:55,y2:30,viaY:40,c:'#1976D2',st:'mech'},  /* check valve to HE hot in */
+      {x1:47,y1:70,x2:55,y2:70,viaY:60,c:'#1976D2',st:'mech'},  /* check valve to HE hot out */
+      /* ── HE → Supply Header (Supply) ── */
+      {x1:67,y1:38,x2:70,y2:38,viaX:67,c:'#26A69A',st:'mech',label:'供液 '+Math.round(coolKw*1.3)+' L/min'},
+      {x1:67,y1:62,x2:70,y2:62,viaX:67,c:'#E53935',st:'return',dash:true},  /* HE cold out to return header */
+      /* ── Supply Header → CDU Units ── */
+      {x1:82,y1:20,x2:82,y2:22,c:'#26A69A',st:'mech'},   /* CDU-101 supply */
+      {x1:82,y1:20,x2:82,y2:35,c:'#26A69A',st:'mech'},   /* CDU-101 supply down */
+      {x1:82,y1:20,x2:82,y2:42,c:'#26A69A',st:'mech'},   /* CDU-102 supply */
+      {x1:82,y1:20,x2:82,y2:58,c:'#26A69A',st:'mech'},   /* CDU-103 supply */
+      {x1:82,y1:20,x2:82,y2:66,c:'#26A69A',st:'mech'},   /* CDU-104 supply */
+      /* ── CDU Units → Return Header ── */
+      {x1:82,y1:42,x2:82,y2:44,c:'#E53935',st:'return',dash:true},  /* CDU-102 return */
+      {x1:82,y1:58,x2:82,y2:60,c:'#E53935',st:'return',dash:true},  /* CDU-103 return */
+      {x1:82,y1:72,x2:82,y2:74,c:'#E53935',st:'return',dash:true},  /* CDU-104 return */
+      {x1:82,y1:28,x2:82,y2:30,c:'#E53935',st:'return',dash:true,label:'回液'},  /* CDU-101 return */
+      /* ── Return Header → HE Cold In ── */
+      {x1:55,y1:62,x2:67,y2:62,c:'#E53935',st:'return',dash:true},
+      /* ── Return from HE → Tower ── */
+      {x1:55,y1:62,x2:42,y2:62,viaX:48,c:'#E53935',st:'return',dash:true},
+      {x1:42,y1:62,x2:42,y2:50,viaX:22,c:'#E53935',st:'return',dash:true},
+      {x1:22,y1:50,x2:8,y2:50,c:'#E53935',st:'return',dash:true},
+      /* ── Expansion Tank ── */
+      {x1:82,y1:20,x2:89,y2:20,viaX:89,c:'#AB47BC',st:'control',dash:true,label:'补水 DN25'},
+      {x1:89,y1:50,x2:89,y2:20,c:'#AB47BC',st:'control',dash:true},
+      {x1:89,y1:50,x2:89,y2:80,c:'#AB47BC',st:'control',dash:true,label:'溢流 DN25'},
+      {x1:89,y1:50,x2:95,y2:50,c:'#AB47BC',st:'control',dash:true},
+      /* ── Tower Makeup ── */
+      {x1:17,y1:50,x2:17,y2:20,viaX:8,c:'#42A5F5',st:'control',dash:true,label:'自动补水'},
+      /* ── Instruments as pipe tags ── */
+      {x1:22,y1:18,x2:22,y2:28,c:'#42A5F5',st:'inst',label:'TI-101'},
+      {x1:55,y1:35,x2:55,y2:40,c:'#42A5F5',st:'inst',label:'TI-102'},
+      {x1:55,y1:65,x2:55,y2:70,c:'#42A5F5',st:'inst',label:'TI-103'},
+      {x1:70,y1:15,x2:70,y2:20,c:'#f0883e',st:'inst',label:'PI-101'},
+      {x1:70,y1:85,x2:70,y2:80,c:'#f0883e',st:'inst',label:'PI-102'},
+      {x1:32,y1:18,x2:32,y2:28,c:'#3fb950',st:'inst',label:'FI-101'},
+      {x1:95,y1:38,x2:95,y2:45,c:'#AB47BC',st:'inst',label:'LI-101'},
+    ],{w:900,h:480,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.1',scale:'1:50',
        legend:[
-         {style:'mech',label:'冷却水供液管路'},
-         {style:'mech',label:'冷却水回液管路'},
+         {style:'mech',label:'冷却水供液管路 (DN'+Math.round(coolKw*0.08+50)+')'},
+         {style:'return',label:'冷却水回液管路'},
          {style:'control',label:'控制/补水管路'},
-         {style:'data',label:'仪表信号管路'}
+         {style:'inst',label:'仪表信号管路'}
        ],coolKw:coolKw})+
     tableHtml(
     ['参数','数值','说明'],
     [['冷却方式',coolLabel,'主冷却方案'],
      ['冷却负载',coolKw+' kW','总散热需求'],
      ['进/出水温度','18~22℃ / 35~40℃','ΔT=16~18℃'],
-     ['流量需求',Math.round(coolKw*2.5)+' L/min','系统总流量'],
-     ['CDU数量',Math.max(2,Math.ceil(coolKw/300))+' 台','液冷分配单元'],
+     ['流量需求',Math.round(coolKw*2.6)+' L/min','系统总流量'],
+     ['CDU数量',Math.max(2,Math.ceil(coolKw/300))+' 台','液冷分配单元 N+1'],
      ['冷却塔',Math.max(1,Math.ceil(coolKw/800))+' 台闭式','干球温度35℃'],
      ['PUE贡献','-0.12 (液冷vs风冷)','能效提升'],
      ['冗余设计','N+1 (CDU) / 2N (冷却塔)','高可用']], true
