@@ -42,6 +42,9 @@ if (fs.existsSync(path.join(src, 'BMS&protocol.png')))
 // Copy reguanli.png as reguanli.png (used by flash thermal tab)
 if (fs.existsSync(path.join(src, 'reguanli.png')))
   fs.cpSync(path.join(src, 'reguanli.png'), path.join(dist, 'reguanli.png'), { force: true });
+// Copy yelengsanre.png as yelengsanre.png (used by 算电协同 liquid cooling step)
+if (fs.existsSync(path.join(src, 'yelengsanre.png')))
+  fs.cpSync(path.join(src, 'yelengsanre.png'), path.join(dist, 'yelengsanre.png'), { force: true });
 // Copy flash SVG wrappers
 const svgWrappers = ['flash-arch.svg', 'flash-power.svg', 'flash-cooling.svg', 'gaoyapeidian.svg', 'gonglvdiaodu.svg', 'bms-protocol.svg', 'battery-design.svg', 'thermal.svg'];
 svgWrappers.forEach(f => {
