@@ -41043,83 +41043,6 @@ if __name__ == "__main__":
 </div>
 </div>
 
-<script>
-if(typeof drawPidIec==='function'){
-  var coolKw=250;
-  var coolLabel='全液冷冷板+CDU';
-  var thermalSvg=drawPidIec('闪充热管理系统P&ID图 — '+coolLabel,[
-    {x:8,y:25,n:'闭式冷却塔#1',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-101',lbl:'250kW'},
-    {x:8,y:75,n:'闭式冷却塔#2',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-102',lbl:'250kW(备)'},
-    {x:22,y:25,n:'一次泵A',type:'pump',sc:'#1976D2',sz:14,tag:'P-101A',lbl:'变频 80m³/h'},
-    {x:22,y:75,n:'一次泵B',type:'pump',sc:'#1976D2',sz:14,tag:'P-101B',lbl:'变频 80m³/h'},
-    {x:32,y:25,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-101'},
-    {x:32,y:75,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-102'},
-    {x:42,y:25,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-105'},
-    {x:42,y:75,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-106'},
-    {x:55,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:24,h:20,tag:'HX-101',lbl:'500kW'},
-    {x:55,y:15,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-101',lbl:'300kW'},
-    {x:55,y:85,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-102',lbl:'300kW'},
-    {x:72,y:15,n:'CDU-1',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-101',lbl:'枪1-2 125kW'},
-    {x:72,y:35,n:'CDU-2',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-102',lbl:'枪3-4 125kW'},
-    {x:72,y:65,n:'CDU-3',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-103',lbl:'功率模块 125kW'},
-    {x:72,y:85,n:'CDU-4',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-104',lbl:'母排/储能 125kW'},
-    {x:68,y:15,n:'供液分水器',type:'manifold',sc:'#26A69A',w:22,h:12,tag:'MS-101',lbl:'SUPPLY'},
-    {x:68,y:85,n:'回液集水器',type:'manifold',sc:'#E53935',w:22,h:12,tag:'MR-101',lbl:'RETURN'},
-    {x:86,y:10,n:'充电枪1-2',type:'tank',sc:'#546E7A',w:14,h:12,tag:'GUN-12',lbl:'250kW'},
-    {x:86,y:20,n:'充电枪3-4',type:'tank',sc:'#546E7A',w:14,h:12,tag:'GUN-34',lbl:'250kW'},
-    {x:86,y:60,n:'功率模块',type:'tank',sc:'#546E7A',w:14,h:12,tag:'PM-12',lbl:'PFC+DC/DC'},
-    {x:86,y:70,n:'母排/储能',type:'tank',sc:'#546E7A',w:14,h:12,tag:'BS-ESS',lbl:'母排+电池'},
-    {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:14,h:16,tag:'TK-101',lbl:'TK-101'},
-    {x:95,y:20,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',sz:8,tag:'V-103'},
-    {x:95,y:80,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',sz:8,tag:'V-104'},
-    {x:50,y:95,n:'AI热控单元',type:'exchanger',sc:'#8B5CF6',w:24,h:12,tag:'TC-101',lbl:'AI Thermal Ctrl'},
-  ],[
-    {x1:16,y1:25,x2:22,y2:25,c:'#26A69A',st:'mech',label:'DN100'},
-    {x1:16,y1:75,x2:22,y2:75,c:'#26A69A',st:'mech',label:'DN100'},
-    {x1:29,y1:25,x2:32,y2:25,c:'#1976D2',st:'mech'},
-    {x1:29,y1:75,x2:32,y2:75,c:'#1976D2',st:'mech'},
-    {x1:37,y1:25,x2:42,y2:25,c:'#1976D2',st:'mech'},
-    {x1:37,y1:75,x2:42,y2:75,c:'#1976D2',st:'mech'},
-    {x1:47,y1:25,x2:55,y2:40,viaY:40,c:'#1976D2',st:'mech'},
-    {x1:47,y1:75,x2:55,y2:60,viaY:60,c:'#1976D2',st:'mech'},
-    {x1:55,y1:35,x2:55,y2:25,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
-    {x1:55,y1:65,x2:55,y2:75,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
-    {x1:67,y1:30,x2:68,y2:15,c:'#26A69A',st:'mech',label:'供液 160m³/h'},
-    {x1:67,y1:70,x2:68,y2:85,c:'#E53935',st:'return',dash:true,label:'回液'},
-    {x1:79,y1:15,x2:72,y2:15,c:'#26A69A',st:'mech'},
-    {x1:79,y1:35,x2:72,y2:35,c:'#26A69A',st:'mech'},
-    {x1:79,y1:65,x2:72,y2:65,c:'#26A69A',st:'mech'},
-    {x1:79,y1:85,x2:72,y2:85,c:'#26A69A',st:'mech'},
-    {x1:82,y1:15,x2:86,y2:10,c:'#26A69A',st:'mech'},
-    {x1:82,y1:20,x2:86,y2:20,c:'#26A69A',st:'mech'},
-    {x1:82,y1:65,x2:86,y2:60,c:'#26A69A',st:'mech'},
-    {x1:82,y1:85,x2:86,y2:70,c:'#26A69A',st:'mech'},
-    {x1:93,y1:10,x2:93,y2:20,viaY:20,c:'#E53935',st:'return',dash:true},
-    {x1:93,y1:20,x2:93,y2:30,viaY:30,c:'#E53935',st:'return',dash:true},
-    {x1:93,y1:60,x2:93,y2:70,viaY:70,c:'#E53935',st:'return',dash:true},
-    {x1:93,y1:70,x2:93,y2:80,viaY:80,c:'#E53935',st:'return',dash:true},
-    {x1:68,y1:85,x2:55,y2:65,c:'#E53935',st:'return',dash:true},
-    {x1:82,y1:15,x2:89,y2:20,viaX:89,c:'#AB47BC',st:'control',dash:true,label:'补水'},
-    {x1:89,y1:50,x2:89,y2:20,c:'#AB47BC',st:'control',dash:true,label:'溢流'},
-    {x1:50,y1:15,x2:50,y2:25,c:'#8B5CF6',st:'inst',label:'T1-T8'},
-    {x1:50,y1:35,x2:50,y2:45,c:'#8B5CF6',st:'inst',label:'T9-T16'},
-    {x1:50,y1:65,x2:50,y2:75,c:'#8B5CF6',st:'inst',label:'T17-T24'},
-    {x1:50,y1:85,x2:50,y2:95,c:'#8B5CF6',st:'inst',label:'T25-T32'},
-    {x1:68,y1:15,x2:65,y2:15,c:'#f0883e',st:'inst',label:'P1-P8'},
-    {x1:68,y1:85,x2:65,y2:85,c:'#f0883e',st:'inst',label:'P9-P16'},
-    {x1:79,y1:15,x2:75,y2:15,c:'#3fb950',st:'inst',label:'F1-F8'},
-    {x1:79,y1:85,x2:75,y2:85,c:'#3fb950',st:'inst',label:'F9-F16'},
-  ],{w:960,h:500,theme:'siemens',drawingNo:'FLASH-PID-001',ver:'V1.0',scale:'1:50',
-     legend:[
-       {style:'mech',label:'设施侧供液 DN100'},
-       {style:'return',label:'设施侧回液'},
-       {style:'control',label:'冷冻水/补水控制'},
-       {style:'inst',label:'AI热控仪表 (T/P/F)'}
-     ],coolKw:250});
-  document.getElementById('flashThermalPid').innerHTML=thermalSvg;
-}
-</script>
-
 <div id="flashSubTab-bom" style="display:none">
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px;padding:16px;background:var(--bg3);border-radius:10px;border-left:4px solid #f59e0b">
 <div><div style="font-size:10px;color:var(--text2)">项目名称</div><div style="font-size:13px;font-weight:700;color:var(--text1)">1MW 液冷闪充站</div></div>
@@ -44354,6 +44277,83 @@ function showFlashSubTab(tab){
     var el=document.getElementById('flashSubTab-'+t);
     if(el) el.style.display=(t===tab)?'block':'none';
   });
+  if(tab==='thermal'){
+    var pid=document.getElementById('flashThermalPid');
+    if(pid && typeof drawPidIec==='function' && !pid.dataset.rendered){
+      pid.dataset.rendered='1';
+      var coolKw=250;
+      var thermalSvg=drawPidIec('闪充热管理系统P&ID图 — 全液冷CDU',[
+        {x:8,y:25,n:'闭式冷却塔#1',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-101',lbl:'250kW'},
+        {x:8,y:75,n:'闭式冷却塔#2',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-102',lbl:'250kW(备)'},
+        {x:22,y:25,n:'一次泵A',type:'pump',sc:'#1976D2',sz:14,tag:'P-101A',lbl:'变频 80m³/h'},
+        {x:22,y:75,n:'一次泵B',type:'pump',sc:'#1976D2',sz:14,tag:'P-101B',lbl:'变频 80m³/h'},
+        {x:32,y:25,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-101'},
+        {x:32,y:75,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-102'},
+        {x:42,y:25,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-105'},
+        {x:42,y:75,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-106'},
+        {x:55,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:24,h:20,tag:'HX-101',lbl:'500kW'},
+        {x:55,y:15,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-101',lbl:'300kW'},
+        {x:55,y:85,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-102',lbl:'300kW'},
+        {x:72,y:15,n:'CDU-1',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-101',lbl:'枪1-2 125kW'},
+        {x:72,y:35,n:'CDU-2',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-102',lbl:'枪3-4 125kW'},
+        {x:72,y:65,n:'CDU-3',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-103',lbl:'功率模块 125kW'},
+        {x:72,y:85,n:'CDU-4',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-104',lbl:'母排/储能 125kW'},
+        {x:68,y:15,n:'供液分水器',type:'manifold',sc:'#26A69A',w:22,h:12,tag:'MS-101',lbl:'SUPPLY'},
+        {x:68,y:85,n:'回液集水器',type:'manifold',sc:'#E53935',w:22,h:12,tag:'MR-101',lbl:'RETURN'},
+        {x:86,y:10,n:'充电枪1-2',type:'tank',sc:'#546E7A',w:14,h:12,tag:'GUN-12',lbl:'250kW'},
+        {x:86,y:20,n:'充电枪3-4',type:'tank',sc:'#546E7A',w:14,h:12,tag:'GUN-34',lbl:'250kW'},
+        {x:86,y:60,n:'功率模块',type:'tank',sc:'#546E7A',w:14,h:12,tag:'PM-12',lbl:'PFC+DC/DC'},
+        {x:86,y:70,n:'母排/储能',type:'tank',sc:'#546E7A',w:14,h:12,tag:'BS-ESS',lbl:'母排+电池'},
+        {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:14,h:16,tag:'TK-101',lbl:'TK-101'},
+        {x:95,y:20,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',sz:8,tag:'V-103'},
+        {x:95,y:80,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',sz:8,tag:'V-104'},
+        {x:50,y:95,n:'AI热控单元',type:'exchanger',sc:'#8B5CF6',w:24,h:12,tag:'TC-101',lbl:'AI Thermal Ctrl'},
+      ],[
+        {x1:16,y1:25,x2:22,y2:25,c:'#26A69A',st:'mech',label:'DN100'},
+        {x1:16,y1:75,x2:22,y2:75,c:'#26A69A',st:'mech',label:'DN100'},
+        {x1:29,y1:25,x2:32,y2:25,c:'#1976D2',st:'mech'},
+        {x1:29,y1:75,x2:32,y2:75,c:'#1976D2',st:'mech'},
+        {x1:37,y1:25,x2:42,y2:25,c:'#1976D2',st:'mech'},
+        {x1:37,y1:75,x2:42,y2:75,c:'#1976D2',st:'mech'},
+        {x1:47,y1:25,x2:55,y2:40,viaY:40,c:'#1976D2',st:'mech'},
+        {x1:47,y1:75,x2:55,y2:60,viaY:60,c:'#1976D2',st:'mech'},
+        {x1:55,y1:35,x2:55,y2:25,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
+        {x1:55,y1:65,x2:55,y2:75,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
+        {x1:67,y1:30,x2:68,y2:15,c:'#26A69A',st:'mech',label:'供液 160m³/h'},
+        {x1:67,y1:70,x2:68,y2:85,c:'#E53935',st:'return',dash:true,label:'回液'},
+        {x1:79,y1:15,x2:72,y2:15,c:'#26A69A',st:'mech'},
+        {x1:79,y1:35,x2:72,y2:35,c:'#26A69A',st:'mech'},
+        {x1:79,y1:65,x2:72,y2:65,c:'#26A69A',st:'mech'},
+        {x1:79,y1:85,x2:72,y2:85,c:'#26A69A',st:'mech'},
+        {x1:82,y1:15,x2:86,y2:10,c:'#26A69A',st:'mech'},
+        {x1:82,y1:20,x2:86,y2:20,c:'#26A69A',st:'mech'},
+        {x1:82,y1:65,x2:86,y2:60,c:'#26A69A',st:'mech'},
+        {x1:82,y1:85,x2:86,y2:70,c:'#26A69A',st:'mech'},
+        {x1:93,y1:10,x2:93,y2:20,viaY:20,c:'#E53935',st:'return',dash:true},
+        {x1:93,y1:20,x2:93,y2:30,viaY:30,c:'#E53935',st:'return',dash:true},
+        {x1:93,y1:60,x2:93,y2:70,viaY:70,c:'#E53935',st:'return',dash:true},
+        {x1:93,y1:70,x2:93,y2:80,viaY:80,c:'#E53935',st:'return',dash:true},
+        {x1:68,y1:85,x2:55,y2:65,c:'#E53935',st:'return',dash:true},
+        {x1:82,y1:15,x2:89,y2:20,viaX:89,c:'#AB47BC',st:'control',dash:true,label:'补水'},
+        {x1:89,y1:50,x2:89,y2:20,c:'#AB47BC',st:'control',dash:true,label:'溢流'},
+        {x1:50,y1:15,x2:50,y2:25,c:'#8B5CF6',st:'inst',label:'T1-T8'},
+        {x1:50,y1:35,x2:50,y2:45,c:'#8B5CF6',st:'inst',label:'T9-T16'},
+        {x1:50,y1:65,x2:50,y2:75,c:'#8B5CF6',st:'inst',label:'T17-T24'},
+        {x1:50,y1:85,x2:50,y2:95,c:'#8B5CF6',st:'inst',label:'T25-T32'},
+        {x1:68,y1:15,x2:65,y2:15,c:'#f0883e',st:'inst',label:'P1-P8'},
+        {x1:68,y1:85,x2:65,y2:85,c:'#f0883e',st:'inst',label:'P9-P16'},
+        {x1:79,y1:15,x2:75,y2:15,c:'#3fb950',st:'inst',label:'F1-F8'},
+        {x1:79,y1:85,x2:75,y2:85,c:'#3fb950',st:'inst',label:'F9-F16'},
+      ],{w:960,h:500,theme:'siemens',drawingNo:'FLASH-PID-001',ver:'V1.0',scale:'1:50',
+         legend:[
+           {style:'mech',label:'设施侧供液 DN100'},
+           {style:'return',label:'设施侧回液'},
+           {style:'control',label:'冷冻水/补水控制'},
+           {style:'inst',label:'AI热控仪表 (T/P/F)'}
+         ],coolKw:250});
+      pid.innerHTML=thermalSvg;
+    }
+  }
 }
 function initFlashZoom(){
   document.querySelectorAll('div[id^="flashSubTab-"] img[alt]').forEach(function(img){
