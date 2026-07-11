@@ -41039,7 +41039,7 @@ if __name__ == "__main__":
 <h3 style="margin:0;color:var(--text1);font-size:15px">🌡️ 热管理系统方案图</h3>
 <span style="font-size:11px;color:var(--text2)">Thermal Management · 液冷/风冷完整热管理架构</span>
 </div>
-<div id="flashThermalPid"></div>
+<img src="/reguanli.png" alt="热管理系统" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: reguanli.png</div>'">
 </div>
 </div>
 
@@ -98940,140 +98940,183 @@ function synUnifiedFlow(){
        legend:[{style:'data',label:'MQTT/Modbus TCP'},{style:'control',label:'BACnet/IEC 61850'},{style:'power',label:'电力线路'},{style:'mech',label:'冷却管路'}]});
 
 steps[2].delay=800; steps[2].result=
-    drawPidIec('液冷散热系统P&ID图 — '+coolLabel,[
-      /* ===== 一级冷却回路 ===== */
-      /* Cooling Towers */
-      {x:8,y:25,n:'冷却塔#1',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-101',lbl:'2000kW'},
-      {x:8,y:75,n:'冷却塔#2',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-102',lbl:'2000kW(备)'},
-      /* Primary Pumps */
-      {x:22,y:25,n:'一次泵A',type:'pump',sc:'#1976D2',sz:14,tag:'P-101A',lbl:'变频 160m³/h'},
-      {x:22,y:75,n:'一次泵B',type:'pump',sc:'#1976D2',sz:14,tag:'P-101B',lbl:'变频 160m³/h'},
+    drawPidIec('算电协同液冷散热系统P&ID图 — '+coolLabel+' · '+powerMW+'MW/'+gpuN+'GPU',[
+      /* ===== 一级冷却回路 (Facility Loop) ===== */
+      /* Cooling Towers - 4x for 100MW scale */
+      {x:5,y:15,n:'冷却塔#1',type:'cooling_tower',sc:'#26A69A',w:18,h:24,tag:'CT-101',lbl:'3000kW'},
+      {x:5,y:35,n:'冷却塔#2',type:'cooling_tower',sc:'#26A69A',w:18,h:24,tag:'CT-102',lbl:'3000kW'},
+      {x:5,y:65,n:'冷却塔#3',type:'cooling_tower',sc:'#26A69A',w:18,h:24,tag:'CT-103',lbl:'3000kW'},
+      {x:5,y:85,n:'冷却塔#4',type:'cooling_tower',sc:'#26A69A',w:18,h:24,tag:'CT-104',lbl:'3000kW(备)'},
+      /* Primary Pumps - N+1 per tower */
+      {x:18,y:15,n:'一次泵A1',type:'pump',sc:'#1976D2',sz:16,tag:'P-101A',lbl:'变频 400m³/h'},
+      {x:18,y:35,n:'一次泵A2',type:'pump',sc:'#1976D2',sz:16,tag:'P-102A',lbl:'变频 400m³/h'},
+      {x:18,y:65,n:'一次泵B1',type:'pump',sc:'#1976D2',sz:16,tag:'P-103A',lbl:'变频 400m³/h'},
+      {x:18,y:85,n:'一次泵B2',type:'pump',sc:'#1976D2',sz:16,tag:'P-104A',lbl:'变频 400m³/h'},
       /* Valves */
-      {x:32,y:25,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-101'},
-      {x:32,y:75,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-102'},
-      {x:42,y:25,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-105'},
-      {x:42,y:75,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-106'},
-      /* Heat Exchanger */
-      {x:55,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:24,h:20,tag:'HX-101',lbl:'4000kW'},
-      /* Chiller */
-      {x:55,y:15,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-101',lbl:'1500kW×2'},
-      {x:55,y:85,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-102',lbl:'1500kW×2'},
+      {x:28,y:15,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:12,tag:'V-101'},
+      {x:28,y:35,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:12,tag:'V-102'},
+      {x:28,y:65,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:12,tag:'V-103'},
+      {x:28,y:85,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:12,tag:'V-104'},
+      {x:38,y:15,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:12,tag:'V-105'},
+      {x:38,y:35,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:12,tag:'V-106'},
+      {x:38,y:65,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:12,tag:'V-107'},
+      {x:38,y:85,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:12,tag:'V-108'},
+      /* Plate Heat Exchangers - 2x large */
+      {x:50,y:25,n:'板式换热器#1',type:'exchanger',sc:'#1976D2',w:26,h:28,tag:'HX-101',lbl:'6000kW'},
+      {x:50,y:75,n:'板式换热器#2',type:'exchanger',sc:'#1976D2',w:26,h:28,tag:'HX-102',lbl:'6000kW'},
+      /* Chillers - 4x for redundancy */
+      {x:50,y:5,n:'冷水机组#1',type:'tank',sc:'#AB47BC',w:22,h:18,tag:'CH-101',lbl:'2500kW'},
+      {x:50,y:95,n:'冷水机组#2',type:'tank',sc:'#AB47BC',w:22,h:18,tag:'CH-102',lbl:'2500kW'},
 
-      /* ===== 二级冷却回路 (CDU Loop) ===== */
-      /* CDU Units (4x 500kW) */
-      {x:72,y:15,n:'CDU-1',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-101',lbl:'500kW Rack01-02'},
-      {x:72,y:35,n:'CDU-2',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-102',lbl:'500kW Rack03-04'},
-      {x:72,y:65,n:'CDU-3',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-103',lbl:'500kW Rack05-06'},
-      {x:72,y:85,n:'CDU-4',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-104',lbl:'500kW Rack07-08'},
+      /* ===== 二级冷却回路 (CDU Loop - Server Side) ===== */
+      /* CDU Units - 8x for 1024 GPU scale */
+      {x:68,y:5,n:'CDU-1',type:'cdu',sc:'#26A69A',w:22,h:18,tag:'CDU-101',lbl:'800kW Row A-B'},
+      {x:68,y:18,n:'CDU-2',type:'cdu',sc:'#26A69A',w:22,h:18,tag:'CDU-102',lbl:'800kW Row C-D'},
+      {x:68,y:32,n:'CDU-3',type:'cdu',sc:'#26A69A',w:22,h:18,tag:'CDU-103',lbl:'800kW Row E-F'},
+      {x:68,y:45,n:'CDU-4',type:'cdu',sc:'#26A69A',w:22,h:18,tag:'CDU-104',lbl:'800kW Row G-H'},
+      {x:68,y:58,n:'CDU-5',type:'cdu',sc:'#26A69A',w:22,h:18,tag:'CDU-105',lbl:'800kW Row I-J'},
+      {x:68,y:71,n:'CDU-6',type:'cdu',sc:'#26A69A',w:22,h:18,tag:'CDU-106',lbl:'800kW Row K-L'},
+      {x:68,y:84,n:'CDU-7',type:'cdu',sc:'#26A69A',w:22,h:18,tag:'CDU-107',lbl:'800kW Row M-N'},
+      {x:68,y:95,n:'CDU-8',type:'cdu',sc:'#26A69A',w:22,h:18,tag:'CDU-108',lbl:'800kW(备)'},
 
-      /* Supply/Return Manifolds */
-      {x:68,y:15,n:'供液分水器',type:'manifold',sc:'#26A69A',w:22,h:12,tag:'MS-101',lbl:'SUPPLY HEADER'},
-      {x:68,y:85,n:'回液集水器',type:'manifold',sc:'#E53935',w:22,h:12,tag:'MR-101',lbl:'RETURN HEADER'},
+      /* Supply/Return Headers */
+      {x:64,y:5,n:'供液总管',type:'manifold',sc:'#26A69A',w:28,h:14,tag:'MS-101',lbl:'SUPPLY HEADER DN400'},
+      {x:64,y:95,n:'回液总管',type:'manifold',sc:'#E53935',w:28,h:14,tag:'MR-101',lbl:'RETURN HEADER DN400'},
 
-      /* GPU Racks with Cold Plates */
-      {x:86,y:10,n:'Rack-01',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-01',lbl:'GPU×8'},
-      {x:86,y:20,n:'Rack-02',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-02',lbl:'GPU×8'},
-      {x:86,y:30,n:'Rack-03',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-03',lbl:'GPU×8'},
-      {x:86,y:40,n:'Rack-04',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-04',lbl:'GPU×8'},
-      {x:86,y:60,n:'Rack-05',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-05',lbl:'GPU×8'},
-      {x:86,y:70,n:'Rack-06',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-06',lbl:'GPU×8'},
-      {x:86,y:80,n:'Rack-07',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-07',lbl:'GPU×8'},
-      {x:86,y:90,n:'Rack-08',type:'tank',sc:'#546E7A',w:14,h:12,tag:'RK-08',lbl:'GPU×8'},
+      /* GPU Rack Rows - 16 rows for 1024 GPU */
+      {x:82,y:3,n:'Row A',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-A',lbl:'8柜×8GPU'},
+      {x:82,y:10,n:'Row B',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-B',lbl:'8柜×8GPU'},
+      {x:82,y:16,n:'Row C',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-C',lbl:'8柜×8GPU'},
+      {x:82,y:23,n:'Row D',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-D',lbl:'8柜×8GPU'},
+      {x:82,y:30,n:'Row E',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-E',lbl:'8柜×8GPU'},
+      {x:82,y:36,n:'Row F',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-F',lbl:'8柜×8GPU'},
+      {x:82,y:43,n:'Row G',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-G',lbl:'8柜×8GPU'},
+      {x:82,y:50,n:'Row H',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-H',lbl:'8柜×8GPU'},
+      {x:82,y:57,n:'Row I',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-I',lbl:'8柜×8GPU'},
+      {x:82,y:63,n:'Row J',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-J',lbl:'8柜×8GPU'},
+      {x:82,y:70,n:'Row K',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-K',lbl:'8柜×8GPU'},
+      {x:82,y:76,n:'Row L',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-L',lbl:'8柜×8GPU'},
+      {x:82,y:83,n:'Row M',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-M',lbl:'8柜×8GPU'},
+      {x:82,y:90,n:'Row N',type:'tank',sc:'#546E7A',w:16,h:12,tag:'RK-N',lbl:'8柜×8GPU'},
 
       /* Expansion Tank & Makeup */
-      {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:14,h:16,tag:'TK-101',lbl:'TK-101'},
-      {x:95,y:20,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',sz:8,tag:'V-103'},
-      {x:95,y:80,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',sz:8,tag:'V-104'},
+      {x:92,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:16,h:18,tag:'TK-101',lbl:'TK-101 5m³'},
+      {x:92,y:20,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',sz:10,tag:'V-103'},
+      {x:92,y:80,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',sz:10,tag:'V-104'},
 
-      /* AI Thermal Controller (symbolic) */
-      {x:50,y:95,n:'AI热控单元',type:'exchanger',sc:'#8B5CF6',w:24,h:12,tag:'TC-101',lbl:'AI Thermal Controller'},
+      /* AI Thermal Controller */
+      {x:45,y:95,n:'AI热控单元',type:'exchanger',sc:'#8B5CF6',w:26,h:14,tag:'TC-101',lbl:'AI Thermal Controller · Digital Twin'},
     ],[
       /* ===== 一级回路管路 ===== */
       /* Tower headers to pumps */
-      {x1:16,y1:25,x2:22,y2:25,c:'#26A69A',st:'mech',label:'DN200'},
-      {x1:16,y1:75,x2:22,y2:75,c:'#26A69A',st:'mech',label:'DN200'},
+      {x1:14,y1:15,x2:18,y2:15,c:'#26A69A',st:'mech',label:'DN300'},
+      {x1:14,y1:35,x2:18,y2:35,c:'#26A69A',st:'mech',label:'DN300'},
+      {x1:14,y1:65,x2:18,y2:65,c:'#26A69A',st:'mech',label:'DN300'},
+      {x1:14,y1:85,x2:18,y2:85,c:'#26A69A',st:'mech',label:'DN300'},
       /* Pump discharge to valves */
-      {x1:29,y1:25,x2:32,y2:25,c:'#1976D2',st:'mech'},
-      {x1:29,y1:75,x2:32,y2:75,c:'#1976D2',st:'mech'},
+      {x1:26,y1:15,x2:28,y2:15,c:'#1976D2',st:'mech'},
+      {x1:26,y1:35,x2:28,y2:35,c:'#1976D2',st:'mech'},
+      {x1:26,y1:65,x2:28,y2:65,c:'#1976D2',st:'mech'},
+      {x1:26,y1:85,x2:28,y2:85,c:'#1976D2',st:'mech'},
       /* Valves to check valves */
-      {x1:37,y1:25,x2:42,y2:25,c:'#1976D2',st:'mech'},
-      {x1:37,y1:75,x2:42,y2:75,c:'#1976D2',st:'mech'},
-      /* Check valves to HE */
-      {x1:47,y1:25,x2:55,y2:40,viaY:40,c:'#1976D2',st:'mech'},
-      {x1:47,y1:75,x2:55,y2:60,viaY:60,c:'#1976D2',st:'mech'},
-      /* HE to Chillers */
-      {x1:55,y1:35,x2:55,y2:25,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
-      {x1:55,y1:65,x2:55,y2:75,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
+      {x1:34,y1:15,x2:38,y2:15,c:'#1976D2',st:'mech'},
+      {x1:34,y1:35,x2:38,y2:35,c:'#1976D2',st:'mech'},
+      {x1:34,y1:65,x2:38,y2:65,c:'#1976D2',st:'mech'},
+      {x1:34,y1:85,x2:38,y2:85,c:'#1976D2',st:'mech'},
+      /* Check valves to HX */
+      {x1:44,y1:15,x2:50,y2:15,viaY:20,c:'#1976D2',st:'mech'},
+      {x1:44,y1:35,x2:50,y2:40,viaY:30,c:'#1976D2',st:'mech'},
+      {x1:44,y1:65,x2:50,y2:60,viaY:70,c:'#1976D2',st:'mech'},
+      {x1:44,y1:85,x2:50,y2:90,viaY:80,c:'#1976D2',st:'mech'},
+      /* HX to Chillers */
+      {x1:50,y1:15,x2:50,y2:10,c:'#AB47BC',st:'control',dash:true,label:'冷冻水 12℃'},
+      {x1:50,y1:95,x2:50,y2:100,c:'#AB47BC',st:'control',dash:true,label:'冷冻水 12℃'},
 
       /* ===== 二级回路 ===== */
-      /* HE cold side → Supply Header */
-      {x1:67,y1:30,x2:68,y2:15,c:'#26A69A',st:'mech',label:'供液 320m³/h'},
-      {x1:67,y1:70,x2:68,y2:85,c:'#E53935',st:'return',dash:true,label:'回液'},
+      /* HX cold side → Supply Header */
+      {x1:63,y1:25,x2:64,y2:5,c:'#26A69A',st:'mech',label:'供液 1200m³/h 28℃'},
+      {x1:63,y1:75,x2:64,y2:95,c:'#E53935',st:'return',dash:true,label:'回液 42℃'},
 
-      /* Supply Header → CDUs */
-      {x1:79,y1:15,x2:72,y2:15,c:'#26A69A',st:'mech'},
-      {x1:79,y1:35,x2:72,y2:35,c:'#26A69A',st:'mech'},
-      {x1:79,y1:65,x2:72,y2:65,c:'#26A69A',st:'mech'},
-      {x1:79,y1:85,x2:72,y2:85,c:'#26A69A',st:'mech'},
+      /* Supply Header → CDUs (8 branches) */
+      {x1:78,y1:5,x2:68,y2:5,c:'#26A69A',st:'mech'},
+      {x1:78,y1:18,x2:68,y2:18,c:'#26A69A',st:'mech'},
+      {x1:78,y1:32,x2:68,y2:32,c:'#26A69A',st:'mech'},
+      {x1:78,y1:45,x2:68,y2:45,c:'#26A69A',st:'mech'},
+      {x1:78,y1:58,x2:68,y2:58,c:'#26A69A',st:'mech'},
+      {x1:78,y1:71,x2:68,y2:71,c:'#26A69A',st:'mech'},
+      {x1:78,y1:84,x2:68,y2:84,c:'#26A69A',st:'mech'},
+      {x1:78,y1:95,x2:68,y2:95,c:'#26A69A',st:'mech'},
 
-      /* CDU → Racks */
-      {x1:82,y1:15,x2:86,y2:10,c:'#26A69A',st:'mech'},
-      {x1:82,y1:20,x2:86,y2:20,c:'#26A69A',st:'mech'},
-      {x1:82,y1:35,x2:86,y2:30,c:'#26A69A',st:'mech'},
-      {x1:82,y1:40,x2:86,y2:40,c:'#26A69A',st:'mech'},
-      {x1:82,y1:65,x2:86,y2:60,c:'#26A69A',st:'mech'},
-      {x1:82,y1:70,x2:86,y2:70,c:'#26A69A',st:'mech'},
-      {x1:82,y1:85,x2:86,y2:80,c:'#26A69A',st:'mech'},
-      {x1:82,y1:90,x2:86,y2:90,c:'#26A69A',st:'mech'},
+      /* CDUs → Rack Rows (14 rows) */
+      {x1:82,y1:3,x2:82,y2:3,c:'#26A69A',st:'mech'},
+      {x1:82,y1:10,x2:82,y2:10,c:'#26A69A',st:'mech'},
+      {x1:82,y1:16,x2:82,y2:16,c:'#26A69A',st:'mech'},
+      {x1:82,y1:23,x2:82,y2:23,c:'#26A69A',st:'mech'},
+      {x1:82,y1:30,x2:82,y2:30,c:'#26A69A',st:'mech'},
+      {x1:82,y1:36,x2:82,y2:36,c:'#26A69A',st:'mech'},
+      {x1:82,y1:43,x2:82,y2:43,c:'#26A69A',st:'mech'},
+      {x1:82,y1:50,x2:82,y2:50,c:'#26A69A',st:'mech'},
+      {x1:82,y1:57,x2:82,y2:57,c:'#26A69A',st:'mech'},
+      {x1:82,y1:63,x2:82,y2:63,c:'#26A69A',st:'mech'},
+      {x1:82,y1:70,x2:82,y2:70,c:'#26A69A',st:'mech'},
+      {x1:82,y1:76,x2:82,y2:76,c:'#26A69A',st:'mech'},
+      {x1:82,y1:83,x2:82,y2:83,c:'#26A69A',st:'mech'},
+      {x1:82,y1:90,x2:82,y2:90,c:'#26A69A',st:'mech'},
 
-      /* Racks → Return Header */
-      {x1:93,y1:10,x2:93,y2:20,viaY:20,c:'#E53935',st:'return',dash:true},
-      {x1:93,y1:20,x2:93,y2:30,viaY:30,c:'#E53935',st:'return',dash:true},
-      {x1:93,y1:30,x2:93,y2:40,viaY:40,c:'#E53935',st:'return',dash:true},
-      {x1:93,y1:40,x2:93,y2:50,viaY:50,c:'#E53935',st:'return',dash:true},
-      {x1:93,y1:60,x2:93,y2:70,viaY:70,c:'#E53935',st:'return',dash:true},
-      {x1:93,y1:70,x2:93,y2:80,viaY:80,c:'#E53935',st:'return',dash:true},
-      {x1:93,y1:80,x2:93,y2:90,viaY:90,c:'#E53935',st:'return',dash:true},
-      {x1:93,y1:90,x2:93,y2:95,viaY:95,c:'#E53935',st:'return',dash:true},
+      /* Rack Rows → Return Header */
+      {x1:90,y1:3,x2:90,y2:5,viaY:5,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:10,x2:90,y2:12,viaY:12,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:16,x2:90,y2:18,viaY:18,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:23,x2:90,y2:25,viaY:25,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:30,x2:90,y2:32,viaY:32,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:36,x2:90,y2:38,viaY:38,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:43,x2:90,y2:45,viaY:45,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:50,x2:90,y2:52,viaY:52,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:57,x2:90,y2:59,viaY:59,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:63,x2:90,y2:65,viaY:65,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:70,x2:90,y2:72,viaY:72,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:76,x2:90,y2:78,viaY:78,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:83,x2:90,y2:85,viaY:85,c:'#E53935',st:'return',dash:true},
+      {x1:90,y1:90,x2:90,y2:92,viaY:92,c:'#E53935',st:'return',dash:true},
 
-      /* Return Header → HE */
-      {x1:68,y1:85,x2:55,y2:65,c:'#E53935',st:'return',dash:true},
+      /* Return Header → HX */
+      {x1:64,y1:95,x2:50,y2:75,c:'#E53935',st:'return',dash:true},
 
       /* Expansion Tank connections */
-      {x1:82,y1:15,x2:89,y2:20,viaX:89,c:'#AB47BC',st:'control',dash:true,label:'补水'},
-      {x1:89,y1:50,x2:89,y2:20,c:'#AB47BC',st:'control',dash:true,label:'溢流'},
+      {x1:78,y1:5,x2:88,y2:20,viaX:88,c:'#AB47BC',st:'control',dash:true,label:'补水 DN50'},
+      {x1:88,y1:50,x2:88,y2:20,c:'#AB47BC',st:'control',dash:true,label:'溢流 DN50'},
 
       /* AI Controller sensor lines */
-      {x1:50,y1:15,x2:50,y2:25,c:'#8B5CF6',st:'inst',label:'T1-T8'},
-      {x1:50,y1:35,x2:50,y2:45,c:'#8B5CF6',st:'inst',label:'T9-T16'},
-      {x1:50,y1:65,x2:50,y2:75,c:'#8B5CF6',st:'inst',label:'T17-T24'},
-      {x1:50,y1:85,x2:50,y2:95,c:'#8B5CF6',st:'inst',label:'T25-T32'},
-      {x1:68,y1:15,x2:65,y2:15,c:'#f0883e',st:'inst',label:'P1-P8'},
-      {x1:68,y1:85,x2:65,y2:85,c:'#f0883e',st:'inst',label:'P9-P16'},
-      {x1:79,y1:15,x2:75,y2:15,c:'#3fb950',st:'inst',label:'F1-F8'},
-      {x1:79,y1:85,x2:75,y2:85,c:'#3fb950',st:'inst',label:'F9-F16'},
-    ],{w:960,h:500,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.2',scale:'1:50',
+      {x1:45,y1:15,x2:45,y2:20,c:'#8B5CF6',st:'inst',label:'T1-T16'},
+      {x1:45,y1:35,x2:45,y2:40,c:'#8B5CF6',st:'inst',label:'T17-T32'},
+      {x1:45,y1:65,x2:45,y2:70,c:'#8B5CF6',st:'inst',label:'T33-T48'},
+      {x1:45,y1:85,x2:45,y2:90,c:'#8B5CF6',st:'inst',label:'T49-T64'},
+      {x1:64,y1:5,x2:60,y2:5,c:'#f0883e',st:'inst',label:'P1-P16'},
+      {x1:64,y1:95,x2:60,y2:95,c:'#f0883e',st:'inst',label:'P17-P32'},
+      {x1:78,y1:5,x2:74,y2:5,c:'#3fb950',st:'inst',label:'F1-F16'},
+      {x1:78,y1:95,x2:74,y2:95,c:'#3fb950',st:'inst',label:'F17-F32'},
+    ],{w:980,h:520,theme:'siemens',drawingNo:'SYN-PID-002',ver:'V3.0',scale:'1:50',
        legend:[
-         {style:'mech',label:'施工侧供液管路 (DN200)'},
-         {style:'return',label:'施工侧回液管路'},
-         {style:'control',label:'冷冻水/补水控制管路'},
-         {style:'inst',label:'AI热控仪表信号 (T/P/F)'}
+         {style:'mech',label:'设施侧供液管路 (DN300-DN400)'},
+         {style:'return',label:'设施侧回液管路'},
+         {style:'control',label:'冷冻水/补水/控制管路'},
+         {style:'inst',label:'AI热控仪表信号 (T/P/F 64路)'}
        ],coolKw:coolKw})+
     tableHtml(
     ['参数','数值','说明'],
-    [['冷却方式',coolLabel,'主冷却方案：全液冷冷板+CDU'],
-     ['冷却负载',coolKw+' kW','总散热需求'],
-     ['一级回路','2×冷却塔+2×冷水机组','设施侧冷源 N+1'],
-     ['二级回路','4×CDU (500kW)','机柜侧液冷分配 N+1'],
-     ['进/出水温度','32℃ / 42℃','ΔT=10℃'],
-     ['总流量',Math.round(coolKw*2.6)+' L/min','320 m³/h'],
-     ['GPU机柜','8柜 × 8 GPU','冷板式液冷'],
-     ['CDU数量','4 台 (500kW/台)','冗余 N+1'],
-     ['冷却塔','2×2000kW 闭式','干球35℃设计'],
-     ['冷水机组','2×1500kW','变频离心式'],
-     ['AI热控','PID+预测算法','温度/压力/流量/泄漏全监测'],
-     ['PUE','1.15','液冷vs风冷节能15%'],
-     ['冗余设计','2N (冷源) / N+1 (CDU)','Tier III+ 高可用']], true
+    [['冷却方式',coolLabel,'主冷却方案：全液冷冷板+CDU冗余N+1'],
+     ['冷却负载',coolKw+' kW','总散热需求 (IT负载'+itKw+'kW)'],
+     ['一级回路','4×冷却塔+2×换热器+2×冷水机组','设施侧冷源 2N冗余'],
+     ['二级回路','8×CDU (800kW/台)','机柜侧液冷分配 N+1冗余'],
+     ['进/出水温度','28℃ / 38℃','ΔT=10℃ (高温回水设计)'],
+     ['总流量',Math.round(coolKw*3.2)+' L/min','1440 m³/h'],
+     ['GPU机柜','16排 × 8柜 × 8GPU','冷板式液冷 1024 GPU'],
+     ['CDU数量','8 台 (800kW/台)','冗余 N+1 (7+1备用)'],
+     ['冷却塔','4×3000kW 闭式','干球35℃ 进塔32℃/出塔28℃'],
+     ['冷水机组','2×2500kW 离心式','变频 12℃冷冻水供应'],
+     ['AI热控','数字孪生+预测式PID','64路温度/32路压力/32路流量/泄漏监测'],
+     ['PUE','1.18','液冷vs风冷节能14%'],
+     ['冗余设计','2N (冷源) / N+1 (CDU)','Tier IV 高可用']], true
   );
 
   var pueData=[];
