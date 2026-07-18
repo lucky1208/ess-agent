@@ -56,6 +56,9 @@ Object.entries(packImgs).forEach(([srcName, dstName]) => {
   if (fs.existsSync(path.join(src, srcName)))
     fs.cpSync(path.join(src, srcName), path.join(dist, dstName), { force: true });
 });
+// Copy Module design image
+if (fs.existsSync(path.join(src, '电池设计与模块规格图.png')))
+  fs.cpSync(path.join(src, '电池设计与模块规格图.png'), path.join(dist, 'pack-module.png'), { force: true });
 // Copy flash SVG wrappers
 const svgWrappers = ['flash-arch.svg', 'flash-power.svg', 'flash-cooling.svg', 'gaoyapeidian.svg', 'gonglvdiaodu.svg', 'bms-protocol.svg', 'battery-design.svg', 'thermal.svg'];
 svgWrappers.forEach(f => {

@@ -40296,7 +40296,6 @@ if __name__ == "__main__":
 <div style="font-size:12px;color:var(--text2);margin-bottom:16px">电池包工程设计：Cell/Module/Pack布局 · 铜排连接 · 液冷系统 · BMS采样 · HV Box · 热管理</div>
 <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
 <div class="bs-elec-tab active" onclick="bsPackSwitchTab('overview')">📋 系统概览</div>
-<div class="bs-elec-tab" onclick="bsPackSwitchTab('cell')">🔋 Cell设计</div>
 <div class="bs-elec-tab" onclick="bsPackSwitchTab('module')">📦 Module设计</div>
 <div class="bs-elec-tab" onclick="bsPackSwitchTab('packlayout')">📐 Pack布局</div>
 <div class="bs-elec-tab" onclick="bsPackSwitchTab('electrical')">⚡ 电气连接</div>
@@ -40341,49 +40340,14 @@ if __name__ == "__main__":
 </div>
 </div>
 </div>
-<!-- ② Cell设计 -->
-<div id="bpCell" style="display:none">
-<div class="mg-card" style="margin-bottom:20px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-<h3 style="margin:0;color:var(--text1);font-size:15px">🔋 电芯设计 Cell Engineering</h3>
-<span style="font-size:11px;color:var(--text2)">方形铝壳 LFP</span>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div>
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">电芯参数</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">化学体系</span><br><b style="color:var(--text1)">LiFePO₄</b></div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">标称容量</span><br><b style="color:var(--text1)">280Ah</b></div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">标称电压</span><br><b style="color:var(--text1)">3.2V</b></div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">内阻</span><br><b style="color:var(--text1)">≤0.4mΩ</b></div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">重量</span><br><b style="color:var(--text1)">5.4kg</b></div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">尺寸</span><br><b style="color:var(--text1)">174×72×207mm</b></div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">充电截止</span><br><b style="color:#50c878">3.65V</b></div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">放电截止</span><br><b style="color:#ef4444">2.5V</b></div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">循环寿命</span><br><b style="color:var(--text1)">≥6000次</b></div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">充电倍率</span><br><b style="color:var(--text1)">1C (持续)</b></div>
-</div>
-</div>
-<div>
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">电芯内部结构</div>
-<div style="padding:12px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.8">
-<div>📌 <b style="color:var(--text1)">极片叠层</b>：正极(LFP) → 隔膜(PP/PE) → 负极(石墨)</div>
-<div>📌 <b style="color:var(--text1)">极耳设计</b>：铝极耳(正极) + 铜极耳(负极)</div>
-<div>📌 <b style="color:var(--text1)">电解液</b>：LiPF₆/EC+DMC+EMC</div>
-<div>📌 <b style="color:var(--text1)">安全阀</b>：顶部泄压阀 ≥0.8MPa开启</div>
-<div>📌 <b style="color:var(--text1)">密封</b>：激光焊接铝壳 + 密封圈</div>
-<div>📌 <b style="color:var(--text1)">集流体</b>：正极铝箔16μm / 负极铜箔8μm</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- ③ Module设计 -->
+<!-- ② Module设计 -->
 <div id="bpModule" style="display:none">
 <div class="mg-card" style="margin-bottom:20px">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
 <h3 style="margin:0;color:var(--text1);font-size:15px">📦 模组设计 Module Engineering</h3>
-<span style="font-size:11px;color:var(--text2)">4模组并联 × 16串</span>
+<span style="font-size:11px;color:var(--text2)">Cell设计与模块规格</span>
+</div>
+<img src="pack-module.png" alt="电池设计与模块规格图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: pack-module.png</div>'">
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 <div>
@@ -83160,13 +83124,13 @@ function bsDigitalAiDiagnose(){}// AI diagnosis moved to tab 7 Digital Twin
 // ═══════════════════════════════════════════════════════════════
 function bsPackSwitchTab(tab){
   document.querySelectorAll('#page-bs-pack .bs-elec-tab').forEach(t=>t.classList.remove('active'));
-  const tabs={overview:0,cell:1,module:2,packlayout:3,electrical:4,bms:5,cooling:6,hvbox:7,bom:8};
+  const tabs={overview:0,module:1,packlayout:2,electrical:3,bms:4,cooling:5,hvbox:6,bom:7};
   document.querySelectorAll('#page-bs-pack .bs-elec-tab')[tabs[tab]].classList.add('active');
-  ['bpOverview','bpCell','bpModule','bpPacklayout','bpElectrical','bpBms','bpCooling','bpHvbox','bpBom'].forEach(id=>{
+  ['bpOverview','bpModule','bpPacklayout','bpElectrical','bpBms','bpCooling','bpHvbox','bpBom'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display='none';
   });
-  const MAP={overview:'bpOverview',cell:'bpCell',module:'bpModule',packlayout:'bpPacklayout',electrical:'bpElectrical',bms:'bpBms',cooling:'bpCooling',hvbox:'bpHvbox',bom:'bpBom'};
+  const MAP={overview:'bpOverview',module:'bpModule',packlayout:'bpPacklayout',electrical:'bpElectrical',bms:'bpBms',cooling:'bpCooling',hvbox:'bpHvbox',bom:'bpBom'};
   const el=document.getElementById(MAP[tab]);
   if(el) el.style.display='block';
 }
