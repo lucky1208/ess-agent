@@ -96235,13 +96235,13 @@ console.log('[ESS Software] loaded - '+ESS_CHIPS.length+' chips, '+ESS_PROGRAMS.
 /* ── Page routing ── */
 var _vppInited=false, _synInited=false;
 function showVppPage(id){
-  document.querySelectorAll('#vppNav .sub-tab').forEach(t=>t.classList.add('active'));
+  document.querySelectorAll('#vppNav .sub-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
   var el=document.getElementById('page-vpp-unified'); if(el)el.style.display='block';
   if(!_vppInited){ _vppInited=true; setTimeout(function(){ vppUnifiedFlow(); }, 100); }
 }
 function showSynPage(id){
-  document.querySelectorAll('#synergyNav .sub-tab').forEach(t=>t.classList.add('active'));
+  document.querySelectorAll('#synergyNav .sub-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.syn-content').forEach(t=>t.style.display='none');
   var el=document.getElementById('page-syn-unified'); if(el)el.style.display='block';
   if(!_synInited){ _synInited=true; setTimeout(function(){ synUnifiedFlow(); }, 100); }

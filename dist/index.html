@@ -4,7 +4,7 @@
 <meta name="version" content="2026.06.24-aidc-v2">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preload" href="/assets/gb60kw_schematic-DgaywTWl.svg" as="image">
+<link rel="preload" href="gb60kw_schematic.svg" as="image">
 <title>Open ESS Agent — 开源储能系统解决方案AI智能体</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>
@@ -37395,10 +37395,9 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
     return s.y1 + t * (s.y2 - s.y1);
   }
   // AABB 检查: 线段 s 是否穿过 node box (除自身端点 node)
-  function segmentCrossesNodeBox(s, excludeNodeIds) {
-    const excludeSet = new Set(Array.isArray(excludeNodeIds) ? excludeNodeIds : (excludeNodeIds ? [excludeNodeIds] : []));
+  function segmentCrossesNodeBox(s, excludeNodeId) {
     for (const b of nodeBoxes) {
-      if (excludeSet.has(b.id)) continue;
+      if (excludeNodeId && (b.id === excludeNodeId)) continue;
       // 端点 node 不算穿过 (端点本来就要连)
       // 判断线段 (x1,y1)-(x2,y2) 与矩形 (x1,y1,x2,y2) 是否相交
       // 用 Liang-Barsky 简化: 检测线段两端点是否在矩形内 + 矩形 4 边是否穿过线段
@@ -37446,20 +37445,9 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
     const a = positions[conn.from];
     const b = positions[conn.to];
     if (!a || !b) continue;
+    const pa = getPort(a, 'right');
+    const pb = getPort(b, 'left');
     const spanSlots = Math.abs(slotIndexOf(b, positions) - slotIndexOf(a, positions));
-    let pa, pb;
-    if (spanSlots === 0 && Math.abs((a.x + a.w / 2) - (b.x + b.w / 2)) < NODE_WIDTH * 0.6) {
-      if (a.y < b.y) {
-        pa = { x: a.x + a.w / 2, y: a.y + a.h };
-        pb = { x: b.x + b.w / 2, y: b.y };
-      } else {
-        pa = { x: a.x + a.w / 2, y: a.y };
-        pb = { x: b.x + b.w / 2, y: b.y + b.h };
-      }
-    } else {
-      pa = getPort(a, 'right');
-      pb = getPort(b, 'left');
-    }
     let d, segs = [];
     if (Math.abs(pa.y - pb.y) < 0.5 && spanSlots <= 1) {
       // Aligned ports and adjacent columns: check if straight line crosses any intermediate node
@@ -37504,75 +37492,35 @@ function renderSldSvg(uem, layers, positions, totalW, totalH, connections) {
       ];
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else if (spanSlots === 0) {
-      // Same-layer connection (e.g. QF→XF, GRID→XF).
-      // Strategy: place vertical segment between src and dst (if possible), or below all nodes.
-      const halfW = NODE_WIDTH / 2;
-      const gap = 40;
-      // Try placing vertical at midpoint between the two ports
-      let midX = (pa.x + pb.x) / 2;
-      // Check vertical segment from midX doesn't cross any box (excluding src/dst)
-      const vSeg = { x1: midX, y1: Math.min(pa.y, pb.y), x2: midX, y2: Math.max(pa.y, pb.y) };
-      const vConflict = segmentCrossesNodeBox(vSeg, [conn.from, conn.to]);
-      if (vConflict) {
-        // Shift midX right of the conflicting node
-        midX = vConflict.x2 + gap;
-      }
-      // Check if horizontal from pa.x to midX crosses any box (excluding src/dst)
-      const hSegA = { x1: Math.min(pa.x, midX), y1: pa.y, x2: Math.max(pa.x, midX), y2: pa.y };
-      const hConflictA = segmentCrossesNodeBox(hSegA, [conn.from, conn.to]);
-      // Check if horizontal from midX to pb.x crosses any box (excluding src/dst)
-      const hSegB = { x1: Math.min(midX, pb.x), y1: pb.y, x2: Math.max(midX, pb.x), y2: pb.y };
-      const hConflictB = segmentCrossesNodeBox(hSegB, [conn.from, conn.to]);
-      if (!hConflictA && !hConflictB) {
-        // Midpoint routing works
-        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
-        segs = [
-          { x1: pa.x, y1: pa.y, x2: midX, y2: pa.y },
-          { x1: midX, y1: pa.y, x2: midX, y2: pb.y },
-          { x1: midX, y1: pb.y, x2: pb.x, y2: pb.y }
-        ];
-      } else {
-        // Route below all nodes
-        const allY2 = Object.values(positions).map(p => p.y + p.h);
-        const belowY = Math.max(...allY2) + 40;
-        let belowX = Math.max(pa.x, pb.x) + 40;
-        belowX = safeClimbX(belowX, pb.y, belowY, conn.from, conn.to);
-        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${pa.x.toFixed(1)} ${belowY.toFixed(1)} L ${belowX.toFixed(1)} ${belowY.toFixed(1)} L ${belowX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
-        segs = [
-          { x1: pa.x, y1: pa.y, x2: pa.x, y2: belowY },
-          { x1: pa.x, y1: belowY, x2: belowX, y2: belowY },
-          { x1: belowX, y1: belowY, x2: belowX, y2: pb.y },
-          { x1: belowX, y1: pb.y, x2: pb.x, y2: pb.y }
-        ];
-      }
+      // Same-layer connection (e.g. QF→XF): route vertical segment to the right of both nodes
+      const rightX = safeClimbX(Math.max(pa.x, pb.x) + 40, pb.y, pa.y, conn.from, conn.to);
+      d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${rightX.toFixed(1)} ${pa.y.toFixed(1)} L ${rightX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      segs = [
+        { x1: pa.x, y1: pa.y, x2: rightX, y2: pa.y },
+        { x1: rightX, y1: pa.y, x2: rightX, y2: pb.y },
+        { x1: rightX, y1: pb.y, x2: pb.x, y2: pb.y }
+      ];
       out.push(`<path d="${d}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/>`);
     } else {
-      // Adjacent column but ports at different Y.
-      // Check if dst is inside a zone → route BELOW the zone to avoid cutting through it.
-      let dstZoneBottom = null;
-      for (const zkey in zoneBoxes) {
-        const zb = zoneBoxes[zkey];
-        if (zb.nodes.includes(conn.to)) {
-          dstZoneBottom = zb.y2;
-          break;
-        }
-      }
-      if (dstZoneBottom !== null) {
-        // Route below zone: drop → horizontal below zone → climb to dst
-        const belowY = dstZoneBottom + 30;
-        let climbX = pb.x;
-        climbX = safeClimbX(climbX, pb.y, belowY, conn.from, conn.to);
-        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${pa.x.toFixed(1)} ${belowY.toFixed(1)} L ${climbX.toFixed(1)} ${belowY.toFixed(1)} L ${climbX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
+      // Adjacent column but ports at different Y: simple 4-vertex ortho at src-Y
+      const midX = (pa.x + pb.x) / 2;
+      const vSeg = { x1: midX, y1: pa.y, x2: midX, y2: pb.y };
+      const conflictFrom = segmentCrossesNodeBox(vSeg, conn.from);
+      const conflictTo = segmentCrossesNodeBox(vSeg, conn.to);
+      const conflict = conflictFrom || conflictTo;
+      if (conflict && conflict.id !== conn.from && conflict.id !== conn.to) {
+        // 改走 trunk 通道绕行
+        const dropX1 = pa.x + 20;
+        const dropX2 = safeClimbX(pb.x - 20, pb.y, trunkY, conn.from, conn.to);
+        d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${pa.y.toFixed(1)} L ${dropX1.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${trunkY.toFixed(1)} L ${dropX2.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
         segs = [
-          { x1: pa.x, y1: pa.y, x2: pa.x, y2: belowY },
-          { x1: pa.x, y1: belowY, x2: climbX, y2: belowY },
-          { x1: climbX, y1: belowY, x2: climbX, y2: pb.y },
-          { x1: climbX, y1: pb.y, x2: pb.x, y2: pb.y }
+          { x1: pa.x, y1: pa.y, x2: dropX1, y2: pa.y },
+          { x1: dropX1, y1: pa.y, x2: dropX1, y2: trunkY },
+          { x1: dropX1, y1: trunkY, x2: dropX2, y2: trunkY },
+          { x1: dropX2, y1: trunkY, x2: dropX2, y2: pb.y },
+          { x1: dropX2, y1: pb.y, x2: pb.x, y2: pb.y }
         ];
       } else {
-        // No zone: route vertical to the right of dst
-        const rightOfDst = pb.x + NODE_WIDTH / 2 + 40;
-        const midX = Math.max(pa.x + 40, rightOfDst);
         d = `M ${pa.x.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pa.y.toFixed(1)} L ${midX.toFixed(1)} ${pb.y.toFixed(1)} L ${pb.x.toFixed(1)} ${pb.y.toFixed(1)}`;
         segs = [
           { x1: pa.x, y1: pa.y, x2: midX, y2: pa.y },
@@ -38332,8 +38280,7 @@ select.form-input{appearance:auto}
 <div class="sub-tab" onclick="showChargingPage('ch-elec')" data-i18n="ch_elec">电气设计</div>
 <div class="sub-tab" onclick="showChargingPage('ch-software')" data-i18n="ch_software">软件平台</div>
 <div class="sub-tab" onclick="showChargingPage('ch-proto')" data-i18n="ch_proto">通信协议</div>
-<div class="sub-tab" onclick="showChargingPage('ch-cooling')" data-i18n="ch_cooling">超充液冷</div>
-<div class="sub-tab" onclick="showChargingPage('ch-flash')" data-i18n="ch_flash">⭐ 闪充系统</div>
+<div class="sub-tab" onclick="showChargingPage('ch-flash')" data-i18n="ch_flash">⭐ 闪充液冷</div>
 <div class="sub-tab" onclick="showChargingPage('ch-evcc')" data-i18n="ch_evcc">EVCC/SECC</div>
 <div class="sub-tab" onclick="showChargingPage('ch-bom')" data-i18n="ch_bom">BOM清单</div>
 <div class="sub-tab" onclick="showChargingPage('ch-platform')" data-i18n="ch_platform">平台互联互通</div>
@@ -38465,13 +38412,13 @@ ACC AC一体柜专题
 </h3>
 <div class="device-grid" style="margin-bottom:0">
 <div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('ACC_DETAIL','ACC-480-P750 AC一体柜')">
-<div class="dev-img-wrap"><img src="/assets/X-522_X261_product-Tukia3DJ.jpeg" alt="ACC-480" onerror="this.style.display='none'"></div>
+<div class="dev-img-wrap"><img src="images/products/X-522_X261_product.jpeg" alt="ACC-480" onerror="this.style.display='none'"></div>
 <div class="dev-header"><div><div class="dev-name">ACC-480-P750 AC一体机</div><div class="dev-model">ACC-480-P750-UL</div></div><span class="dev-badge badge-orange">480kWh</span></div>
 <div class="dev-specs"><span class="spec-item">750kW内置PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈10t</span></div>
 <div class="dev-features"><span class="feature-tag">PCS+升压变+开关柜一体</span><span class="feature-tag">即插即用</span><span class="feature-tag">最大4并→1.92MWh</span></div>
 </div>
 <div class="device-card" style="border-color:var(--green);cursor:pointer" onclick="showDocDetail('LL760_DETAIL','760kWh液冷储能柜')">
-<div class="dev-img-wrap"><img src="/assets/GRID-5M_product-CI7pnyej.jpeg" alt="760LL" onerror="this.style.display='none'"></div>
+<div class="dev-img-wrap"><img src="images/products/GRID-5M_product.jpeg" alt="760LL" onerror="this.style.display='none'"></div>
 <div class="dev-header"><div><div class="dev-name">760kWh液冷储能柜</div><div class="dev-model">光储充一体化标准柜</div></div><span class="dev-badge badge-green">760kWh</span></div>
 <div class="dev-specs"><span class="spec-item">380kW PCS</span><span class="spec-item">液冷</span><span class="spec-item">IP55</span><span class="spec-item">≈38t</span></div>
 <div class="dev-features"><span class="feature-tag">光储充一体化</span><span class="feature-tag">7000次循环</span><span class="feature-tag">最大8并→6.08MWh</span></div>
@@ -38855,7 +38802,7 @@ ACC AC一体柜专题
 <div class="sec-title" style="margin-bottom:0" data-i18n="mg_energy_title">能源管理 Agent</div>
 <div style="font-size:11px;color:var(--text2)" data-i18n="mg_energy_desc">调试期 · 运营期 · 验收期 — 三期共用一入口，交付闭环</div>
 </div>
-<div style="margin-bottom:12px"><img src="/assets/ems_module_design_overview-C-80ZA8D.svg" style="width:100%;max-width:900px;border-radius:8px;border:1px solid var(--border)" onerror="this.style.display='none'"></div>
+<div style="margin-bottom:12px"><img src="ems_module_design_overview.svg" style="width:100%;max-width:900px;border-radius:8px;border:1px solid var(--border)" onerror="this.style.display='none'"></div>
 <div class="sw-tabs" id="energyTabs" style="margin-bottom:16px;flex-wrap:wrap">
 <div class="sw-tab active" onclick="mgShowEnergy('startup')">系统启动</div>
 <div class="sw-tab" onclick="mgShowEnergy('monitor')">实时监控</div>
@@ -38938,7 +38885,7 @@ ACC AC一体柜专题
 <div class="sub-tab" onclick="mgTradingShowTab('monitor')">📊 实时监控</div>
 <div class="sub-tab" onclick="mgTradingShowTab('revenue')">💰 收益分析</div>
 </nav>
-<div id="mgTradeTab-logic"><div class="mg-card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:var(--text1)">储能站电力交易与能量管理控制架构</div><button class="btn" onclick="mgDownloadTradingSVG()" style="font-size:10px;padding:4px 10px;background:#1a2a3a;color:#4a90d9;border:1px solid #4a90d944;border-radius:4px;cursor:pointer">📥 下载图片</button></div><div style="font-size:11px;color:var(--text2);margin-bottom:12px">市场信号→PPC报价→EMS决策→PCS执行→BMS反馈→电网交互—闭环</div><img src="/assets/%E5%82%A8%E8%83%BD%E7%94%B5%E7%AB%99%E7%94%B5%E5%8A%9B%E4%BA%A4%E6%98%93%E4%B8%8E%E8%83%BD%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%8C%E6%95%B4%E6%8E%A7%E5%88%B6%E9%93%BE%E8%B7%AF%E4%B8%8E%E9%80%9A%E4%BF%A1%E6%9E%B6%E6%9E%84-VdQqSee2.png" alt="储能站电力交易与能量管理控制架构" style="width:100%;height:auto;border-radius:8px;display:block"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="mg-card"><h3>📋 交易时序</h3><div id="mgTradingTimeline"></div></div><div class="mg-card"><h3>⚙️ 控制参数</h3><div id="mgTradingParams"></div></div></div></div>
+<div id="mgTradeTab-logic"><div class="mg-card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:var(--text1)">储能站电力交易与能量管理控制架构</div><button class="btn" onclick="mgDownloadTradingSVG()" style="font-size:10px;padding:4px 10px;background:#1a2a3a;color:#4a90d9;border:1px solid #4a90d944;border-radius:4px;cursor:pointer">📥 下载图片</button></div><div style="font-size:11px;color:var(--text2);margin-bottom:12px">市场信号→PPC报价→EMS决策→PCS执行→BMS反馈→电网交互—闭环</div><img src="images/储能电站电力交易与能量管理完整控制链路与通信架构.png" alt="储能站电力交易与能量管理控制架构" style="width:100%;height:auto;border-radius:8px;display:block"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="mg-card"><h3>📋 交易时序</h3><div id="mgTradingTimeline"></div></div><div class="mg-card"><h3>⚙️ 控制参数</h3><div id="mgTradingParams"></div></div></div></div>
 <div id="mgTradeTab-discharge" style="display:none"><div class="mg-card" style="margin-bottom:16px"><div style="font-size:14px;font-weight:700;color:var(--text1);margin-bottom:8px">储能放电启动—7步可视化</div><div id="mgDischargeSteps"></div></div><div class="mg-card"><div style="font-size:14px;font-weight:700;color:var(--text1);margin-bottom:8px">放电过程监控</div><div id="mgDischargeMonitor" style="background:#0a0c0f;border-radius:6px;padding:12px;font-family:Consolas,monospace;font-size:11px;color:#a5d6ff;height:300px;overflow-y:auto"></div><div style="margin-top:8px;display:flex;gap:8px"><button class="btn btn-primary" onclick="mgStartDischarge()">▶ 启动放电</button><button class="btn" onclick="mgStopDischarge()">⏹ 停止</button><button class="btn" onclick="mgClearDischargeLog()">清空</button></div></div></div>
 <div id="mgTradeTab-code" style="display:none">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -40345,73 +40292,300 @@ if __name__ == "__main__":
 </div>
 
 <div id="page-bs-pack" class="bs-content" style="display:none;padding:24px 32px">
-<div class="sec-title">③ Pack智能设计 Agent ★★★★★</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">AI驱动Pack设计：热仿真、SOC窗口优化、循环寿命预测、库存算法、Pack仓布局</div>
-<div id="bsPackEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「智能规划」中生成换电方案</div>
-<div id="bsPackContent" style="display:none">
-<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-<div class="bs-elec-tab active" onclick="bsPackSwitchTab('thermal')">🔥 热仿真</div>
-<div class="bs-elec-tab" onclick="bsPackSwitchTab('soc')">⚡ SOC优化</div>
-<div class="bs-elec-tab" onclick="bsPackSwitchTab('lifecycle')">📈 寿命预测</div>
-<div class="bs-elec-tab" onclick="bsPackSwitchTab('inventory')">📦 库存算法</div>
-<div class="bs-elec-tab" onclick="bsPackSwitchTab('layout')">🏗️ Pack仓布局</div>
+<div class="sec-title">③ Battery Pack Engineering ★★★★★</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">电池包工程设计：Cell/Module/Pack布局 · 铜排连接 · 液冷系统 · BMS采样 · HV Box · 热管理</div>
+<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+<div class="bs-elec-tab active" onclick="bsPackSwitchTab('overview')">📋 系统概览</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('module')">📦 Module设计</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('packlayout')">📐 Pack布局</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('electrical')">⚡ 电气连接</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('bms')">🧠 BMS布局</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('cooling')">❄️ 水冷系统</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('hvbox')">🔌 HV Box</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('bom')">📊 BOM</div>
 </div>
-<!-- 热仿真 -->
-<div id="bsPackThermal" style="display:block">
+<!-- ① 系统概览 -->
+<div id="bpOverview" style="display:block">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🏭 换电站电池包总览</h3>
+<span style="font-size:11px;color:var(--text2)">Battery Pack System Overview</span>
+</div>
+<img src="bs-pack-design.png" alt="换电站电池包设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
+<div style="font-size:12px;color:var(--text2)">电芯规格</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">LFP 280Ah 3.2V</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
+<div style="font-size:12px;color:var(--text2)">Pack配置</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">1P16S / 51.2V</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
+<div style="font-size:12px;color:var(--text2)">容量/能量</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">280Ah / 14.3kWh</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
+<div style="font-size:12px;color:var(--text2)">冷却方式</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">液冷 (50%乙二醇)</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
+<div style="font-size:12px;color:var(--text2)">BMS架构</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">1主+4从 CAN-FD</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
+<div style="font-size:12px;color:var(--text2)">循环寿命</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">≥6000次 (80%SOH)</div>
+</div>
+</div>
+</div>
+<!-- ② Module设计 -->
+<div id="bpModule" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">📦 模组设计 Module Engineering</h3>
+<span style="font-size:11px;color:var(--text2)">Cell设计与模块规格</span>
+</div>
+<img src="pack-module.png" alt="电池设计与模块规格图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">🔥 Pack热仿真模型</div>
-<div id="bsPackThermalSvg"></div>
+<div>
+<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">模组结构</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.8">
+<div>📌 <b style="color:var(--text1)">电芯排列</b>：8S1P (8颗电芯串联)</div>
+<div>📌 <b style="color:var(--text1)">铜排连接</b>：激光焊接 / 螺栓连接</div>
+<div>📌 <b style="color:var(--text1)">采样线束</b>：NTC温度传感器 + 电压采集</div>
+<div>📌 <b style="color:var(--text1)">绝缘片</b>：云母片 + PI膜</div>
+<div>📌 <b style="color:var(--text1)">压缩板</b>：铝板预紧 200-500kPa</div>
+<div>📌 <b style="color:var(--text1)">导热垫</b>：硅胶导热片 3W/mK</div>
 </div>
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">🌡️ 温度分布</div>
-<div id="bsPackThermalInfo"></div>
+</div>
+<div>
+<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">模组参数</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">配置</span><br><b style="color:var(--text1)">8S1P</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">电压</span><br><b style="color:var(--text1)">25.6V</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">容量</span><br><b style="color:var(--text1)">280Ah</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">重量</span><br><b style="color:var(--text1)">≈52kg</b></div>
 </div>
 </div>
 </div>
-<!-- SOC优化 -->
-<div id="bsPackSoc" style="display:none">
+</div>
+</div>
+<!-- ④ Pack布局 -->
+<div id="bpPacklayout" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">📐 Pack结构布局</h3>
+<span style="font-size:11px;color:var(--text2)">Pack Structural Layout</span>
+</div>
+<img src="pack-layout.png" alt="电池包结构布局图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">⚡ SOC充放电曲线</div>
-<div id="bsPackSocCurve"></div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">上盖组件</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 铝合金上盖 2.0mm</div>
+<div>• 密封圈 EPDM 50°</div>
+<div>• 泄压阀 0.8MPa</div>
+<div>• 防爆阀</div>
 </div>
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">📊 SOC窗口优化</div>
-<div id="bsPackSocInfo"></div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">下壳体</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 铝合金型材底壳</div>
+<div>• 液冷板集成</div>
+<div>• 固定梁/安装点</div>
+<div>• IP67防护等级</div>
 </div>
 </div>
 </div>
-<!-- 寿命预测 -->
-<div id="bsPackLifecycle" style="display:none">
+</div>
+<!-- ⑤ 电气连接 -->
+<div id="bpElectrical" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">⚡ 电气连接设计</h3>
+<span style="font-size:11px;color:var(--text2)">Cell Interconnection · Busbar</span>
+</div>
+<img src="pack-electrical.png" alt="电池包电气连接" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">铜排设计</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 材质：T2紫铜</div>
+<div>• 截面：8×3mm</div>
+<div>• 载流：≥80A</div>
+<div>• 激光焊接</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">串并联拓扑</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 配置：1P16S</div>
+<div>• 模组间：铜排串联</div>
+<div>• 汇流排截面计算</div>
+<div>• 压降分析</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">安全设计</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 电流保险丝 350A</div>
+<div>• 温度保险丝 85°C</div>
+<div>• 预充电路</div>
+<div>• 高压互锁 HVIL</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ⑥ BMS布局 -->
+<div id="bpBms" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🧠 BMS采样电路设计</h3>
+<span style="font-size:11px;color:var(--text2)">BMS Architecture · 1主+4从 CAN-FD</span>
+</div>
+<img src="bms-sampling.png" alt="BMS采样电路设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">📈 SOH衰减曲线</div>
-<div id="bsPackSohCurve"></div>
-</div>
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">🔄 循环寿命分析</div>
-<div id="bsPackLifecycleInfo"></div>
-</div>
-</div>
-</div>
-<!-- 库存算法 -->
-<div id="bsPackInventory" style="display:none">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2);margin-bottom:16px">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">📦 智能库存算法</div>
-<div id="bsPackInventorySvg"></div>
-</div>
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">📋 库存策略</div>
-<div id="bsPackInventoryInfo"></div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">主控 Master</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• MCU：ARM Cortex-M4</div>
+<div>• CAN-FD ↔ VCU通信</div>
+<div>• SOC/SOH算法</div>
+<div>• 均衡控制</div>
+<div>• 故障诊断 UDS</div>
 </div>
 </div>
-<!-- Pack仓布局 -->
-<div id="bsPackLayout" style="display:none">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">🏗️ Pack仓物理布局</div>
-<div id="bsPackLayoutSvg"></div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">从控 Slave (×4)</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• AFE：TI BQ76952</div>
+<div>• ADC：16bit 电压采集</div>
+<div>• NTC：每模组2路</div>
+<div>• 被动均衡 100mA</div>
+<div>• 每从控管理4S1P</div>
 </div>
+</div>
+</div>
+</div>
+<!-- ⑦ 水冷系统 -->
+<div id="bpCooling" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">❄️ 液冷散热系统</h3>
+<span style="font-size:11px;color:var(--text2)">Cooling Plate · 50% Ethylene Glycol</span>
+</div>
+<img src="yelengsanre.png" alt="液冷散热系统" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">冷却回路</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 入口温度：25°C</div>
+<div>• 出口温度：32°C</div>
+<div>• 流量：8L/min</div>
+<div>• 散热功率：2.8kW</div>
+<div>• 最大温差：≤5°C</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">液冷板参数</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 材质：铝合金6063</div>
+<div>• 厚度：3.5mm</div>
+<div>• 流道：蛇形/U形</div>
+<div>• 接口：Φ16宝塔头</div>
+<div>• 压降：≤15kPa</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ⑧ HV Box -->
+<div id="bpHvbox" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🔌 高压配电盒 HV Box</h3>
+<span style="font-size:11px;color:var(--text2)">HV Junction Box · IEC 62660</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
+<div style="font-size:12px;color:var(--text2)">主保险丝</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">350A 熔断器</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">额定电压 60V DC</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
+<div style="font-size:12px;color:var(--text2)">主接触器</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">正极+负极 双断</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">TE Connectivity EV200</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
+<div style="font-size:12px;color:var(--text2)">预充电路</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">预充继电器+电阻</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">R=20Ω 预充≤3s</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
+<div style="font-size:12px;color:var(--text2)">电流传感器</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">霍尔传感器 ±400A</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">精度 ±1%</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
+<div style="font-size:12px;color:var(--text2)">绝缘检测 IMD</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">≥500Ω/V</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">IEC 61557-8</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
+<div style="font-size:12px;color:var(--text2)">高压互锁 HVIL</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">低压信号回路</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">拔插检测</div>
+</div>
+</div>
+</div>
+<!-- ⑨ BOM -->
+<div id="bpBom" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">📊 电池包BOM清单</h3>
+<span style="font-size:11px;color:var(--text2)">Bill of Materials</span>
+</div>
+<div style="overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px">
+<thead>
+<tr style="border-bottom:2px solid var(--border)">
+<th style="text-align:left;padding:8px;color:var(--text1);font-weight:600">序号</th>
+<th style="text-align:left;padding:8px;color:var(--text1);font-weight:600">物料名称</th>
+<th style="text-align:left;padding:8px;color:var(--text1);font-weight:600">规格型号</th>
+<th style="text-align:right;padding:8px;color:var(--text1);font-weight:600">数量</th>
+<th style="text-align:right;padding:8px;color:var(--text1);font-weight:600">单价(元)</th>
+<th style="text-align:right;padding:8px;color:var(--text1);font-weight:600">小计(元)</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">1</td><td style="padding:8px;color:var(--text1)">LFP电芯 280Ah</td><td style="padding:8px;color:var(--text2)">CATL 174×72×207mm</td><td style="text-align:right;padding:8px;color:var(--text1)">16</td><td style="text-align:right;padding:8px;color:var(--text1)">280</td><td style="text-align:right;padding:8px;color:var(--text1)">4,480</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">2</td><td style="padding:8px;color:var(--text1)">铜排 T2紫铜</td><td style="padding:8px;color:var(--text2)">8×3mm 长100mm</td><td style="text-align:right;padding:8px;color:var(--text1)">15</td><td style="text-align:right;padding:8px;color:var(--text1)">15</td><td style="text-align:right;padding:8px;color:var(--text1)">225</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">3</td><td style="padding:8px;color:var(--text1)">液冷板</td><td style="padding:8px;color:var(--text2)">铝合金6063 400×200×3.5mm</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">350</td><td style="text-align:right;padding:8px;color:var(--text1)">350</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">4</td><td style="padding:8px;color:var(--text1)">BMS主控板</td><td style="padding:8px;color:var(--text2)">ARM M4 + CAN-FD</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">180</td><td style="text-align:right;padding:8px;color:var(--text1)">180</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">5</td><td style="padding:8px;color:var(--text1)">BMS从控板</td><td style="padding:8px;color:var(--text2)">BQ76952 AFE</td><td style="text-align:right;padding:8px;color:var(--text1)">4</td><td style="text-align:right;padding:8px;color:var(--text1)">85</td><td style="text-align:right;padding:8px;color:var(--text1)">340</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">6</td><td style="padding:8px;color:var(--text1)">主保险丝</td><td style="padding:8px;color:var(--text2)">350A 60VDC</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">45</td><td style="text-align:right;padding:8px;color:var(--text1)">45</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">7</td><td style="padding:8px;color:var(--text1)">主接触器</td><td style="padding:8px;color:var(--text2)">TE EV200AA</td><td style="text-align:right;padding:8px;color:var(--text1)">2</td><td style="text-align:right;padding:8px;color:var(--text1)">120</td><td style="text-align:right;padding:8px;color:var(--text1)">240</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">8</td><td style="padding:8px;color:var(--text1)">导热硅胶垫</td><td style="padding:8px;color:var(--text2)">3W/mK 1mm</td><td style="text-align:right;padding:8px;color:var(--text1)">16</td><td style="text-align:right;padding:8px;color:var(--text1)">12</td><td style="text-align:right;padding:8px;color:var(--text1)">192</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">9</td><td style="padding:8px;color:var(--text1)">NTC热敏电阻</td><td style="padding:8px;color:var(--text2)">10kΩ B3950</td><td style="text-align:right;padding:8px;color:var(--text1)">8</td><td style="text-align:right;padding:8px;color:var(--text1)">3</td><td style="text-align:right;padding:8px;color:var(--text1)">24</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">10</td><td style="padding:8px;color:var(--text1)">壳体(上盖+下壳)</td><td style="padding:8px;color:var(--text2)">铝合金型材 IP67</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">600</td><td style="text-align:right;padding:8px;color:var(--text1)">600</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">11</td><td style="padding:8px;color:var(--text1)">密封圈</td><td style="padding:8px;color:var(--text2)">EPDM 50° 异型</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">35</td><td style="text-align:right;padding:8px;color:var(--text1)">35</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">12</td><td style="padding:8px;color:var(--text1)">泄压阀</td><td style="padding:8px;color:var(--text2)">0.8MPa 防爆</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">25</td><td style="text-align:right;padding:8px;color:var(--text1)">25</td></tr>
+</tbody>
+<tfoot>
+<tr style="border-top:2px solid var(--border)">
+<td colspan="5" style="padding:8px;text-align:right;color:var(--text1);font-weight:700">合计</td>
+<td style="text-align:right;padding:8px;color:#50c878;font-weight:700;font-size:14px">¥6,736</td>
+</tr>
+</tfoot>
+</table>
 </div>
 </div>
 </div>
@@ -40883,16 +41057,12 @@ if __name__ == "__main__":
 </div>
 </div>
 
-<div id="page-ch-cooling" class="charging-content" style="display:none;padding:24px 32px">
-<div id="chLcDashboard"></div>
-</div>
-
 <div id="page-ch-flash" class="charging-content" style="display:none;padding:24px 32px">
 <div style="background:linear-gradient(135deg,#0a1628 0%,#0d2137 50%,#0a1628 100%);border-radius:12px;padding:32px;margin-bottom:24px;border:1px solid #1e3a5f">
 <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
 <div style="width:48px;height:48px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px">⚡</div>
 <div>
-<h2 style="margin:0;color:#f8fafc;font-size:22px">Flash Charging System · 闪充系统</h2>
+<h2 style="margin:0;color:#f8fafc;font-size:22px">Flash Charging System · 闪充液冷</h2>
 <p style="margin:4px 0 0;color:#94a3b8;font-size:13px">从10kV电网到车辆电池的完整MW级闪充系统研发平台 · 覆盖配电/高压/液冷/BMS/EMS/功率调度全链路</p>
 </div>
 </div>
@@ -40903,14 +41073,7 @@ if __name__ == "__main__":
 <span style="padding:4px 12px;background:#10b98122;color:#10b981;border-radius:20px;font-size:11px;font-weight:600">ISO 15118 / OCPP 2.0.1</span>
 <span style="padding:4px 12px;background:#8b5cf622;color:#8b5cf6;border-radius:20px;font-size:11px;font-weight:600">储能联动 EMS</span>
 </div>
-</div>
-
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px">
-<div onclick="showFlashSubTab('overview')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
-<div style="font-size:22px;margin-bottom:8px">🏠</div>
-<div style="font-size:13px;font-weight:700;color:var(--text1)">系统概览</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">Architecture Overview</div>
-</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:16px">
 <div onclick="showFlashSubTab('arch')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
 <div style="font-size:22px;margin-bottom:8px">📐</div>
 <div style="font-size:13px;font-weight:700;color:var(--text1)">系统框图</div>
@@ -40951,76 +41114,10 @@ if __name__ == "__main__":
 <div style="font-size:13px;font-weight:700;color:var(--text1)">热管理</div>
 <div style="font-size:11px;color:var(--text2);margin-top:4px">Thermal Management</div>
 </div>
-<div onclick="showFlashSubTab('reviewer')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
-<div style="font-size:22px;margin-bottom:8px">🔍</div>
-<div style="font-size:13px;font-weight:700;color:var(--text1)">AI Reviewer</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">智能审查</div>
-</div>
 <div onclick="showFlashSubTab('bom')" style="cursor:pointer;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;transition:all .2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
 <div style="font-size:22px;margin-bottom:8px">📋</div>
 <div style="font-size:13px;font-weight:700;color:var(--text1)">BOM清单</div>
 <div style="font-size:11px;color:var(--text2);margin-top:4px">Bill of Materials</div>
-</div>
-</div>
-
-<div id="flashSubTab-overview" style="display:block">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
-<div class="mg-card">
-<h3 style="margin:0 0 12px;color:var(--text1);font-size:15px">⚡ 系统能量流</h3>
-<div style="font-family:monospace;font-size:12px;line-height:2;color:var(--text1);background:var(--bg3);padding:16px;border-radius:8px">
-<div style="text-align:center;color:#f59e0b;font-weight:700;margin-bottom:8px">10kV 电网接入</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:var(--text1)">配电变压器 10kV/400V</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:var(--text1)">AC400V 母线</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:#3b82f6;font-weight:700">PFC 整流 (多模块并联)</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:#ef4444;font-weight:700">1000V DC Bus</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:var(--text1)">SiC DC/DC 模块</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:#8b5cf6;font-weight:700">功率动态分配</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:#3b82f6">液冷母排系统</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:#10b981;font-weight:700">液冷充电枪 1000A</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:var(--text1)">车端高压接口</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:var(--text1)">BMS 控制</div>
-<div style="text-align:center;color:#64748b">│</div>
-<div style="text-align:center;color:#06b6d4">电池液冷热管理</div>
-</div>
-</div>
-<div class="mg-card">
-<h3 style="margin:0 0 12px;color:var(--text1);font-size:15px">🗺️ 全栈覆盖范围</h3>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #f59e0b">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">配电系统</div>
-<div style="font-size:11px;color:var(--text2)">10kV→400V→DC Bus</div>
-</div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #ef4444">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">主功率拓扑</div>
-<div style="font-size:11px;color:var(--text2)">PFC + SiC DC/DC</div>
-</div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #3b82f6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">液冷系统</div>
-<div style="font-size:11px;color:var(--text2)">母排+枪+热管理</div>
-</div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #8b5cf6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">功率调度</div>
-<div style="font-size:11px;color:var(--text2)">动态分配+削峰填谷</div>
-</div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #10b981">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">BMS/协议</div>
-<div style="font-size:11px;color:var(--text2)">ISO15118+OCPP</div>
-</div>
-<div style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid #06b6d4">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">储能联动</div>
-<div style="font-size:11px;color:var(--text2)">PCS+SOC调度</div>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -41029,9 +41126,9 @@ if __name__ == "__main__":
 <div class="mg-card" style="margin-bottom:20px">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
 <h3 style="margin:0;color:var(--text1);font-size:15px">📐 闪充系统架构图</h3>
-<span style="font-size:11px;color:var(--text2)">GPT5.5 参考架构 · 从电网到车辆的完整功率路径</span>
+<span style="font-size:11px;color:var(--text2)">从电网到车辆的完整功率路径</span>
 </div>
-<img src="images/images/flash-arch.png" alt="闪充系统架构图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: images/flash-arch.png</div>'">
+<img src="flash-arch.svg" alt="闪充系统架构图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
 <div class="mg-card">
@@ -41053,9 +41150,9 @@ if __name__ == "__main__":
 <div class="mg-card" style="margin-bottom:20px">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
 <h3 style="margin:0;color:var(--text1);font-size:15px">🔌 主功率原理图</h3>
-<span style="font-size:11px;color:var(--text2)">GPT5.5 参考设计 · SiC主功率拓扑 + PFC整流</span>
+<span style="font-size:11px;color:var(--text2)">SiC主功率拓扑 + PFC整流</span>
 </div>
-<img src="images/images/flash-power.png" alt="闪充主功率原理图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: images/flash-power.png</div>'">
+<img src="flash-power.svg" alt="闪充主功率原理图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
 <div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
@@ -41097,9 +41194,9 @@ if __name__ == "__main__":
 <div class="mg-card" style="margin-bottom:20px">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
 <h3 style="margin:0;color:var(--text1);font-size:15px">❄️ 闪充站冷却系统图</h3>
-<span style="font-size:11px;color:var(--text2)">GPT5.5 参考设计 · 全站液冷热管理</span>
+<span style="font-size:11px;color:var(--text2)">全站液冷热管理</span>
 </div>
-<img src="/c.png" alt="闪充站冷却系统图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: images/flash-cooling.png</div>'">
+<img src="flash-cooling.svg" alt="闪充站冷却系统图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 <div class="mg-card">
@@ -41125,278 +41222,158 @@ if __name__ == "__main__":
 
 <div id="flashSubTab-hv" style="display:none">
 <div class="mg-card" style="margin-bottom:20px">
-<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">⚡ 高压配电系统</h3>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px">
-<div style="padding:14px;background:var(--bg3);border-radius:8px;text-align:center;border:2px solid #f59e0b">
-<div style="font-size:20px;font-weight:800;color:#f59e0b">10kV</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">电网接入</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">⚡ 高压配电系统方案图</h3>
+<span style="font-size:11px;color:var(--text2)">HV Distribution · 10kV/400V/1000V/1500V 完整配电架构</span>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;text-align:center;border:2px solid #3b82f6">
-<div style="font-size:20px;font-weight:800;color:#3b82f6">400V</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">交流母线</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;text-align:center;border:2px solid #ef4444">
-<div style="font-size:20px;font-weight:800;color:#ef4444">1000V</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">DC母线</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;text-align:center;border:2px solid #10b981">
-<div style="font-size:20px;font-weight:800;color:#10b981">1500V</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">高压平台</div>
-</div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div class="mg-card">
-<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">配电设备</h3>
-<div style="font-size:11px;color:var(--text2);line-height:2">
-<div>• 高压断路器 (ACB/MCCB)</div>
-<div>• 熔断器 (Fuse)</div>
-<div>• 浪涌保护器 (SPD)</div>
-<div>• 电流互感器 (CT)</div>
-<div>• 电压互感器 (PT)</div>
-<div>• 绝缘监测 (IMD)</div>
-</div>
-</div>
-<div class="mg-card">
-<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">安全系统</h3>
-<div style="font-size:11px;color:var(--text2);line-height:2">
-<div>• 接地系统 (PE)</div>
-<div>• 漏电保护 (RCD)</div>
-<div>• 温度监测</div>
-<div>• 电弧检测 (AFDD)</div>
-<div>• 联锁保护</div>
-<div>• 应急断电 (E-Stop)</div>
-</div>
-</div>
-</div>
+<img src="gaoyapeidian.svg" alt="高压配电系统" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
 </div>
 </div>
 
 <div id="flashSubTab-dispatch" style="display:none">
 <div class="mg-card" style="margin-bottom:20px">
-<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">📊 功率调度策略</h3>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
-<div style="padding:16px;background:var(--bg3);border-radius:8px;text-align:center">
-<div style="font-size:11px;color:var(--text2);margin-bottom:4px">总功率</div>
-<div style="font-size:28px;font-weight:800;color:#f59e0b">1000kW</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">📊 功率调度系统方案图</h3>
+<span style="font-size:11px;color:var(--text2)">Power Dispatch · 动态分配/削峰填谷/储能联动</span>
 </div>
-<div style="padding:16px;background:var(--bg3);border-radius:8px;text-align:center">
-<div style="font-size:11px;color:var(--text2);margin-bottom:4px">充电枪数</div>
-<div style="font-size:28px;font-weight:800;color:#3b82f6">4 枪</div>
-</div>
-<div style="padding:16px;background:var(--bg3);border-radius:8px;text-align:center">
-<div style="font-size:11px;color:var(--text2);margin-bottom:4px">单枪均分</div>
-<div style="font-size:28px;font-weight:800;color:#10b981">250kW</div>
-</div>
-</div>
-<div class="mg-card">
-<h3 style="margin:0 0 12px;font-size:13px;color:var(--text1)">动态功率分配模式</h3>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-<div style="padding:12px;background:var(--bg3);border-radius:6px;border-left:3px solid #10b981">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">均分模式</div>
-<div style="font-size:11px;color:var(--text2)">250 + 250 + 250 + 250 kW</div>
-</div>
-<div style="padding:12px;background:var(--bg3);border-radius:6px;border-left:3px solid #f59e0b">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">优先模式</div>
-<div style="font-size:11px;color:var(--text2)">800 + 200 kW (快充优先)</div>
-</div>
-<div style="padding:12px;background:var(--bg3);border-radius:6px;border-left:3px solid #3b82f6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">削峰填谷</div>
-<div style="font-size:11px;color:var(--text2)">峰时降功率 / 谷时满充</div>
-</div>
-<div style="padding:12px;background:var(--bg3);border-radius:6px;border-left:3px solid #8b5cf6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">储能联动</div>
-<div style="font-size:11px;color:var(--text2)">PCS+SOC联合调度</div>
-</div>
-</div>
-</div>
+<img src="gonglvdiaodu.svg" alt="功率调度系统" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
 </div>
 </div>
 
 <div id="flashSubTab-bms" style="display:none">
 <div class="mg-card" style="margin-bottom:20px">
-<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">🔋 BMS与充电协议</h3>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px">
-<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #f59e0b">
-<div style="font-size:13px;font-weight:700;color:var(--text1)">CCS2</div>
-<div style="font-size:10px;color:var(--text2)">欧标 Combo</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🔋 BMS与充电协议方案图</h3>
+<span style="font-size:11px;color:var(--text2)">BMS & Protocol · CCS2/GB-T/ISO15118/OCPP 全协议栈</span>
 </div>
-<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #ef4444">
-<div style="font-size:13px;font-weight:700;color:var(--text1)">GB/T</div>
-<div style="font-size:10px;color:var(--text2)">国标直流</div>
-</div>
-<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #3b82f6">
-<div style="font-size:13px;font-weight:700;color:var(--text1)">ChaoJi</div>
-<div style="font-size:10px;color:var(--text2)">下一代超充</div>
-</div>
-<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #10b981">
-<div style="font-size:13px;font-weight:700;color:var(--text1)">ISO 15118</div>
-<div style="font-size:10px;color:var(--text2)">PLC通信</div>
-</div>
-<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #8b5cf6">
-<div style="font-size:13px;font-weight:700;color:var(--text1)">OCPP 2.0.1</div>
-<div style="font-size:10px;color:var(--text2)">站端协议</div>
-</div>
-<div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center;border-top:3px solid #06b6d4">
-<div style="font-size:13px;font-weight:700;color:var(--text1)">CAN / CANFD</div>
-<div style="font-size:10px;color:var(--text2)">BMS总线</div>
-</div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div class="mg-card">
-<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">BMS功能</h3>
-<div style="font-size:11px;color:var(--text2);line-height:2">
-<div>• SOC/SOH 估算</div>
-<div>• 均衡控制</div>
-<div>• 过压/欠压/过温保护</div>
-<div>• 充电状态机</div>
-<div>• 预充电控制</div>
-</div>
-</div>
-<div class="mg-card">
-<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">协议栈</h3>
-<div style="font-size:11px;color:var(--text2);line-height:2">
-<div>• PLC (ISO 15118)</div>
-<div>• TCP/IP (OCPP)</div>
-<div>• CAN 2.0B (BMS)</div>
-<div>• Modbus (电表)</div>
-<div>• MQTT (云端)</div>
-</div>
-</div>
-</div>
+<img src="bms-protocol.svg" alt="BMS与充电协议" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
 </div>
 </div>
 
 <div id="flashSubTab-battery" style="display:none">
 <div class="mg-card" style="margin-bottom:20px">
-<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">📦 电池侧架构</h3>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px">
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #f59e0b">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Pack</div>
-<div style="font-size:11px;color:var(--text2)">电池包总成</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">📦 电池系统设计方案图</h3>
+<span style="font-size:11px;color:var(--text2)">Battery System Design · Pack/Module/Cell/BMS 完整架构</span>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #3b82f6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Module</div>
-<div style="font-size:11px;color:var(--text2)">模组单元</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #10b981">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Cell</div>
-<div style="font-size:11px;color:var(--text2)">电芯单体</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #8b5cf6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">HV Junction Box</div>
-<div style="font-size:11px;color:var(--text2)">高压配电盒</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #ef4444">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Fuse + Contactor</div>
-<div style="font-size:11px;color:var(--text2)">熔断器+接触器</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #06b6d4">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Pre-charge</div>
-<div style="font-size:11px;color:var(--text2)">预充电路</div>
-</div>
-</div>
+<img src="battery-design.svg" alt="电池系统设计" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
 </div>
 </div>
 
 <div id="flashSubTab-thermal" style="display:none">
 <div class="mg-card" style="margin-bottom:20px">
-<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">🌡️ 热管理系统</h3>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Heat Source</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">功率模块、母排、充电枪</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🌡️ 热管理系统方案图</h3>
+<span style="font-size:11px;color:var(--text2)">Thermal Management · 液冷/风冷完整热管理架构</span>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Cooling Loop</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">液冷回路设计</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Pump + Valve</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">循环泵+比例阀</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Radiator + Fan</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">散热器+风机</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Flow Sensor</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">流量+温度传感</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Control Logic</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">PID控制+故障诊断</div>
-</div>
-</div>
-</div>
-</div>
-
-<div id="flashSubTab-reviewer" style="display:none">
-<div class="mg-card" style="margin-bottom:20px">
-<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">🔍 AI Reviewer · 智能图纸审查</h3>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">上传EPLAN/KiCad/CAD/PDF图纸，AI自动检查IEC标准合规性</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px">
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #ef4444">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">IEC 60617</div>
-<div style="font-size:11px;color:var(--text2)">图形符号标准</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #f59e0b">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">IEC 61082</div>
-<div style="font-size:11px;color:var(--text2)">电气文件编制</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #3b82f6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">GB 4728</div>
-<div style="font-size:11px;color:var(--text2)">电气简图用图形符号</div>
-</div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid #10b981">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">IEC 81346</div>
-<div style="font-size:11px;color:var(--text2)">产品结构与编码</div>
-</div>
-</div>
-<div class="mg-card">
-<h3 style="margin:0 0 12px;font-size:13px;color:var(--text1)">AI自动检查项</h3>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">QF编号错误检测</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">PE遗漏检查</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">CT方向错误</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">SPD位置错误</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">绝缘距离不足</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">导线编号重复</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">线径错误</div>
-<div style="padding:8px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2)">接地系统检查</div>
-</div>
-</div>
+<img src="/reguanli.png" alt="热管理系统" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
 </div>
 </div>
 
 <div id="flashSubTab-bom" style="display:none">
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px;padding:16px;background:var(--bg3);border-radius:10px;border-left:4px solid #f59e0b">
+<div><div style="font-size:10px;color:var(--text2)">项目名称</div><div style="font-size:13px;font-weight:700;color:var(--text1)">1MW 液冷闪充站</div></div>
+<div><div style="font-size:10px;color:var(--text2)">系统功率</div><div style="font-size:13px;font-weight:700;color:var(--text1)">1000 kW</div></div>
+<div><div style="font-size:10px;color:var(--text2)">直流电压</div><div style="font-size:13px;font-weight:700;color:var(--text1)">1000 VDC</div></div>
+<div><div style="font-size:10px;color:var(--text2)">充电电流</div><div style="font-size:13px;font-weight:700;color:var(--text1)">1000 A</div></div>
+<div><div style="font-size:10px;color:var(--text2)">BOM版本</div><div style="font-size:13px;font-weight:700;color:var(--text1)">V1.0</div></div>
+<div><div style="font-size:10px;color:var(--text2)">生成时间</div><div style="font-size:13px;font-weight:700;color:var(--text1)">2026-07-10</div></div>
+</div>
+<style>
+.fbom-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.fbom-tbl th{background:#1a2a3a;color:#cbd5e1;padding:7px 8px;text-align:left;font-weight:600;border:1px solid #2a3a4a;white-space:nowrap}
+.fbom-tbl td{padding:6px 8px;border:1px solid #232f3d;color:var(--text1);vertical-align:top}
+.fbom-tbl tr:nth-child(even){background:rgba(255,255,255,.02)}
+.fbom-tag{color:#f59e0b;font-weight:700}
+.fbom-mfr{color:#3b82f6;font-weight:600}
+</style>
+
 <div class="mg-card" style="margin-bottom:20px">
-<h3 style="margin:0 0 16px;color:var(--text1);font-size:15px">📋 闪充系统BOM</h3>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px">
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Electrical BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">SiC MOSFET、Driver、传感器</div>
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">① 主功率电气 BOM · 采购级</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Main Power Electrical BOM · 配电保护 / 进线 / 隔离</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">QF1</td><td>主进线空气断路器</td><td class="fbom-mfr">Schneider / Masterpact MTZ2 16</td><td>4P 1600A · AC1000V · Icu 65kA</td><td>1</td><td>10kV侧总保护</td><td>ABB Emax2</td><td>框架断路器</td></tr>
+<tr><td class="fbom-tag">KM1~KM4</td><td>DC 主接触器</td><td class="fbom-mfr">TE Connectivity / KILOVAC EV200AAANA</td><td>900VDC 500A · 线圈12V</td><td>4</td><td>功率回路通断</td><td>Panasonic AM</td><td>预充并联</td></tr>
+<tr><td class="fbom-tag">FU1/FU2</td><td>DC 熔断器</td><td class="fbom-mfr">Bussmann / 170M6810</td><td>1250A / 1000VDC · aR</td><td>2</td><td>短路保护</td><td>Ferraz</td><td>gPV 特性</td></tr>
+<tr><td class="fbom-tag">SPD1</td><td>浪涌保护器</td><td class="fbom-mfr">Phoenix Contact / VAL-MS-T1/T2</td><td>1000VDC · Type I+II</td><td>2</td><td>防雷过压保护</td><td>DEHN</td><td>双极</td></tr>
+<tr><td class="fbom-tag">IMD1</td><td>绝缘监测仪</td><td class="fbom-mfr">Bender / Iso685-D</td><td>0~1000VDC · 50kΩ</td><td>1</td><td>直流绝缘监测</td><td>Schoeffner</td><td>符合IEC61557</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Mechanical BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">柜体、母排、结构件</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">② PFC 整流模块 BOM · SiC</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">PFC Rectifier Module BOM · AC400V → DC1000V</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">PFC-M1~16</td><td>图腾柱 PFC 模块</td><td class="fbom-mfr">Infy Power / IPM-62.5K-1000</td><td>62.5kW · AC400V→DC1000V</td><td>16</td><td>AC/DC 整流</td><td>UUC Power</td><td>多模块并联</td></tr>
+<tr><td class="fbom-tag">U1</td><td>SiC MOSFET</td><td class="fbom-mfr">Wolfspeed / CAB450M12XM3</td><td>1200V · 450A</td><td>32</td><td>高频开关</td><td>ST SiC</td><td>每模块2颗</td></tr>
+<tr><td class="fbom-tag">L1</td><td>Boost 电感</td><td class="fbom-mfr">定制件 / Sendust Core</td><td>220µH · 150A</td><td>16</td><td>功率因数校正</td><td>铁硅铝</td><td>非标定制</td></tr>
+<tr><td class="fbom-tag">Cbus</td><td>DC Link 电容</td><td class="fbom-mfr">TDK EPCOS / B25690A</td><td>1000V · 6800µF</td><td>16</td><td>母线稳压</td><td>KEMET</td><td>薄膜电容</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Cooling BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">泵、阀、换热器、冷却液</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">③ SiC DC/DC 模块 BOM · 双向</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">SiC DC/DC Module BOM · 1000V↔200~1000V 隔离变换</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">DAB-M1~16</td><td>双向 DAB 模块</td><td class="fbom-mfr">StarCharge / DAB-62.5K</td><td>62.5kW · 1000V↔200~1000V</td><td>16</td><td>电压匹配/隔离</td><td>Sinexcel</td><td>双有源桥</td></tr>
+<tr><td class="fbom-tag">T1</td><td>高频变压器</td><td class="fbom-mfr">定制 / 纳米晶磁芯</td><td>100kHz · 70kW</td><td>16</td><td>隔离传能</td><td>铁氧体</td><td>非标定制</td></tr>
+<tr><td class="fbom-tag">U2</td><td>SiC 功率模块</td><td class="fbom-mfr">Rohm / BSM600D12P3G001</td><td>1200V · 600A</td><td>32</td><td>高频开关</td><td>Wolfspeed</td><td>每模块2颗</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Communication BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">PLC、CAN、OCPP模块</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">④ 液冷系统 BOM · 1000A</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Liquid Cooling System BOM · 泵 / 换热器 / 枪 / 传感</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">P1</td><td>冷却循环泵</td><td class="fbom-mfr">Grundfos / CRN 15-10</td><td>25m³/h · H=20m</td><td>2</td><td>冷却液循环</td><td>Wilo</td><td>一用一备</td></tr>
+<tr><td class="fbom-tag">HX1</td><td>板式换热器</td><td class="fbom-mfr">Alfa Laval / CB110</td><td>500kW · SS316</td><td>1</td><td>热量交换</td><td>SWEP</td><td>不锈钢</td></tr>
+<tr><td class="fbom-tag">GUN1/GUN2</td><td>液冷充电枪</td><td class="fbom-mfr">Phoenix Contact / CHARX connect pro</td><td>1000A · 1000VDC</td><td>4</td><td>车辆接口</td><td> thermal management</td><td>带液冷</td></tr>
+<tr><td class="fbom-tag">FT1</td><td>流量传感器</td><td class="fbom-mfr">Krohne / OPTIFLUX 1300</td><td>0~30m³/h · 4~20mA</td><td>2</td><td>流量监测</td><td>Endress</td><td>电磁式</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">HV BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">断路器、熔断器、SPD</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">⑤ 电池包 BOM · 1024V / 215kWh</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Battery Pack BOM · 电芯 / 模组 / 高压盒 / BMS</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">CELL</td><td>LFP 电芯</td><td class="fbom-mfr">EVE / LF280K</td><td>3.2V · 280Ah</td><td>320</td><td>能量存储</td><td>CATL</td><td>磷酸铁锂</td></tr>
+<tr><td class="fbom-tag">MOD1~20</td><td>电池模组</td><td class="fbom-mfr">定制 / 1P16S</td><td>51.2V · 280Ah</td><td>20</td><td>串并联单元</td><td>—</td><td>非标定制</td></tr>
+<tr><td class="fbom-tag">HVJB1</td><td>高压盒</td><td class="fbom-mfr">定制 / HVJB-1000</td><td>1000V · 1000A</td><td>1</td><td>高压配电</td><td>—</td><td>含熔断器</td></tr>
+<tr><td class="fbom-tag">BMU1</td><td>BMS 主控</td><td class="fbom-mfr">NXP / S32K344</td><td>CAN FD · Ethernet</td><td>1</td><td>电池管理</td><td>TI</td><td>车规级</td></tr>
+</tbody>
+</table>
 </div>
-<div style="padding:14px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
-<div style="font-size:12px;font-weight:700;color:var(--text1)">Safety BOM</div>
-<div style="font-size:11px;color:var(--text2);margin-top:4px">接地、绝缘、联锁</div>
+
+<div class="mg-card" style="margin-bottom:20px">
+<h3 style="margin:0 0 4px;color:var(--text1);font-size:15px">⑥ 线缆 BOM · 高压</h3>
+<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Cable BOM · 母排 / 高压电缆 / 接地 / 通信</div>
+<table class="fbom-tbl">
+<thead><tr><th>位号</th><th>功能描述</th><th>供应商 / 型号</th><th>关键参数</th><th>数量</th><th>系统作用</th><th>备选型号</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td class="fbom-tag">BUS1</td><td>DC 主母排</td><td class="fbom-mfr">定制 / T2 铜排 镀锡</td><td>100×10mm</td><td>若干</td><td>PFC↔DC Bus</td><td>—</td><td>非标定制</td></tr>
+<tr><td class="fbom-tag">CAB1</td><td>高压电缆</td><td class="fbom-mfr">Prysmian / EV Cable</td><td>240mm² · 1500VDC</td><td>若干</td><td>DC/DC↔充电枪</td><td>Leoni</td><td>液冷兼容</td></tr>
+<tr><td class="fbom-tag">PE1</td><td>PE 接地线</td><td class="fbom-mfr">远东电缆 / 国标</td><td>95mm² · 黄绿双色</td><td>若干</td><td>保护接地</td><td>上上</td><td>—</td></tr>
+<tr><td class="fbom-tag">CAN1</td><td>CAN FD 总线</td><td class="fbom-mfr">Belden / 9841</td><td>2×0.75mm² 屏蔽双绞</td><td>若干</td><td>BMS 通信</td><td>LAPP</td><td>—</td></tr>
+</tbody>
+</table>
 </div>
-</div>
+
+<div style="font-size:11px;color:var(--text2);padding:12px;background:var(--bg3);border-radius:8px;border-left:3px solid #8b5cf6;line-height:1.8">
+<b style="color:var(--text1)">BOM 说明：</b>以上为 1MW 液冷闪充系统采购级 BOM 示例，关键字段含 <b>位号(Tag)</b>、<b>完整型号(Manufacturer+Model)</b>、<b>关键参数(电压/电流/功率)</b>、<b>基本功能说明</b>、<b>数量</b>、<b>备选供应商</b>。实际项目应根据站点功率、枪数、是否含储能动态生成，并支持导出 Excel / ERP / SAP / PLM。
 </div>
 </div>
 
@@ -42721,7 +42698,7 @@ aidc_dw_title:'图纸汇总 Agent',aidc_dw_desc:'所有AIDC图纸集中展示与
 aidc_dw_arch:'AIDC系统架构图',aidc_dw_wiring:'AIDC电气一次接线图',aidc_dw_dual:'AIDC双路供电拓扑图',aidc_dw_liquid:'AIDC液冷管路图',
 ess_layout:'平面布置图',ess_cable:'电缆走向图',ess_principle:'PCS-BESS电气原理图',
 lang_btn_zh:'中文',lang_btn_en:'English',lang_btn_ar:'العربية',
-mg_arch_panorama:'微网(Microgrid) 架构全景图',mg_arch_ac_topo:'一、微网电力拓扑总览（交流微网）',mg_arch_hybrid:'二、交直流混合微网架构（推荐方案）',mg_arch_topo_compare:'三、四种典型微网拓扑对比',mg_arch_mode_switch:'四、微网运行模式切换',mg_arch_protection:'五、电气二次接线图',mg_arch_comm:'六、通信控制网络',mg_arch_params:'七、关键参数速查',mg_arch_logic:'八、微网并离网控制逻辑图',cat_charging:'充电智能体',ch_design:'方案设计',ch_elec:'电气设计',ch_software:'软件平台',ch_proto:'通信协议',ch_cooling:'超充液冷',ch_flash:'闪充系统',ch_evcc:'EVCC/SECC',ch_bom:'BOM清单',ch_skill:'核心Skill',ch_design_title:'充电站方案设计 Agent',ch_design_desc:'输入站点类型、车位、目标功率，AI自动生成站级方案、单线图、BOM与投资估算',ch_elec_title:'电气设计 Agent',ch_elec_desc:'基于IEC 60617/61851标准生成工程级原理图，支持欧标/国标移动充电桩、固定式超充堆电气设计',ch_elec_mobile_eu:'欧标移动充电桩原理图',ch_elec_cabinet:'超充堆一次图',
+mg_arch_panorama:'微网(Microgrid) 架构全景图',mg_arch_ac_topo:'一、微网电力拓扑总览（交流微网）',mg_arch_hybrid:'二、交直流混合微网架构（推荐方案）',mg_arch_topo_compare:'三、四种典型微网拓扑对比',mg_arch_mode_switch:'四、微网运行模式切换',mg_arch_protection:'五、电气二次接线图',mg_arch_comm:'六、通信控制网络',mg_arch_params:'七、关键参数速查',mg_arch_logic:'八、微网并离网控制逻辑图',cat_charging:'充电智能体',ch_design:'方案设计',ch_elec:'电气设计',ch_software:'软件平台',ch_proto:'通信协议',ch_flash:'闪充液冷',ch_evcc:'EVCC/SECC',ch_bom:'BOM清单',ch_skill:'核心Skill',ch_design_title:'充电站方案设计 Agent',ch_design_desc:'输入站点类型、车位、目标功率，AI自动生成站级方案、单线图、BOM与投资估算',ch_elec_title:'电气设计 Agent',ch_elec_desc:'基于IEC 60617/61851标准生成工程级原理图，支持欧标/国标移动充电桩、固定式超充堆电气设计',ch_elec_mobile_eu:'欧标移动充电桩原理图',ch_elec_cabinet:'超充堆一次图',
 mg_ems_arch_title:'eBlock 微网能量管理系统(EMS)架构',mg_ems_overview:'一、总体架构（四层）',mg_ems_protocol:'二、通信协议 & 连接总线',mg_ems_eblock:'三、单台eBlock内部架构',mg_ems_delay:'四、关键通信时延（时序图）',mg_ems_network:'五、网络拓扑',
 mg_schedule_title:'微网调度优化',mg_schedule_obj:'一、优化目标函数',mg_schedule_constraints:'二、约束条件',mg_schedule_layers:'三、调度策略层级',mg_schedule_scenarios:'四、典型调度场景',
 mg_sw_pill_dispatch:'调度',mg_sw_pill_trading:'交易',mg_sw_pill_datacenter:'数据中台',
@@ -42855,7 +42832,7 @@ aidc_dw_title:'Drawing Summary Agent',aidc_dw_desc:'All AIDC drawings centralize
 aidc_dw_arch:'AIDC System Architecture',aidc_dw_wiring:'AIDC Single-line Diagram',aidc_dw_dual:'AIDC Dual-feed Power Topology',aidc_dw_liquid:'AIDC Liquid Cooling Diagram',
 ess_layout:'Floor Plan',ess_cable:'Cable Routing',ess_principle:'PCS-BESS Schematic',
 lang_btn_zh:'Chinese',lang_btn_en:'English',lang_btn_ar:'Arabic',
-mg_arch_panorama:'Microgrid Architecture Overview',mg_arch_ac_topo:'1. Microgrid Power Topology Overview (AC Microgrid)',mg_arch_hybrid:'2. AC/DC Hybrid Microgrid Architecture (Recommended)',mg_arch_topo_compare:'3. Four Typical Microgrid Topology Comparison',mg_arch_mode_switch:'4. Microgrid Operation Mode Switching',mg_arch_protection:'5. Microgrid Electrical Secondary Wiring Diagram',mg_arch_comm:'6. Communication & Control Network',mg_arch_params:'7. Key Parameters Quick Reference',mg_arch_logic:'8. Microgrid Grid-Connected/Islanded Control Logic Diagram',cat_charging:'Charging Solution Agent',ch_design:'Design',ch_elec:'Electrical',ch_software:'Software Platform',ch_proto:'Protocols',ch_cooling:'Liquid-Cooled HPC',ch_flash:'Flash Charging',ch_evcc:'EVCC/SECC',ch_bom:'BOM',ch_skill:'Core Skills',ch_design_title:'Charging Station Design Agent',ch_design_desc:'Input site type/parking/power targets, AI auto-generates station plan, SLD, BOM & investment',ch_elec_title:'Electrical Design Agent',ch_elec_desc:'Engineering schematics based on IEC 60617/61851. Supports EU-standard mobile charger & fixed HPC cabinet.',ch_elec_mobile_eu:'EU Mobile Charger Schematic',ch_elec_cabinet:'HPC Cabinet SLD',
+mg_arch_panorama:'Microgrid Architecture Overview',mg_arch_ac_topo:'1. Microgrid Power Topology Overview (AC Microgrid)',mg_arch_hybrid:'2. AC/DC Hybrid Microgrid Architecture (Recommended)',mg_arch_topo_compare:'3. Four Typical Microgrid Topology Comparison',mg_arch_mode_switch:'4. Microgrid Operation Mode Switching',mg_arch_protection:'5. Microgrid Electrical Secondary Wiring Diagram',mg_arch_comm:'6. Communication & Control Network',mg_arch_params:'7. Key Parameters Quick Reference',mg_arch_logic:'8. Microgrid Grid-Connected/Islanded Control Logic Diagram',cat_charging:'Charging Solution Agent',ch_design:'Design',ch_elec:'Electrical',ch_software:'Software Platform',ch_proto:'Protocols',ch_flash:'Flash Liquid Cooling',ch_evcc:'EVCC/SECC',ch_bom:'BOM',ch_skill:'Core Skills',ch_design_title:'Charging Station Design Agent',ch_design_desc:'Input site type/parking/power targets, AI auto-generates station plan, SLD, BOM & investment',ch_elec_title:'Electrical Design Agent',ch_elec_desc:'Engineering schematics based on IEC 60617/61851. Supports EU-standard mobile charger & fixed HPC cabinet.',ch_elec_mobile_eu:'EU Mobile Charger Schematic',ch_elec_cabinet:'HPC Cabinet SLD',
 mg_ems_arch_title:'eBlock Microgrid EMS Architecture',mg_ems_overview:'1. Overall Architecture (4 Layers)',mg_ems_protocol:'2. Communication Protocols & Bus',mg_ems_eblock:'3. Single eBlock Internal Architecture',mg_ems_delay:'4. Key Communication Latency (Sequence Diagram)',mg_ems_network:'5. Network Topology',
 mg_schedule_title:'Microgrid Dispatch Optimization',mg_schedule_obj:'1. Optimization Objective Function',mg_schedule_constraints:'2. Constraints',mg_schedule_layers:'3. Dispatch Strategy Hierarchy',mg_schedule_scenarios:'4. Typical Dispatch Scenarios',
 mg_sw_pill_dispatch:'Dispatch',mg_sw_pill_trading:'Trading',mg_sw_pill_datacenter:'Data Platform',
@@ -42989,7 +42966,7 @@ aidc_dw_title:'وكيل ملخص الرسوم',aidc_dw_desc:'عرض وتحميل
 aidc_dw_arch:'هيكل نظام AIDC',aidc_dw_wiring:'مخطط التوصيل أحادي الخط AIDC',aidc_dw_dual:'طوبولوجيا الطاقة المزدوجة AIDC',aidc_dw_liquid:'مخطط التبريد السائل AIDC',
 ess_layout:'مخطط الأرضية',ess_cable:'توجيه الكابلات',ess_principle:'مخطط PCS-BESS',
 lang_btn_zh:'الصينية',lang_btn_en:'الإنجليزية',lang_btn_ar:'العربية',
-mg_arch_panorama:'نظرة شاملة على بنية الشبكة المصغرة',mg_arch_ac_topo:'1. نظرة عامة على طوبولوجيا طاقة الشبكة المصغرة (شبكة مصغرة AC)',mg_arch_hybrid:'2. بنية الشبكة المصغرة الهجينة AC/DC (موصى بها)',mg_arch_topo_compare:'3. مقارنة أربع طوبولوجيات نموذجية للشبكة المصغرة',mg_arch_mode_switch:'4. تبديل وضع تشغيل الشبكة المصغرة',mg_arch_protection:'5. مخطط التوصيلات الثانوية للشبكة المصغرة',mg_arch_comm:'6. شبكة الاتصال والتحكم',mg_arch_params:'7. مرجع سريع للمعلمات الرئيسية',mg_arch_logic:'8. مخطط منطق التحكم في الشبكة/الجزيرة للشبكة المصغرة',cat_charging:'وكيل حلول الشحن',ch_design:'التصميم',ch_elec:'الكهربائي',ch_software:'منصة البرمجيات',ch_proto:'البروتوكولات',ch_cooling:'التبريد السائل',ch_flash:'شحن سريع',ch_evcc:'EVCC/SECC',ch_bom:'قائمة المواد',ch_skill:'المهارات',ch_design_title:'وكيل تصميم محطة الشحن',ch_design_desc:'...',ch_elec_title:'وكيل التصميم الكهربائي',ch_elec_desc:'...',ch_elec_mobile_eu:'...',ch_elec_cabinet:'...',
+mg_arch_panorama:'نظرة شاملة على بنية الشبكة المصغرة',mg_arch_ac_topo:'1. نظرة عامة على طوبولوجيا طاقة الشبكة المصغرة (شبكة مصغرة AC)',mg_arch_hybrid:'2. بنية الشبكة المصغرة الهجينة AC/DC (موصى بها)',mg_arch_topo_compare:'3. مقارنة أربع طوبولوجيات نموذجية للشبكة المصغرة',mg_arch_mode_switch:'4. تبديل وضع تشغيل الشبكة المصغرة',mg_arch_protection:'5. مخطط التوصيلات الثانوية للشبكة المصغرة',mg_arch_comm:'6. شبكة الاتصال والتحكم',mg_arch_params:'7. مرجع سريع للمعلمات الرئيسية',mg_arch_logic:'8. مخطط منطق التحكم في الشبكة/الجزيرة للشبكة المصغرة',cat_charging:'وكيل حلول الشحن',ch_design:'التصميم',ch_elec:'الكهربائي',ch_software:'منصة البرمجيات',ch_proto:'البروتوكولات',ch_flash:'تبريد سائل سريع',ch_evcc:'EVCC/SECC',ch_bom:'قائمة المواد',ch_skill:'المهارات',ch_design_title:'وكيل تصميم محطة الشحن',ch_design_desc:'...',ch_elec_title:'وكيل التصميم الكهربائي',ch_elec_desc:'...',ch_elec_mobile_eu:'...',ch_elec_cabinet:'...',
 mg_ems_arch_title:'بنية نظام إدارة طاقة الشبكة المصغرة eBlock',mg_ems_overview:'1. البنية العامة (4 طبقات)',mg_ems_protocol:'2. بروتوكولات الاتصال وناقل الربط',mg_ems_eblock:'3. البنية الداخلية لوحدة eBlock واحدة',mg_ems_delay:'4. زمن الاتصال الرئيسي (مخطط التسلسل)',mg_ems_network:'5. طوبولوجيا الشبكة',
 mg_schedule_title:'تحسين توزيع الشبكة المصغرة',mg_schedule_obj:'1. دالة الهدف التحسينية',mg_schedule_constraints:'2. القيود',mg_schedule_layers:'3. التسلسل الهرمي لاستراتيجية التوزيع',mg_schedule_scenarios:'4. سيناريوهات التوزيع النموذجية',
 mg_sw_pill_dispatch:'التوزيع',mg_sw_pill_trading:'التداول',mg_sw_pill_datacenter:'منصة البيانات',
@@ -44507,7 +44484,7 @@ function bsShowPage(id){
 // ========== Charging Agent Logic ==========
 function showChargingPage(id){
   document.querySelectorAll('#chargingNav .sub-tab').forEach(t=>t.classList.remove('active'));
-  const subPages=['ch-design','ch-elec','ch-software','ch-proto','ch-cooling','ch-flash','ch-evcc','ch-bom','ch-platform'];
+  const subPages=['ch-design','ch-elec','ch-software','ch-proto','ch-flash','ch-evcc','ch-bom','ch-platform'];
   const tabIdx=subPages.indexOf(id);
   if(tabIdx>=0) document.querySelectorAll('#chargingNav .sub-tab')[tabIdx].classList.add('active');
   document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
@@ -44517,20 +44494,127 @@ function showChargingPage(id){
   if(id==='ch-elec') chElecSwitchDiagram('mobile_eu');
   if(id==='ch-software') chDrawSwArch();
   if(id==='ch-proto') chShowProto('ocpp');
-  if(id==='ch-cooling') chDrawCooling();
-  if(id==='ch-flash') showFlashSubTab('overview');
+  if(id==='ch-flash') showFlashSubTab('arch');
   if(id==='ch-evcc'){ setTimeout(()=>{ showEvccSubTab('chips'); },50); }
-
   if(id==='ch-platform') chShowPlatform('guowang');
-
 }
 function showFlashSubTab(tab){
-  var tabs=['overview','arch','power','cooling','hv','dispatch','bms','battery','thermal','reviewer','bom'];
+  var tabs=['arch','power','cooling','hv','dispatch','bms','battery','thermal','bom'];
   tabs.forEach(function(t){
     var el=document.getElementById('flashSubTab-'+t);
     if(el) el.style.display=(t===tab)?'block':'none';
   });
+  if(tab==='thermal'){
+    var pid=document.getElementById('flashThermalPid');
+    if(pid && typeof drawPidIec==='function' && !pid.dataset.rendered){
+      pid.dataset.rendered='1';
+      var coolKw=250;
+      var thermalSvg=drawPidIec('闪充热管理系统P&ID图 — 全液冷CDU',[
+        {x:8,y:25,n:'闭式冷却塔#1',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-101',lbl:'250kW'},
+        {x:8,y:75,n:'闭式冷却塔#2',type:'cooling_tower',sc:'#26A69A',w:16,h:22,tag:'CT-102',lbl:'250kW(备)'},
+        {x:22,y:25,n:'一次泵A',type:'pump',sc:'#1976D2',sz:14,tag:'P-101A',lbl:'变频 80m³/h'},
+        {x:22,y:75,n:'一次泵B',type:'pump',sc:'#1976D2',sz:14,tag:'P-101B',lbl:'变频 80m³/h'},
+        {x:32,y:25,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-101'},
+        {x:32,y:75,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',sz:10,tag:'V-102'},
+        {x:42,y:25,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-105'},
+        {x:42,y:75,n:'止回阀',type:'valve',vtype:'check',sc:'#1976D2',sz:10,tag:'V-106'},
+        {x:55,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:24,h:20,tag:'HX-101',lbl:'500kW'},
+        {x:55,y:15,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-101',lbl:'300kW'},
+        {x:55,y:85,n:'冷水机组',type:'tank',sc:'#AB47BC',w:20,h:18,tag:'CH-102',lbl:'300kW'},
+        {x:72,y:15,n:'CDU-1',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-101',lbl:'枪1-2 125kW'},
+        {x:72,y:35,n:'CDU-2',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-102',lbl:'枪3-4 125kW'},
+        {x:72,y:65,n:'CDU-3',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-103',lbl:'功率模块 125kW'},
+        {x:72,y:85,n:'CDU-4',type:'cdu',sc:'#26A69A',w:20,h:16,tag:'CDU-104',lbl:'母排/储能 125kW'},
+        {x:68,y:15,n:'供液分水器',type:'manifold',sc:'#26A69A',w:22,h:12,tag:'MS-101',lbl:'SUPPLY'},
+        {x:68,y:85,n:'回液集水器',type:'manifold',sc:'#E53935',w:22,h:12,tag:'MR-101',lbl:'RETURN'},
+        {x:86,y:10,n:'充电枪1-2',type:'tank',sc:'#546E7A',w:14,h:12,tag:'GUN-12',lbl:'250kW'},
+        {x:86,y:20,n:'充电枪3-4',type:'tank',sc:'#546E7A',w:14,h:12,tag:'GUN-34',lbl:'250kW'},
+        {x:86,y:60,n:'功率模块',type:'tank',sc:'#546E7A',w:14,h:12,tag:'PM-12',lbl:'PFC+DC/DC'},
+        {x:86,y:70,n:'母排/储能',type:'tank',sc:'#546E7A',w:14,h:12,tag:'BS-ESS',lbl:'母排+电池'},
+        {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:14,h:16,tag:'TK-101',lbl:'TK-101'},
+        {x:95,y:20,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',sz:8,tag:'V-103'},
+        {x:95,y:80,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',sz:8,tag:'V-104'},
+        {x:50,y:95,n:'AI热控单元',type:'exchanger',sc:'#8B5CF6',w:24,h:12,tag:'TC-101',lbl:'AI Thermal Ctrl'},
+      ],[
+        {x1:16,y1:25,x2:22,y2:25,c:'#26A69A',st:'mech',label:'DN100'},
+        {x1:16,y1:75,x2:22,y2:75,c:'#26A69A',st:'mech',label:'DN100'},
+        {x1:29,y1:25,x2:32,y2:25,c:'#1976D2',st:'mech'},
+        {x1:29,y1:75,x2:32,y2:75,c:'#1976D2',st:'mech'},
+        {x1:37,y1:25,x2:42,y2:25,c:'#1976D2',st:'mech'},
+        {x1:37,y1:75,x2:42,y2:75,c:'#1976D2',st:'mech'},
+        {x1:47,y1:25,x2:55,y2:40,viaY:40,c:'#1976D2',st:'mech'},
+        {x1:47,y1:75,x2:55,y2:60,viaY:60,c:'#1976D2',st:'mech'},
+        {x1:55,y1:35,x2:55,y2:25,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
+        {x1:55,y1:65,x2:55,y2:75,c:'#AB47BC',st:'control',dash:true,label:'冷冻水'},
+        {x1:67,y1:30,x2:68,y2:15,c:'#26A69A',st:'mech',label:'供液 160m³/h'},
+        {x1:67,y1:70,x2:68,y2:85,c:'#E53935',st:'return',dash:true,label:'回液'},
+        {x1:79,y1:15,x2:72,y2:15,c:'#26A69A',st:'mech'},
+        {x1:79,y1:35,x2:72,y2:35,c:'#26A69A',st:'mech'},
+        {x1:79,y1:65,x2:72,y2:65,c:'#26A69A',st:'mech'},
+        {x1:79,y1:85,x2:72,y2:85,c:'#26A69A',st:'mech'},
+        {x1:82,y1:15,x2:86,y2:10,c:'#26A69A',st:'mech'},
+        {x1:82,y1:20,x2:86,y2:20,c:'#26A69A',st:'mech'},
+        {x1:82,y1:65,x2:86,y2:60,c:'#26A69A',st:'mech'},
+        {x1:82,y1:85,x2:86,y2:70,c:'#26A69A',st:'mech'},
+        {x1:93,y1:10,x2:93,y2:20,viaY:20,c:'#E53935',st:'return',dash:true},
+        {x1:93,y1:20,x2:93,y2:30,viaY:30,c:'#E53935',st:'return',dash:true},
+        {x1:93,y1:60,x2:93,y2:70,viaY:70,c:'#E53935',st:'return',dash:true},
+        {x1:93,y1:70,x2:93,y2:80,viaY:80,c:'#E53935',st:'return',dash:true},
+        {x1:68,y1:85,x2:55,y2:65,c:'#E53935',st:'return',dash:true},
+        {x1:82,y1:15,x2:89,y2:20,viaX:89,c:'#AB47BC',st:'control',dash:true,label:'补水'},
+        {x1:89,y1:50,x2:89,y2:20,c:'#AB47BC',st:'control',dash:true,label:'溢流'},
+        {x1:50,y1:15,x2:50,y2:25,c:'#8B5CF6',st:'inst',label:'T1-T8'},
+        {x1:50,y1:35,x2:50,y2:45,c:'#8B5CF6',st:'inst',label:'T9-T16'},
+        {x1:50,y1:65,x2:50,y2:75,c:'#8B5CF6',st:'inst',label:'T17-T24'},
+        {x1:50,y1:85,x2:50,y2:95,c:'#8B5CF6',st:'inst',label:'T25-T32'},
+        {x1:68,y1:15,x2:65,y2:15,c:'#f0883e',st:'inst',label:'P1-P8'},
+        {x1:68,y1:85,x2:65,y2:85,c:'#f0883e',st:'inst',label:'P9-P16'},
+        {x1:79,y1:15,x2:75,y2:15,c:'#3fb950',st:'inst',label:'F1-F8'},
+        {x1:79,y1:85,x2:75,y2:85,c:'#3fb950',st:'inst',label:'F9-F16'},
+      ],{w:960,h:500,theme:'siemens',drawingNo:'FLASH-PID-001',ver:'V1.0',scale:'1:50',
+         legend:[
+           {style:'mech',label:'设施侧供液 DN100'},
+           {style:'return',label:'设施侧回液'},
+           {style:'control',label:'冷冻水/补水控制'},
+           {style:'inst',label:'AI热控仪表 (T/P/F)'}
+         ],coolKw:250});
+      pid.innerHTML=thermalSvg;
+    }
+  }
 }
+function initFlashZoom(){
+  document.querySelectorAll('div[id^="flashSubTab-"] img[alt]').forEach(function(img){
+    if(img.dataset.fzoom==='1') return;
+    img.dataset.fzoom='1';
+    var scale=1;
+    var wrap=document.createElement('div');
+    wrap.style.cssText='overflow:auto;margin:2px 0';
+    img.parentNode.insertBefore(wrap,img);
+    wrap.appendChild(img);
+    img.style.maxWidth='none';
+    img.style.width='100%';
+    img.style.display='block';
+    img.style.margin='0 auto';
+    var bar=document.createElement('div');
+    bar.style.cssText='display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:8px';
+    var bstyle='width:30px;height:30px;border-radius:6px;border:1px solid var(--text2);background:var(--bg3);color:var(--text1);cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center';
+    var minus=document.createElement('button');
+    var plus=document.createElement('button');
+    var label=document.createElement('span');
+    minus.textContent='−';
+    plus.textContent='+';
+    minus.setAttribute('style',bstyle);
+    plus.setAttribute('style',bstyle);
+    label.style.cssText='font-size:11px;color:var(--text2);min-width:46px;text-align:center';
+    label.textContent='100%';
+    minus.onclick=function(e){e.stopPropagation();scale=Math.max(0.5,scale-0.25);apply();};
+    plus.onclick=function(e){e.stopPropagation();scale=Math.min(4,scale+0.25);apply();};
+    function apply(){img.style.width=(100*scale)+'%';label.textContent=Math.round(scale*100)+'%';}
+    bar.appendChild(minus);bar.appendChild(label);bar.appendChild(plus);
+    wrap.parentNode.insertBefore(bar,wrap);
+  });
+}
+if(document.readyState!=='loading'){initFlashZoom();}else{document.addEventListener('DOMContentLoaded',initFlashZoom);}
 function chCalcPower(){
   const guns=parseInt((document.getElementById('chGunCount')||{}).value||0);
   const pwr=parseInt((document.getElementById('chGunPower')||{}).value||0);
@@ -83040,13 +83124,13 @@ function bsDigitalAiDiagnose(){}// AI diagnosis moved to tab 7 Digital Twin
 // ═══════════════════════════════════════════════════════════════
 function bsPackSwitchTab(tab){
   document.querySelectorAll('#page-bs-pack .bs-elec-tab').forEach(t=>t.classList.remove('active'));
-  const tabs={thermal:0,soc:1,lifecycle:2,inventory:3,layout:4};
+  const tabs={overview:0,module:1,packlayout:2,electrical:3,bms:4,cooling:5,hvbox:6,bom:7};
   document.querySelectorAll('#page-bs-pack .bs-elec-tab')[tabs[tab]].classList.add('active');
-  ['bsPackThermal','bsPackSoc','bsPackLifecycle','bsPackInventory','bsPackLayout'].forEach(id=>{
+  ['bpOverview','bpModule','bpPacklayout','bpElectrical','bpBms','bpCooling','bpHvbox','bpBom'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display='none';
   });
-  const MAP={thermal:'bsPackThermal',soc:'bsPackSoc',lifecycle:'bsPackLifecycle',inventory:'bsPackInventory',layout:'bsPackLayout'};
+  const MAP={overview:'bpOverview',module:'bpModule',packlayout:'bpPacklayout',electrical:'bpElectrical',bms:'bpBms',cooling:'bpCooling',hvbox:'bpHvbox',bom:'bpBom'};
   const el=document.getElementById(MAP[tab]);
   if(el) el.style.display='block';
 }
@@ -83264,182 +83348,8 @@ function bsRenderPlanning(){
 }
 
 function bsRenderPackDesign(){
-  const empty=document.getElementById('bsPackEmpty');
-  const content=document.getElementById('bsPackContent');
-  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
-  empty.style.display='none';content.style.display='';
-  const r=LAST_BS_RESULT;
-  const U=UEM;
-  // ── 热仿真 ──
-  let th='<svg width="100%" height="300" viewBox="0 0 500 300">';
-  th+='<rect width="500" height="300" fill="#0a0e14" rx="8"/>';
-  th+='<text x="250" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">Pack 热仿真模型</text>';
-  // Pack outline
-  th+='<rect x="100" y="50" width="300" height="180" rx="6" fill="#111827" stroke="#334155" stroke-width="2"/>';
-  th+='<text x="250" y="45" text-anchor="middle" fill="#64748b" font-size="9">Pack 外壳 (LFP 280Ah)</text>';
-  // Cells grid (4x6)
-  for(let row=0;row<6;row++){
-    for(let col=0;col<4;col++){
-      const cx=130+col*70, cy=65+row*26;
-      const temp=25+Math.floor(Math.random()*15);
-      const tc=temp>45?'#ef4444':temp>35?'#e8a838':temp>28?'#50c878':'#4a90d9';
-      th+='<rect x="'+cx+'" y="'+cy+'" width="55" height="20" rx="3" fill="#1e293b" stroke="'+tc+'" stroke-width="1"/>';
-      th+='<text x="'+(cx+27)+'" y="'+(cy+13)+'" text-anchor="middle" fill="'+tc+'" font-size="7">'+temp+'°C</text>';
-    }
-  }
-  // Coolant flow
-  th+='<line x1="110" y1="240" x2="390" y2="240" stroke="#06b6d4" stroke-width="3" stroke-dasharray="8,4"><animate attributeName="stroke-dashoffset" values="12;0" dur="1.5s" repeatCount="indefinite"/></line>';
-  th+='<text x="250" y="258" text-anchor="middle" fill="#06b6d4" font-size="8">冷却液入口 → 25°C → 出口 32°C | 流量: 8L/min</text>';
-  // Heat map legend
-  th+='<rect x="420" y="60" width="15" height="120" rx="3" fill="url(#bsHeatMap)"/>';
-  th+='<defs><linearGradient id="bsHeatMap" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#4a90d9"/><stop offset="33%" stop-color="#50c878"/><stop offset="66%" stop-color="#e8a838"/><stop offset="100%" stop-color="#ef4444"/></linearGradient></defs>';
-  th+='<text x="445" y="70" fill="#64748b" font-size="7">50°C</text>';
-  th+='<text x="445" y="125" fill="#64748b" font-size="7">35°C</text>';
-  th+='<text x="445" y="178" fill="#64748b" font-size="7">25°C</text>';
-  th+='</svg>';
-  document.getElementById('bsPackThermalSvg').innerHTML=th;
-  // Thermal info
-  let ti='<div style="font-size:12px">';
-  ti+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">冷却方式</span><br><b style="color:var(--text1)">液冷 (乙二醇)</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">最大温差</span><br><b style="color:#50c878">≤5°C</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">入口温度</span><br><b style="color:var(--text1)">25°C</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">出口温度</span><br><b style="color:#e8a838">32°C</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">散热功率</span><br><b style="color:var(--text1)">2.8kW</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">流量</span><br><b style="color:var(--text1)">8L/min</b></div>';
-  ti+='</div>';
-  ti+='<div style="margin-top:10px;padding:8px;background:rgba(80,200,120,0.1);border-radius:4px;border-left:3px solid #50c878;color:#50c878;font-size:11px">✓ 热仿真通过：所有电芯温差≤5°C，无热失控风险</div>';
-  ti+='</div>';
-  document.getElementById('bsPackThermalInfo').innerHTML=ti;
-  // ── SOC曲线 ──
-  let sc='<svg width="100%" height="250" viewBox="0 0 500 250">';
-  sc+='<rect width="500" height="250" fill="#0a0e14" rx="8"/>';
-  sc+='<text x="250" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">SOC 充放电曲线 (24h)</text>';
-  // Grid lines
-  for(let i=0;i<=4;i++){
-    const gy=40+i*45;
-    sc+='<line x1="40" y1="'+gy+'" x2="480" y2="'+gy+'" stroke="#1e293b" stroke-width="0.5"/>';
-    sc+='<text x="35" y="'+(gy+4)+'" text-anchor="end" fill="#475569" font-size="7">'+(100-i*25)+'%</text>';
-  }
-  // SOC curve
-  sc+='<polyline points="';
-  const socPoints=[];
-  for(let h=0;h<24;h++){
-    const x=50+h*18;
-    let soc;
-    if(h<7) soc=20+Math.floor(h*8.5);// valley charging
-    else if(h<10) soc=80-Math.floor((h-7)*5);// peak discharge
-    else if(h<18) soc=65+Math.floor((h-10)*2);// flat
-    else if(h<21) soc=80-Math.floor((h-18)*5);// peak discharge
-    else soc=65+Math.floor((h-21)*5);// valley charge
-    socPoints.push(x+','+(220-soc*1.8));
-  }
-  sc+=socPoints.join(' ')+'" fill="none" stroke="#4a90d9" stroke-width="2"/>';
-  // Fill area
-  sc+='<polygon points="50,220 '+socPoints.join(' ')+' 466,220" fill="rgba(74,144,217,0.1)"/>';
-  // SOC window markers
-  sc+='<line x1="40" y1="'+(220-90*1.8)+'" x2="480" y2="'+(220-90*1.8)+'" stroke="#50c878" stroke-width="1" stroke-dasharray="4,2"/>';
-  sc+='<text x="485" y="'+(220-90*1.8+4)+'" fill="#50c878" font-size="7">MAX 90%</text>';
-  sc+='<line x1="40" y1="'+(220-20*1.8)+'" x2="480" y2="'+(220-20*1.8)+'" stroke="#e06070" stroke-width="1" stroke-dasharray="4,2"/>';
-  sc+='<text x="485" y="'+(220-20*1.8+4)+'" fill="#e06070" font-size="7">MIN 20%</text>';
-  // X axis labels
-  for(let h=0;h<24;h+=3) sc+='<text x="'+(50+h*18)+'" y="240" text-anchor="middle" fill="#475569" font-size="7">'+h+':00</text>';
-  sc+='</svg>';
-  document.getElementById('bsPackSocCurve').innerHTML=sc;
-  let si='<div style="font-size:12px">';
-  si+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  si+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">SOC窗口</span><br><b style="color:var(--text1)">20% ~ 90%</b></div>';
-  si+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">最优SOC</span><br><b style="color:#50c878">80%</b></div>';
-  si+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">充电倍率</span><br><b style="color:var(--text1)">0.5C</b></div>';
-  si+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">充电时间</span><br><b style="color:var(--text1)">90min (20→90%)</b></div>';
-  si+='</div>';
-  si+='<div style="margin-top:10px;padding:8px;background:rgba(74,144,217,0.1);border-radius:4px;border-left:3px solid #4a90d9;color:#4a90d9;font-size:11px">💡 建议：谷电时段(23-07时)满充，峰电时段维持≥20%</div>';
-  si+='</div>';
-  document.getElementById('bsPackSocInfo').innerHTML=si;
-  // ── SOH衰减曲线 ──
-  let lc='<svg width="100%" height="250" viewBox="0 0 500 250">';
-  lc+='<rect width="500" height="250" fill="#0a0e14" rx="8"/>';
-  lc+='<text x="250" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">SOH 衰减曲线 (8年)</text>';
-  lc+='<polyline points="';
-  const sohPoints=[];
-  for(let m=0;m<=96;m++){
-    const x=50+m*4.5;
-    const soh=100-m*0.42;// ~60% at 96 months
-    sohPoints.push(x+','+(220-(soh-50)*3.2));
-  }
-  lc+=sohPoints.join(' ')+'" fill="none" stroke="#e8a838" stroke-width="2"/>';
-  lc+='<polygon points="50,220 '+sohPoints.join(' ')+' 486,220" fill="rgba(232,168,56,0.08)"/>';
-  // Threshold line
-  lc+='<line x1="40" y1="'+(220-(60-50)*3.2)+'" x2="480" y2="'+(220-(60-50)*3.2)+'" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,2"/>';
-  lc+='<text x="485" y="'+(220-(60-50)*3.2+4)+'" fill="#ef4444" font-size="7">退役 60%</text>';
-  // X axis
-  for(let y=0;y<=8;y+=2) lc+='<text x="'+(50+y*12*4.5)+'" y="240" text-anchor="middle" fill="#475569" font-size="7">'+y+'年</text>';
-  lc+='</svg>';
-  document.getElementById('bsPackSohCurve').innerHTML=lc;
-  let li='<div style="font-size:12px">';
-  li+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  li+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">日历寿命</span><br><b style="color:var(--text1)">8年</b></div>';
-  li+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">循环寿命</span><br><b style="color:var(--text1)">3000次</b></div>';
-  li+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">年衰减率</span><br><b style="color:#e8a838">5%/年</b></div>';
-  li+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">退役SOH</span><br><b style="color:#ef4444">60%</b></div>';
-  li+='</div>';
-  li+='<div style="margin-top:10px;padding:8px;background:rgba(232,168,56,0.1);border-radius:4px;border-left:3px solid #e8a838;color:#e8a838;font-size:11px">⚠️ 第5年SOH降至80%，建议提前规划梯次利用</div>';
-  li+='</div>';
-  document.getElementById('bsPackLifecycleInfo').innerHTML=li;
-  // ── 库存算法 ──
-  let iv='<svg width="100%" height="200" viewBox="0 0 800 200">';
-  iv+='<rect width="800" height="200" fill="#0a0e14" rx="8"/>';
-  iv+='<text x="400" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">库存动态监控</text>';
-  // Inventory bars
-  const invSlots=[
-    {label:'在线可用',count:r.battery.readyBatteries||20,color:'#50c878'},
-    {label:'充电中',count:r.battery.chargingBatteries||15,color:'#4a90d9'},
-    {label:'待维护',count:3,color:'#e06070'},
-    {label:'备用',count:r.battery.backupBatteries||5,color:'#94a3b8'},
-    {label:'总计',count:r.battery.totalBatteries||43,color:'#e8a838'}
-  ];
-  invSlots.forEach((s,i)=>{
-    const bx=60+i*150, bw=Math.min(s.count*8,120);
-    iv+='<rect x="'+bx+'" y="50" width="'+bw+'" height="30" rx="4" fill="'+s.color+'" opacity="0.3"><animate attributeName="opacity" values="0.2;0.4;0.2" dur="'+(2+i*0.3)+'s" repeatCount="indefinite"/></rect>';
-    iv+='<rect x="'+bx+'" y="50" width="'+bw+'" height="30" rx="4" fill="none" stroke="'+s.color+'" stroke-width="1"/>';
-    iv+='<text x="'+(bx+bw/2)+'" y="70" text-anchor="middle" fill="'+s.color+'" font-size="10" font-weight="600">'+s.count+'</text>';
-    iv+='<text x="'+(bx+bw/2)+'" y="95" text-anchor="middle" fill="#94a3b8" font-size="8">'+s.label+'</text>';
-  });
-  // Safety stock line
-  iv+='<line x1="50" y1="130" x2="750" y2="130" stroke="#e06070" stroke-width="1" stroke-dasharray="4,2"/>';
-  iv+='<text x="760" y="134" fill="#e06070" font-size="7">安全库存</text>';
-  iv+='</svg>';
-  document.getElementById('bsPackInventorySvg').innerHTML=iv;
-  let ii='<div style="font-size:12px">';
-  ii+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
-  ii+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">周转天数</span><br><b style="color:var(--text1)">3.2天</b></div>';
-  ii+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">补货点</span><br><b style="color:#e8a838">8块</b></div>';
-  ii+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">安全库存</span><br><b style="color:#e06070">5块</b></div>';
-  ii+='</div>';
-  ii+='</div>';
-  document.getElementById('bsPackInventoryInfo').innerHTML=ii;
-  // ── Pack仓布局 ──
-  let ly='<svg width="100%" height="300" viewBox="0 0 600 300">';
-  ly+='<rect width="600" height="300" fill="#0a0e14" rx="8"/>';
-  ly+='<text x="300" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">充电架 Pack 仓布局</text>';
-  const slots=Math.min(r.chargingRack.actualSlots||40,60);
-  const cols=Math.min(10,slots);
-  const rows=Math.ceil(slots/cols);
-  for(let row=0;row<Math.min(rows,6);row++){
-    for(let col=0;col<cols;col++){
-      const idx=row*cols+col;
-      if(idx>=slots) break;
-      const sx=60+col*50, sy=45+row*40;
-      const soc=40+Math.floor(Math.random()*55);
-      const sc=soc>80?'#50c878':soc>40?'#e8a838':'#e06070';
-      ly+='<rect x="'+sx+'" y="'+sy+'" width="42" height="32" rx="3" fill="#111827" stroke="'+sc+'" stroke-width="1"><animate attributeName="stroke-opacity" values="1;0.5;1" dur="'+(2+idx*0.1)+'s" repeatCount="indefinite"/></rect>';
-      ly+='<text x="'+(sx+21)+'" y="'+(sy+14)+'" text-anchor="middle" fill="'+sc+'" font-size="8" font-weight="600">#'+(idx+1)+'</text>';
-      ly+='<text x="'+(sx+21)+'" y="'+(sy+25)+'" text-anchor="middle" fill="'+sc+'" font-size="6">'+soc+'%</text>';
-    }
-  }
-  ly+='<text x="300" y="'+(45+Math.min(rows,6)*40+20)+'" text-anchor="middle" fill="#475569" font-size="8">共 '+slots+' 仓位 | '+r.inputParams.chargingPower+'kW/仓 | 液冷散热</text>';
-  ly+='</svg>';
-  document.getElementById('bsPackLayoutSvg').innerHTML=ly;
+  // New Battery Pack Engineering section uses static content + images
+  // Just ensure the page is visible when selected
 }
 
 function bsRenderOps(){
@@ -96325,13 +96235,13 @@ console.log('[ESS Software] loaded - '+ESS_CHIPS.length+' chips, '+ESS_PROGRAMS.
 /* ── Page routing ── */
 var _vppInited=false, _synInited=false;
 function showVppPage(id){
-  document.querySelectorAll('#vppNav .sub-tab').forEach(t=>t.classList.add('active'));
+  document.querySelectorAll('#vppNav .sub-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
   var el=document.getElementById('page-vpp-unified'); if(el)el.style.display='block';
   if(!_vppInited){ _vppInited=true; setTimeout(function(){ vppUnifiedFlow(); }, 100); }
 }
 function showSynPage(id){
-  document.querySelectorAll('#synergyNav .sub-tab').forEach(t=>t.classList.add('active'));
+  document.querySelectorAll('#synergyNav .sub-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.syn-content').forEach(t=>t.style.display='none');
   var el=document.getElementById('page-syn-unified'); if(el)el.style.display='block';
   if(!_synInited){ _synInited=true; setTimeout(function(){ synUnifiedFlow(); }, 100); }
@@ -98138,7 +98048,7 @@ function drawPid(title, nodes, pipes, opts){
     s+='<line x1="'+cx+'" y1="'+(cy+h/2)+'" x2="'+cx+'" y2="'+(cy+h/2+8)+'" stroke="'+c+'" stroke-width="1.5"/>';
     return s;
   }
-  function _heatex(cx,cy,c,w,h){
+  function _heatex(cx,cy,c,w,h,tag){
     var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="3" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3"/>';
     for(var zi=0;zi<3;zi++){
       var zy=cy-h/2+8+zi*(h-16)/3;
@@ -98149,9 +98059,10 @@ function drawPid(title, nodes, pipes, opts){
     s+='<line x1="'+cx+'" y1="'+(cy+h/2)+'" x2="'+cx+'" y2="'+(cy+h/2+8)+'" stroke="'+c+'" stroke-width="1.5"/>';
     s+='<line x1="'+(cx-w/2)+'" y1="'+cy+'" x2="'+(cx-w/2-8)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.5"/>';
     s+='<line x1="'+(cx+w/2)+'" y1="'+cy+'" x2="'+(cx+w/2+8)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.5"/>';
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy+h/2+14)+'" text-anchor="middle" font-size="7" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
     return s;
   }
-  function _coolingtower(cx,cy,c,w,h){
+  function _coolingtower(cx,cy,c,w,h,tag){
     /* trapezoid tower */
     var tw=w/2; var bw=w; var th2=h*0.7;
     var tx=cx-tw/2, ty=cy-th2/2;
@@ -98167,20 +98078,22 @@ function drawPid(title, nodes, pipes, opts){
     s+='<line x1="'+cx+'" y1="'+by+'" x2="'+cx+'" y2="'+(by+8)+'" stroke="'+c+'" stroke-width="1.5"/>';
     s+='<line x1="'+(bx+8)+'" y1="'+cy+'" x2="'+(bx-8)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.5"/>';
     /* label */
-    s+='<text x="'+cx+'" y="'+(cy+4)+'" text-anchor="middle" font-size="7" fill="'+c+'" font-family="'+th.font+'">C.T.</text>';
+    s+='<text x="'+cx+'" y="'+(by+16)+'" text-anchor="middle" font-size="7" fill="'+c+'" font-family="'+th.font+'">C.T.</text>';
+    if(tag){ s+='<text x="'+cx+'" y="'+(by+28)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
     return s;
   }
-  function _manifold(cx,cy,c,w,h,label){
+  function _manifold(cx,cy,c,w,h,label,tag){
     var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="2" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3"/>';
-    s+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+c+'" font-family="'+th.font+'">'+(label||'')+'</text>';
+    s+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+c+'" font-family="'+th.font+'" font-weight="700">'+(label||'')+'</text>';
     for(var bi=0;bi<4;bi++){
       var by=cy-h/2+bi*(h/3);
       s+='<line x1="'+(cx+w/2)+'" y1="'+by+'" x2="'+(cx+w/2+8)+'" y2="'+by+'" stroke="'+c+'" stroke-width="1.5"/>';
     }
     s+='<line x1="'+(cx-w/2)+'" y1="'+cy+'" x2="'+(cx-w/2-8)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.5"/>';
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy+h/2+14)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
     return s;
   }
-  function _gpuserver(cx,cy,c,w,h,label){
+  function _gpuserver(cx,cy,c,w,h,label,tag){
     var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="3" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3"/>';
     for(var si=0;si<3;si++){
       var sx=cx-w/2+10+si*(w-20)/3;
@@ -98191,6 +98104,7 @@ function drawPid(title, nodes, pipes, opts){
     /* inlet/outlet */
     s+='<line x1="'+cx+'" y1="'+(cy-h/2)+'" x2="'+cx+'" y2="'+(cy-h/2-8)+'" stroke="'+c+'" stroke-width="1.5"/>';
     s+='<line x1="'+cx+'" y1="'+(cy+h/2)+'" x2="'+cx+'" y2="'+(cy+h/2+8)+'" stroke="'+c+'" stroke-width="1.5"/>';
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy+h/2+22)+'" text-anchor="middle" font-size="5.5" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
     return s;
   }
   function _bubble(cx,cy,c,tag,sub){
@@ -98236,7 +98150,7 @@ function drawPid(title, nodes, pipes, opts){
         }else if(nd.type==='manifold'){
           svg+=_manifold(cx,cy,c,nW,nH,lbl,tag);
         }else if(nd.type==='gpu'){
-          svg+=_gpuserver(cx,cy,c,nW,nH,tag);
+          svg+=_gpuserver(cx,cy,c,nW,nH,lbl,tag);
         }else{
           svg+='<rect x="'+(cx-nW/2)+'" y="'+(cy-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+(nd.fc||th.boxFill)+'" stroke="'+c+'" stroke-width="1.3"/>';
           svg+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+lbl+'</text>';
@@ -98289,6 +98203,234 @@ function drawPid(title, nodes, pipes, opts){
 
   if(legendItems) svg+=_legendBlock(legendItems,w-155,h-20,140,themeName);
   svg+=_cadTitle(title,opts.drawingNo||'PID-001',opts.ver||'V1.0',opts.scale||'NTS',w,svgH,th);
+  svg+='</svg></div>'; return svg;
+}
+
+/* ── V5 P&ID with IEC 60617/62424 symbols ── */
+function drawPidIec(title, nodes, pipes, opts){
+  opts=opts||{}; var w=opts.w||900,h=opts.h||450; var themeName=opts.theme||'huawei';
+  var th=DIAGRAM_THEME[themeName]||DIAGRAM_THEME.huawei; var legendItems=opts.legend||null;
+  var cadH=60; var svgH=h+cadH+(legendItems?24:0);
+  var svg='<div class="arch-svg"><svg width="100%" height="'+svgH+'" viewBox="0 0 '+w+' '+svgH+'" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<defs>';
+  ['mech','data','control','alarm','power','dash'].forEach(function(st){
+    var cc=({power:'#1976D2',data:'#42A5F5',control:'#546E7A',alarm:'#E53935',mech:'#26A69A',dash:'#9E9E9E'})[st];
+    svg+='<marker id="pidArr'+st+'" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="7" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8 Z" fill="'+cc+'"/></marker>';
+  });
+  svg+='<style>.pid-pipe{fill:none;stroke-width:2}.pid-pipe-mech{stroke:#26A69A}.pid-pipe-return{stroke:#E53935;stroke-dasharray:8,4}.pid-pipe-control{stroke:#546E7A;stroke-width:1.5}.pid-pipe-dash{stroke:#9E9E9E;stroke-dasharray:6,3}.pid-pipe-inst{stroke:#42A5F5;stroke-width:1;stroke-dasharray:3,2}</style>';
+  svg+='</defs>';
+  svg+='<rect width="'+w+'" height="'+svgH+'" fill="'+th.bg+'"/>';
+  svg+=_fineGrid(w,h,th);
+
+  var top=32;
+  svg+='<line x1="10" y1="26" x2="'+(w-10)+'" y2="26" stroke="'+th.accent+'" stroke-width="1"/>';
+  svg+='<text x="'+w/2+'" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="'+th.title+'" letter-spacing="0.5">'+title+'</text>';
+
+  function px(pct){ return pct*w/100; }
+  function py(pct){ return top + pct*(h-top-18)/100; }
+
+  /* ── IEC 60617 symbol primitives ── */
+  function _pump(cx,cy,c,sz,tag,label){
+    var r=sz/2;
+    var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5" class="pid-pipe pid-pipe-mech"/>';
+    s+='<path d="M'+(cx-r*0.5)+','+(cy+r*0.3)+' L'+(cx+r*0.7)+','+cy+' L'+(cx-r*0.5)+','+(cy-r*0.3)+' Z" fill="'+c+'" opacity="0.7" stroke="'+c+'" stroke-width="1"/>';
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(r*0.3)+'" fill="none" stroke="'+c+'" stroke-width="1" stroke-dasharray="2,2"/>';
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+r+14)+'" text-anchor="middle" font-size="7" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-r-8)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _valve(cx,cy,c,type,sz,tag,label){
+    var hz=sz/2; var s='';
+    if(type==='gate'){
+      s+='<polygon points="'+cx+','+(cy-hz)+' '+(cx-hz)+','+cy+' '+cx+','+(cy+hz)+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+      s+='<polygon points="'+cx+','+(cy-hz)+' '+(cx+hz)+','+cy+' '+cx+','+(cy+hz)+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+      s+='<line x1="'+cx+'" y1="'+(cy-hz)+'" x2="'+cx+'" y2="'+(cy-hz-6)+'" stroke="'+c+'" stroke-width="1.3"/>';
+      s+='<rect x="'+(cx-5)+'" y="'+(cy-hz-10)+'" width="10" height="4" fill="none" stroke="'+c+'" stroke-width="1"/>';
+    }else if(type==='check'){
+      s+='<polygon points="'+(cx-hz)+','+(cy-hz*0.6)+' '+(cx+hz*0.5)+','+cy+' '+(cx-hz)+','+(cy+hz*0.6)+' Z" fill="'+c+'" opacity="0.6" stroke="'+c+'" stroke-width="1" class="pid-pipe pid-pipe-mech"/>';
+      s+='<line x1="'+(cx+hz*0.5)+'" y1="'+(cy-hz*0.6)+'" x2="'+(cx+hz*0.5)+'" y2="'+(cy+hz*0.6)+'" stroke="'+c+'" stroke-width="1.2"/>';
+    }else if(type==='butterfly'){
+      s+='<line x1="'+(cx-hz)+'" y1="'+cy+'" x2="'+(cx+hz)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+      s+='<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+hz*0.7+'" ry="'+hz*0.4+'" fill="none" stroke="'+c+'" stroke-width="1.2"/>';
+      s+='<line x1="'+cx+'" y1="'+(cy-hz)+'" x2="'+cx+'" y2="'+(cy+hz)+'" stroke="'+c+'" stroke-width="1.2"/>';
+      s+='<circle cx="'+cx+'" cy="'+(cy-hz-2)+'" r="3" fill="'+c+'"/>';
+    }else if(type==='ball'){
+      s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+hz*0.8+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+      s+='<line x1="'+(cx-hz*0.5)+'" y1="'+cy+'" x2="'+(cx+hz*0.5)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.8"/>';
+    }
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+hz+14)+'" text-anchor="middle" font-size="6" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-hz-8)+'" text-anchor="middle" font-size="5.5" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _tank(cx,cy,c,w,h,tag,label){
+    var r=8;
+    var s='<rect x="'+(cx-w/2+r)+'" y="'+(cy-h/2)+'" width="'+(w-2*r)+'" height="'+h+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+    s+='<ellipse cx="'+(cx-w/2+r)+'" cy="'+cy+'" rx="'+r+'" ry="'+h/2+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+    s+='<ellipse cx="'+(cx+w/2-r)+'" cy="'+cy+'" rx="'+r+'" ry="'+h/2+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+(cx-w/2+4)+'" y1="'+(cy+h/4)+'" x2="'+(cx+w/2-4)+'" y2="'+(cy+h/4)+'" stroke="'+c+'" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.6"/>';
+    s+='<line x1="'+cx+'" y1="'+(cy-h/2)+'" x2="'+cx+'" y2="'+(cy-h/2-10)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+cx+'" y1="'+(cy+h/2)+'" x2="'+cx+'" y2="'+(cy+h/2+10)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+h/2+18)+'" text-anchor="middle" font-size="7" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-h/2-10)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _heatex(cx,cy,c,w,h,tag,label){
+    var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="3" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5" class="pid-pipe pid-pipe-mech"/>';
+    for(var zi=0;zi<4;zi++){
+      var zy=cy-h/2+8+zi*(h-16)/4;
+      s+='<path d="M'+(cx-w/2+6)+','+zy+' Q'+(cx-w/2+15)+','+(zy-6)+' '+(cx-w/2+24)+','+zy+' T'+(cx+w/2-6)+','+zy+'" fill="none" stroke="'+c+'" stroke-width="1" opacity="0.6" stroke-dasharray="3,2"/>';
+    }
+    s+='<line x1="'+cx+'" y1="'+(cy-h/2)+'" x2="'+cx+'" y2="'+(cy-h/2-12)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+cx+'" y1="'+(cy+h/2)+'" x2="'+cx+'" y2="'+(cy+h/2+12)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+(cx-w/2)+'" y1="'+cy+'" x2="'+(cx-w/2-12)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+(cx+w/2)+'" y1="'+cy+'" x2="'+(cx+w/2+12)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+h/2+18)+'" text-anchor="middle" font-size="7" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-h/2-12)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _coolingtower(cx,cy,c,w,h,tag,label){
+    var tw=w*0.45; var bw=w*0.85; var th2=h*0.75;
+    var tx=cx-tw/2, ty=cy-th2/2;
+    var bx=cx-bw/2, by=cy+th2/2;
+    var s='<polygon points="'+tx+','+ty+' '+(tx+tw)+','+ty+' '+(bx+bw)+','+by+' '+bx+','+by+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.3" class="pid-pipe pid-pipe-mech"/>';
+    s+='<circle cx="'+cx+'" cy="'+(ty-2)+'" r="'+tw*0.28+'" fill="none" stroke="'+c+'" stroke-width="1.2" stroke-dasharray="4,2"/>';
+    s+='<line x1="'+(cx-tw*0.2)+'" y1="'+ty+'" x2="'+(cx+tw*0.2)+'" y2="'+ty+'" stroke="'+c+'" stroke-width="0.8"/>';
+    s+='<line x1="'+cx+'" y1="'+(ty-tw*0.2)+'" x2="'+cx+'" y2="'+(ty+tw*0.2)+'" stroke="'+c+'" stroke-width="0.8"/>';
+    s+='<line x1="'+(bx+10)+'" y1="'+(by-14)+'" x2="'+(bx+bw-10)+'" y2="'+(by-14)+'" stroke="'+c+'" stroke-width="0.8" stroke-dasharray="4,2" opacity="0.6"/>';
+    s+='<line x1="'+cx+'" y1="'+by+'" x2="'+cx+'" y2="'+(by+12)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+(bx+10)+'" y1="'+cy+'" x2="'+(bx-12)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<text x="'+cx+'" y="'+(by+22)+'" text-anchor="middle" font-size="7" fill="'+c+'" font-family="'+th.font+'" font-weight="700">C.T.</text>';
+    if(label){ s+='<text x="'+cx+'" y="'+(by+32)+'" text-anchor="middle" font-size="7" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(ty-14)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _manifold(cx,cy,c,w,h,label,tag){
+    var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="2" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5" class="pid-pipe pid-pipe-mech"/>';
+    s+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+c+'" font-family="'+th.font+'" font-weight="700">'+(label||'')+'</text>';
+    for(var bi=0;bi<4;bi++){
+      var by=cy-h/2+bi*(h/3)+h/6;
+      s+='<line x1="'+(cx+w/2)+'" y1="'+by+'" x2="'+(cx+w/2+12)+'" y2="'+by+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    }
+    s+='<line x1="'+(cx-w/2)+'" y1="'+cy+'" x2="'+(cx-w/2-12)+'" y2="'+cy+'" stroke="'+c+'" stroke-width="2" class="pid-pipe pid-pipe-mech"/>';
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy+h/2+16)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _cdu(cx,cy,c,w,h,label,tag){
+    var s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="4" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5" class="pid-pipe pid-pipe-mech"/>';
+    for(var si=0;si<2;si++){
+      var sy=cy-h/2+8+si*(h-20)/2;
+      s+='<rect x="'+(cx-w/2+6)+'" y="'+sy+'" width="'+(w-12)+'" height="'+(h/2-10)+'" rx="2" fill="none" stroke="'+c+'" stroke-width="0.8" opacity="0.5" stroke-dasharray="2,2"/>';
+    }
+    s+='<line x1="'+cx+'" y1="'+(cy-h/2)+'" x2="'+cx+'" y2="'+(cy-h/2-10)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<line x1="'+cx+'" y1="'+(cy+h/2)+'" x2="'+cx+'" y2="'+(cy+h/2+10)+'" stroke="'+c+'" stroke-width="1.8" class="pid-pipe pid-pipe-mech"/>';
+    s+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="7" fill="'+c+'" font-family="'+th.font+'" font-weight="700">CDU</text>';
+    if(label){ s+='<text x="'+cx+'" y="'+(cy+h/2+16)+'" text-anchor="middle" font-size="6" fill="'+th.boxText+'" font-family="'+th.font+'">'+label+'</text>'; }
+    if(tag){ s+='<text x="'+cx+'" y="'+(cy-h/2-12)+'" text-anchor="middle" font-size="5.5" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    return s;
+  }
+
+  function _instrument(cx,cy,c,tag,sub,lineX,lineY){
+    var r=12;
+    var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+th.bg+'" stroke="'+c+'" stroke-width="1.5"/>';
+    s+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+c+'" font-weight="700" font-family="'+th.fontMono+'">'+tag+'</text>';
+    if(sub){ s+='<text x="'+cx+'" y="'+(cy+r+10)+'" text-anchor="middle" font-size="6" fill="'+th.sub+'" font-family="'+th.fontMono+'">'+sub+'</text>'; }
+    if(lineX!==undefined && lineY!==undefined){
+      s+='<line x1="'+cx+'" y1="'+(cy+r)+'" x2="'+lineX+'" y2="'+lineY+'" stroke="'+c+'" stroke-width="0.8" stroke-dasharray="3 2" class="pid-pipe pid-pipe-inst"/>';
+    }
+    return s;
+  }
+
+  function _route(x1,y1,x2,y2,viaX,viaY){
+    var pts=[x1+','+y1];
+    if(viaX!==undefined){ pts.push(viaX+','+y1); pts.push(viaX+','+viaY); }
+    else if(viaY!==undefined){ pts.push(x1+','+viaY); pts.push(viaX!==undefined?viaX:x2+','+viaY); }
+    pts.push(x2+','+y2);
+    return pts.join(' ');
+  }
+
+  /* ── Main headers ── */
+  var supplyY=py(12), returnY=py(88);
+  var dnMain=Math.round((opts.coolKw||0)*0.08+50);
+  svg+='<line x1="'+px(5)+'" y1="'+supplyY+'" x2="'+px(95)+'" y2="'+supplyY+'" stroke="#26A69A" stroke-width="3" marker-end="url(#pidArrmech)" class="pid-pipe pid-pipe-mech"/>';
+  svg+='<text x="'+px(8)+'" y="'+(supplyY-10)+'" font-size="8" fill="#26A69A" font-family="'+th.fontMono+'" font-weight="700">供液主管 SUPPLY DN'+dnMain+'</text>';
+  svg+='<line x1="'+px(95)+'" y1="'+returnY+'" x2="'+px(5)+'" y2="'+returnY+'" stroke="#E53935" stroke-width="3" stroke-dasharray="10,4" marker-end="url(#pidArrDash)" class="pid-pipe pid-pipe-return"/>';
+  svg+='<text x="'+px(8)+'" y="'+(returnY+16)+'" font-size="8" fill="#E53935" font-family="'+th.fontMono+'" font-weight="700">回液主管 RETURN DN'+dnMain+'</text>';
+
+  /* ── Draw nodes ── */
+  for(var ni=0;ni<nodes.length;ni++){
+    var nd=nodes[ni]; var cx=px(nd.x), cy=py(nd.y);
+    var c=nd.sc||th.mech; var nW=nd.w||70; var nH=nd.h||36;
+    var lbl=nd.n||''; var tag=nd.tag||''; var vtype=nd.vtype||'gate';
+
+    if(nd.type==='pump'){
+      svg+=_pump(cx,cy,c,Math.max(nW,nH),tag,lbl);
+    }else if(nd.type==='valve'){
+      svg+=_valve(cx,cy,c,vtype,Math.max(nW,nH),tag,lbl);
+    }else if(nd.type==='tank'){
+      svg+=_tank(cx,cy,c,nW,nH,tag,lbl);
+    }else if(nd.type==='exchanger'){
+      svg+=_heatex(cx,cy,c,nW,nH,tag,lbl);
+    }else if(nd.type==='cooling_tower'){
+      svg+=_coolingtower(cx,cy,c,nW,nH,tag,lbl);
+    }else if(nd.type==='manifold'){
+      svg+=_manifold(cx,cy,c,nW,nH,lbl,tag);
+    }else if(nd.type==='cdu'){
+      svg+=_cdu(cx,cy,c,nW,nH,lbl,tag);
+    }else{
+      svg+='<rect x="'+(cx-nW/2)+'" y="'+(cy-nH/2)+'" width="'+nW+'" height="'+nH+'" rx="4" fill="'+(nd.fc||th.boxFill)+'" stroke="'+c+'" stroke-width="1.3"/>';
+      svg+='<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="'+th.boxText+'" font-family="'+th.font+'">'+lbl+'</text>';
+      if(tag){ svg+='<text x="'+cx+'" y="'+(cy-nH/2-8)+'" text-anchor="middle" font-size="6" fill="'+c+'" font-family="'+th.fontMono+'" font-weight="700">'+tag+'</text>'; }
+    }
+  }
+
+  /* ── Draw branch pipes ── */
+  for(var pi=0;pi<pipes.length;pi++){
+    var pp=pipes[pi];
+    var col=pp.c||th.mech; var st=pp.style||'mech';
+    var cls='pid-pipe pid-pipe-'+st;
+    var pts;
+    if(pp.points){
+      pts=pp.points.map(function(p){return px(p.x)+','+py(p.y);}).join(' ');
+    }else if(pp.viaX!==undefined || pp.viaY!==undefined){
+      pts=_route(px(pp.x1),py(pp.y1),px(pp.x2),py(pp.y2),pp.viaX!==undefined?px(pp.viaX):undefined,pp.viaY!==undefined?py(pp.viaY):undefined);
+    }else{
+      var x1=px(pp.x1), y1=py(pp.y1), x2=px(pp.x2), y2=py(pp.y2);
+      pts=connPath(x1,y1,x2,y2,pp.route||'vh');
+    }
+    svg+='<polyline points="'+pts+'" class="'+cls+'" marker-end="url(#pidArr'+st+')"/>';
+    if(pp.label){
+      if(pp.points && pp.points.length>=2){
+        var lp=pp.points; var liA=lp[0], liB=lp[lp.length-1];
+        var isH2=Math.abs(liB.y-liA.y)<Math.abs(liB.x-liA.x);
+        var lx=(px(liA.x)+px(liB.x))/2; var ly=isH2?(Math.min(py(liA.y),py(liB.y))-10):((py(liA.y)+py(liB.y))/2+5);
+        svg+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" font-size="7" fill="'+col+'" font-family="'+th.fontMono+'" font-weight="700">'+pp.label+'</text>';
+      }else{
+        var x1l=px(pp.x1), y1l=py(pp.y1), x2l=px(pp.x2), y2l=py(pp.y2);
+        var isH3=Math.abs(y2l-y1l)<Math.abs(x2l-x1l);
+        var lx2=(x1l+x2l)/2; var ly2=isH3?(Math.min(y1l,y2l)-10):((y1l+y2l)/2+5);
+        svg+='<text x="'+lx2+'" y="'+ly2+'" text-anchor="middle" font-size="7" fill="'+col+'" font-family="'+th.fontMono+'" font-weight="700">'+pp.label+'</text>';
+      }
+    }
+  }
+
+  /* ── Draw instruments ── */
+  if(opts.instruments){
+    for(var ii=0;ii<opts.instruments.length;ii++){
+      var inst=opts.instruments[ii];
+      var ix=px(inst.x), iy=py(inst.y);
+      var ic=inst.sc||'#42A5F5';
+      svg+=_instrument(ix,iy,ic,inst.tag,inst.sub,inst.sx!==undefined?px(inst.sx):undefined,inst.sy!==undefined?py(inst.sy):undefined);
+    }
+  }
+
+  if(legendItems) svg+=_legendBlock(legendItems,w-170,h-20,160,themeName);
+  svg+=_cadTitle(title,opts.drawingNo||'PID-001',opts.ver||'V1.0',opts.scale||'1:50',w,svgH,th);
   svg+='</svg></div>'; return svg;
 }
 
@@ -98850,88 +98992,23 @@ function synUnifiedFlow(){
     ],{w:760,h:300,theme:'huawei',drawingNo:'SYN-ARCH-001',ver:'V2.0',scale:'NTS',
        legend:[{style:'data',label:'MQTT/Modbus TCP'},{style:'control',label:'BACnet/IEC 61850'},{style:'power',label:'电力线路'},{style:'mech',label:'冷却管路'}]});
 
-  steps[2].delay=800; steps[2].result=
-    drawPid('液冷散热系统P&ID图 — '+coolLabel,[
-      /* ── Left: Cooling tower and primary loop (aligned) ── */
-      {x:10,y:50,n:'冷却塔',type:'cooling_tower',sc:'#26A69A',w:25,h:34,tag:'CT-101'},
-      {x:28,y:28,n:'泵A',type:'pump',sc:'#1976D2',w:12,h:12,tag:'P-101A'},
-      {x:28,y:72,n:'泵B',type:'pump',sc:'#1976D2',w:12,h:12,tag:'P-101B'},
-      {x:38,y:28,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:8,h:8,tag:'V-101'},
-      {x:38,y:72,n:'闸阀',type:'valve',vtype:'gate',sc:'#1976D2',w:8,h:8,tag:'V-102'},
-      /* ── Center: Heat exchanger (no overlap with pipes) ── */
-      {x:52,y:50,n:'板式换热器',type:'exchanger',sc:'#1976D2',w:28,h:24,tag:'HX-101'},
-      /* ── Right: Manifolds and GPUs (clear vertical corridors) ── */
-      {x:70,y:18,n:'分水器',type:'manifold',sc:'#26A69A',w:30,h:8,tag:'MS-101'},
-      {x:70,y:82,n:'集水器',type:'manifold',sc:'#FF7043',w:30,h:8,tag:'MR-101'},
-      /* GPU rows spaced vertically to allow clean pipe drops from above/below */
-      {x:82,y:30,n:'GPU-1',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-101'},
-      {x:82,y:42,n:'GPU-2',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-102'},
-      {x:82,y:58,n:'GPU-3',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-103'},
-      {x:82,y:70,n:'GPU-4',type:'gpu',sc:'#26A69A',w:20,h:10,tag:'GPU-104'},
-      /* ── Far right: Utilities (aligned) ── */
-      {x:95,y:50,n:'膨胀水箱',type:'tank',sc:'#AB47BC',w:12,h:12,tag:'TK-101'},
-      {x:95,y:18,n:'补水阀',type:'valve',vtype:'ball',sc:'#42A5F5',w:6,h:6,tag:'V-103'},
-      {x:95,y:82,n:'止回阀',type:'valve',vtype:'check',sc:'#E53935',w:6,h:6,tag:'V-104'},
-    ],[
-      /* ── Primary loop: Tower → Pumps → HE (clear corridors only) ── */
-      /* Tower right stub → vertical corridor (avoiding tower area) → horizontal to pump inlet */
-      {points:[{x:22,y:50},{x:22,y:28},{x:22,y:28}],c:'#26A69A',style:'mech',label:'DN'+Math.round(coolKw*0.08+40)},
-      /* Tower right stub → vertical corridor (avoiding tower area) → horizontal to pump inlet */
-      {points:[{x:22,y:50},{x:22,y:72},{x:22,y:72}],c:'#26A69A',style:'mech'},
-      /* Pump outlet → short horizontal to valve inlet */
-      {points:[{x:34,y:28},{x:38,y:28}],c:'#1976D2',style:'mech'},
-      {points:[{x:34,y:72},{x:38,y:72}],c:'#1976D2',style:'mech'},
-      /* Valve outlet → vertical corridor (no overlap) → horizontal to HE inlet */
-      {points:[{x:42,y:28},{x:42,y:38},{x:38,y:38}],c:'#1976D2',style:'mech'},
-      {points:[{x:42,y:72},{x:42,y:62},{x:38,y:62}],c:'#1976D2',style:'mech'},
-      /* ── HE → Supply manifold (outer corridor, no equipment crossings) ── */
-      {points:[{x:66,y:38},{x:66,y:24},{x:52,y:24},{x:52,y:18}],c:'#26A69A',style:'mech',label:'供液 '+Math.round(coolKw*1.25)+' L/min'},
-      /* ── Supply manifold → GPU rows (dedicated vertical corridors only) ── */
-      {points:[{x:82,y:22},{x:82,y:25}],c:'#26A69A',style:'mech'},
-      {points:[{x:82,y:22},{x:82,y:37}],c:'#26A69A',style:'mech'},
-      {points:[{x:82,y:22},{x:82,y:53}],c:'#26A69A',style:'mech'},
-      /* ── GPU rows → Return manifold (dedicated vertical corridors only) ── */
-      {points:[{x:82,y:75},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true},
-      {points:[{x:82,y:65},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true},
-      {points:[{x:82,y:45},{x:82,y:78}],c:'#FF7043',style:'mech',dash:true,label:'回液'},
-      /* ── Return manifold → HE → Tower (outer corridor only) ── */
-      {points:[{x:52,y:78},{x:52,y:74},{x:66,y:74}],c:'#FF7043',style:'mech',dash:true},
-      {points:[{x:38,y:62},{x:38,y:68},{x:10,y:68},{x:10,y:69}],c:'#FF7043',style:'mech',dash:true},
-      /* ── Expansion tank (outermost corridor, no equipment crossings) ── */
-      {points:[{x:89,y:50},{x:89,y:18},{x:95,y:18}],c:'#AB47BC',style:'control',label:'补水'},
-      {points:[{x:89,y:50},{x:89,y:82},{x:95,y:82}],c:'#AB47BC',style:'control',dash:true,label:'溢流'},
-      {points:[{x:89,y:24},{x:82,y:24}],c:'#AB47BC',style:'control',dash:true},
-      /* ── Pump backup (outer corridor only, no overlap with HE) ── */
-      {points:[{x:22,y:34},{x:22,y:66},{x:28,y:66}],c:'#1976D2',style:'control',dash:true,label:'备用'},
-      /* ── Supply/return header connections (directly to manifolds) ── */
-      {points:[{x:22,y:12},{x:22,y:24},{x:52,y:24},{x:52,y:18}],c:'#26A69A',style:'mech'},
-      {points:[{x:10,y:76},{x:10,y:88}],c:'#FF7043',style:'mech',dash:true}
-    ],{w:850,h:400,theme:'siemens',drawingNo:'SYN-PID-001',ver:'V2.0',scale:'1:50',
-       instruments:[
-         {x:28,y:16,tag:'TI',sub:'TI-101',sc:'#42A5F5',sx:28,sy:28},
-         {x:52,y:30,tag:'TI',sub:'TI-102',sc:'#42A5F5',sx:52,sy:38},
-         {x:52,y:70,tag:'TI',sub:'TI-103',sc:'#42A5F5',sx:52,sy:62},
-         {x:70,y:12,tag:'PI',sub:'PI-101',sc:'#f0883e',sx:70,sy:18},
-         {x:70,y:88,tag:'PI',sub:'PI-102',sc:'#f0883e',sx:70,sy:82},
-         {x:38,y:16,tag:'FI',sub:'FI-101',sc:'#3fb950',sx:38,sy:28},
-         {x:95,y:38,tag:'LI',sub:'LI-101',sc:'#AB47BC',sx:95,sy:50}
-       ],
-       legend:[
-         {style:'mech',label:'冷却水供液管路'},
-         {style:'mech',label:'冷却水回液管路'},
-         {style:'control',label:'控制/补水管路'},
-         {style:'data',label:'仪表信号管路'}
-       ],coolKw:coolKw})+
+steps[2].delay=800; steps[2].result=
+    '<div class="mg-card" style="margin-bottom:20px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:var(--text1);font-size:15px">❄️ 液冷散热系统设计</h3><span style="font-size:11px;color:var(--text2)">Liquid Cooling System · 全液冷冷板+CDU</span></div><img src="/yelengsanre.png" alt="液冷散热系统" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML=\'<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: yelengsanre.png</div>\'"></div>'+
     tableHtml(
     ['参数','数值','说明'],
-    [['冷却方式',coolLabel,'主冷却方案'],
+    [['冷却方式',coolLabel,'主冷却方案：全液冷冷板+CDU'],
      ['冷却负载',coolKw+' kW','总散热需求'],
-     ['进/出水温度','18~22℃ / 35~40℃','ΔT=16~18℃'],
-     ['流量需求',Math.round(coolKw*2.5)+' L/min','系统总流量'],
-     ['CDU数量',Math.max(2,Math.ceil(coolKw/300))+' 台','液冷分配单元'],
-     ['冷却塔',Math.max(1,Math.ceil(coolKw/800))+' 台闭式','干球温度35℃'],
-     ['PUE贡献','-0.12 (液冷vs风冷)','能效提升'],
-     ['冗余设计','N+1 (CDU) / 2N (冷却塔)','高可用']], true
+     ['一级回路','4×冷却塔+2×冷水机组','设施侧冷源 2N'],
+     ['二级回路','8×CDU (800kW)','机柜侧液冷分配 N+1'],
+     ['进/出水温度','28℃ / 42℃','ΔT=14℃'],
+     ['总流量',Math.round(coolKw*2.8)+' L/min','1200 m³/h'],
+     ['GPU机柜行','16行 × 8柜 × 8GPU','冷板式液冷 1024 GPU'],
+     ['CDU数量','8 台 (800kW/台)','冗余 N+1'],
+     ['冷却塔','4×3000kW 闭式','干球35℃设计 2N'],
+     ['冷水机组','2×2500kW','变频离心式'],
+     ['AI热控','数字孪生+预测PID','温度/压力/流量/泄漏全监测'],
+     ['PUE','1.18','液冷vs风冷节能14%'],
+     ['冗余设计','2N (冷源) / N+1 (CDU)','Tier IV 高可用']], true
   );
 
   var pueData=[];
