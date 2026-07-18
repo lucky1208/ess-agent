@@ -45,6 +45,17 @@ if (fs.existsSync(path.join(src, 'reguanli.png')))
 // Copy yelengsanre.png as yelengsanre.png (used by 算电协同 liquid cooling step)
 if (fs.existsSync(path.join(src, 'yelengsanre.png')))
   fs.cpSync(path.join(src, 'yelengsanre.png'), path.join(dist, 'yelengsanre.png'), { force: true });
+// Copy Battery Pack Engineering images
+const packImgs = {
+  '电池包结构布局图.png': 'pack-layout.png',
+  '电池包电气连接.png': 'pack-electrical.png',
+  'BMS采样电路设计图.png': 'bms-sampling.png',
+  '换电站电池包设计图.png': 'bs-pack-design.png'
+};
+Object.entries(packImgs).forEach(([srcName, dstName]) => {
+  if (fs.existsSync(path.join(src, srcName)))
+    fs.cpSync(path.join(src, srcName), path.join(dist, dstName), { force: true });
+});
 // Copy flash SVG wrappers
 const svgWrappers = ['flash-arch.svg', 'flash-power.svg', 'flash-cooling.svg', 'gaoyapeidian.svg', 'gonglvdiaodu.svg', 'bms-protocol.svg', 'battery-design.svg', 'thermal.svg'];
 svgWrappers.forEach(f => {

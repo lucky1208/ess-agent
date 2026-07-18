@@ -40292,73 +40292,336 @@ if __name__ == "__main__":
 </div>
 
 <div id="page-bs-pack" class="bs-content" style="display:none;padding:24px 32px">
-<div class="sec-title">③ Pack智能设计 Agent ★★★★★</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px">AI驱动Pack设计：热仿真、SOC窗口优化、循环寿命预测、库存算法、Pack仓布局</div>
-<div id="bsPackEmpty" style="text-align:center;padding:60px;color:var(--text2)" data-i18n="bs_no_result">请先在「智能规划」中生成换电方案</div>
-<div id="bsPackContent" style="display:none">
-<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-<div class="bs-elec-tab active" onclick="bsPackSwitchTab('thermal')">🔥 热仿真</div>
-<div class="bs-elec-tab" onclick="bsPackSwitchTab('soc')">⚡ SOC优化</div>
-<div class="bs-elec-tab" onclick="bsPackSwitchTab('lifecycle')">📈 寿命预测</div>
-<div class="bs-elec-tab" onclick="bsPackSwitchTab('inventory')">📦 库存算法</div>
-<div class="bs-elec-tab" onclick="bsPackSwitchTab('layout')">🏗️ Pack仓布局</div>
+<div class="sec-title">③ Battery Pack Engineering ★★★★★</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px">电池包工程设计：Cell/Module/Pack布局 · 铜排连接 · 液冷系统 · BMS采样 · HV Box · 热管理</div>
+<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+<div class="bs-elec-tab active" onclick="bsPackSwitchTab('overview')">📋 系统概览</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('cell')">🔋 Cell设计</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('module')">📦 Module设计</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('packlayout')">📐 Pack布局</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('electrical')">⚡ 电气连接</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('bms')">🧠 BMS布局</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('cooling')">❄️ 水冷系统</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('hvbox')">🔌 HV Box</div>
+<div class="bs-elec-tab" onclick="bsPackSwitchTab('bom')">📊 BOM</div>
 </div>
-<!-- 热仿真 -->
-<div id="bsPackThermal" style="display:block">
+<!-- ① 系统概览 -->
+<div id="bpOverview" style="display:block">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🏭 换电站电池包总览</h3>
+<span style="font-size:11px;color:var(--text2)">Battery Pack System Overview</span>
+</div>
+<img src="bs-pack-design.png" alt="换电站电池包设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: bs-pack-design.png</div>'">
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
+<div style="font-size:12px;color:var(--text2)">电芯规格</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">LFP 280Ah 3.2V</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
+<div style="font-size:12px;color:var(--text2)">Pack配置</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">1P16S / 51.2V</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
+<div style="font-size:12px;color:var(--text2)">容量/能量</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">280Ah / 14.3kWh</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
+<div style="font-size:12px;color:var(--text2)">冷却方式</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">液冷 (50%乙二醇)</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
+<div style="font-size:12px;color:var(--text2)">BMS架构</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">1主+4从 CAN-FD</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
+<div style="font-size:12px;color:var(--text2)">循环寿命</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">≥6000次 (80%SOH)</div>
+</div>
+</div>
+</div>
+<!-- ② Cell设计 -->
+<div id="bpCell" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🔋 电芯设计 Cell Engineering</h3>
+<span style="font-size:11px;color:var(--text2)">方形铝壳 LFP</span>
+</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">🔥 Pack热仿真模型</div>
-<div id="bsPackThermalSvg"></div>
+<div>
+<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">电芯参数</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">化学体系</span><br><b style="color:var(--text1)">LiFePO₄</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">标称容量</span><br><b style="color:var(--text1)">280Ah</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">标称电压</span><br><b style="color:var(--text1)">3.2V</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">内阻</span><br><b style="color:var(--text1)">≤0.4mΩ</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">重量</span><br><b style="color:var(--text1)">5.4kg</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">尺寸</span><br><b style="color:var(--text1)">174×72×207mm</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">充电截止</span><br><b style="color:#50c878">3.65V</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">放电截止</span><br><b style="color:#ef4444">2.5V</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">循环寿命</span><br><b style="color:var(--text1)">≥6000次</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">充电倍率</span><br><b style="color:var(--text1)">1C (持续)</b></div>
 </div>
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">🌡️ 温度分布</div>
-<div id="bsPackThermalInfo"></div>
+</div>
+<div>
+<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">电芯内部结构</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.8">
+<div>📌 <b style="color:var(--text1)">极片叠层</b>：正极(LFP) → 隔膜(PP/PE) → 负极(石墨)</div>
+<div>📌 <b style="color:var(--text1)">极耳设计</b>：铝极耳(正极) + 铜极耳(负极)</div>
+<div>📌 <b style="color:var(--text1)">电解液</b>：LiPF₆/EC+DMC+EMC</div>
+<div>📌 <b style="color:var(--text1)">安全阀</b>：顶部泄压阀 ≥0.8MPa开启</div>
+<div>📌 <b style="color:var(--text1)">密封</b>：激光焊接铝壳 + 密封圈</div>
+<div>📌 <b style="color:var(--text1)">集流体</b>：正极铝箔16μm / 负极铜箔8μm</div>
 </div>
 </div>
 </div>
-<!-- SOC优化 -->
-<div id="bsPackSoc" style="display:none">
+</div>
+</div>
+<!-- ③ Module设计 -->
+<div id="bpModule" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">📦 模组设计 Module Engineering</h3>
+<span style="font-size:11px;color:var(--text2)">4模组并联 × 16串</span>
+</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">⚡ SOC充放电曲线</div>
-<div id="bsPackSocCurve"></div>
+<div>
+<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">模组结构</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.8">
+<div>📌 <b style="color:var(--text1)">电芯排列</b>：8S1P (8颗电芯串联)</div>
+<div>📌 <b style="color:var(--text1)">铜排连接</b>：激光焊接 / 螺栓连接</div>
+<div>📌 <b style="color:var(--text1)">采样线束</b>：NTC温度传感器 + 电压采集</div>
+<div>📌 <b style="color:var(--text1)">绝缘片</b>：云母片 + PI膜</div>
+<div>📌 <b style="color:var(--text1)">压缩板</b>：铝板预紧 200-500kPa</div>
+<div>📌 <b style="color:var(--text1)">导热垫</b>：硅胶导热片 3W/mK</div>
 </div>
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">📊 SOC窗口优化</div>
-<div id="bsPackSocInfo"></div>
+</div>
+<div>
+<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">模组参数</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">配置</span><br><b style="color:var(--text1)">8S1P</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">电压</span><br><b style="color:var(--text1)">25.6V</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">容量</span><br><b style="color:var(--text1)">280Ah</b></div>
+<div style="padding:10px;background:var(--bg3);border-radius:6px"><span style="font-size:11px;color:var(--text2)">重量</span><br><b style="color:var(--text1)">≈52kg</b></div>
 </div>
 </div>
 </div>
-<!-- 寿命预测 -->
-<div id="bsPackLifecycle" style="display:none">
+</div>
+</div>
+<!-- ④ Pack布局 -->
+<div id="bpPacklayout" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">📐 Pack结构布局</h3>
+<span style="font-size:11px;color:var(--text2)">Pack Structural Layout</span>
+</div>
+<img src="pack-layout.png" alt="电池包结构布局图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: pack-layout.png</div>'">
+</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">📈 SOH衰减曲线</div>
-<div id="bsPackSohCurve"></div>
-</div>
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">🔄 循环寿命分析</div>
-<div id="bsPackLifecycleInfo"></div>
-</div>
-</div>
-</div>
-<!-- 库存算法 -->
-<div id="bsPackInventory" style="display:none">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2);margin-bottom:16px">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">📦 智能库存算法</div>
-<div id="bsPackInventorySvg"></div>
-</div>
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">📋 库存策略</div>
-<div id="bsPackInventoryInfo"></div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">上盖组件</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 铝合金上盖 2.0mm</div>
+<div>• 密封圈 EPDM 50°</div>
+<div>• 泄压阀 0.8MPa</div>
+<div>• 防爆阀</div>
 </div>
 </div>
-<!-- Pack仓布局 -->
-<div id="bsPackLayout" style="display:none">
-<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg2)">
-<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:8px">🏗️ Pack仓物理布局</div>
-<div id="bsPackLayoutSvg"></div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">下壳体</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 铝合金型材底壳</div>
+<div>• 液冷板集成</div>
+<div>• 固定梁/安装点</div>
+<div>• IP67防护等级</div>
 </div>
+</div>
+</div>
+</div>
+<!-- ⑤ 电气连接 -->
+<div id="bpElectrical" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">⚡ 电气连接设计</h3>
+<span style="font-size:11px;color:var(--text2)">Cell Interconnection · Busbar</span>
+</div>
+<img src="pack-electrical.png" alt="电池包电气连接" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: pack-electrical.png</div>'">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">铜排设计</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 材质：T2紫铜</div>
+<div>• 截面：8×3mm</div>
+<div>• 载流：≥80A</div>
+<div>• 激光焊接</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">串并联拓扑</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 配置：1P16S</div>
+<div>• 模组间：铜排串联</div>
+<div>• 汇流排截面计算</div>
+<div>• 压降分析</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">安全设计</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 电流保险丝 350A</div>
+<div>• 温度保险丝 85°C</div>
+<div>• 预充电路</div>
+<div>• 高压互锁 HVIL</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ⑥ BMS布局 -->
+<div id="bpBms" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🧠 BMS采样电路设计</h3>
+<span style="font-size:11px;color:var(--text2)">BMS Architecture · 1主+4从 CAN-FD</span>
+</div>
+<img src="bms-sampling.png" alt="BMS采样电路设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: bms-sampling.png</div>'">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">主控 Master</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• MCU：ARM Cortex-M4</div>
+<div>• CAN-FD ↔ VCU通信</div>
+<div>• SOC/SOH算法</div>
+<div>• 均衡控制</div>
+<div>• 故障诊断 UDS</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">从控 Slave (×4)</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• AFE：TI BQ76952</div>
+<div>• ADC：16bit 电压采集</div>
+<div>• NTC：每模组2路</div>
+<div>• 被动均衡 100mA</div>
+<div>• 每从控管理4S1P</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ⑦ 水冷系统 -->
+<div id="bpCooling" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">❄️ 液冷散热系统</h3>
+<span style="font-size:11px;color:var(--text2)">Cooling Plate · 50% Ethylene Glycol</span>
+</div>
+<img src="yelengsanre.png" alt="液冷散热系统" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:var(--text2)>图片加载失败: yelengsanre.png</div>'">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">冷却回路</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 入口温度：25°C</div>
+<div>• 出口温度：32°C</div>
+<div>• 流量：8L/min</div>
+<div>• 散热功率：2.8kW</div>
+<div>• 最大温差：≤5°C</div>
+</div>
+</div>
+<div class="mg-card">
+<h3 style="margin:0 0 8px;font-size:13px;color:var(--text1)">液冷板参数</h3>
+<div style="font-size:12px;color:var(--text2);line-height:1.8">
+<div>• 材质：铝合金6063</div>
+<div>• 厚度：3.5mm</div>
+<div>• 流道：蛇形/U形</div>
+<div>• 接口：Φ16宝塔头</div>
+<div>• 压降：≤15kPa</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ⑧ HV Box -->
+<div id="bpHvbox" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">🔌 高压配电盒 HV Box</h3>
+<span style="font-size:11px;color:var(--text2)">HV Junction Box · IEC 62660</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
+<div style="font-size:12px;color:var(--text2)">主保险丝</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">350A 熔断器</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">额定电压 60V DC</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #f59e0b">
+<div style="font-size:12px;color:var(--text2)">主接触器</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">正极+负极 双断</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">TE Connectivity EV200</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
+<div style="font-size:12px;color:var(--text2)">预充电路</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">预充继电器+电阻</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">R=20Ω 预充≤3s</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #10b981">
+<div style="font-size:12px;color:var(--text2)">电流传感器</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">霍尔传感器 ±400A</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">精度 ±1%</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #8b5cf6">
+<div style="font-size:12px;color:var(--text2)">绝缘检测 IMD</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">≥500Ω/V</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">IEC 61557-8</div>
+</div>
+<div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #06b6d4">
+<div style="font-size:12px;color:var(--text2)">高压互锁 HVIL</div>
+<div style="font-size:14px;font-weight:700;color:var(--text1)">低压信号回路</div>
+<div style="font-size:11px;color:var(--text2);margin-top:4px">拔插检测</div>
+</div>
+</div>
+</div>
+<!-- ⑨ BOM -->
+<div id="bpBom" style="display:none">
+<div class="mg-card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="margin:0;color:var(--text1);font-size:15px">📊 电池包BOM清单</h3>
+<span style="font-size:11px;color:var(--text2)">Bill of Materials</span>
+</div>
+<div style="overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px">
+<thead>
+<tr style="border-bottom:2px solid var(--border)">
+<th style="text-align:left;padding:8px;color:var(--text1);font-weight:600">序号</th>
+<th style="text-align:left;padding:8px;color:var(--text1);font-weight:600">物料名称</th>
+<th style="text-align:left;padding:8px;color:var(--text1);font-weight:600">规格型号</th>
+<th style="text-align:right;padding:8px;color:var(--text1);font-weight:600">数量</th>
+<th style="text-align:right;padding:8px;color:var(--text1);font-weight:600">单价(元)</th>
+<th style="text-align:right;padding:8px;color:var(--text1);font-weight:600">小计(元)</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">1</td><td style="padding:8px;color:var(--text1)">LFP电芯 280Ah</td><td style="padding:8px;color:var(--text2)">CATL 174×72×207mm</td><td style="text-align:right;padding:8px;color:var(--text1)">16</td><td style="text-align:right;padding:8px;color:var(--text1)">280</td><td style="text-align:right;padding:8px;color:var(--text1)">4,480</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">2</td><td style="padding:8px;color:var(--text1)">铜排 T2紫铜</td><td style="padding:8px;color:var(--text2)">8×3mm 长100mm</td><td style="text-align:right;padding:8px;color:var(--text1)">15</td><td style="text-align:right;padding:8px;color:var(--text1)">15</td><td style="text-align:right;padding:8px;color:var(--text1)">225</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">3</td><td style="padding:8px;color:var(--text1)">液冷板</td><td style="padding:8px;color:var(--text2)">铝合金6063 400×200×3.5mm</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">350</td><td style="text-align:right;padding:8px;color:var(--text1)">350</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">4</td><td style="padding:8px;color:var(--text1)">BMS主控板</td><td style="padding:8px;color:var(--text2)">ARM M4 + CAN-FD</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">180</td><td style="text-align:right;padding:8px;color:var(--text1)">180</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">5</td><td style="padding:8px;color:var(--text1)">BMS从控板</td><td style="padding:8px;color:var(--text2)">BQ76952 AFE</td><td style="text-align:right;padding:8px;color:var(--text1)">4</td><td style="text-align:right;padding:8px;color:var(--text1)">85</td><td style="text-align:right;padding:8px;color:var(--text1)">340</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">6</td><td style="padding:8px;color:var(--text1)">主保险丝</td><td style="padding:8px;color:var(--text2)">350A 60VDC</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">45</td><td style="text-align:right;padding:8px;color:var(--text1)">45</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">7</td><td style="padding:8px;color:var(--text1)">主接触器</td><td style="padding:8px;color:var(--text2)">TE EV200AA</td><td style="text-align:right;padding:8px;color:var(--text1)">2</td><td style="text-align:right;padding:8px;color:var(--text1)">120</td><td style="text-align:right;padding:8px;color:var(--text1)">240</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">8</td><td style="padding:8px;color:var(--text1)">导热硅胶垫</td><td style="padding:8px;color:var(--text2)">3W/mK 1mm</td><td style="text-align:right;padding:8px;color:var(--text1)">16</td><td style="text-align:right;padding:8px;color:var(--text1)">12</td><td style="text-align:right;padding:8px;color:var(--text1)">192</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">9</td><td style="padding:8px;color:var(--text1)">NTC热敏电阻</td><td style="padding:8px;color:var(--text2)">10kΩ B3950</td><td style="text-align:right;padding:8px;color:var(--text1)">8</td><td style="text-align:right;padding:8px;color:var(--text1)">3</td><td style="text-align:right;padding:8px;color:var(--text1)">24</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">10</td><td style="padding:8px;color:var(--text1)">壳体(上盖+下壳)</td><td style="padding:8px;color:var(--text2)">铝合金型材 IP67</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">600</td><td style="text-align:right;padding:8px;color:var(--text1)">600</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">11</td><td style="padding:8px;color:var(--text1)">密封圈</td><td style="padding:8px;color:var(--text2)">EPDM 50° 异型</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">35</td><td style="text-align:right;padding:8px;color:var(--text1)">35</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--text2)">12</td><td style="padding:8px;color:var(--text1)">泄压阀</td><td style="padding:8px;color:var(--text2)">0.8MPa 防爆</td><td style="text-align:right;padding:8px;color:var(--text1)">1</td><td style="text-align:right;padding:8px;color:var(--text1)">25</td><td style="text-align:right;padding:8px;color:var(--text1)">25</td></tr>
+</tbody>
+<tfoot>
+<tr style="border-top:2px solid var(--border)">
+<td colspan="5" style="padding:8px;text-align:right;color:var(--text1);font-weight:700">合计</td>
+<td style="text-align:right;padding:8px;color:#50c878;font-weight:700;font-size:14px">¥6,736</td>
+</tr>
+</tfoot>
+</table>
 </div>
 </div>
 </div>
@@ -82897,13 +83160,13 @@ function bsDigitalAiDiagnose(){}// AI diagnosis moved to tab 7 Digital Twin
 // ═══════════════════════════════════════════════════════════════
 function bsPackSwitchTab(tab){
   document.querySelectorAll('#page-bs-pack .bs-elec-tab').forEach(t=>t.classList.remove('active'));
-  const tabs={thermal:0,soc:1,lifecycle:2,inventory:3,layout:4};
+  const tabs={overview:0,cell:1,module:2,packlayout:3,electrical:4,bms:5,cooling:6,hvbox:7,bom:8};
   document.querySelectorAll('#page-bs-pack .bs-elec-tab')[tabs[tab]].classList.add('active');
-  ['bsPackThermal','bsPackSoc','bsPackLifecycle','bsPackInventory','bsPackLayout'].forEach(id=>{
+  ['bpOverview','bpCell','bpModule','bpPacklayout','bpElectrical','bpBms','bpCooling','bpHvbox','bpBom'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display='none';
   });
-  const MAP={thermal:'bsPackThermal',soc:'bsPackSoc',lifecycle:'bsPackLifecycle',inventory:'bsPackInventory',layout:'bsPackLayout'};
+  const MAP={overview:'bpOverview',cell:'bpCell',module:'bpModule',packlayout:'bpPacklayout',electrical:'bpElectrical',bms:'bpBms',cooling:'bpCooling',hvbox:'bpHvbox',bom:'bpBom'};
   const el=document.getElementById(MAP[tab]);
   if(el) el.style.display='block';
 }
@@ -83121,182 +83384,8 @@ function bsRenderPlanning(){
 }
 
 function bsRenderPackDesign(){
-  const empty=document.getElementById('bsPackEmpty');
-  const content=document.getElementById('bsPackContent');
-  if(!LAST_BS_RESULT){empty.style.display='';content.style.display='none';return;}
-  empty.style.display='none';content.style.display='';
-  const r=LAST_BS_RESULT;
-  const U=UEM;
-  // ── 热仿真 ──
-  let th='<svg width="100%" height="300" viewBox="0 0 500 300">';
-  th+='<rect width="500" height="300" fill="#0a0e14" rx="8"/>';
-  th+='<text x="250" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">Pack 热仿真模型</text>';
-  // Pack outline
-  th+='<rect x="100" y="50" width="300" height="180" rx="6" fill="#111827" stroke="#334155" stroke-width="2"/>';
-  th+='<text x="250" y="45" text-anchor="middle" fill="#64748b" font-size="9">Pack 外壳 (LFP 280Ah)</text>';
-  // Cells grid (4x6)
-  for(let row=0;row<6;row++){
-    for(let col=0;col<4;col++){
-      const cx=130+col*70, cy=65+row*26;
-      const temp=25+Math.floor(Math.random()*15);
-      const tc=temp>45?'#ef4444':temp>35?'#e8a838':temp>28?'#50c878':'#4a90d9';
-      th+='<rect x="'+cx+'" y="'+cy+'" width="55" height="20" rx="3" fill="#1e293b" stroke="'+tc+'" stroke-width="1"/>';
-      th+='<text x="'+(cx+27)+'" y="'+(cy+13)+'" text-anchor="middle" fill="'+tc+'" font-size="7">'+temp+'°C</text>';
-    }
-  }
-  // Coolant flow
-  th+='<line x1="110" y1="240" x2="390" y2="240" stroke="#06b6d4" stroke-width="3" stroke-dasharray="8,4"><animate attributeName="stroke-dashoffset" values="12;0" dur="1.5s" repeatCount="indefinite"/></line>';
-  th+='<text x="250" y="258" text-anchor="middle" fill="#06b6d4" font-size="8">冷却液入口 → 25°C → 出口 32°C | 流量: 8L/min</text>';
-  // Heat map legend
-  th+='<rect x="420" y="60" width="15" height="120" rx="3" fill="url(#bsHeatMap)"/>';
-  th+='<defs><linearGradient id="bsHeatMap" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#4a90d9"/><stop offset="33%" stop-color="#50c878"/><stop offset="66%" stop-color="#e8a838"/><stop offset="100%" stop-color="#ef4444"/></linearGradient></defs>';
-  th+='<text x="445" y="70" fill="#64748b" font-size="7">50°C</text>';
-  th+='<text x="445" y="125" fill="#64748b" font-size="7">35°C</text>';
-  th+='<text x="445" y="178" fill="#64748b" font-size="7">25°C</text>';
-  th+='</svg>';
-  document.getElementById('bsPackThermalSvg').innerHTML=th;
-  // Thermal info
-  let ti='<div style="font-size:12px">';
-  ti+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">冷却方式</span><br><b style="color:var(--text1)">液冷 (乙二醇)</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">最大温差</span><br><b style="color:#50c878">≤5°C</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">入口温度</span><br><b style="color:var(--text1)">25°C</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">出口温度</span><br><b style="color:#e8a838">32°C</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">散热功率</span><br><b style="color:var(--text1)">2.8kW</b></div>';
-  ti+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">流量</span><br><b style="color:var(--text1)">8L/min</b></div>';
-  ti+='</div>';
-  ti+='<div style="margin-top:10px;padding:8px;background:rgba(80,200,120,0.1);border-radius:4px;border-left:3px solid #50c878;color:#50c878;font-size:11px">✓ 热仿真通过：所有电芯温差≤5°C，无热失控风险</div>';
-  ti+='</div>';
-  document.getElementById('bsPackThermalInfo').innerHTML=ti;
-  // ── SOC曲线 ──
-  let sc='<svg width="100%" height="250" viewBox="0 0 500 250">';
-  sc+='<rect width="500" height="250" fill="#0a0e14" rx="8"/>';
-  sc+='<text x="250" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">SOC 充放电曲线 (24h)</text>';
-  // Grid lines
-  for(let i=0;i<=4;i++){
-    const gy=40+i*45;
-    sc+='<line x1="40" y1="'+gy+'" x2="480" y2="'+gy+'" stroke="#1e293b" stroke-width="0.5"/>';
-    sc+='<text x="35" y="'+(gy+4)+'" text-anchor="end" fill="#475569" font-size="7">'+(100-i*25)+'%</text>';
-  }
-  // SOC curve
-  sc+='<polyline points="';
-  const socPoints=[];
-  for(let h=0;h<24;h++){
-    const x=50+h*18;
-    let soc;
-    if(h<7) soc=20+Math.floor(h*8.5);// valley charging
-    else if(h<10) soc=80-Math.floor((h-7)*5);// peak discharge
-    else if(h<18) soc=65+Math.floor((h-10)*2);// flat
-    else if(h<21) soc=80-Math.floor((h-18)*5);// peak discharge
-    else soc=65+Math.floor((h-21)*5);// valley charge
-    socPoints.push(x+','+(220-soc*1.8));
-  }
-  sc+=socPoints.join(' ')+'" fill="none" stroke="#4a90d9" stroke-width="2"/>';
-  // Fill area
-  sc+='<polygon points="50,220 '+socPoints.join(' ')+' 466,220" fill="rgba(74,144,217,0.1)"/>';
-  // SOC window markers
-  sc+='<line x1="40" y1="'+(220-90*1.8)+'" x2="480" y2="'+(220-90*1.8)+'" stroke="#50c878" stroke-width="1" stroke-dasharray="4,2"/>';
-  sc+='<text x="485" y="'+(220-90*1.8+4)+'" fill="#50c878" font-size="7">MAX 90%</text>';
-  sc+='<line x1="40" y1="'+(220-20*1.8)+'" x2="480" y2="'+(220-20*1.8)+'" stroke="#e06070" stroke-width="1" stroke-dasharray="4,2"/>';
-  sc+='<text x="485" y="'+(220-20*1.8+4)+'" fill="#e06070" font-size="7">MIN 20%</text>';
-  // X axis labels
-  for(let h=0;h<24;h+=3) sc+='<text x="'+(50+h*18)+'" y="240" text-anchor="middle" fill="#475569" font-size="7">'+h+':00</text>';
-  sc+='</svg>';
-  document.getElementById('bsPackSocCurve').innerHTML=sc;
-  let si='<div style="font-size:12px">';
-  si+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  si+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">SOC窗口</span><br><b style="color:var(--text1)">20% ~ 90%</b></div>';
-  si+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">最优SOC</span><br><b style="color:#50c878">80%</b></div>';
-  si+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">充电倍率</span><br><b style="color:var(--text1)">0.5C</b></div>';
-  si+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">充电时间</span><br><b style="color:var(--text1)">90min (20→90%)</b></div>';
-  si+='</div>';
-  si+='<div style="margin-top:10px;padding:8px;background:rgba(74,144,217,0.1);border-radius:4px;border-left:3px solid #4a90d9;color:#4a90d9;font-size:11px">💡 建议：谷电时段(23-07时)满充，峰电时段维持≥20%</div>';
-  si+='</div>';
-  document.getElementById('bsPackSocInfo').innerHTML=si;
-  // ── SOH衰减曲线 ──
-  let lc='<svg width="100%" height="250" viewBox="0 0 500 250">';
-  lc+='<rect width="500" height="250" fill="#0a0e14" rx="8"/>';
-  lc+='<text x="250" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">SOH 衰减曲线 (8年)</text>';
-  lc+='<polyline points="';
-  const sohPoints=[];
-  for(let m=0;m<=96;m++){
-    const x=50+m*4.5;
-    const soh=100-m*0.42;// ~60% at 96 months
-    sohPoints.push(x+','+(220-(soh-50)*3.2));
-  }
-  lc+=sohPoints.join(' ')+'" fill="none" stroke="#e8a838" stroke-width="2"/>';
-  lc+='<polygon points="50,220 '+sohPoints.join(' ')+' 486,220" fill="rgba(232,168,56,0.08)"/>';
-  // Threshold line
-  lc+='<line x1="40" y1="'+(220-(60-50)*3.2)+'" x2="480" y2="'+(220-(60-50)*3.2)+'" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,2"/>';
-  lc+='<text x="485" y="'+(220-(60-50)*3.2+4)+'" fill="#ef4444" font-size="7">退役 60%</text>';
-  // X axis
-  for(let y=0;y<=8;y+=2) lc+='<text x="'+(50+y*12*4.5)+'" y="240" text-anchor="middle" fill="#475569" font-size="7">'+y+'年</text>';
-  lc+='</svg>';
-  document.getElementById('bsPackSohCurve').innerHTML=lc;
-  let li='<div style="font-size:12px">';
-  li+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  li+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">日历寿命</span><br><b style="color:var(--text1)">8年</b></div>';
-  li+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">循环寿命</span><br><b style="color:var(--text1)">3000次</b></div>';
-  li+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">年衰减率</span><br><b style="color:#e8a838">5%/年</b></div>';
-  li+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">退役SOH</span><br><b style="color:#ef4444">60%</b></div>';
-  li+='</div>';
-  li+='<div style="margin-top:10px;padding:8px;background:rgba(232,168,56,0.1);border-radius:4px;border-left:3px solid #e8a838;color:#e8a838;font-size:11px">⚠️ 第5年SOH降至80%，建议提前规划梯次利用</div>';
-  li+='</div>';
-  document.getElementById('bsPackLifecycleInfo').innerHTML=li;
-  // ── 库存算法 ──
-  let iv='<svg width="100%" height="200" viewBox="0 0 800 200">';
-  iv+='<rect width="800" height="200" fill="#0a0e14" rx="8"/>';
-  iv+='<text x="400" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">库存动态监控</text>';
-  // Inventory bars
-  const invSlots=[
-    {label:'在线可用',count:r.battery.readyBatteries||20,color:'#50c878'},
-    {label:'充电中',count:r.battery.chargingBatteries||15,color:'#4a90d9'},
-    {label:'待维护',count:3,color:'#e06070'},
-    {label:'备用',count:r.battery.backupBatteries||5,color:'#94a3b8'},
-    {label:'总计',count:r.battery.totalBatteries||43,color:'#e8a838'}
-  ];
-  invSlots.forEach((s,i)=>{
-    const bx=60+i*150, bw=Math.min(s.count*8,120);
-    iv+='<rect x="'+bx+'" y="50" width="'+bw+'" height="30" rx="4" fill="'+s.color+'" opacity="0.3"><animate attributeName="opacity" values="0.2;0.4;0.2" dur="'+(2+i*0.3)+'s" repeatCount="indefinite"/></rect>';
-    iv+='<rect x="'+bx+'" y="50" width="'+bw+'" height="30" rx="4" fill="none" stroke="'+s.color+'" stroke-width="1"/>';
-    iv+='<text x="'+(bx+bw/2)+'" y="70" text-anchor="middle" fill="'+s.color+'" font-size="10" font-weight="600">'+s.count+'</text>';
-    iv+='<text x="'+(bx+bw/2)+'" y="95" text-anchor="middle" fill="#94a3b8" font-size="8">'+s.label+'</text>';
-  });
-  // Safety stock line
-  iv+='<line x1="50" y1="130" x2="750" y2="130" stroke="#e06070" stroke-width="1" stroke-dasharray="4,2"/>';
-  iv+='<text x="760" y="134" fill="#e06070" font-size="7">安全库存</text>';
-  iv+='</svg>';
-  document.getElementById('bsPackInventorySvg').innerHTML=iv;
-  let ii='<div style="font-size:12px">';
-  ii+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
-  ii+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">周转天数</span><br><b style="color:var(--text1)">3.2天</b></div>';
-  ii+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">补货点</span><br><b style="color:#e8a838">8块</b></div>';
-  ii+='<div style="padding:8px;background:var(--bg1);border-radius:4px"><span style="color:var(--text2)">安全库存</span><br><b style="color:#e06070">5块</b></div>';
-  ii+='</div>';
-  ii+='</div>';
-  document.getElementById('bsPackInventoryInfo').innerHTML=ii;
-  // ── Pack仓布局 ──
-  let ly='<svg width="100%" height="300" viewBox="0 0 600 300">';
-  ly+='<rect width="600" height="300" fill="#0a0e14" rx="8"/>';
-  ly+='<text x="300" y="25" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">充电架 Pack 仓布局</text>';
-  const slots=Math.min(r.chargingRack.actualSlots||40,60);
-  const cols=Math.min(10,slots);
-  const rows=Math.ceil(slots/cols);
-  for(let row=0;row<Math.min(rows,6);row++){
-    for(let col=0;col<cols;col++){
-      const idx=row*cols+col;
-      if(idx>=slots) break;
-      const sx=60+col*50, sy=45+row*40;
-      const soc=40+Math.floor(Math.random()*55);
-      const sc=soc>80?'#50c878':soc>40?'#e8a838':'#e06070';
-      ly+='<rect x="'+sx+'" y="'+sy+'" width="42" height="32" rx="3" fill="#111827" stroke="'+sc+'" stroke-width="1"><animate attributeName="stroke-opacity" values="1;0.5;1" dur="'+(2+idx*0.1)+'s" repeatCount="indefinite"/></rect>';
-      ly+='<text x="'+(sx+21)+'" y="'+(sy+14)+'" text-anchor="middle" fill="'+sc+'" font-size="8" font-weight="600">#'+(idx+1)+'</text>';
-      ly+='<text x="'+(sx+21)+'" y="'+(sy+25)+'" text-anchor="middle" fill="'+sc+'" font-size="6">'+soc+'%</text>';
-    }
-  }
-  ly+='<text x="300" y="'+(45+Math.min(rows,6)*40+20)+'" text-anchor="middle" fill="#475569" font-size="8">共 '+slots+' 仓位 | '+r.inputParams.chargingPower+'kW/仓 | 液冷散热</text>';
-  ly+='</svg>';
-  document.getElementById('bsPackLayoutSvg').innerHTML=ly;
+  // New Battery Pack Engineering section uses static content + images
+  // Just ensure the page is visible when selected
 }
 
 function bsRenderOps(){
