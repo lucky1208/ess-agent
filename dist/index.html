@@ -43726,7 +43726,7 @@ function switchCategory(cat){
     if(chNav)chNav.style.display='none';
     if(vppNav)vppNav.style.display='none';
     if(synNav)synNav.style.display='none';
-    if(mc)mc.style.display='none';
+    if(mc)mc.style.display='';
     document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.bs-content').forEach(t=>t.style.display='none');
@@ -43742,7 +43742,7 @@ function switchCategory(cat){
     if(chNav)chNav.style.display='none';
     if(vppNav)vppNav.style.display='none';
     if(synNav)synNav.style.display='none';
-    if(mc)mc.style.display='none';
+    if(mc)mc.style.display='';
     document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.bs-content').forEach(t=>t.style.display='none');
@@ -43758,7 +43758,7 @@ function switchCategory(cat){
     if(chNav)chNav.style.display='block';
     if(vppNav)vppNav.style.display='none';
     if(synNav)synNav.style.display='none';
-    if(mc)mc.style.display='none';
+    if(mc)mc.style.display='';
     document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.micro-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.aidc-content').forEach(t=>t.style.display='none');
@@ -43774,14 +43774,14 @@ function switchCategory(cat){
     if(chNav)chNav.style.display='none';
     if(vppNav)vppNav.style.display='none';
     if(synNav)synNav.style.display='none';
-    if(mc)mc.style.display='none';
+    if(mc)mc.style.display='';
     document.querySelectorAll('.tab-content,.micro-content,.aidc-content,.charging-content,.vpp-content,.syn-content').forEach(t=>t.style.display='none');
     bsShowPage('bs-design');
   }else if(cat==='vpp'){
     essNav.style.display='none'; mgNav.style.display='none'; aidcNav.style.display='none';
     if(bsNav)bsNav.style.display='none'; if(chNav)chNav.style.display='none';
     if(vppNav)vppNav.style.display='block'; if(synNav)synNav.style.display='none';
-    if(mc)mc.style.display='none';
+    if(mc)mc.style.display='';
     document.querySelectorAll('.tab-content,.micro-content,.aidc-content,.bs-content,.charging-content,.syn-content').forEach(t=>t.style.display='none');
     document.querySelectorAll('.vpp-content').forEach(t=>t.style.display='none');
     showVppPage('vpp-access');
@@ -43789,7 +43789,7 @@ function switchCategory(cat){
     essNav.style.display='none'; mgNav.style.display='none'; aidcNav.style.display='none';
     if(bsNav)bsNav.style.display='none'; if(chNav)chNav.style.display='none';
     if(vppNav)vppNav.style.display='none'; if(synNav)synNav.style.display='block';
-    if(mc)mc.style.display='none';
+    if(mc)mc.style.display='';
     document.querySelectorAll('.tab-content,.micro-content,.aidc-content,.bs-content,.charging-content,.vpp-content').forEach(t=>t.style.display='none');
     showSynPage('syn-compute');
   }
