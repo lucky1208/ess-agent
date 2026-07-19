@@ -43689,7 +43689,7 @@ window._ESS_COMPLIANCE_READY=true;
 }
 
 function switchCategory(cat){
-
+  console.log('[DEBUG] switchCategory called with cat='+cat);
   document.querySelectorAll('.category-tab').forEach(t=>t.classList.remove('active'));
   const catIdx=cat==='ess'?0:cat==='charging'?1:cat==='battery_swap'?2:cat==='microgrid'?3:cat==='aidc'?4:cat==='vpp'?5:cat==='synergy'?6:0;
   document.querySelectorAll('.category-tab')[catIdx].classList.add('active');
@@ -44484,13 +44484,16 @@ function bsShowPage(id){
 
 // ========== Charging Agent Logic ==========
 function showChargingPage(id){
+  console.log('[DEBUG] showChargingPage called with id='+id);
   document.querySelectorAll('#chargingNav .sub-tab').forEach(t=>t.classList.remove('active'));
   const subPages=['ch-design','ch-elec','ch-software','ch-proto','ch-flash','ch-evcc','ch-bom','ch-platform'];
   const tabIdx=subPages.indexOf(id);
   if(tabIdx>=0) document.querySelectorAll('#chargingNav .sub-tab')[tabIdx].classList.add('active');
   document.querySelectorAll('.charging-content').forEach(t=>t.style.display='none');
   const el=document.getElementById('page-'+id);
+  console.log('[DEBUG] page-'+id+' element:', el, 'display:', el?el.style.display:'N/A');
   if(el) el.style.display='block';
+  console.log('[DEBUG] after set block, display:', el?el.style.display:'N/A');
   if(id==='ch-design') chCalcPower();
   if(id==='ch-elec') chElecSwitchDiagram('mobile_eu');
   if(id==='ch-software') chDrawSwArch();
