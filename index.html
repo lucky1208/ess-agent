@@ -38185,6 +38185,13 @@ select.form-input{appearance:auto}
 .kpi-box{flex:1;min-width:70px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;text-align:center}
 .kpi-box .kv{font-size:16px;font-weight:700;font-family:monospace}
 .kpi-box .kl{font-size:9px;color:var(--text2);margin-top:2px}
+.bp-img-viewer{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:8px;background:#0d1117;cursor:grab;min-height:200px}
+.bp-img-viewer:active{cursor:grabbing}
+.bp-img-viewer img{transform-origin:0 0;pointer-events:none;max-width:none}
+.bp-img-toolbar{position:absolute;top:8px;right:8px;z-index:10;display:flex;gap:4px;align-items:center;background:rgba(0,0,0,0.7);border-radius:6px;padding:4px 8px}
+.bp-img-toolbar button{background:var(--bg3);color:var(--text1);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:11px;cursor:pointer}
+.bp-img-toolbar button:hover{background:var(--blue);color:#fff}
+.bp-img-toolbar span{color:var(--text2);font-size:11px;min-width:36px;text-align:center}
 </style>
 </head>
 <body>
@@ -40312,7 +40319,23 @@ if __name__ == "__main__":
 <h3 style="margin:0;color:var(--text1);font-size:15px">🏭 换电站电池包总览</h3>
 <span style="font-size:11px;color:var(--text2)">Battery Pack System Overview</span>
 </div>
-<img src="bs-pack-design.png" alt="换电站电池包设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+<div class="bp-img-viewer" id="bpViewer_bs_pack_design_png" style="margin-bottom:16px">
+
+<div class="bp-img-toolbar">
+
+<button onclick="bpImgZoom('bpViewer_bs_pack_design_png','zoomOut')">-</button>
+
+<span id="bpViewer_bs_pack_design_png_zl">100%</span>
+
+<button onclick="bpImgZoom('bpViewer_bs_pack_design_png','zoomIn')">+</button>
+
+<button onclick="bpImgZoom('bpViewer_bs_pack_design_png','reset')">重置</button>
+
+</div>
+
+<div class="bp-img-inner" style="overflow:hidden"><img src="bs-pack-design.png" alt="换电站电池包设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'"></div>
+
+</div>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
 <div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #3b82f6">
@@ -40348,7 +40371,23 @@ if __name__ == "__main__":
 <h3 style="margin:0;color:var(--text1);font-size:15px">📦 模组 & 电芯设计 Module & Cell Engineering</h3>
 <span style="font-size:11px;color:var(--text2)">4模组并联 × 16串 · 方形铝壳 LFP</span>
 </div>
-<img src="pack-module.png" alt="电池设计与模块规格图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+<div class="bp-img-viewer" id="bpViewer_pack_module_png" style="margin-bottom:16px">
+
+<div class="bp-img-toolbar">
+
+<button onclick="bpImgZoom('bpViewer_pack_module_png','zoomOut')">-</button>
+
+<span id="bpViewer_pack_module_png_zl">100%</span>
+
+<button onclick="bpImgZoom('bpViewer_pack_module_png','zoomIn')">+</button>
+
+<button onclick="bpImgZoom('bpViewer_pack_module_png','reset')">重置</button>
+
+</div>
+
+<div class="bp-img-inner" style="overflow:hidden"><img src="pack-module.png" alt="电池设计与模块规格图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'"></div>
+
+</div>
 </div>
 <div class="mg-card" style="margin-bottom:20px">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -40414,7 +40453,23 @@ if __name__ == "__main__":
 <h3 style="margin:0;color:var(--text1);font-size:15px">📐 Pack结构布局</h3>
 <span style="font-size:11px;color:var(--text2)">Pack Structural Layout</span>
 </div>
-<img src="pack-layout.png" alt="电池包结构布局图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+<div class="bp-img-viewer" id="bpViewer_pack_layout_png" style="margin-bottom:16px">
+
+<div class="bp-img-toolbar">
+
+<button onclick="bpImgZoom('bpViewer_pack_layout_png','zoomOut')">-</button>
+
+<span id="bpViewer_pack_layout_png_zl">100%</span>
+
+<button onclick="bpImgZoom('bpViewer_pack_layout_png','zoomIn')">+</button>
+
+<button onclick="bpImgZoom('bpViewer_pack_layout_png','reset')">重置</button>
+
+</div>
+
+<div class="bp-img-inner" style="overflow:hidden"><img src="pack-layout.png" alt="电池包结构布局图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'"></div>
+
+</div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 <div class="mg-card">
@@ -40444,7 +40499,23 @@ if __name__ == "__main__":
 <h3 style="margin:0;color:var(--text1);font-size:15px">⚡ 电气连接设计</h3>
 <span style="font-size:11px;color:var(--text2)">Cell Interconnection · Busbar</span>
 </div>
-<img src="pack-electrical.png" alt="电池包电气连接" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+<div class="bp-img-viewer" id="bpViewer_pack_electrical_png" style="margin-bottom:16px">
+
+<div class="bp-img-toolbar">
+
+<button onclick="bpImgZoom('bpViewer_pack_electrical_png','zoomOut')">-</button>
+
+<span id="bpViewer_pack_electrical_png_zl">100%</span>
+
+<button onclick="bpImgZoom('bpViewer_pack_electrical_png','zoomIn')">+</button>
+
+<button onclick="bpImgZoom('bpViewer_pack_electrical_png','reset')">重置</button>
+
+</div>
+
+<div class="bp-img-inner" style="overflow:hidden"><img src="pack-electrical.png" alt="电池包电气连接" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'"></div>
+
+</div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
 <div class="mg-card">
@@ -40483,7 +40554,23 @@ if __name__ == "__main__":
 <h3 style="margin:0;color:var(--text1);font-size:15px">🧠 BMS采样电路设计</h3>
 <span style="font-size:11px;color:var(--text2)">BMS Architecture · 1主+4从 CAN-FD</span>
 </div>
-<img src="bms-sampling.png" alt="BMS采样电路设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+<div class="bp-img-viewer" id="bpViewer_bms_sampling_png" style="margin-bottom:16px">
+
+<div class="bp-img-toolbar">
+
+<button onclick="bpImgZoom('bpViewer_bms_sampling_png','zoomOut')">-</button>
+
+<span id="bpViewer_bms_sampling_png_zl">100%</span>
+
+<button onclick="bpImgZoom('bpViewer_bms_sampling_png','zoomIn')">+</button>
+
+<button onclick="bpImgZoom('bpViewer_bms_sampling_png','reset')">重置</button>
+
+</div>
+
+<div class="bp-img-inner" style="overflow:hidden"><img src="bms-sampling.png" alt="BMS采样电路设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'"></div>
+
+</div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 <div class="mg-card">
@@ -40515,7 +40602,23 @@ if __name__ == "__main__":
 <h3 style="margin:0;color:var(--text1);font-size:15px">❄️ 液冷散热系统</h3>
 <span style="font-size:11px;color:var(--text2)">Cooling Plate · 50% Ethylene Glycol</span>
 </div>
-<img src="yelengsanre.png" alt="液冷散热系统" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'">
+<div class="bp-img-viewer" id="bpViewer_yelengsanre_png" style="margin-bottom:16px">
+
+<div class="bp-img-toolbar">
+
+<button onclick="bpImgZoom('bpViewer_yelengsanre_png','zoomOut')">-</button>
+
+<span id="bpViewer_yelengsanre_png_zl">100%</span>
+
+<button onclick="bpImgZoom('bpViewer_yelengsanre_png','zoomIn')">+</button>
+
+<button onclick="bpImgZoom('bpViewer_yelengsanre_png','reset')">重置</button>
+
+</div>
+
+<div class="bp-img-inner" style="overflow:hidden"><img src="yelengsanre.png" alt="液冷散热系统" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto" onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWUyZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE0Ij5cdTU2ZmUgcdU3NTEgcdU2NzA5OiAkMSA8L3RleHQ+PC9zdmc+'"></div>
+
+</div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 <div class="mg-card">
@@ -40547,7 +40650,23 @@ if __name__ == "__main__":
 <h3 style="margin:0;color:var(--text1);font-size:15px">🔌 高压配电盒 HV Box</h3>
 <span style="font-size:11px;color:var(--text2)">HV Junction Box · IEC 62660</span>
 </div>
-<img src="hvbox-design.png" alt="HV Box高压配电盒设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto 16px" onerror="this.style.display='none'">
+<div class="bp-img-viewer" id="bpViewer_hvbox_design_png" style="margin-bottom:16px">
+
+<div class="bp-img-toolbar">
+
+<button onclick="bpImgZoom('bpViewer_hvbox_design_png','zoomOut')">-</button>
+
+<span id="bpViewer_hvbox_design_png_zl">100%</span>
+
+<button onclick="bpImgZoom('bpViewer_hvbox_design_png','zoomIn')">+</button>
+
+<button onclick="bpImgZoom('bpViewer_hvbox_design_png','reset')">重置</button>
+
+</div>
+
+<div class="bp-img-inner" style="overflow:hidden"><img src="hvbox-design.png" alt="HV Box高压配电盒设计图" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:0 auto 16px" onerror="this.style.display='none'"></div>
+
+</div>
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
 <div style="padding:12px;background:var(--bg3);border-radius:8px;border-top:3px solid #ef4444">
 <div style="font-size:12px;color:var(--text2)">主保险丝</div>
@@ -83148,6 +83267,61 @@ function bsDigitalAiDiagnose(){}// AI diagnosis moved to tab 7 Digital Twin
 // ═══════════════════════════════════════════════════════════════
 // Agent③ Pack智能设计 — 热仿真/SOC/寿命/库存/布局
 // ═══════════════════════════════════════════════════════════════
+
+function bpImgZoom(viewerId,action){
+  var viewer=document.getElementById(viewerId);
+  if(!viewer) return;
+  if(!viewer._zoom) viewer._zoom=1;
+  if(!viewer._panX) viewer._panX=0;
+  if(!viewer._panY) viewer._panY=0;
+  if(action==='zoomIn'){viewer._zoom=Math.min(3,viewer._zoom+0.2);}
+  else if(action==='zoomOut'){viewer._zoom=Math.max(0.3,viewer._zoom-0.2);}
+  else if(action==='reset'){viewer._zoom=1;viewer._panX=0;viewer._panY=0;}
+  var inner=viewer.querySelector('.bp-img-inner');
+  if(inner){
+    var img=inner.querySelector('img');
+    if(img) img.style.transform='translate('+viewer._panX+'px,'+viewer._panY+'px) scale('+viewer._zoom+')';
+  }
+  var zl=document.getElementById(viewerId+'_zl');
+  if(zl) zl.textContent=Math.round(viewer._zoom*100)+'%';
+}
+
+function bpImgInitZoomPan(){
+  document.querySelectorAll('.bp-img-viewer').forEach(function(viewer){
+    if(viewer._bpZoomBound) return;
+    viewer._bpZoomBound=true;
+    viewer._zoom=1;viewer._panX=0;viewer._panY=0;
+    viewer._isPanning=false;viewer._panStartX=0;viewer._panStartY=0;
+    viewer.addEventListener('wheel',function(e){
+      e.preventDefault();
+      if(e.deltaY<0) bpImgZoom(viewer.id,'zoomIn');
+      else bpImgZoom(viewer.id,'zoomOut');
+    },{passive:false});
+    viewer.addEventListener('mousedown',function(e){
+      if(e.target.tagName==='BUTTON'||e.target.tagName==='SPAN') return;
+      if(e.button!==0) return;
+      viewer._isPanning=true;
+      viewer._panStartX=e.clientX-viewer._panX;
+      viewer._panStartY=e.clientY-viewer._panY;
+      viewer.style.cursor='grabbing';
+    });
+    document.addEventListener('mousemove',function(e){
+      if(!viewer._isPanning) return;
+      viewer._panX=e.clientX-viewer._panStartX;
+      viewer._panY=e.clientY-viewer._panStartY;
+      var img=viewer.querySelector('.bp-img-inner img');
+      if(img) img.style.transform='translate('+viewer._panX+'px,'+viewer._panY+'px) scale('+viewer._zoom+')';
+    });
+    document.addEventListener('mouseup',function(){
+      if(viewer._isPanning){viewer._isPanning=false;viewer.style.cursor='grab';}
+    });
+    viewer.addEventListener('dblclick',function(e){
+      if(e.target.tagName==='BUTTON'||e.target.tagName==='SPAN') return;
+      bpImgZoom(viewer.id,'reset');
+    });
+  });
+}
+
 function bsPackSwitchTab(tab){
   document.querySelectorAll('#page-bs-pack .bs-elec-tab').forEach(t=>t.classList.remove('active'));
   const tabs={overview:0,module:1,packlayout:2,electrical:3,bms:4,cooling:5,hvbox:6,bom:7};
@@ -83159,6 +83333,7 @@ function bsPackSwitchTab(tab){
   const MAP={overview:'bpOverview',module:'bpModule',packlayout:'bpPacklayout',electrical:'bpElectrical',bms:'bpBms',cooling:'bpCooling',hvbox:'bpHvbox',bom:'bpBom'};
   const el=document.getElementById(MAP[tab]);
   if(el) el.style.display='block';
+  if(typeof bpImgInitZoomPan==='function') setTimeout(bpImgInitZoomPan,100);
 }
 
 // ═══════════════════════════════════════════════════════════════
